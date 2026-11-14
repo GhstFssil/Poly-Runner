@@ -150,7 +150,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   var $ = function (id) { return document.getElementById(id); };
   var cv = $('cv'), ctx = cv.getContext('2d');
   var KEY = 'polyrun-path-editor-v2';
-  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: { trap: false }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, sink: true, sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {} };
+  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: { trap: false }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, slide: 'down', sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {} };
   var S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }, { len: 1005.3, ang: 90, r: 640, dy: 0 }, { len: 400, ang: 0, r: 640, dy: 20 }, { len: 502.65, ang: -45, r: 640, dy: 0 }, { len: 300, ang: 0, r: 640, dy: 0 }], objs: [] };
   var GH = null, DEFUSER = {};                                  // GH: the not-yet-placed stamp whose settings the panel shows while a stamp tool is chosen
   function ghostMode() { return tool !== 'select' && tool !== 'erase' && tool !== 'preset' && tool !== 'forest'; }
@@ -590,7 +590,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (selected) { ctx.strokeStyle = acc; ctx.lineWidth = 2; ctx.setLineDash([4, 3]); var bw = h ? Math.max(h[0] * z, 6) : Math.max(8, 8 * z + 4), bh = h ? Math.max(h[1] * z, 6) : bw; if (circR(o)) { ctx.beginPath(); ctx.arc(0, 0, bw + 3, 0, 7); ctx.stroke(); } else ctx.strokeRect(-bw - 3, -bh - 3, bw * 2 + 6, bh * 2 + 6); ctx.setLineDash([]); }
     ctx.restore();
     if (o.t === 'goal') { ctx.fillStyle = o.kind === 'bonus' ? '#8a4fd1' : '#2f9e55'; ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText(o.kind === 'bonus' ? 'BONUS GOAL' : 'GOAL', q[0] + 10, q[1] - 10); }
-    if (o.t === 'door') { ctx.fillStyle = css('--ink'); ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText('DOOR  ' + (o.mode === 'open' ? 'always open' : o.mode === 'closed' ? 'always closed' : o.open + 's open / ' + o.shut + 's shut') + (o.links && o.links.length ? '  (linked)' : '') + ((o.sTx || o.sTz || o.oTx || o.oTz) ? '  tilts' : ''), q[0] + 12, q[1] - 12); }
+    if (o.t === 'door') { ctx.fillStyle = css('--ink'); ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText('DOOR  ' + (o.mode === 'open' ? 'always open' : o.mode === 'closed' ? 'always closed' : o.open + 's open / ' + o.shut + 's shut') + (o.links && o.links.length ? '  (linked)' : '') + (o.links && o.links.length ? ' → ' + (o.modeA === 'closed' ? 'always closed' : o.modeA === 'cycle' ? 'cycle' : 'always open') : '') + ((o.sTx || o.sTz || o.oTx || o.oTz) ? '  tilts' : '') + (doorSlide(o) === 'edge' ? '  slides along its lean' : doorSlide(o) === 'none' ? '  swings' : ''), q[0] + 12, q[1] - 12); }
     if (o.t === 'start') { ctx.fillStyle = css('--ink'); ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText('PLAYER START', q[0] + 14, q[1] - 12); }
     if (o.t === 'checkpoint' && z > 0.15) { ctx.fillStyle = '#c9222a'; ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText('CP ' + cpNumber(o), q[0] + 8, q[1] - 8); }
   }
@@ -659,6 +659,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       '<div class="stats">Drag any of them to move the lot · Ctrl+C / Ctrl+V copy and paste · Ctrl+A selects everything · Esc clears</div>';
     $('insp').hidden = false;
   }
+  function doorSlide(o) { return o.slide === 'edge' || o.slide === 'none' || o.slide === 'down' ? o.slide : o.sink === false ? 'none' : 'down'; }   // how a door opens (older layouts said sink: true / false)
   function endsOf(o) { return o.ends === 'square' ? 'square' : 'round'; }
   function endsF(o) { return '<label class="f">Ends<select data-ok="ends"><option value="round"' + (endsOf(o) === 'round' ? ' selected' : '') + '>Rounded (a half-circle past each end)</option><option value="square"' + (endsOf(o) === 'square' ? ' selected' : '') + '>Squared (flat, 1.5 past each end)</option></select></label>'; }
   function mudW(o) { return o.follow === false ? (o.w > 0 ? o.w : 12) : S.width; }   // mud on the path is as wide as the path; mud of its own has a width
@@ -732,11 +733,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       h += sel2('kind', 'Goal type', [['regular', 'Regular goal'], ['bonus', 'Bonus goal']]) + sel2('style', 'Look', [['banner', 'Banner'], ['ring', 'Ring']]) + num('w', 'Width', 4, 200, 1, o.w);
     }
     if (o.t === 'door') {
-      var dset = function (pre, c) {                                // one set of door behaviour: before or after what it is linked to
-        var nn = function (k, l, mn, mx, st) { return num(pre + k, l, mn, mx, st, c[k]); }, sl = function (k, l, opts) { return '<label class="f">' + l + '<select data-ok="' + pre + k + '">' + opts.map(function (m) { return '<option value="' + m[0] + '"' + (String(c[k]) === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>'; };
-        return sl('mode', 'Behaviour', [['cycle', 'Opens and shuts on a cycle'], ['open', 'Always open'], ['closed', 'Always closed']]) + (c.mode === 'cycle' ? nn('open', 'Open for (seconds)', 0.1, 600, 0.1) + nn('shut', 'Closed for (seconds)', 0.1, 600, 0.1) + nn('phase', 'Start offset (seconds)', 0, 600, 0.1) : '') + nn('speed', 'Time to open or shut (seconds)', 0.05, 60, 0.05)
-          + sl('sink', 'Slides into the floor to open', [['true', 'Yes'], ['false', 'No, it only tilts']]) + nn('sTx', 'Tilt when shut: forward / back °', -180, 180, 1) + nn('sTz', 'Tilt when shut: sideways °', -180, 180, 1) + nn('oTx', 'Tilt when open: forward / back °', -180, 180, 1) + nn('oTz', 'Tilt when open: sideways °', -180, 180, 1);
-      };
+      var dsl = function (k, l, v, opts) { return '<label class="f">' + l + '<select data-ok="' + k + '">' + opts.map(function (m) { return '<option value="' + m[0] + '"' + (String(v) === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>'; };
+      var MODES = [['cycle', 'Opens and shuts on a cycle'], ['open', 'Always open'], ['closed', 'Always closed']];
       var dl = (o.links || []).filter(function (id) { return S.objs.some(function (q) { return q.id === id; }); });
       h += num('w', 'Width', 2, 100, 1, o.w) + num('hgt', 'Height', 1, 60, 0.5, o.hgt);
       if (!ghost) {
@@ -744,9 +742,13 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         var cand = S.objs.filter(function (q) { return (q.t === 'minion' || q.t === 'bigminion') && dl.indexOf(q.id) < 0; });
         if (cand.length) h += '<label class="f">Link to…<select data-ok="addlink"><option value="">Choose…</option>' + cand.map(function (q) { var p2 = pos(q); return '<option value="' + q.id + '">' + NAMES[q.t] + ' #' + q.id + ' (X ' + Math.round(p2.x) + ', Z ' + Math.round(p2.z) + ')</option>'; }).join('') + '</select></label>';
       }
-      if (dl.length && o.af) h += '<h3 style="grid-column:1/-1;margin:8px 0 0">Before interaction</h3>' + dset('', o) + '<h3 style="grid-column:1/-1;margin:8px 0 0">After interaction (once everything linked is beaten)</h3>' + dset('af.', o.af);
-      else h += dset('', o);
-      h += '<div class="stats" style="grid-column:1/-1">Tilts pivot at the door\'s base: forward / back leans its top along the way ahead, sideways leans it to the right. If it shuts on someone in the doorway, they are pushed out the side they came from.</div>';
+      var linked = dl.length > 0, modeA = o.modeA || 'open';   // linked: only the mode changes once everything it is linked to is beaten; how it opens and shuts stays the same
+      h += dsl('mode', linked ? 'Before interaction' : 'Behaviour', o.mode, MODES) + (linked ? dsl('modeA', 'After interaction (once everything linked is beaten)', modeA, MODES) : '');
+      if (o.mode === 'cycle' || (linked && modeA === 'cycle')) h += num('open', 'Open for (seconds)', 0.1, 600, 0.1, o.open) + num('shut', 'Closed for (seconds)', 0.1, 600, 0.1, o.shut) + num('phase', 'Start offset (seconds)', 0, 600, 0.1, o.phase);
+      h += num('speed', 'Time to open or shut (seconds)', 0.05, 60, 0.05, o.speed)
+        + dsl('slide', 'Opens by', doorSlide(o), [['down', 'Sliding straight down into the floor'], ['edge', 'Sliding toward its bottom edge (along its own lean)'], ['none', 'Swinging only (to its open tilt)']])
+        + num('sTx', 'Tilt when shut: forward / back °', -180, 180, 1, o.sTx) + num('sTz', 'Tilt when shut: sideways °', -180, 180, 1, o.sTz) + num('oTx', 'Tilt when open: forward / back °', -180, 180, 1, o.oTx) + num('oTz', 'Tilt when open: sideways °', -180, 180, 1, o.oTz);
+      h += '<div class="stats" style="grid-column:1/-1">Tilts pivot at the door\'s base: forward / back leans its top along the way ahead, sideways leans it to the right. Sliding toward its bottom edge moves it its own height along its lean, so its top edge ends where its bottom edge was. If it shuts on someone in the doorway, they are pushed out the side they came from.</div>';
     }
     if (o.t === 'ramp') h += num('len', 'Length', 5, 300, 1, o.len) + num('w', 'Width', 2, 100, 1, o.w) + num('ang', 'Slope °', 0, 60, 1, o.ang) + num('boost', 'Style Boost (last units)', 0, 100, 1, o.boost);
     if (o.t === 'checkpoint') h += num('w', 'Gate width', 4, 200, 1, o.w);
@@ -768,8 +770,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var k = t.dataset.ok; if (!k) return; if (!ghost) snap();
     if (k === 'ang' && !ghost && o.t === 'cave' && o.after !== undefined) o.angSet = true;     // typing an angle on a linked cave sets its own
     if (ghost) DEFUSER[o.t + '.' + k] = 1;
-    if (k === 'addlink') { var lid = parseInt(t.value, 10); if (lid) { o.links = (o.links || []).concat([lid]); if (!o.af) { o.af = JSON.parse(JSON.stringify({ mode: 'open', open: o.open, shut: o.shut, phase: o.phase, speed: o.speed, sink: o.sink, sTx: o.sTx, sTz: o.sTz, oTx: o.oTx, oTz: o.oTz })); } } afterEdit(false); renderInsp(); return; }
-    if (k.indexOf('af.') === 0) { var ak = k.slice(3), ac = o.af || (o.af = {}); ac[ak] = ak === 'mode' ? t.value : ak === 'sink' ? t.value === 'true' : parseFloat(t.value) || 0; afterEdit(false); renderInsp(); return; }
+    if (k === 'addlink') { var lid = parseInt(t.value, 10); if (lid) { o.links = (o.links || []).concat([lid]); if (!o.modeA) o.modeA = 'open'; } afterEdit(false); renderInsp(); return; }
     if (k === 'X' || k === 'Z') { var p = pos(o), x = k === 'X' ? parseFloat(t.value) || 0 : p.x, z = k === 'Z' ? parseFloat(t.value) || 0 : p.z; place2(o, x, z); }
     else if (k === 'after') {
       if (t.value === '') { if (o.after !== undefined) { var b0 = base(o, 0); o.x = b0.x; o.z = b0.z; o.th = b0.th * 180 / Math.PI; delete o.after; o.turn = 0; o.follow = false; } }
@@ -783,7 +784,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     }
     else if (k === 'exs') { o.ex = t.value === 'exact'; if (o.ex && !(o.tH > 0)) { o.tH = 15.5; o.tW = 1.6; o.cH = 14.9; o.cW = 7.4; } }
     else if (k === 'mode' && o.t === 'door') { o.mode = t.value; }
-    else if (k === 'sink' && o.t === 'door') { o.sink = t.value === 'true'; }
+    else if (k === 'slide' && o.t === 'door') { o.slide = t.value; delete o.sink; }
+    else if (k === 'modeA' && o.t === 'door') { o.modeA = t.value; }
     else if (k === 'hm') { o.hm = t.value === 'ind' ? 'ind' : 'add'; }
     else if (k === 'angSet') { o.angSet = t.value === '1'; }
     else if (k === 'noat') {
@@ -808,7 +810,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   $('insp').addEventListener('change', function (e) { var t = e.target; if (t.dataset.gk !== 'layer' || t.value === '') return; var sl = selList(); if (sl.length < 2) return; snap(); sl.forEach(function (q) { q.layer = +t.value; }); afterEdit(false); renderInsp(); });
   $('insp').addEventListener('input', function (e) { if (e.target.tagName === 'TEXTAREA') { var o = S.objs[sel]; if (o) { o.text = e.target.value; DEF[o.t].text = o.text; afterEdit(false); } } });
   $('insp').addEventListener('click', function (e) { var b = e.target.closest('button[data-oact]'); if (!b || sel < 0) return; var o = S.objs[sel], a = b.dataset.oact; snap();
-    if (a === 'unlink') { var ul = parseInt(b.dataset.lid, 10); o.links = (o.links || []).filter(function (id) { return id !== ul; }); if (!o.links.length) delete o.af; afterEdit(false); renderInsp(); return; }
+    if (a === 'unlink') { var ul = parseInt(b.dataset.lid, 10); o.links = (o.links || []).filter(function (id) { return id !== ul; }); if (!o.links.length) delete o.modeA; afterEdit(false); renderInsp(); return; }
     if (a === 'split') { var parts2 = splitCrags(o), at2 = S.objs.indexOf(o); S.objs.splice(at2, 1); parts2.forEach(function (c) { S.objs.push(c); }); setSelList(parts2); afterEdit(false); renderInsp(); return; }
     if (a === 'reroll') { o.seed = 1 + Math.floor(Math.random() * 2000000000); afterEdit(false); renderInsp(); return; }
     if (a === 'next') { var c = JSON.parse(JSON.stringify(o)); delete c.id; c.after = o.id; c.turn = 0; c.follow = false; if (o.t === 'cave') { c.rot = 0; c.angSet = false; c.y = 0; } S.objs.push(c); setSel(S.objs.length - 1); afterEdit(false); renderInsp(); return; }
@@ -829,10 +831,10 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (o.t === 'tree' && o.ex) { r.exact = true; r.trunkHeight = o.tH; r.trunkWidth = o.tW; r.canopyHeight = o.cH; r.canopyWidth = o.cW; }
       if (o.t === 'toxic') { r.width = o.w; r.length = o.d; }
       if (o.t === 'door') {
-        var dx = function (c, r2) { if (c.mode && c.mode !== 'cycle') r2.mode = c.mode; r2.open = c.open; r2.closed = c.shut; r2.phase = c.phase; if (c.speed !== 0.5) r2.speed = c.speed; if (c.sink === false) r2.sink = false; if (c.sTx) r2.shutTiltX = c.sTx; if (c.sTz) r2.shutTiltZ = c.sTz; if (c.oTx) r2.openTiltX = c.oTx; if (c.oTz) r2.openTiltZ = c.oTz; };
+        var dx = function (c, r2) { if (c.mode && c.mode !== 'cycle') r2.mode = c.mode; r2.open = c.open; r2.closed = c.shut; r2.phase = c.phase; if (c.speed !== 0.5) r2.speed = c.speed; var sl0 = doorSlide(c); if (sl0 === 'none') r2.sink = false; else if (sl0 === 'edge') r2.slide = 'edge'; if (c.sTx) r2.shutTiltX = c.sTx; if (c.sTz) r2.shutTiltZ = c.sTz; if (c.oTx) r2.openTiltX = c.oTx; if (c.oTz) r2.openTiltZ = c.oTz; };
         r.width = o.w; r.height = o.hgt; dx(o, r);
         var dls = (o.links || []).filter(function (id) { return S.objs.some(function (q) { return q.id === id; }); });
-        if (dls.length && o.af) { r.links = dls; r.after = {}; dx(o.af, r.after); }
+        if (dls.length) { r.links = dls; r.after = { mode: o.modeA || 'open' }; }
       }
       if (o.t === 'ramp') { r.length = o.len; r.width = o.w; r.slope = o.ang; r.boost = o.boost; }
       if (o.t === 'checkpoint') { r.width = o.w; r.number = cpNumber(o); }
@@ -855,7 +857,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (o.t === 'seg') { r.big = !!o.big; if (o.h) r.height = o.h; }
       if (o.t === 'segchain') { r.big = !!o.big; if (o.h) r.height = o.h; if (o.rise) r.rise = o.rise; if (o.arc) r.arc = o.arc; r.length = o.len; r.spacing = o.gap; r.count = chainPts(o).length; if (o.follow === false) { r.follow = false; r.heading = R(o.th); r.bend = R(o.bend); } }
       if (o.t === 'tip') { r.shape = o.shape; if (o.shape === 'circle') r.radius = o.r; else { r.width = o.w; r.length = o.d; } r.text = o.text; if (o.up) r.above = o.up; if (o.dn) r.below = o.dn; }
-      if (o.after !== undefined) { delete r.x; delete r.z; delete r.s; delete r.u; delete r.heading; r.after = o.after; r.turn = o.turn || 0; }
+      if (o.after !== undefined && o.t !== 'door') { delete r.x; delete r.z; delete r.s; delete r.u; delete r.heading; r.after = o.after; r.turn = o.turn || 0; }
       return r; }) }, null, 1);
     save(); terEnsure(); terNote(); draw(); if (document.activeElement && document.activeElement.closest && !document.activeElement.closest('#insp')) renderInsp();
     if (!(document.activeElement && document.activeElement.closest && document.activeElement.closest('#layers'))) renderLayers();
@@ -1012,10 +1014,10 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         var o = { t: r.type, rot: r.rot || 0, y: r.y || 0 }; if (r.noAttach) o.noat = true; if (r.s !== undefined) { o.s = r.s; o.u = r.u; } else { o.x = r.x; o.z = r.z; }
         if (r.type === 'toxic') { o.w = r.width || r.size || 12; o.d = r.length || r.size || 12; }
         if (r.type === 'door') {
-          var dr = function (q, d) { return { mode: q.mode || 'cycle', open: q.open === undefined ? d.open : q.open, shut: q.closed === undefined ? d.shut : q.closed, phase: q.phase === undefined ? d.phase : q.phase, speed: q.speed === undefined ? d.speed : q.speed, sink: q.sink === undefined ? d.sink : q.sink !== false, sTx: q.shutTiltX === undefined ? d.sTx : q.shutTiltX, sTz: q.shutTiltZ === undefined ? d.sTz : q.shutTiltZ, oTx: q.openTiltX === undefined ? d.oTx : q.openTiltX, oTz: q.openTiltZ === undefined ? d.oTz : q.openTiltZ }; };
-          var d0 = dr(r, { open: 3, shut: 3, phase: 0, speed: 0.5, sink: true, sTx: 0, sTz: 0, oTx: 0, oTz: 0 });
+          var dr = function (q, d) { return { mode: q.mode || 'cycle', open: q.open === undefined ? d.open : q.open, shut: q.closed === undefined ? d.shut : q.closed, phase: q.phase === undefined ? d.phase : q.phase, speed: q.speed === undefined ? d.speed : q.speed, slide: q.slide === 'edge' ? 'edge' : q.sink === false ? 'none' : q.sink === undefined && !q.slide ? d.slide : 'down', sTx: q.shutTiltX === undefined ? d.sTx : q.shutTiltX, sTz: q.shutTiltZ === undefined ? d.sTz : q.shutTiltZ, oTx: q.openTiltX === undefined ? d.oTx : q.openTiltX, oTz: q.openTiltZ === undefined ? d.oTz : q.openTiltZ }; };
+          var d0 = dr(r, { open: 3, shut: 3, phase: 0, speed: 0.5, slide: 'down', sTx: 0, sTz: 0, oTx: 0, oTz: 0 });
           o.w = r.width || 12; o.hgt = r.height === undefined ? 10 : r.height; for (var dk0 in d0) o[dk0] = d0[dk0];
-          if (r.links && r.links.length) { o.links = r.links.slice(); o.af = dr(r.after || {}, d0); }
+          if (r.links && r.links.length) { o.links = r.links.slice(); o.modeA = r.after && (r.after.mode === 'open' || r.after.mode === 'closed' || r.after.mode === 'cycle') ? r.after.mode : r.after ? 'cycle' : 'open'; }   // older layouts had a whole second set of settings after: only its mode is kept
         }
         if (r.type === 'ramp') { o.len = r.length || 45; o.w = r.width || 9; o.ang = r.slope === undefined ? 30 : r.slope; o.boost = r.boost || 0; }
         if (r.type === 'checkpoint') o.w = r.width || 16;
@@ -1028,7 +1030,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         if (r.type === 'mud') { o.slow = r.slowdown === undefined ? 50 : r.slowdown; o.len = r.length || 150; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.heading || 0; o.bend = r.bend || 0; o.w = r.width || 12; } }
         if (r.type === 'ledge' || r.type === 'platform' || r.type === 'gap') { o.len = r.length || 40; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.heading || 0; o.bend = r.bend || 0; } }
         if (r.id !== undefined) o.id = r.id; if (r.layer !== undefined) o.layer = r.layer; if (r.heightMode === 'independent') o.hm = 'ind';
-        if (r.after !== undefined) { o.after = r.after; o.turn = r.turn || 0; o.follow = false; }
+        if (typeof r.after === 'number' && r.type !== 'door') { o.after = r.after; o.turn = r.turn || 0; o.follow = false; }   // starts from the end of another piece (a door's "after" is its mode once beaten, not this)
         if (r.type === 'tree' && r.exact) { o.ex = true; o.tH = r.trunkHeight || 15.5; o.tW = r.trunkWidth || 1.6; o.cH = r.canopyHeight || 14.9; o.cW = r.canopyWidth || 7.4; }
         if (r.type === 'crag') { o.r = r.radius || 60; o.count = r.count || 25; o.seed = r.seed || (1 + Math.floor(Math.random() * 2000000000)); if (r.heightVar !== undefined) { o.base = r.baseRadius || 5.5; o.baseV = r.baseRadiusVar || 0; o.hgt = r.height || 4; o.hgtV = r.heightVar || 0; o.gap = r.spacing || 0; o.gapV = r.spacingVar || 0; } else { o.base = 5.5; o.baseV = 2; o.hgt = Math.round(0.675 * (r.height || 6) * 10) / 10; o.hgtV = Math.round(0.325 * (r.height || 6) * 10) / 10; o.gap = 0; o.gapV = 0; } }
         if (r.type === 'patch') { o.shape = r.shape || 'ellipse'; o.w = r.width || 200; o.d = r.length || 150; o.ground = r.ground || 'grass'; o.edge = r.edge === 'hard' ? 'hard' : 'soft'; o.soft = r.soften === undefined ? 30 : r.soften; }
@@ -1160,7 +1162,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     });
     made.forEach(function (m) {
       var c = m.c;
-      if (c.links) { c.links = c.links.map(function (id) { return map[id]; }).filter(function (id) { return id !== undefined; }); if (!c.links.length) { delete c.links; delete c.af; } }
+      if (c.links) { c.links = c.links.map(function (id) { return map[id]; }).filter(function (id) { return id !== undefined; }); if (!c.links.length) { delete c.links; delete c.modeA; } }
       if (c.after !== undefined) { c.after = map[c.after]; return; }
       if (STRIPS[c.t]) place2(c, m.it.x + dx, m.it.z + dz); else place(c, m.it.x + dx, m.it.z + dz);
     });
