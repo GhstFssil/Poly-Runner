@@ -221,8 +221,9 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       var inf = []; INFO.push(inf); pth.pieces.forEach(upg); var f0 = pth.pieces[0];
       x = pth.x; z = pth.z; th = pth.th; s = pk * STRIDE; y = pth.y; brk = pk > 0; rl = 0; wd = S.width; wc = wd;
       if (f0) { if (f0.sx !== undefined) x = f0.sx; if (f0.sz !== undefined) z = f0.sz; if (f0.sy !== undefined) y = f0.sy; if (f0.sh !== undefined) th = f0.sh * Math.PI / 180; if (f0.b0 !== undefined) rl = f0.b0; if (f0.w0 > 0) { wd = f0.w0; wc = wd; } }
-      push(); PSTART.push(s);
+      push(); PSTART.push(s); var VJ = [];
       pth.pieces.forEach(function (p, pi) {
+        var px0 = x, pz0 = z, py0 = y;
         if (pi > 0 && (p.sx !== undefined || p.sz !== undefined || p.sy !== undefined || p.sh !== undefined || p.b0 !== undefined || p.w0 > 0)) {   // a start typed in by hand: this segment no longer picks up where the last one ended
           var nx = p.sx !== undefined ? p.sx : x, nz = p.sz !== undefined ? p.sz : z;
           if (Math.hypot(nx - x, nz - z) > 0.5) brk = true;
@@ -230,6 +231,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
           push();
         }
         var rl0 = rl, rl1 = p.roll || 0, w0 = wd, w1 = p.w > 0 ? p.w : wd, wstep = p.wm === 'step', gf = p.gf ? 1 : 0, inf1 = { x0: x, z0: z, th0: th, y0: y, rl0: rl, w0: wd };
+        var vj = { i0: samples.length - 1, len: p.len, g: p.len > 0 ? (p.dy || 0) / p.len : 0, sm: !!p.sm, smL: p.smL > 0 ? p.smL : 20, gf: !!gf, cont: pi > 0 && Math.hypot(x - px0, z - pz0) < 0.5 && Math.abs(y - py0) < 0.01 };
         if (Math.abs(p.ang || 0) < 1e-9) {
           var n = Math.max(1, Math.round(p.len / STEP)), d = p.len / n, y0 = y;
           for (var i = 1; i <= n; i++) { x += Math.sin(th) * d; z -= Math.cos(th) * d; s += d; y = gf ? terrRel(x, z) + (p.dy || 0) : y0 + (p.dy || 0) * i / n; rl = rl0 + (rl1 - rl0) * smoothS(i / n); wc = wstep ? w1 : w0 + (w1 - w0) * smoothS(i / n); push(); }
@@ -240,11 +242,20 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
             x = cx - Math.cos(t2) * R * sg; z = cz - Math.sin(t2) * R * sg; th = t2; s = samples[samples.length - 1].s + L / n2; y = gf ? terrRel(x, z) + (p.dy || 0) : y1 + (p.dy || 0) * k / n2; rl = rl0 + (rl1 - rl0) * smoothS(k / n2); wc = wstep ? w1 : w0 + (w1 - w0) * smoothS(k / n2); push();
           }
         }
-        wd = w1; inf1.x1 = x; inf1.z1 = z; inf1.th1 = th; inf1.y1 = y; inf1.rl1 = rl; inf1.w1 = w1; inf.push(inf1);
+        wd = w1; inf1.x1 = x; inf1.z1 = z; inf1.th1 = th; inf1.y1 = y; inf1.rl1 = rl; inf1.w1 = w1; inf.push(inf1); vj.i1 = samples.length - 1; VJ.push(vj);
       });
+      vcurves(samples, VJ);
       PEND.push(samples[samples.length - 1].s);
     });
     total = samples.length ? samples[samples.length - 1].s : 0;
+  }
+  function vcurves(sm, VJ) {                                    // gradual slope changes: where either segment at a joint asks for it, the grade eases from one to the other over the blend length (half each side), as a parabola that meets both straight grades. The heights at the far ends of the blend are untouched, so nothing else moves. (The game does exactly the same.) Start Y and End Y in the fields stay the straight-line values.
+    for (var q = 1; q < VJ.length; q++) {
+      var A = VJ[q - 1], B = VJ[q]; if (!B.cont || A.gf || B.gf || !(A.sm || B.sm)) continue;
+      var L = Math.min(Math.max(A.sm ? A.smL : 0, B.sm ? B.smL : 0), A.len, B.len), g1 = A.g, g2 = B.g; if (!(L > 0.01) || Math.abs(g2 - g1) < 1e-9) continue;
+      var h = L / 2, sJ = sm[B.i0].s;
+      for (var k = A.i0; k <= B.i1; k++) { var d = sm[k].s - sJ; if (d <= -h || d >= h) continue; sm[k].y += g1 * d + (g2 - g1) * (d + h) * (d + h) / (2 * L) - (d < 0 ? g1 : g2) * d; }
+    }
   }
   function at(s) {
     if (!samples.length) return { x: 0, z: 0, th: 0, y: 0 };
@@ -575,7 +586,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   function segVals(p, pk, i) {                                    // every number the segment's fields show: the ones it keeps, and the ones that follow from them (where it starts, where it ends)
     var q = (INFO[pk] && INFO[pk][i]) || { x0: 0, z0: 0, th0: 0, y0: 0, rl0: 0, w0: S.width, x1: 0, z1: 0, y1: 0, w1: S.width }, R = function (v) { return Math.round(v * 100) / 100; };
     var pit = p.gf ? Math.round(Math.atan2(q.y1 - q.y0, horizOf(p)) * 180 / Math.PI * 10) / 10 : pitchOf(p);
-    return { sx: R(q.x0), sy: R(q.y0), sz: R(q.z0), sh: R(q.th0 * 180 / Math.PI), ex: R(q.x1), ey: R(q.y1), ez: R(q.z1), len: R(p.len), ang: R(p.ang || 0), r: R(segRadius(p)), b0: R(q.rl0), roll: R(p.roll || 0), dy: R(p.dy || 0), pitch: pit, w0: R(q.w0), w: R(q.w1 === undefined ? S.width : q.w1), fl: p.fl || 0 };
+    return { sx: R(q.x0), sy: R(q.y0), sz: R(q.z0), sh: R(q.th0 * 180 / Math.PI), ex: R(q.x1), ey: R(q.y1), ez: R(q.z1), len: R(p.len), ang: R(p.ang || 0), r: R(segRadius(p)), b0: R(q.rl0), roll: R(p.roll || 0), dy: R(p.dy || 0), smL: R(p.smL > 0 ? p.smL : 20), pitch: pit, w0: R(q.w0), w: R(q.w1 === undefined ? S.width : q.w1), fl: p.fl || 0 };
   }
   function fields(p, i, pk) {
     var v = segVals(p, pk, i);
@@ -588,6 +599,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       g('End') + f('ex', 'End X', -99999, 99999, 1) + f('ey', 'End Y', -3000, 3000, 1) + f('ez', 'End Z', -99999, 99999, 1) +
       g('Shape') + f('len', 'Length', 0.5, 20000, 10) + f('ang', 'Curve angle °', -360, 360, 1, '+ curves right, − curves left, 0 = straight') + f('r', 'Curve radius', 1, 20000, 10) +
       g('Height') + f('dy', p.gf ? 'Rise (above the ground)' : 'Rise (Y)', -3000, 3000, 1) + f('pitch', 'Slope angle °', -85, 85, 0.5) +
+      sel('sm', 'Slope change at its ends', [['0', 'Sharp: the slope changes at the joint'], ['1', 'Gradual: eases from the last segment\'s slope and into the next one\'s']], p.sm ? 1 : 0, 'Gradual blends the slope over the blend length, half before each joint and half after, so the path has no kink. It applies at both ends of this segment (a joint is gradual if either segment asks for it). The path rounds the joint off, so right at the joint it sits a little above or below the Start/End Y shown (by an eighth of the slope change times the blend length); away from the joint nothing moves.') + (p.sm ? f('smL', 'Blend length', 1, 2000, 1, 'How far the change is spread, centred on each joint (at most the length of the shorter segment)') : '') +
       g('Bank (+ tips the right side down)') + f('b0', 'Start bank °', -90, 90, 1) + f('roll', 'End bank °', -90, 90, 1) +
       g('Width') + f('w0', 'Start width', 1, 40, 1) + f('w', 'End width', 1, 40, 1) + sel('wm', 'Width change', [['taper', 'Taper along the segment'], ['step', 'Step at the start']], p.wm === 'step' ? 'step' : 'taper') +
       g('Surface') + sel('tx', 'Texture', [['0', 'Stone'], ['1', 'Wood planks'], ['2', 'Metal plates'], ['3', 'Grass']], p.tx || 0) +
@@ -835,6 +847,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var list = pcs(pk), pc = upg(list[pi]), info = (INFO[pk] || [])[pi] || {}, A0 = Math.abs(pc.ang || 0), straight = A0 < 1e-9, m = pk ? S.more[pk - 1] : null, rr;
     if (k === 'ov') { if (raw === '1') pc.ov = 1; else delete pc.ov; }
     else if (k === 'gf') { if (raw === '1') pc.gf = 1; else delete pc.gf; }
+    else if (k === 'sm') { if (raw === '1') { pc.sm = 1; if (!(pc.smL > 0)) pc.smL = 20; } else { delete pc.sm; delete pc.smL; } }
+    else if (k === 'smL') pc.smL = Math.max(1, v);
     else if (k === 'tx') { if (+raw > 0) pc.tx = +raw; else delete pc.tx; }
     else if (k === 'wm') { if (raw === 'step') pc.wm = 'step'; else delete pc.wm; }
     else if (k === 'len') {
@@ -888,7 +902,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var wasHand = hasHand(upg(pc));
     if (!segEdit(pk, pi, t.dataset.k, v, t.value)) { hist.pop(); renderPieces(); return; }
     afterEdit(false);
-    if (t.dataset.k === 'gf' || wasHand !== hasHand(pc)) { renderPieces(); return; }
+    if (t.dataset.k === 'gf' || t.dataset.k === 'sm' || wasHand !== hasHand(pc)) { renderPieces(); return; }
     var vals = segVals(upg(pc), pk, pi);                          // the other fields show what now follows
     box.querySelectorAll('[data-i="' + pi + '"][data-k]').forEach(function (inp) { if (inp !== t && inp.tagName === 'INPUT' && vals[inp.dataset.k] !== undefined && document.activeElement !== inp) inp.value = vals[inp.dataset.k]; });
     var head = t.closest('.piece'); if (head) { var nm = head.querySelector('.head > span:first-child'); if (nm) nm.innerHTML = '<span class="num">' + (pi + 1) + '</span> ' + segName(pc); }
