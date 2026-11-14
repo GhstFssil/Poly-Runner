@@ -12,6 +12,10 @@ hooks=r"""
   window.__mudAt = function (x, z) { return sbMudAt(x, z); };
   window.__put = function (x, y, z) { player.position.set(x, y, z); fallTop = y; vy = 0; grounded = true; speed = 0; };
   window.__gH = function (x, z) { return groundH(x, z); };
+  window.__ens = function () { return ENEMIES.map(function (e, i) { return { i: i, x: e.x, z: e.z, fy: e.fy, H: e.H, R: e.R, sc: e.sc, dead: e.dead, act: e.act, hearts: e.hearts, big: e.big, sbp: !!e.sbp, top: e.c.top, stomp: e.c.stomp, vis: e.g.visible }; }); };
+  window.__vy = function (v) { if (v !== undefined) { vy = v; grounded = false; } return vy; };
+  window.__ball = function () { return ballOn; };
+  window.__spd = function (v) { if (v !== undefined) speed = v; return speed; };
   window.__chunks = function (x, z) { updateChunks(x, z, 99); scene.updateMatrixWorld(true); };
   window.__ray = function (x, z, y0) { var r = new THREE.Raycaster(new THREE.Vector3(x, y0 === undefined ? 2000 : y0, z), new THREE.Vector3(0, -1, 0)); return r.intersectObjects(scene.children, true).filter(function (h) { var o = h.object; while (o) { if (o === player) return false; o = o.parent; } return h.object.visible !== false; }).slice(0, 4).map(function (h) { var o = h.object, kind = o.userData && o.userData.ci !== undefined ? 'chunk' : (o.geometry && o.geometry.type === 'PlaneGeometry' && o.material === waterMesh.material) ? 'water' : (SB && SB.meshes.indexOf(o) >= 0) ? 'sb' + SB.meshes.indexOf(o) : o.type; return [+h.point.y.toFixed(3), kind]; }); };
   window.__l3m = function (x, z) { return level3H(x, z); };

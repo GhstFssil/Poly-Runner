@@ -265,7 +265,7 @@
 <div id="stage">
   <canvas id="view" aria-label="3D view of a girl in a red jumpsuit with a ponytail running through a long grass valley with stone walls"></canvas>
   <div id="start" class="splash">
-    <div class="ver">v175</div>
+    <div class="ver">v176</div>
     <button id="bClog" class="clogBtn" type="button" title="What changed in each version">Changes</button>
     <section class="scr on" id="scr-main" aria-label="Main menu">
       <h1 class="logo"><span>POLY</span><span>RUNNER</span></h1>
@@ -509,6 +509,7 @@ summary{cursor:pointer;padding:10px 0;font-weight:600;font-size:13px;letter-spac
 summary::-webkit-details-marker{display:none}
 summary::after{content:"+";color:var(--muted);font-family:var(--mono)}
 details[open]>summary::after{content:"\2212"}
+.mcols{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin:4px 0 12px}.mcols label{display:flex;gap:8px;align-items:center;font-size:13px}
 .row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;margin:0 0 9px}
 .row label{font-size:13px}
 .row output{text-align:right;color:var(--muted);font-size:12px}
@@ -565,6 +566,15 @@ textarea{width:100%;min-height:84px;background:var(--bg);color:var(--fg);border:
         <div id="moveScen"></div>
         <div id="moveOut"></div>
       </details>
+    </details>
+    <details id="minBox"><summary>Minions</summary>
+      <p class="sub">How Minions and Big Minions look, walk and fight. The preview shows the one picked here, walking at its top speed and chasing; close the editor and every minion in the game follows.</p>
+      <div class="seg" id="minTabs" role="group" aria-label="Which minion"><button type="button" data-mt="min" aria-pressed="true">Minion</button><button type="button" data-mt="big" aria-pressed="false">Big Minion</button></div>
+      <p class="sub" id="minNote"></p>
+      <h3>Look</h3><div id="minLook"></div><div id="minCols" class="mcols"></div>
+      <h3>Walk</h3><div id="minWalk"></div>
+      <h3>Stats</h3><div id="minStats"></div>
+      <div class="actions"><button class="btn" id="resetMin">Reset this minion</button></div>
     </details>
     <section class="editor" id="animSec" aria-label="Animation dials" hidden>
       <h2 id="animTitle"></h2>
@@ -3131,7 +3141,7 @@ Object.keys(MOVES).forEach(function(n){var cur={},k;for(k in KD)cur[k]=KD[k];
 var DEF={},k,q;
 for(k in GLOBAL)DEF[k]=GLOBAL[k];
 Object.keys(MOVEX).forEach(function(n){DEF['m.'+n+'.dur']=MOVEDUR[n];MOVEX[n].forEach(function(e,i){DEF['m.'+n+'.'+i+'.t']=e[0];for(var f in KD)DEF['m.'+n+'.'+i+'.'+f]=e[1][f];});});
-DEF['stat.top']=80;DEF['stat.accelT']=7;DEF['stat.brake']=3;DEF['stat.jumpH']=7.2;DEF['stat.grav']=20;DEF['stat.gripZ']=20;DEF['stat.fadeSlope']=0;DEF['stat.fadeWall']=1;DEF['stat.fall']=50;DEF['stat.hearts']=3;DEF['stat.colH']=3.6;DEF['stat.colW']=1;DEF['stat.wallGrip']=1;DEF['stat.fric']=11.4;DEF['stat.slamAcc']=40;DEF['stat.slamMax']=60;DEF['m.drift.lean']=28.6;DEF['m.drift.angle']=15;DEF['m.drift.time']=.15;DEF['m.drift.minZips']=30;DEF['m.drift.cool']=1;DEF['m.drift.rate']=9;DEF['slope.side']=.85;
+DEF['stat.top']=80;DEF['stat.accelT']=7;DEF['stat.brake']=3;DEF['stat.jumpH']=7.2;DEF['stat.grav']=20;DEF['stat.gripZ']=20;DEF['stat.fadeSlope']=0;DEF['stat.fadeWall']=1;DEF['stat.fall']=50;DEF['stat.hearts']=3;DEF['stat.colH']=3.6;DEF['stat.colW']=1;DEF['stat.wallGrip']=1;DEF['stat.fric']=11.4;var MNE={scale:[1,5],radius:[1,3],headW:[.9,.9],headH:[.9,.9],headD:[.9,.9],torsoW:[.7,.7],torsoH:[1.35,1.35],torsoD:[.45,.45],armW:[.3,.3],armL:[1.35,1.35],legW:[.33,.33],legD:[.4,.4],legL:[1.35,1.35],cHead:['#45484e','#45484e'],cBody:['#2f3237','#2f3237'],cLimb:['#26282c','#26282c'],cEye:['#ff2a1a','#ff2a1a'],stride:[.9,.9],legSwing:[45.8,45.8],armSwing:[13.8,13.8],armRaise:[83.1,83.1],bob:[0,0],top:[10,10],acc:[5,5],see:[100,100],hearts:[1,3],dmg:[1,2],cool:[1.2,1.2],k1:[20,20],k2:[0,0],k3:[0,0],stomp:[8,17]};for(var mnk in MNE){DEF['mn.min.'+mnk]=MNE[mnk][0];DEF['mn.big.'+mnk]=MNE[mnk][1];}   /* the minions' own dials (the game's MN_DEF) */DEF['stat.slamAcc']=40;DEF['stat.slamMax']=60;DEF['m.drift.lean']=28.6;DEF['m.drift.angle']=15;DEF['m.drift.time']=.15;DEF['m.drift.minZips']=30;DEF['m.drift.cool']=1;DEF['m.drift.rate']=9;DEF['slope.side']=.85;
 var BARRIER_DEF={'barrier.radius':1.76,'barrier.height':1.64,'barrier.spin':1,'barrier.sphereAt':40,'barrier.squeezeAt':75,'barrier.squeezeLen':5,'barrier.squeeze':.2,'barrier.stretch':.12,'barrier.chargeSphere':2,'barrier.chargeSqueeze':3.5,'barrier.glow':.2,'barrier.glowSize':1.14,'barrier.dashLen':.32,'barrier.dashGap':.22,
   'barrier.cBody':'#ff2a1f','barrier.cEmis':'#b3140c','barrier.cEdge':'#ffc7b8','barrier.cDash':'#ff9a88','barrier.cGlow':'#ff3a2a','barrier.preview':0};
 for(k in BARRIER_DEF)DEF[k]=BARRIER_DEF[k];
@@ -3189,7 +3199,7 @@ var HOLDS=[[/\.len$/,.5,400],[/\.dia$/,.2,400],[/\.depth$/,.02,20],[/\.peak$/,.0
  [/^scale$/,.05,20],[/^sides$/,5,48,1],[/^rings$/,1,8,1],[/^ringGap$/,0,20],[/^fmt$/,2,2],[/^hairVol$/,.05,10],[/^bangL$/,0,10],[/^j[A-Z]/,0,100],[/^(jit|irr|irrC)$/,0,5],
  [/\.dur$/,.05,600],[/^m\.drift\.time$/,.02,10],[/^m\.drift\.rate$/,.1,200],[/^m\.drift\.(cool|minZips)$/,0,1000],
  [/^barrier\.radius$/,.2,20],[/^barrier\.squeezeLen$/,.5,1e4],[/^barrier\.squeeze$/,-2,.95],[/^barrier\.stretch$/,-.95,10],[/^barrier\.glow$/,0,1],[/^barrier\.glowSize$/,.1,10],[/^barrier\.dash(Len|Gap)$/,.005,20],
- [/^stat\.top$/,1,1e4],[/^stat\.accelT$/,.5,1e4],[/^stat\.(brake|jumpH|wallGrip|fric)$/,0,1e4],[/^stat\.gripZ$/,.5,5e5],[/^stat\.grav$/,1,1e4],[/^stat\.fade(Wall|Slope)$/,0,1,1],[/^stat\.fall$/,1,1e4],[/^stat\.slam(Acc|Max)$/,1,1e4],[/^stat\.hearts$/,1,12,1],[/^stat\.colH$/,1.2,100],[/^stat\.colW$/,.2,100]];
+ [/^stat\.top$/,1,1e4],[/^stat\.accelT$/,.5,1e4],[/^stat\.(brake|jumpH|wallGrip|fric)$/,0,1e4],[/^stat\.gripZ$/,.5,5e5],[/^stat\.grav$/,1,1e4],[/^stat\.fade(Wall|Slope)$/,0,1,1],[/^stat\.fall$/,1,1e4],[/^stat\.slam(Acc|Max)$/,1,1e4],[/^mn\.\w+\.(scale|head[WHD]|torso[WHD]|arm[WL]|leg[WDL])$/,.05,100],[/^mn\.\w+\.hearts$/,1,99,1],[/^mn\.\w+\.dmg$/,0,99,1],[/^mn\.\w+\.(radius|top|acc|see|cool|k[123]|stomp|stride|bob)$/,0,1e4],[/^mn\.\w+\.(legSwing|armSwing|armRaise)$/,-180,180],[/^stat\.hearts$/,1,12,1],[/^stat\.colH$/,1.2,100],[/^stat\.colW$/,.2,100]];
 function hold(key,v){
   if(typeof DEF[key]==='string')return typeof v==='string'&&/^#[0-9a-f]{6}$/i.test(v)?v:DEF[key];   /* a colour */
   if(typeof v!=='number'||!isFinite(v))return DEF[key];
@@ -4142,6 +4152,40 @@ function renderStats(){var h=$('#statRows');if(!h)return;h.innerHTML='';addRows(
 try{renderStats();}catch(e){}
 try{SR.querySelector('#moveBox').addEventListener('toggle',function(){moveScenBuild();moveRefresh();});}catch(e){}
 $('#resetStats').addEventListener('click',function(){STAT_ROWS.forEach(function(c){P[c[0]]=DEF[c[0]];});save();renderStats();status('Stats reset.');});
+/* ================= Minions panel: one kind at a time, with its own preview ================= */
+var minTab='min',minDirty=true,minGroup=null,minModel=null,minPhase=0;
+var MIN_LOOK=[['scale','Overall size (× the blocks below)','x',.2,8,.05],['radius','Collision radius (how close it gets to her)','units',.2,20,.05],['headW','Head width','units',.1,3,.01],['headH','Head height','units',.1,3,.01],['headD','Head depth','units',.1,3,.01],['torsoW','Body width','units',.1,3,.01],['torsoH','Body height','units',.1,4,.01],['torsoD','Body depth','units',.1,3,.01],['armW','Arm thickness','units',.05,2,.01],['armL','Arm length','units',.1,4,.01],['legW','Leg width','units',.05,2,.01],['legD','Leg depth','units',.05,2,.01],['legL','Leg length','units',.1,4,.01]];
+var MIN_WALK=[['stride','Stride rate (swings per unit it moves)','x',.05,4,.01],['legSwing','Leg swing','°',0,90,.5],['armSwing','Arm swing','°',0,90,.5],['armRaise','Arms raised forward while chasing','°',-30,180,.5],['bob','Bob (lift at each step)','units',0,1.5,.01]];
+var MIN_STATS=[['top','Top speed','Zips',1,60,.5],['acc','Acceleration','Zips/s²',.5,60,.5],['see','Sight range (chases her within)','units',5,400,1],['hearts','Hearts','n',1,20,1],['dmg','Damage to Molly per touch (hearts)','n',0,12,1],['cool','Time before it can hurt her again','s',.1,5,.05],['k1','Barrier speed for 1 heart of damage (0 = never)','Zips',0,200,1],['k2','Barrier speed for 2 hearts (0 = never)','Zips',0,200,1],['k3','Barrier speed for 3 hearts (0 = never)','Zips',0,200,1],['stomp','Bounce off its head (a stomp on the top quarter)','Zips',0,60,.5]];
+var MIN_COLS=[['cHead','Head'],['cBody','Body'],['cLimb','Arms and legs'],['cEye','Eyes']];
+function minCfgP(t){var c={};for(var k in MNE){var v=P['mn.'+t+'.'+k];c[k]=v===undefined?DEF['mn.'+t+'.'+k]:v;}return c;}
+function renderMinions(){
+  var pre='mn.'+minTab+'.',map=function(l){return l.map(function(r){return [pre+r[0]].concat(r.slice(1));});},then={anim:1,then:function(){minDirty=true;minNoteSet();}};
+  ['#minLook','#minWalk','#minStats','#minCols'].forEach(function(s){$(s).innerHTML='';});
+  addRows($('#minLook'),map(MIN_LOOK),then);addRows($('#minWalk'),map(MIN_WALK),then);addRows($('#minStats'),map(MIN_STATS),then);
+  MIN_COLS.forEach(function(c){var key=pre+c[0],l=document.createElement('label');l.innerHTML='<input type="color" value="'+P[key]+'"><span>'+c[1]+'</span>';$('#minCols').appendChild(l);var inp=l.querySelector('input');inp.addEventListener('input',function(){P[key]=inp.value;save();minDirty=true;});});
+  SR.querySelectorAll('#minTabs button').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-mt')===minTab));});
+  minDirty=true;minNoteSet();
+}
+function minNoteSet(){var c=minCfgP(minTab),h=(c.legL+c.torsoH+c.headH)*c.scale;$('#minNote').textContent=(minTab==='big'?'Big Minion':'Minion')+': '+(Math.round(h*100)/100)+' units tall in the game (Molly is 3.6). The preview is drawn at her height.';}
+SR.querySelectorAll('#minTabs button').forEach(function(b){b.addEventListener('click',function(){minTab=b.getAttribute('data-mt');renderMinions();});});
+$('#resetMin').addEventListener('click',function(){for(var k in MNE)P['mn.'+minTab+'.'+k]=DEF['mn.'+minTab+'.'+k];save();renderMinions();status((minTab==='big'?'Big Minion':'Minion')+' reset.');});
+try{renderMinions();}catch(e){}
+function minPreview(dt){
+  var on=$('#minBox').open&&!!window.__makeMinion;
+  if(!on){if(minGroup)minGroup.visible=false;return;}
+  if(rigRoot)rigRoot.visible=false;if(barrierGroup)barrierGroup.visible=false;
+  var c=minCfgP(minTab);
+  if(minDirty||!minGroup){
+    if(minGroup){scene.remove(minGroup);minGroup.traverse(function(o){if(o.geometry)o.geometry.dispose();});}
+    minGroup=new THREE.Group();scene.add(minGroup);minModel=window.__makeMinion(c,minGroup);minDirty=false;
+    var H=Math.max(.1,minModel.H),hm=3.6,y0=0;if(rigRoot){var bb=new THREE.Box3().setFromObject(rigRoot);if(isFinite(bb.max.y-bb.min.y)&&bb.max.y>bb.min.y){hm=bb.max.y-bb.min.y;y0=bb.min.y;}}
+    minGroup.scale.setScalar(hm/H);minGroup.position.y=y0;minGroup.rotation.y=Math.PI;   /* drawn at Molly's height, standing where she stands, facing the camera */
+  }
+  minGroup.visible=true;
+  var spd=c.top*2;if(ui.playing)minPhase+=spd*dt*c.stride;
+  window.__poseMinion(minModel,c,minPhase,Math.min(1,spd/12),true);
+}
 $('#resetAnim').addEventListener('click',function(){var pre=animPrefix(ui.mode),key;for(key in DEF){if(key.indexOf(pre)===0)P[key]=DEF[key];}
   if(ui.mode==='drift')P['slope.side']=DEF['slope.side'];   /* the sideways-slope tilt sits with the drift dials */
   barrierDirty=true;save();renderAnim();statCardRefresh();status('Animation reset.');});
@@ -4215,7 +4259,7 @@ function tick(now){
     var dur=Math.max(.05,modeDur(ui.mode));ui.phase=(ui.phase+dt/dur)%1;$('#phase').value=ui.phase;}
   applyPose(poseFor(ui.mode,2*Math.PI*ui.phase));
   if(ui.mode==='drift'&&rigRoot){var hb=bones.Hips;if(hb)hb.quaternion.premultiply(qz(-P['m.drift.lean']*rad));}   /* shows the lean the game adds on top of the pose */
-  barrierPreview(dt);
+  barrierPreview(dt);minPreview(dt);
   controls.update();renderer.render(scene,camera);
 }
 bandReady=true;                                                     /* the part tables exist now: any arm band numbers still in the old meaning are converted, the defaults' and the dials' each against their own other dials */
@@ -6876,13 +6920,19 @@ requestAnimationFrame(tick);
   };
   var MAXHP = 3;
   var mollyScale = 1, SLIDE_H = 1;   // mollyScale: the Overall scale the model in use was saved with (the Rig Editor's dial). She stands 3.6 units x this, and her collision box (standing and sliding) is multiplied by it too
+  // Minions and Big Minions are set in the Rig Editor's Minions panel: their blocks, colours, walk and stats. [Minion, Big Minion]. Speeds in Zips; swing angles in degrees; a damage speed of 0 means never
+  var MN_DEF = { scale: [1, 5], radius: [1, 3], headW: [0.9, 0.9], headH: [0.9, 0.9], headD: [0.9, 0.9], torsoW: [0.7, 0.7], torsoH: [1.35, 1.35], torsoD: [0.45, 0.45], armW: [0.3, 0.3], armL: [1.35, 1.35], legW: [0.33, 0.33], legD: [0.4, 0.4], legL: [1.35, 1.35],
+    cHead: ['#45484e', '#45484e'], cBody: ['#2f3237', '#2f3237'], cLimb: ['#26282c', '#26282c'], cEye: ['#ff2a1a', '#ff2a1a'],
+    stride: [0.9, 0.9], legSwing: [45.8, 45.8], armSwing: [13.8, 13.8], armRaise: [83.1, 83.1], bob: [0, 0],
+    top: [10, 10], acc: [5, 5], see: [100, 100], hearts: [1, 3], dmg: [1, 2], cool: [1.2, 1.2], k1: [20, 20], k2: [0, 0], k3: [0, 0], stomp: [8, 17] };
+  for (var mnk in MN_DEF) { RIGCFG['mn.min.' + mnk] = MN_DEF[mnk][0]; RIGCFG['mn.big.' + mnk] = MN_DEF[mnk][1]; }
   var RIGDEF = JSON.parse(JSON.stringify(RIGCFG));
   function rigRead() {
     var o = null; try { o = JSON.parse(localStorage.getItem('runnerRig2') || 'null'); } catch (e) {}
     if (o && o['stat.gripZ'] === undefined && typeof o['stat.grip'] === 'number') o['stat.gripZ'] = o['stat.grip'] / 2;   // dials saved by an older build kept her grip in units/s^2 (1 Zip = 2 units)
     for (var k in RIGDEF) RIGCFG[k] = o && typeof o[k] === typeof RIGDEF[k] && (typeof o[k] !== 'string' || /^#[0-9a-f]{6}$/i.test(o[k])) ? o[k] : RIGDEF[k];
     RIGCFG['barrier.radius'] = Math.max(0.2, RIGCFG['barrier.radius']); RIGCFG['m.drift.rate'] = Math.max(0.1, RIGCFG['m.drift.rate']);   // a Barrier with no size or a drift that never settles would break her spin and her lean
-    applyStats();
+    applyStats(); if (typeof enRestyle === 'function') enRestyle();
   }
   function applyStats() {                                        // Molly's stat card: the numbers the Rig Editor's Stats tab sets. They replace the built-in values for running, braking, jumping, turning, falling and hearts
     var C = RIGCFG;
@@ -8432,21 +8482,48 @@ requestAnimationFrame(tick);
   // is doing 20 Zips or more, or lands on its head at any speed, it falls apart and its pieces vanish 3 seconds later. ----
   var EN_H = 3.6, EN_R = 1, EN_SEE = 100, EN_MAX = 10 * TILE, EN_ACC = 5 * TILE, EN_KILL_SPEED = 20 * TILE, EN_HIT_COOL = 1.2;
   var ENEMIES = [], enemiesReady = false, enHurtUntil = 0, enPrevX = 0, enPrevZ = 0, enPrevOK = false;
+  function mnCfg(big) {                                          // the settings in use for one kind: the Rig Editor's, held to values that cannot break anything
+    var c = {}, t = big ? 'big' : 'min', k, v;
+    for (k in MN_DEF) { v = RIGCFG['mn.' + t + '.' + k]; c[k] = v === undefined ? MN_DEF[k][big ? 1 : 0] : v; }
+    ['scale', 'headW', 'headH', 'headD', 'torsoW', 'torsoH', 'torsoD', 'armW', 'armL', 'legW', 'legD', 'legL'].forEach(function (q) { c[q] = Math.max(0.05, +c[q] || 0.05); });
+    ['radius', 'top', 'acc', 'see', 'cool', 'k1', 'k2', 'k3', 'stomp', 'stride', 'bob', 'dmg'].forEach(function (q) { c[q] = Math.max(0, +c[q] || 0); });
+    c.hearts = Math.max(1, Math.round(+c.hearts || 1)); c.dmg = Math.round(c.dmg);
+    return c;
+  }
+  window.__makeMinion = function (c, g) {                        // a minion's blocks, built into group g (feet at 0, facing -Z, at size 1: the caller scales it): returns its parts for posing. The Rig Editor's preview uses this too
+    var col = function (h) { return new THREE.Color(/^#[0-9a-f]{6}$/i.test(h) ? h : '#808080'); };
+    var mHead = new THREE.MeshLambertMaterial({ color: col(c.cHead), flatShading: true }), mBody = new THREE.MeshLambertMaterial({ color: col(c.cBody), flatShading: true }),
+        mLimb = new THREE.MeshLambertMaterial({ color: col(c.cLimb), flatShading: true }), mEye = new THREE.MeshBasicMaterial({ color: col(c.cEye) });
+    function limb(w, l, d, mat, x, y) { var p = new THREE.Group(); p.position.set(x, y, 0); var m = new THREE.Mesh(new THREE.BoxGeometry(w, l, d), mat); m.position.y = -l / 2; p.add(m); p.userData.rest = p.position.clone(); p.userData.off = l; return p; }
+    var hy = c.legL + c.torsoH + c.headH / 2, head = new THREE.Mesh(new THREE.BoxGeometry(c.headW, c.headH, c.headD), mHead), torso = new THREE.Mesh(new THREE.BoxGeometry(c.torsoW, c.torsoH, c.torsoD), mBody);
+    head.position.y = hy; torso.position.y = c.legL + c.torsoH / 2; head.userData.rest = head.position.clone(); head.userData.off = c.headH / 2; torso.userData.rest = torso.position.clone(); torso.userData.off = c.torsoH / 2;
+    var ew = c.headW * 0.222, eg = new THREE.BoxGeometry(c.headW * 0.222, c.headH * 0.133, 0.06), e1 = new THREE.Mesh(eg, mEye), e2 = new THREE.Mesh(eg, mEye);
+    e1.position.set(-ew, c.headH * 0.089, -c.headD / 2 - 0.01); e2.position.set(ew, c.headH * 0.089, -c.headD / 2 - 0.01); head.add(e1, e2);
+    var ay = c.legL + c.torsoH - 0.08, ax = c.torsoW / 2 + c.armW / 2, lx = c.legW / 2 + 0.015;
+    var aL = limb(c.armW, c.armL, c.armW, mLimb, -ax, ay), aR = limb(c.armW, c.armL, c.armW, mLimb, ax, ay), lL = limb(c.legW, c.legL, c.legD, mLimb, -lx, c.legL), lR = limb(c.legW, c.legL, c.legD, mLimb, lx, c.legL);
+    var body = new THREE.Group(); body.add(head, torso, aL, aR, lL, lR); g.add(body);
+    return { body: body, parts: [head, torso, aL, aR, lL, lR], aL: aL, aR: aR, lL: lL, lR: lR, mats: [mHead, mBody, mLimb], H: c.legL + c.torsoH + c.headH };
+  };
+  window.__poseMinion = function (m, c, phase, k, chase) {       // the walk: legs swing by the leg swing (k: 0 standing to 1 at full stride), arms by the arm swing, raised forward while chasing; the body bobs twice a stride
+    var sn = Math.sin(phase) * k, D = Math.PI / 180;
+    m.lL.rotation.x = sn * c.legSwing * D; m.lR.rotation.x = -sn * c.legSwing * D;
+    m.aL.rotation.x = -(chase ? c.armRaise * D : 0) + sn * c.armSwing * D; m.aR.rotation.x = -(chase ? c.armRaise * D : 0) - sn * c.armSwing * D;
+    m.body.position.y = Math.abs(Math.sin(phase)) * k * c.bob;
+  };
+  function enBuild(e) {                                          // (re)build one minion from the settings for its kind
+    e.bits.forEach(function (b) { scene.remove(b.m); }); e.bits = [];
+    if (e.model) { e.g.remove(e.model.body); e.model.body.traverse(function (o) { if (o.geometry) o.geometry.dispose(); }); }
+    var c = mnCfg(e.big); e.c = c; e.model = window.__makeMinion(c, e.g);
+    e.parts = e.model.parts; e.aL = e.model.aL; e.aR = e.model.aR; e.lL = e.model.lL; e.lR = e.model.lR; e.mats = e.model.mats; e.flashK = -1; enFlash(e, 0);
+    e.sc = c.scale; e.H = e.model.H * c.scale; e.R = c.radius; e.dmg = c.dmg; e.g.scale.setScalar(e.sc);
+    if (e.hearts > c.hearts) e.hearts = c.hearts;
+  }
+  function enRestyle() { if (!enemiesReady) return; ENEMIES.forEach(function (e) { var dead = e.dead; enBuild(e); if (dead) e.g.visible = false; }); }   // the Rig Editor changed them
   (function () {
-    var mHead = new THREE.MeshLambertMaterial({ color: 0x45484e, flatShading: true }), mBody = new THREE.MeshLambertMaterial({ color: 0x2f3237, flatShading: true }),
-        mLimb = new THREE.MeshLambertMaterial({ color: 0x26282c, flatShading: true }), mEye = new THREE.MeshBasicMaterial({ color: 0xff2a1a });
-    var gHead = new THREE.BoxGeometry(0.9, 0.9, 0.9), gTorso = new THREE.BoxGeometry(0.7, 1.35, 0.45), gArm = new THREE.BoxGeometry(0.3, 1.35, 0.3),
-        gLeg = new THREE.BoxGeometry(0.33, 1.35, 0.4), gEye = new THREE.BoxGeometry(0.2, 0.12, 0.06);
-    function limb(geo, mat, x, y) { var p = new THREE.Group(); p.position.set(x, y, 0); var m = new THREE.Mesh(geo, mat); m.position.y = -0.675; p.add(m); return p; }
     function make(x, z, fy, l2, sc) {
-      sc = sc || 1; var g = new THREE.Group(), head = new THREE.Mesh(gHead, mHead), torso = new THREE.Mesh(gTorso, mBody);
-      head.position.y = 3.15; torso.position.y = 2.025;
-      var e1 = new THREE.Mesh(gEye, mEye), e2 = new THREE.Mesh(gEye, mEye); e1.position.set(-0.2, 0.08, -0.46); e2.position.set(0.2, 0.08, -0.46); head.add(e1, e2);
-      var aL = limb(gArm, mLimb, -0.5, 2.62), aR = limb(gArm, mLimb, 0.5, 2.62), lL = limb(gLeg, mLimb, -0.18, 1.35), lR = limb(gLeg, mLimb, 0.18, 1.35);
-      g.add(head, torso, aL, aR, lL, lR);
-      g.scale.setScalar(sc); scene.add(g);
-      var mats = []; if (sc > 1) g.traverse(function (m) { if (m.isMesh && m.material && m.material.emissive) { m.material = m.material.clone(); mats.push(m.material); } });   // a Big Minion has its own materials, so it can flash red alone
-      return { mats: mats, flashUntil: 0, flashK: 0, sc: sc, H: EN_H * sc, R: sc > 1 ? 3 : EN_R, big: sc > 1, hearts: sc > 1 ? 3 : 1, dmg: sc > 1 ? 2 : 1, stuck: false, fyF: null, invUntil: 0, pulse: 0, g: g, parts: [head, torso, aL, aR, lL, lR], aL: aL, aR: aR, lL: lL, lR: lR, hx: x, hz: z, x: x, z: z, vx: 0, vz: 0, face: 0, phase: 0, dead: false, deadAt: 0, bits: [], fy: fy === undefined ? CH_FLOOR : fy, l2: !!l2 };
+      var g = new THREE.Group(); scene.add(g);
+      var e = { mats: [], flashUntil: 0, flashK: 0, sc: 1, H: EN_H, R: EN_R, big: (sc || 1) > 1, hearts: 1, dmg: 1, stuck: false, fyF: null, invUntil: 0, pulse: 0, g: g, parts: [], hx: x, hz: z, x: x, z: z, vx: 0, vz: 0, face: 0, phase: 0, dead: false, deadAt: 0, bits: [], fy: fy === undefined ? CH_FLOOR : fy, l2: !!l2 };
+      enBuild(e); e.hearts = e.c.hearts; return e;
     }
     var homes = [[-45, -25], [45, -25], [0, -62]];
     for (var i = 0; i < 3; i++) ENEMIES.push(make(CH_X + homes[i][0], CH_Z + homes[i][1]));
@@ -8474,10 +8551,10 @@ requestAnimationFrame(tick);
   var ovSpawnT = 0;
   function reviveEnemy(e, x, z) {
     e.bits.forEach(function (b) { scene.remove(b.m); }); e.bits = [];
-    e.dead = false; e.act = true; e.hx = x; e.hz = z; e.x = x; e.z = z; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.fy = SB && level === 3 ? sbFoot(x, z) : groundH(x, z); e.hearts = e.big ? 3 : 1; e.stuck = false; e.idle = false; e.fyF = null; e.invUntil = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc);
+    e.dead = false; e.act = true; e.hx = x; e.hz = z; e.x = x; e.z = z; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.fy = SB && level === 3 ? sbFoot(x, z) : groundH(x, z); e.hearts = e.c.hearts; e.stuck = false; e.idle = false; e.fyF = null; e.invUntil = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc);
     e.g.position.set(x, e.fy, z); e.g.rotation.y = 0; e.g.visible = true;
-    e.parts.forEach(function (p) { if (p.parent !== e.g) e.g.add(p); });
-    e.parts[0].position.set(0, 3.15, 0); e.parts[1].position.set(0, 2.025, 0); e.parts[2].position.set(-0.5, 2.62, 0); e.parts[3].position.set(0.5, 2.62, 0); e.parts[4].position.set(-0.18, 1.35, 0); e.parts[5].position.set(0.18, 1.35, 0);
+    e.parts.forEach(function (p) { if (p.parent !== e.model.body) e.model.body.add(p); });
+    e.parts.forEach(function (p) { p.position.copy(p.userData.rest); }); e.model.body.position.y = 0;
     e.parts.forEach(function (p) { p.rotation.set(0, 0, 0); p.scale.set(1, 1, 1); p.visible = true; });
   }
   function spawnSinkMinion(now) {                            // one a second while she is at the Sink, somewhere random on its poisoned floor (not on a crag, not on top of her), 20 alive at most
@@ -8500,10 +8577,10 @@ requestAnimationFrame(tick);
     if (!enemiesReady) return;
     ENEMIES.forEach(function (e) {
       e.bits.forEach(function (b) { scene.remove(b.m); });
-      e.bits = []; e.dead = false; e.x = e.hx; e.z = e.hz; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.hearts = e.big ? 3 : 1; e.invUntil = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc); if (e.fyF) e.fy = e.fyF();
+      e.bits = []; e.dead = false; e.x = e.hx; e.z = e.hz; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.hearts = e.c.hearts; e.invUntil = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc); if (e.fyF) e.fy = e.fyF();
       e.g.position.set(e.x, e.fy, e.z); e.g.rotation.y = 0; e.g.visible = e.sbp ? false : e.l2 ? level === 2 : level === 1;
-      e.parts.forEach(function (p) { if (p.parent !== e.g) e.g.add(p); });
-      e.parts[0].position.set(0, 3.15, 0); e.parts[1].position.set(0, 2.025, 0); e.parts[2].position.set(-0.5, 2.62, 0); e.parts[3].position.set(0.5, 2.62, 0); e.parts[4].position.set(-0.18, 1.35, 0); e.parts[5].position.set(0.18, 1.35, 0);
+      e.parts.forEach(function (p) { if (p.parent !== e.model.body) e.model.body.add(p); });
+      e.parts.forEach(function (p) { p.position.copy(p.userData.rest); }); e.model.body.position.y = 0;
       e.parts.forEach(function (p) { p.rotation.set(0, 0, 0); p.scale.set(1, 1, 1); p.visible = true; });
       if (e.ov || e.sbp) { e.act = false; e.hx = e.hz = e.x = e.z = 1e7; e.g.visible = false; e.g.position.set(1e7, 0, 1e7); }
     });
@@ -8523,7 +8600,7 @@ requestAnimationFrame(tick);
   function killEnemy(e, now) {
     e.dead = true; e.deadAt = now;
     setPower(segCount + (e.big ? 20 : 5));                   // every minion beaten refills the Power Line by 5, a Big Minion by 20
-    var off = [0.45 * e.sc, 0.675 * e.sc, 1.35 * e.sc, 1.35 * e.sc, 1.35 * e.sc, 1.35 * e.sc];
+    var off = e.parts.map(function (p) { return (p.userData.off || 1) * e.sc; });
     e.g.updateMatrixWorld(true);
     e.parts.forEach(function (p, i) {
       scene.attach(p);
@@ -8565,7 +8642,7 @@ requestAnimationFrame(tick);
       }
       if (e.l2 ? Math.hypot(pp.x - e.x, pp.z - e.z) > 700 : !near) continue;
       // chase
-      var dx = pp.x - e.x, dz = pp.z - e.z, d = Math.hypot(dx, dz), chase = d < EN_SEE && Math.abs(pp.y - e.fy) < 40;
+      var dx = pp.x - e.x, dz = pp.z - e.z, d = Math.hypot(dx, dz), chase = d < e.c.see && Math.abs(pp.y - e.fy) < 40, EACC = e.c.acc * TILE, EMAX = e.c.top * TILE;
       var spd = Math.hypot(e.vx, e.vz);
       if (e.stuck || e.idle) { if (chase && d > 0.001) e.face = Math.atan2(-dx, -dz); e.vx = e.vz = 0; }   // trapped or idle: it stands its ground and only turns to face her
       else if (chase && d > 0.001) {
@@ -8573,15 +8650,15 @@ requestAnimationFrame(tick);
         if (sp0 > 0.5) {                                     // steering: sideways drift bleeds off, and if it is heading well away from her (more than about 35 degrees) it eases off the speed until it has turned
           var par = e.vx * ux + e.vz * uz, kk = Math.max(0, 1 - 3 * dt);
           e.vx = par * ux + (e.vx - par * ux) * kk; e.vz = par * uz + (e.vz - par * uz) * kk;
-          if (par / sp0 < 0.82) { var sp1 = Math.hypot(e.vx, e.vz), ns1 = Math.max(0, sp1 - 3 * EN_ACC * dt); if (sp1 > 1e-6) { e.vx *= ns1 / sp1; e.vz *= ns1 / sp1; } }
+          if (par / sp0 < 0.82) { var sp1 = Math.hypot(e.vx, e.vz), ns1 = Math.max(0, sp1 - 3 * EACC * dt); if (sp1 > 1e-6) { e.vx *= ns1 / sp1; e.vz *= ns1 / sp1; } }
         }
-        e.vx += dx / d * EN_ACC * dt; e.vz += dz / d * EN_ACC * dt;
+        e.vx += dx / d * EACC * dt; e.vz += dz / d * EACC * dt;
         e.face = Math.atan2(-dx, -dz);
       } else if (spd > 0) {
-        var ns = Math.max(0, spd - EN_ACC * dt); e.vx *= ns / spd; e.vz *= ns / spd;
+        var ns = Math.max(0, spd - EACC * dt); e.vx *= ns / spd; e.vz *= ns / spd;
       }
       spd = Math.hypot(e.vx, e.vz);
-      if (spd > EN_MAX) { e.vx *= EN_MAX / spd; e.vz *= EN_MAX / spd; spd = EN_MAX; }
+      if (spd > EMAX) { e.vx *= EMAX / spd; e.vz *= EMAX / spd; spd = EMAX; }
       var ex0 = e.x, ez0 = e.z;
       e.x += e.vx * dt; e.z += e.vz * dt;
       if (e.l2 && !e.ov && !e.sbp && l2Dist(e.x, e.z) > L2_HW - 1.2) { e.x = ex0; e.z = ez0; e.vx = e.vz = 0; }
@@ -8600,16 +8677,18 @@ requestAnimationFrame(tick);
       var sx = pp.x - ax, sz = pp.z - az, sl = sx * sx + sz * sz, tt = sl > 1e-6 ? Math.max(0, Math.min(1, ((e.x - ax) * sx + (e.z - az) * sz) / sl)) : 1;
       var qx = ax + sx * tt, qz = az + sz * tt, hd = Math.hypot(qx - e.x, qz - e.z), rs = pr + e.R;
       var vOver = pp.y < e.fy + e.H - 0.01 && pp.y + (ballOn ? 2 * BALL_R : PLAYER_H) > e.fy;
-      var onHeadZone = pp.y >= e.fy + e.H - 1.3 && pp.y < e.fy + e.H + 2.5 && Math.hypot(pp.x - e.x, pp.z - e.z) < rs, onHead = ballOn && onHeadZone;
-      if (ballOn && ((hd < rs && vOver && Math.abs(speed) >= EN_KILL_SPEED) || onHead)) {
-        if (!e.big) { killEnemy(e, now); continue; }
-        if (now > e.invUntil) {                              // a Big Minion takes it one heart at a time, and throws her back like any solid thing
-          e.invUntil = now + 700; e.hearts -= 1; e.pulse = now;
+      var hq = e.c.headH * e.sc * 0.25, hR = pr + Math.max(e.c.headW, e.c.headD) * e.sc / 2;   // the top quarter of its head: only landing there counts as a stomp
+      var onHeadZone = pp.y >= e.fy + e.H - hq - 0.05 && pp.y < e.fy + e.H + 2.5 && vy <= 0 && Math.hypot(pp.x - e.x, pp.z - e.z) < hR, onHead = ballOn && onHeadZone;
+      var asp = Math.abs(speed) / TILE, hits = (e.c.k3 > 0 && asp >= e.c.k3) ? 3 : (e.c.k2 > 0 && asp >= e.c.k2) ? 2 : (e.c.k1 > 0 && asp >= e.c.k1) ? 1 : 0;   // the Barrier's speed sets the damage: 1, 2 or 3 hearts at its three speeds (0 = never)
+      if (ballOn && ((hd < rs && vOver && hits > 0) || onHead)) {
+        if (now > e.invUntil) {
+          var dealt = onHead ? 1 : hits; e.invUntil = now + 700; e.hearts -= dealt; e.pulse = now;
+          if (onHead) { vy = Math.max(vy, e.c.stomp * TILE); grounded = false; }   // a stomp: a bounce off its head, even when that kills it
           if (e.hearts <= 0) { killEnemy(e, now); continue; }
           e.flashUntil = now + 1000;
-          bounceOffBig(e, rs);
+          if (!onHead) bounceOffBig(e, rs);                  // hit from the side and still standing: it throws her back like any solid thing
         }
-      } else if (e.big && !ballOn && onHeadZone && vy <= 0 && now > e.invUntil) { e.invUntil = now + 400; bounceOffBig(e, rs); }   // landing on a Big Minion's head without the Barrier: a bounce, no damage
+      } else if (!ballOn && onHeadZone && now > e.invUntil) { e.invUntil = now + 400; vy = Math.max(vy, e.c.stomp * TILE); grounded = false; }   // landing on its head without the Barrier: the same bounce, no damage
 
       else if (e.big && ballOn && ((hd < rs && vOver) || onHeadZone) && now > (e.zapUntil || 0)) {   // the Barrier touches a Big Minion (side or head) without damaging it: the Barrier loses 20 segs and she is thrown back
         e.zapUntil = now + 1000; setPower(segCount - 20); bounceOffBig(e, rs);
@@ -8618,14 +8697,13 @@ requestAnimationFrame(tick);
       if (cd2 < rs && vOver) {
         if (cd2 > 0.0001) { pp.x = e.x + (pp.x - e.x) / cd2 * rs; pp.z = e.z + (pp.z - e.z) / cd2 * rs; } else pp.x = e.x + rs;
         if (!ballOn && now > enHurtUntil && hp > 0) {
-          enHurtUntil = now + EN_HIT_COOL * 1000; hp = Math.max(0, hp - e.dmg); drawHearts(); flashHurt();
+          enHurtUntil = now + e.c.cool * 1000; hp = Math.max(0, hp - e.dmg); drawHearts(); flashHurt();
           
         }
       }
       // pose
-      e.phase += spd * dt * 0.9;
-      var sw = Math.sin(e.phase) * Math.min(1, spd / 12) * 0.8, atk = chase ? 1.45 : 0;
-      e.aL.rotation.x = -atk + sw * 0.3; e.aR.rotation.x = -atk - sw * 0.3; e.lL.rotation.x = sw; e.lR.rotation.x = -sw;
+      e.phase += spd * dt * e.c.stride;
+      window.__poseMinion(e.model, e.c, e.phase, Math.min(1, spd / 12), chase);
       e.g.position.set(e.x, e.fy, e.z); e.g.rotation.y = e.face;
       if (e.big) e.g.scale.setScalar(e.sc * (1 + 0.07 * Math.max(0, 1 - (now - e.pulse) / 300)));
     }
@@ -8869,6 +8947,23 @@ requestAnimationFrame(tick);
 
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v176', d: 'Nov 14, 2026', t: 'Circular decks and minions you can design', g: [
+    ['Path Editor', [
+      'New segment type: + Circular deck. It has a radius instead of a length. She comes in at its rim; the next segment leaves from the rim where its Heading points (the same heading as the way in: straight across). Slope + makes a hill, − a bowl; Bank tips the whole deck. She can fall off its edge. On Oceana it is a stone deck of its own.',
+      'Gradual slopes: each segment can ease its slope into the segments either side (Slope change at its ends: Gradual, with a Blend length), so a path has no kink where its slope changes.',
+      'Mud can go anywhere now: stamped off the path it has its own heading, bend and width.',
+      'Ledges and platforms can have a toxic surface: dark, bubbling, and a heart a second to stand on.'
+    ]],
+    ['Minions', [
+      'A Minions panel in the Rig Editor, for Minions and Big Minions separately: the size of every block, the colours, the walk (stride, leg and arm swing, arms raised while chasing, bob) and the stats (top speed, acceleration, sight, hearts, damage to her, the time before they can hurt her again), with a live preview.',
+      'Damage from the Barrier now depends on its speed: one, two or three hearts at three speeds you set (by default 20 Zips for one heart, the others off).',
+      'A stomp only counts on the top quarter of the head, and it always bounces her up (a speed you set for each kind), even when it finishes the minion. Without the Barrier, landing on a head bounces her the same way and does no damage.'
+    ]],
+    ['Movement', [
+      'The SEGS counter counts every Seg picked up this run (a Big Seg counts 10), up to 999, and no longer drops when the Power Line is spent. The Power Line itself is unchanged.',
+      'New stats: how hard S in the air drives the Barrier down, and its top speed doing it.'
+    ]]
+  ] },
   { v: 'v175', d: 'Nov 14, 2026', t: 'Layouts you can keep as files', g: [
     ['Path Editor', [
       'New Save to file and Open from file buttons under File: the layout (the same text as the box) goes into a file you keep anywhere, and a saved file opens back into the editor (Ctrl+Z undoes an open). Layouts are autosaved only inside the browser or app, so a file is the copy that cannot be lost with it.',

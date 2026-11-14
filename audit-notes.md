@@ -116,3 +116,11 @@ RESUMED Nov 13 11:50 PM after a usage-limit stop; nothing of the follow-ups was 
 - [x] 3 Rig Editor (edge cases, seams, hip and shoulder welds)
 - [x] 4 In-game mechanics / visuals (Oceana decks rewritten and verified)
 - [x] 5 Regression + report
+
+## v176 (Nov 14): features
+- SEGS counter split from the Power Line (segTotal, cap 999; addSegs). Slam stats stat.slamAcc / stat.slamMax.
+- Mud anywhere (follow=false: heading, bend, width; B.maxM search radius; fixed a mud-tint miss at grid cell edges).
+- Toxic ledges / platforms (o.tox; ledTox from sbLedge; onTox damage in sbTick; bubbles).
+- Gradual slopes: per-segment sm / smL; vcurves (editor) = sbVcurves (game); tests fu/vc1.py.
+- Circular decks: piece {disc:1, rad, h, cs, bk, tx, ov, fl}; sbDiscY / discY; samples flagged dsk (skipped by the ribbon ground and the Oceana deck); level3H override; Oceana disc mesh; tests fu/disc1.py, fu/disc2.py.
+- Minions: MN_DEF (game) = MNE (editor), keys mn.min.* / mn.big.*; __makeMinion / __poseMinion shared by game and preview; enBuild / enRestyle on rigRead; stomp = top quarter of the head, falling; bounce stomp Zips per kind; Barrier damage tiers k1/k2/k3 (0 = never). Tests fu/mn1-4.py.
