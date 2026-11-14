@@ -1,0 +1,16 @@
+import sys,json,base64
+sys.path.insert(0,'/home/claude/poly-runner/tests')
+from righ import *
+g=Rig(draw=False)
+before=g.ev("__molly()"); print('built-in now:',before['verts'],'verts',[round(x,3) for x in before['bb']] if before['bb'] else None)
+g.open(); g.pg.wait_for_timeout(1500)
+g.ev("window.__cap=null;window.__capj=null;(function(){var h=document.getElementById('rigHost'),s=h.__save;h.__save=function(b,j,d){window.__cap=b;window.__capj=j;return s(b,j,d)}})()")
+g.click('#exportGlb',6000)
+print('status:',g.status())
+b64=g.ev("(function(){var u=new Uint8Array(window.__cap),t='';for(var i=0;i<u.length;i+=0x8000)t+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(t)})()")
+j=g.ev("window.__capj")
+open('/home/claude/poly-runner/tests/fu/new_glb.b64','w').write(b64); open('/home/claude/poly-runner/tests/fu/new_settings.json','w').write(j)
+after=g.ev("__molly()"); print('after save:',after['verts'],'verts',[round(x,3) for x in after['bb']] if after['bb'] else None)
+print('glb b64 chars',len(b64),'settings chars',len(j))
+d=json.loads(j); print('fmt',d.get('fmt'),'ringGap',d.get('ringGap'),'bandA',d.get('UpperArm.bandA'),'| stat keys',sorted(k for k in d if k.startswith('stat.')))
+g.close()

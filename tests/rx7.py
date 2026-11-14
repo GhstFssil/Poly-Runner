@@ -1,0 +1,13 @@
+from righ import *
+g=Rig(draw=False)
+def scr(): return g.ev("(function(){var o=[];document.querySelectorAll('.scr.on').forEach(function(e){o.push(e.id)});return o.join(',')})()")
+print('title:',scr())
+g.pg.click('#bDevT'); g.pg.wait_for_timeout(300); print('dev:',scr())
+g.pg.click('#dtRig'); g.pg.wait_for_timeout(2500)
+g.ev("document.activeElement&&document.activeElement.blur()")
+g.pg.keyboard.press('Escape'); g.pg.wait_for_timeout(300)
+g.pg.keyboard.press('KeyW'); g.pg.keyboard.press('Space'); g.pg.keyboard.press('Enter'); g.pg.wait_for_timeout(300)
+print('rig open?',g.ev("!document.getElementById('rigHost').hidden"))
+g.click('#rigClose',500)
+print('after Esc/W/Space/Enter with focus outside, then Back:',scr(),'| playing',g.ev("__dbg().playing"))
+print([e for e in g.errs if 'flatShading' not in e and 'ERR_FAILED' not in e][:5]); g.close()

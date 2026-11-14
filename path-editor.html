@@ -1,0 +1,1234 @@
+<title>Poly Run Path Editor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f3efe6; --panel:#fbf8f1; --ink:#2b2118; --mute:#7a6a58; --line:#ddd3c2; --accent:#c4562a; --accent-ink:#fff;
+  --map:#e9e2d2; --grid:#d8cfbb; --grid2:#c9bea6; --road:#c9a77c; --road-edge:#8c6a43; --tree:#4f7a3a; --trunk:#6b4a2b; --minion:#26282c; --eye:#ff3b2a; --tox:#34353a;
+  --font-d:'Rubik',system-ui,sans-serif; --font-m:'DM Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1d1812; --panel:#262019; --ink:#efe6d6; --mute:#a2927c; --line:#3a3226; --accent:#e0703f; --accent-ink:#1d1812;
+  --map:#2a2419; --grid:#352d20; --grid2:#443a29; --road:#9a7c58; --road-edge:#caa77a; --tree:#6fa356; --trunk:#9a7347; --minion:#0e0f11; --eye:#ff5a48; --tox:#58595f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1d1812; --panel:#262019; --ink:#efe6d6; --mute:#a2927c; --line:#3a3226; --accent:#e0703f; --accent-ink:#1d1812;
+  --map:#2a2419; --grid:#352d20; --grid2:#443a29; --road:#9a7c58; --road-edge:#caa77a; --tree:#6fa356; --trunk:#9a7347; --minion:#0e0f11; --eye:#ff5a48; --tox:#58595f; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-d);font-size:14px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px}
+.app{display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px;max-width:1400px;margin:0 auto;align-items:start}
+@media(max-width:820px){.app{grid-template-columns:minmax(0,1fr)}}
+h1{font-size:20px;margin:0 0 2px;letter-spacing:.02em}
+.sub{color:var(--mute);margin:0 0 14px;font-size:13px;line-height:1.4}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+h2{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:4px 0 0}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
+button{font:inherit;font-weight:700;cursor:pointer;background:transparent;color:var(--ink);border:2px solid var(--line);border-radius:9px;padding:6px 10px}
+button:hover{border-color:var(--accent)}
+button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.small{padding:3px 8px;font-size:12px}
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.piece{border:1px solid var(--line);border-radius:9px;padding:6px 8px;display:flex;flex-direction:column;gap:5px;background:var(--bg)}
+.piece .head{display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:700}
+.piece .head .num{font-family:var(--font-m);color:var(--mute);font-weight:400}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:6px}
+label.f{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--mute);min-width:0}
+input[type=number],input[type=text],textarea{font:13px var(--font-m);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:4px 6px;width:100%;min-width:0}
+input[type=range]{width:100%;accent-color:var(--accent)}
+textarea{height:110px;resize:vertical}
+select{font:13px var(--font-m);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:4px 6px;width:100%}
+#insp .head{margin-bottom:2px}
+.pathbox{border:1px solid var(--line,#4a4033);border-radius:10px;padding:8px 10px}
+.pathbox>summary{cursor:pointer;list-style:revert}
+.stats{font-family:var(--font-m);font-size:12px;color:var(--mute);line-height:1.6}
+.canvaswrap{position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--map);min-width:0}
+canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-action:none;cursor:grab}
+.note{font:12px var(--font-m);color:var(--mute)}
+.hint{position:absolute;left:10px;bottom:8px;font:12px var(--font-m);color:var(--mute);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:3px 8px;pointer-events:none}
+.mapcol{display:flex;flex-direction:column;gap:8px;min-width:0;position:sticky;top:16px}
+@media(max-width:820px){.mapcol{position:static}}
+.lrow{display:flex;gap:4px;align-items:center}
+.lrow input[type=text]{flex:1}
+.lrow.off input[type=text]{opacity:.5;text-decoration:line-through}
+.legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--mute);font-size:12px}
+</style>
+
+<div class="app">
+  <div class="panel" id="side">
+    <div>
+      <h1>Path Editor</h1>
+      <p class="sub">Lay out a level's path from straights and arcs, then stamp trees, minions, toxic patches, caution signs, checkpoints, ramps and tip areas around it. Click a stamp to move or edit it. Inside the game (Dev Mode on the title page) it can play your layout in the Sandbox; on this page it just exports the file.</p>
+    </div>
+
+    <h2>Path</h2>
+    <div class="row">
+      <label class="f" style="flex:1">Path width<input type="number" id="width" value="9" min="2" max="40" step="1"></label>
+    </div>
+    <label class="f">Ground<select id="terrain"><option value="">Flat patchy grass</option><option value="level1">Grass Canyon's generated terrain</option><option value="level2">Oceana Crags' generated terrain</option><option value="grass">Bumpy grass (Grass Canyon's rolling ground only)</option><option value="ocean">Open ocean (Oceana Crags' sea only)</option><option value="crags">Crags (the jagged rock of Oceana Crags only)</option><option value="giant">Giant Hill (one enormous hill, for Sunset Hill)</option></select></label>
+    <div id="lvset" style="display:flex;flex-direction:column;gap:6px">
+      <label class="f">Time limit (seconds; 0 = no clock)<input id="tlim" type="number" min="0" max="36000" step="1" value="0"></label>
+      <div class="f" style="gap:4px"><span>Score needed for each rank (E is anything below D)</span>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+          <label class="f">S<input id="rkS" type="number" min="0" step="1000"></label><label class="f">A<input id="rkA" type="number" min="0" step="1000"></label><label class="f">B<input id="rkB" type="number" min="0" step="1000"></label><label class="f">C<input id="rkC" type="number" min="0" step="1000"></label><label class="f">D<input id="rkD" type="number" min="0" step="1000"></label>
+        </div>
+        <span class="note" style="font-size:12px;opacity:.75">Score = 100 for every tenth of a second left on the clock, doubled for each heart left, plus 1 per Seg.</span>
+      </div>
+    </div>
+    <div id="pieces" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="row"><button class="small" id="addPath">+ New separate path</button></div>
+    <div class="stats" id="stats"></div>
+
+    <h2>Stamps</h2>
+    <div class="tools" id="tools">
+      <button data-tool="select" class="on">Select / move</button>
+      <button data-tool="tree">Tree</button>
+      <button data-tool="minion">Minion</button>
+      <button data-tool="bigminion">Big Minion</button>
+      <button data-tool="toxic">Toxic patch</button>
+      <button data-tool="sign">Caution sign</button>
+      <button data-tool="seg">Seg</button>
+      <button data-tool="segchain">Seg chain</button>
+      <button data-tool="ledge">Ledge</button>
+      <button data-tool="platform">Platform</button>
+      <button data-tool="gap">Gap</button>
+      <button data-tool="mud">Mud</button>
+      <button data-tool="forest">Trees (patch)</button>
+      <button data-tool="crag">Crags</button>
+      <button data-tool="patch">Terrain patch</button>
+      <button data-tool="cave">Cave</button>
+      <button data-tool="hill">Hill</button>
+      <button data-tool="lake">Lake</button>
+      <button data-tool="spawner">Spawner</button>
+      <button data-tool="goal">Goal</button>
+      <button data-tool="checkpoint">Checkpoint</button>
+      <button data-tool="ramp">Ramp</button>
+      <button data-tool="door">Door</button>
+      <button data-tool="tip">Tip area</button>
+      <button data-tool="start">Player start</button>
+      <button data-tool="erase">Erase</button>
+    </div>
+    <div id="clusterOpts" class="piece" hidden></div>
+    <div class="row"><button class="small" id="undo">Undo</button><button class="small" id="dup">Duplicate</button><button class="small" id="cpy">Copy</button><button class="small" id="pst">Paste</button><button class="small" id="pv">▶ Preview motion</button></div>
+    <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.35"><input type="checkbox" id="attach" checked style="margin-top:2px"><span>Attach to the path: stamps near it follow it when the path changes</span></label>
+    <div class="stats" id="counts"></div>
+    <h2>Presets</h2>
+    <div class="row"><input type="text" id="prName" placeholder="Name for the selection" maxlength="40" style="flex:1;min-width:0"><button class="small" id="prSave">Save selection</button></div>
+    <div id="presets" style="display:flex;flex-direction:column;gap:6px"></div>
+    <div class="stats" style="font-size:12px;line-height:1.4">Select some stamps, name them and save. Click a preset, then click the map to stamp a copy there (Esc stops). Presets live in this browser, on every level.</div>
+    <h2>Layers</h2>
+    <div id="layers" style="display:flex;flex-direction:column;gap:6px"></div>
+    <div class="row"><button class="small" id="addLayer">+ Layer</button><button class="small" id="showAllL">Show all</button><label style="display:flex;gap:6px;align-items:center;font-size:12px;color:var(--mute)"><input type="checkbox" id="terShow" checked> Show the ground</label></div>
+    <div class="stats" style="font-size:12px;line-height:1.4">Layers only exist in the editor: hiding one never changes the game. ★ = new stamps go on that layer. Alt+click an eye to show only that layer.</div>
+    <div class="stats" id="terNote"></div>
+    <div id="insp" class="piece" hidden></div>
+
+    <h2>File</h2>
+    <textarea id="json" spellcheck="false"></textarea>
+    <div class="row">
+      <button class="small" id="copy">Copy</button>
+      <button class="small" id="load">Load from box</button>
+      <button class="small" id="reset">Start over</button>
+    </div>
+    <div class="stats" id="msg"></div>
+  </div>
+
+  <div class="mapcol">
+    <div class="canvaswrap"><canvas id="cv"></canvas><div class="hint" id="hint">drag to pan · wheel to zoom · shift+drag box-selects · alt+click adds to the selection</div></div>
+    <div class="legend"><span>North (−Z) is up. The path starts at 0, 0 heading north. Stamps point the way the path runs.</span><span id="coord"></span></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var cv = $('cv'), ctx = cv.getContext('2d');
+  var KEY = 'polyrun-path-editor-v2';
+  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: { trap: false }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, sink: true, sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round' }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4 }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round' }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {} };
+  var S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }, { len: 1005.3, ang: 90, r: 640, dy: 0 }, { len: 400, ang: 0, r: 640, dy: 20 }, { len: 502.65, ang: -45, r: 640, dy: 0 }, { len: 300, ang: 0, r: 640, dy: 0 }], objs: [] };
+  var GH = null, DEFUSER = {};                                  // GH: the not-yet-placed stamp whose settings the panel shows while a stamp tool is chosen
+  function ghostMode() { return tool !== 'select' && tool !== 'erase' && tool !== 'preset' && tool !== 'forest'; }
+  var tool = 'select', view = { cx: 300, cz: -300, zoom: 0.5 }, samples = [], total = 0, hist = [], hover = null, sel = -1, dpr = 1;
+  var STRIPS = { segchain: 1, ledge: 1, platform: 1, gap: 1, mud: 1 };
+  var MOBS = ['minion', 'bigminion'];                         // enemies that can be set Idle (add any new mob type here)
+  var NAMES = { tree: 'Tree', minion: 'Minion', bigminion: 'Big minion', cave: 'Cave', toxic: 'Toxic patch', sign: 'Caution sign', seg: 'Seg', segchain: 'Seg chain', ledge: 'Ledge', platform: 'Platform', gap: 'Gap', mud: 'Mud stretch', crag: 'Crag patch', patch: 'Terrain patch', spawner: 'Spawner', hill: 'Hill', lake: 'Lake', goal: 'Goal', checkpoint: 'Checkpoint', ramp: 'Ramp', tip: 'Tip area', start: 'Player start', door: 'Door' };
+
+  var msel = [], clip = null, marq = null, nextLayer = 2;
+  function setSel(i) { sel = i; msel = []; }
+  function selList() { return msel.length ? msel : (sel >= 0 && S.objs[sel] ? [S.objs[sel]] : []); }
+  function isSel(o) { return msel.length ? msel.indexOf(o) >= 0 : S.objs[sel] === o; }
+  function setSelList(list) { if (list.length === 0) setSel(-1); else if (list.length === 1) setSel(S.objs.indexOf(list[0])); else { sel = -1; msel = list.slice(); } }
+  function lyrById(id) { for (var i = 0; i < S.layers.length; i++) if (S.layers[i].id === id) return S.layers[i]; return null; }
+  function lyrOf(o) { return lyrById(o.layer) || S.layers[0]; }
+  function objVis(o) { return MAPMODE || lyrOf(o).vis !== false; }
+  function objPick(o) { var l = lyrOf(o); return l.vis !== false && !l.lock; }
+  function pathLayerOf(k) { return lyrById(k ? S.more[k - 1].layer : S.pathLayer) || S.layers[0]; }
+  function pathVis(k) { return MAPMODE || pathLayerOf(k).vis !== false; }
+  function ensureLayers() {
+    if (!S.layers || !S.layers.length) S.layers = [{ id: 1, name: 'Layer 1', vis: true, lock: false }];
+    var m = 0; S.layers.forEach(function (l) { m = Math.max(m, l.id); }); nextLayer = m + 1;
+    if (S.activeLayer === undefined || !lyrById(S.activeLayer)) S.activeLayer = S.layers[0].id;
+  }
+  function save() {                                               // every change is kept in this browser; if its storage is full (a big saved Molly model shares it) that fails, and it must not fail silently
+    if (typeof HOST !== 'undefined' && HOST.__nosave) return;
+    try { localStorage.setItem(KEY, JSON.stringify(S)); localStorage.setItem('polyrun-last-export', $('json').value); }
+    catch (e) { if (!save.warned || Date.now() - save.warned > 20000) { save.warned = Date.now(); try { flashHint('Not autosaved: this browser\'s storage is full. Copy the layout text to keep it.'); } catch (e2) {} } }
+  }
+  function load() {
+    try { var j = JSON.parse(localStorage.getItem(KEY)); if (j && j.pieces) S = j; } catch (e) {}
+    S.more = S.more || []; ensureLayers();
+    try { if (!S.objs.length) { var o = JSON.parse(localStorage.getItem('polyrun-path-editor-v1')); if (o && o.objs && o.objs.length) { S = o; } } } catch (e) {}
+    S.objs.forEach(function (o) { if (o.t === 'toxic' && o.size !== undefined) { o.w = o.d = o.size; delete o.size; } if (o.rot === undefined) o.rot = 0; });
+  }
+  function snap() { hist.push(JSON.stringify(S)); if (hist.length > 80) hist.shift(); }
+  function undo() { if (hist.length) { S = JSON.parse(hist.pop()); setSel(-1); afterEdit(true); } }
+
+  // ---- the path: points every 4 units, heading 0 = north (-Z), a right turn swings it toward +X (the same as the game) ----
+  var STRIDE = 100000, PSTART = [], PEND = [];                // every path has its own chain; a distance along path n counts from n * 100000
+  function allPaths() { return [{ x: 0, z: 0, th: 0, y: 0, pieces: S.pieces }].concat((S.more || []).map(function (m) { return { x: m.x || 0, z: m.z || 0, th: (m.th || 0) * Math.PI / 180, y: m.y || 0, pieces: m.pieces }; })); }
+  function pcs(k) { return k === 0 ? S.pieces : S.more[k - 1].pieces; }
+  function smoothS(t) { return t * t * (3 - 2 * t); }
+  function upg(p) {                                              // every piece is the same kind of segment: an old straight or left/right arc is turned into one (a straight is a curve of no angle; a left arc has a negative angle)
+    if (p.t === 'straight') { p.ang = 0; if (!(p.r > 0)) p.r = 640; p.len = Math.max(0, p.len || 0); delete p.t; delete p.dir; }
+    else if (p.t === 'arc') { var a = Math.abs(p.ang || 0), r = Math.max(1, p.r || 1); p.len = Math.round(r * a * Math.PI / 180 * 10000) / 10000; p.ang = p.dir === 'R' ? a : -a; p.r = r; delete p.t; delete p.dir; }
+    else { if (p.ang === undefined) p.ang = 0; if (!(p.r > 0)) p.r = 640; if (p.len === undefined) p.len = 200; }
+    return p;
+  }
+  var INFO = [];                                                  // INFO[path][piece]: where that segment starts and ends (position, heading, height, bank, width)
+  function terrRel(x, z) { return typeof HOST !== 'undefined' && HOST.__terrBase ? HOST.__terrBase(S.terrain || '', x, z) : 0; }   // the ground's height here, measured the way the path's heights are (only known inside the game)
+  function build() {
+    samples = []; PSTART = []; PEND = []; INFO = []; var x = 0, z = 0, th = 0, s = 0, y = 0, STEP = 4, brk = false, rl = 0, wd = S.width, wc = S.width;   // wd: the width the last piece ended at; wc: the width at the sample being made
+    function push() { var q = { x: x, z: z, th: th, s: s, y: y, roll: rl, w: wc }; if (brk) { q.brk = true; brk = false; } samples.push(q); }
+    allPaths().forEach(function (pth, pk) {
+      var inf = []; INFO.push(inf); pth.pieces.forEach(upg); var f0 = pth.pieces[0];
+      x = pth.x; z = pth.z; th = pth.th; s = pk * STRIDE; y = pth.y; brk = pk > 0; rl = 0; wd = S.width; wc = wd;
+      if (f0) { if (f0.sx !== undefined) x = f0.sx; if (f0.sz !== undefined) z = f0.sz; if (f0.sy !== undefined) y = f0.sy; if (f0.sh !== undefined) th = f0.sh * Math.PI / 180; if (f0.b0 !== undefined) rl = f0.b0; if (f0.w0 > 0) { wd = f0.w0; wc = wd; } }
+      push(); PSTART.push(s);
+      pth.pieces.forEach(function (p, pi) {
+        if (pi > 0 && (p.sx !== undefined || p.sz !== undefined || p.sy !== undefined || p.sh !== undefined || p.b0 !== undefined || p.w0 > 0)) {   // a start typed in by hand: this segment no longer picks up where the last one ended
+          var nx = p.sx !== undefined ? p.sx : x, nz = p.sz !== undefined ? p.sz : z;
+          if (Math.hypot(nx - x, nz - z) > 0.5) brk = true;
+          x = nx; z = nz; if (p.sy !== undefined) y = p.sy; if (p.sh !== undefined) th = p.sh * Math.PI / 180; if (p.b0 !== undefined) rl = p.b0; if (p.w0 > 0) { wd = p.w0; wc = wd; }
+          push();
+        }
+        var rl0 = rl, rl1 = p.roll || 0, w0 = wd, w1 = p.w > 0 ? p.w : wd, wstep = p.wm === 'step', gf = p.gf ? 1 : 0, inf1 = { x0: x, z0: z, th0: th, y0: y, rl0: rl, w0: wd };
+        if (Math.abs(p.ang || 0) < 1e-9) {
+          var n = Math.max(1, Math.round(p.len / STEP)), d = p.len / n, y0 = y;
+          for (var i = 1; i <= n; i++) { x += Math.sin(th) * d; z -= Math.cos(th) * d; s += d; y = gf ? terrRel(x, z) + (p.dy || 0) : y0 + (p.dy || 0) * i / n; rl = rl0 + (rl1 - rl0) * smoothS(i / n); wc = wstep ? w1 : w0 + (w1 - w0) * smoothS(i / n); push(); }
+        } else {
+          var A = Math.abs(p.ang) * Math.PI / 180, R = Math.max(1e-6, p.len / A), sg = p.ang > 0 ? 1 : -1, L = p.len, n2 = Math.max(1, Math.round(L / STEP)), y1 = y, th0 = th, cx = x + Math.cos(th0) * R * sg, cz = z + Math.sin(th0) * R * sg;
+          for (var k = 1; k <= n2; k++) {
+            var a = A * k / n2, t2 = th0 + sg * a;
+            x = cx - Math.cos(t2) * R * sg; z = cz - Math.sin(t2) * R * sg; th = t2; s = samples[samples.length - 1].s + L / n2; y = gf ? terrRel(x, z) + (p.dy || 0) : y1 + (p.dy || 0) * k / n2; rl = rl0 + (rl1 - rl0) * smoothS(k / n2); wc = wstep ? w1 : w0 + (w1 - w0) * smoothS(k / n2); push();
+          }
+        }
+        wd = w1; inf1.x1 = x; inf1.z1 = z; inf1.th1 = th; inf1.y1 = y; inf1.rl1 = rl; inf1.w1 = w1; inf.push(inf1);
+      });
+      PEND.push(samples[samples.length - 1].s);
+    });
+    total = samples.length ? samples[samples.length - 1].s : 0;
+  }
+  function at(s) {
+    if (!samples.length) return { x: 0, z: 0, th: 0, y: 0 };
+    var pk = Math.max(0, Math.min(PSTART.length - 1, Math.floor((s + 0.5) / STRIDE))); s = Math.max(PSTART[pk], Math.min(PEND[pk], s));
+    var lo = 0, hi = samples.length - 2;
+    while (lo < hi) { var mid = (lo + hi + 1) >> 1; if (samples[mid].s <= s) lo = mid; else hi = mid - 1; }
+    var i = lo, a = samples[i], b = samples[Math.min(samples.length - 1, i + 1)], t = b.s > a.s && !b.brk ? Math.max(0, Math.min(1, (s - a.s) / (b.s - a.s))) : 0;
+    return { x: a.x + (b.x - a.x) * t, z: a.z + (b.z - a.z) * t, th: a.th + (b.th - a.th) * t, y: a.y + (b.y - a.y) * t, roll: (a.roll || 0) + ((b.roll || 0) - (a.roll || 0)) * t, w: (a.w || S.width) + ((b.w || S.width) - (a.w || S.width)) * t };
+  }
+  function nearest(x, z) {
+    var best = 1e18, bi = 0;
+    for (var i = 0; i < samples.length; i++) { var d = (samples[i].x - x) * (samples[i].x - x) + (samples[i].z - z) * (samples[i].z - z); if (d < best) { best = d; bi = i; } }
+    var p = samples[bi], rx = Math.cos(p.th), rz = Math.sin(p.th);
+    return { s: p.s, u: (x - p.x) * rx + (z - p.z) * rz, d: Math.sqrt(best) };
+  }
+  function cragLayout(c) {                                       // a patch of crags: where each stands and how big, from the patch's seed (the same seed always gives the same crags)
+    var s = (c.seed >>> 0) || 1, out = [], i, t, j, R = c.r, n = Math.max(1, Math.min(500, Math.round(c.count)));
+    function rnd() { s = (s + 0x6D2B79F5) >>> 0; var u = s; u = Math.imul(u ^ u >>> 15, u | 1); u ^= u + Math.imul(u ^ u >>> 7, u | 61); return ((u ^ u >>> 14) >>> 0) / 4294967296; }
+    function vary(a, v, lo, hi) { return Math.min(hi, Math.max(lo, a + (rnd() * 2 - 1) * v)); }
+    for (i = 0; i < n; i++) {
+      var rad = vary(c.base, c.baseV, 1, 15), h = vary(c.hgt, c.hgtV, 0.3, 200), want = vary(c.gap, c.gapV, 0, 1000), x = 0, z = 0;
+      for (t = 0; t < 40; t++) {                                 // the gap asked for eases to nothing over the tries, so a crowded patch squeezes its crags closer rather than dropping any
+        var f = 1 - t / 39, a = rnd() * 6.2832, d = Math.sqrt(rnd()) * R, ok = true; x = Math.cos(a) * d; z = Math.sin(a) * d;
+        for (j = 0; j < out.length; j++) { var q = out[j]; if (Math.hypot(q.x - x, q.z - z) < q.rad + rad + want * f) { ok = false; break; } }
+        if (ok) break;
+      }
+      out.push({ x: x, z: z, rad: rad, h: h });
+    }
+    return out;
+  }
+  function forestLayout(c, seed) {                               // a patch of trees: where each stands and how big, from the seed (the same seed always gives the same trees)
+    var s = (seed >>> 0) || 1, out = [], i, t, j, n = Math.max(1, Math.min(500, Math.round(c.count)));
+    function rnd() { s = (s + 0x6D2B79F5) >>> 0; var u = s; u = Math.imul(u ^ u >>> 15, u | 1); u ^= u + Math.imul(u ^ u >>> 7, u | 61); return ((u ^ u >>> 14) >>> 0) / 4294967296; }
+    function vary(a, v, lo) { return Math.max(lo, a + (rnd() * 2 - 1) * v); }
+    for (i = 0; i < n; i++) {
+      var tH = vary(c.tH, c.tHV, 1), tW = vary(c.tW, c.tWV, 0.2), cH = vary(c.cH, c.cHV, 1), cW = vary(c.cW, c.cWV, 1), rad = cW / 2, want = vary(c.gap, c.gapV, 0), x = 0, z = 0;
+      for (t = 0; t < 40; t++) {                                 // the gap asked for eases to nothing over the tries, so a crowded patch squeezes its trees closer rather than dropping any
+        var f = 1 - t / 39, ok = true;
+        if (c.shape === 'rect') { x = (rnd() - 0.5) * c.w; z = (rnd() - 0.5) * c.d; } else { var a = rnd() * 6.2832, d = Math.sqrt(rnd()) * c.r; x = Math.cos(a) * d; z = Math.sin(a) * d; }
+        for (j = 0; j < out.length; j++) { var q = out[j]; if (Math.hypot(q.x - x, q.z - z) < q.rad + rad + want * f) { ok = false; break; } }
+        if (ok) break;
+      }
+      out.push({ x: x, z: z, rad: rad, tH: tH, tW: tW, cH: cH, cW: cW });
+    }
+    return out;
+  }
+  function renderCluster() {                                     // the settings for the next patch of crags or trees, shown while that tool is chosen
+    var el = $('clusterOpts'), d = DEF[tool];
+    if (tool !== 'forest') { el.hidden = true; return; }
+    el.hidden = false;
+    var n = function (k, l, mn, mx, st) { return '<label class="f">' + l + '<input type="number" data-ck="' + k + '" value="' + d[k] + '" min="' + mn + '" max="' + mx + '" step="' + st + '"></label>'; }, h = '<h3>' + (tool === 'forest' ? 'Next patch of trees' : 'Next patch of crags') + '</h3>';
+    if (tool === 'forest') h += '<label class="f">Shape<select data-ck="shape"><option value="circle"' + (d.shape === 'circle' ? ' selected' : '') + '>Circle</option><option value="rect"' + (d.shape === 'rect' ? ' selected' : '') + '>Rectangle</option></select></label>' + (d.shape === 'rect' ? n('w', 'Width (across)', 4, 2000, 1) + n('d', 'Depth (along)', 4, 2000, 1) : n('r', 'Patch radius', 2, 2000, 1)) + n('count', 'Total number of trees', 1, 500, 1) + n('tH', 'Average trunk height', 1, 80, 0.5) + n('tHV', 'Trunk height variation (±)', 0, 40, 0.5) + n('tW', 'Average trunk width', 0.2, 12, 0.1) + n('tWV', 'Trunk width variation (±)', 0, 6, 0.1) + n('cH', 'Average canopy height', 1, 80, 0.5) + n('cHV', 'Canopy height variation (±)', 0, 40, 0.5) + n('cW', 'Average canopy width', 1, 40, 0.5) + n('cWV', 'Canopy width variation (±)', 0, 20, 0.5) + n('gap', 'Average space between canopies', 0, 200, 0.5) + n('gapV', 'Spacing variation (±)', 0, 200, 0.5);
+    else h += n('r', 'Patch radius', 2, 2000, 1) + n('count', 'Total number of crags', 1, 500, 1) + n('base', 'Average base radius', 1, 15, 0.1) + n('baseV', 'Base radius variation (±)', 0, 14, 0.1) + n('hgt', 'Average peak height', 0.3, 200, 0.1) + n('hgtV', 'Peak height variation (±)', 0, 200, 0.1) + n('gap', 'Average space between (edge to edge)', 0, 1000, 0.5) + n('gapV', 'Spacing variation (±)', 0, 1000, 0.5);
+    el.innerHTML = h + '<div class="stats" style="font-size:12px;line-height:1.4">Click the map to stamp the patch. Every ' + (tool === 'forest' ? 'tree' : 'crag') + ' lands as its own stamp, so each can be moved or tuned alone.</div>';
+  }
+  function isOneCrag(o) { return o.t === 'crag' && o.count === 1 && o.r < 1; }
+  function splitCrags(o) {                                       // a crag patch as separate single crags, each standing exactly where the patch put it
+    var q = pos(o), out = [];
+    cragLayout(o).forEach(function (c) { var n = { t: 'crag', rot: 0, x: q.x + c.x, z: q.z + c.z, r: 0.1, count: 1, seed: 1 + Math.floor(Math.random() * 2000000000), base: Math.round(c.rad * 10) / 10, baseV: 0, hgt: Math.round(c.h * 10) / 10, hgtV: 0, gap: 0, gapV: 0, layer: o.layer }; if (o.hm) n.hm = o.hm; out.push(n); });
+    return out;
+  }
+  function cAng(o) { if (o.t === 'cave' && o.after !== undefined && !o.angSet) { var t = byId(o.after); if (t && t !== o && t.t === 'cave') { if (cAng(t) >= 80) return o.ang; return Math.min(79, caveEnd(t).pitch); } } return o.ang; }     // after a shaft there is no end angle to carry on from: it keeps its own
+  function caveEnd(o) {                                    // where a tunnel ends on the map (and the way it is heading and how steeply it is going down), so another can start from there
+    var q = pos(o), L = Math.max(4, o.len), N = 40, ds = L / N, x = q.x, z = q.z, a0 = cAng(o), i, hd = q.th, pr = a0;
+    if (a0 >= 80) return { x: x, z: z, th: hd, pitch: a0 };
+    for (i = 0; i < N; i++) { var sv = i * ds; hd = q.th + (o.bend || 0) * Math.PI / 180 * sv / L; pr = Math.max(-85, Math.min(85, a0 + (o.slope || 0) * sv / L)); x += Math.sin(hd) * ds * Math.cos(pr * Math.PI / 180); z -= Math.cos(hd) * ds * Math.cos(pr * Math.PI / 180); }
+    return { x: x, z: z, th: q.th + (o.bend || 0) * Math.PI / 180, pitch: Math.max(-85, Math.min(85, a0 + (o.slope || 0))) };
+  }
+  function pos(o) {                                        // where a stamp is, and which way it faces (the path's heading, plus its own rotation)
+    var r = (o.rot || 0) * Math.PI / 180;
+    if (STRIPS[o.t]) { var q0 = shapeAt(o, 0); return { x: q0.x, z: q0.z, th: q0.th }; }
+    if (o.t === 'cave' && o.after !== undefined) { var b1 = base(o, 0); return { x: b1.x, z: b1.z, th: b1.th }; }
+    if (o.s !== undefined) { var p = at(o.s), rx = Math.cos(p.th), rz = Math.sin(p.th); return { x: p.x + rx * o.u, z: p.z + rz * o.u, th: p.th + r }; }
+    return { x: o.x, z: o.z, th: r };
+  }
+  function place(o, x, z) {                                // put a stamp at a world spot: attached to the path if that is on and the path is near
+    var near = samples.length ? nearest(x, z) : { d: 1e9 };
+    delete o.s; delete o.u; delete o.x; delete o.z;
+    if ($('attach').checked && !o.noat && near.d < 120) { o.s = near.s; o.u = near.u; } else { o.x = x; o.z = z; }
+  }
+  function mk(t, x, z) { var o = mk0(t, x, z); o.layer = S.activeLayer; return o; }
+  function mk0(t, x, z) {
+    var o = { t: t, rot: 0 }, d = DEF[t]; if (d) for (var k in d) o[k] = d[k];
+    if (t === 'crag') o.seed = 1 + Math.floor(Math.random() * 2000000000);               // every crag patch stamped gets a layout of its own
+    var U = function (k) { return DEFUSER[t + '.' + k]; };
+    if (t === 'door' && !U('w')) o.w = S.width + 2; if (t === 'ramp' && !U('w')) o.w = S.width; if (t === 'checkpoint' && !U('w')) o.w = Math.max(DEF.checkpoint.w, S.width + 7);
+    if (t === 'gap' && !U('w')) o.w = S.width + 6; if (t === 'goal' && !U('w')) o.w = Math.max(16, S.width + 7);
+    if (STRIPS[t]) {
+      var nn = nearest(x, z);
+      if (t === 'segchain' || t === 'mud') { o.s = nn.s; o.u = t === 'mud' ? 0 : nn.u; o.follow = true; return o; }
+      o.follow = false; o.x = x; o.z = z; o.th = nn.d < 200 ? at(nn.s).th * 180 / Math.PI : 0; o.bend = 0; return o;
+    }
+    place(o, x, z); return o;
+  }
+  function place2(o, x, z) { if (STRIPS[o.t]) { if (o.follow === false) { o.x = x; o.z = z; } else { var nn = nearest(x, z); o.s = nn.s; o.u = o.t === 'mud' ? 0 : nn.u; } } else place(o, x, z); }
+  var nextId = 1, clock = null;
+  function ensureIds() { var m = 0; S.objs.forEach(function (o) { if (o.id !== undefined) m = Math.max(m, o.id); }); nextId = m + 1; S.objs.forEach(function (o) { if (o.id === undefined) o.id = nextId++; }); }
+  function byId(id) { for (var i = 0; i < S.objs.length; i++) if (S.objs[i].id === id) return S.objs[i]; return null; }
+  function base(o, depth) {                                // where a strip starts: its own spot, or the end of the piece it is joined to
+    if (o.after !== undefined && depth < 60) { var t = byId(o.after); if (t && t !== o) { var e = t.t === 'cave' ? caveEnd(t) : shapeAt(t, t.len, depth + 1); return { x: e.x, z: e.z, th: e.th + (o.turn || 0) * Math.PI / 180 }; } }
+    return { x: o.x || 0, z: o.z || 0, th: (o.th || 0) * Math.PI / 180 };
+  }
+  function shapeAt(o, d, depth) {                          // a point d units along a strip: on the path, or on its own line / arc
+    depth = depth || 0;
+    if (o.follow !== false && o.after === undefined) { var p = at(o.s + d); return { x: p.x + Math.cos(p.th) * o.u, z: p.z + Math.sin(p.th) * o.u, th: p.th }; }
+    var b0 = base(o, depth), h0 = b0.th, B = (o.bend || 0) * Math.PI / 180, L = Math.max(1, o.len), dd = Math.min(L, d);
+    if (Math.abs(B) < 1e-4) return { x: b0.x + Math.sin(h0) * dd, z: b0.z - Math.cos(h0) * dd, th: h0 };
+    var Rr = L / B, t2 = h0 + B * dd / L; return { x: b0.x + Math.cos(h0) * Rr - Math.cos(t2) * Rr, z: b0.z + Math.sin(h0) * Rr - Math.sin(t2) * Rr, th: t2 };
+  }
+  function removeAt(i) { var o = S.objs[i]; S.objs.forEach(function (q) { if (q.after !== undefined && q.after === o.id) { var b = base(q, 0); q.x = b.x; q.z = b.z; q.th = b.th * 180 / Math.PI; delete q.after; q.turn = 0; q.follow = false; } }); S.objs.splice(i, 1); }
+  function stripPts(o, step) { var n = Math.max(1, Math.ceil(o.len / step)), out = []; for (var i = 0; i <= n; i++) { var q = shapeAt(o, Math.min(o.len, i * o.len / n)); out.push([q.x, q.z, q.th]); } return out; }
+  function circR(o) { return isOneCrag(o) ? Math.max(2, o.base) : o.t === 'tip' ? (o.shape === 'circle' ? o.r : 0) : (o.t === 'crag' || o.t === 'spawner' || o.t === 'hill' || o.t === 'lake') ? o.r : 0; }
+  function chainPts(o) {
+    var n = Math.max(1, Math.floor(o.len / Math.max(1, o.gap)) + 1), out = [];
+    for (var k = o.after !== undefined ? 1 : 0; k < n; k++) { var q = shapeAt(o, Math.min(o.len, k * o.gap)); out.push([q.x, q.z]); }
+    return out;
+  }
+
+  // ---- shapes (in the stamp's own frame: x across, y toward the back; up on the screen is forward) ----
+  function halves(o) {
+    if (o.t === 'toxic' || o.t === 'patch') return [o.w / 2, o.d / 2];
+    if (o.t === 'ramp') return [o.w / 2, o.len / 2];
+    if (o.t === 'door') return [o.w / 2, 2];
+    if (o.t === 'checkpoint') return [o.w / 2, 3];
+    if (o.t === 'tip') return o.shape === 'circle' ? [o.r, o.r] : [o.w / 2, o.d / 2];
+    if (isOneCrag(o)) return [Math.max(2, o.base), Math.max(2, o.base)];
+    if (o.t === 'crag' || o.t === 'spawner' || o.t === 'hill' || o.t === 'lake') return [o.r, o.r];
+    if (o.t === 'goal') return [o.w / 2, 3];
+    if (o.t === 'cave') return [Math.max(3, o.w / 2), 4];
+    return null;
+  }
+  function hit(o, wx, wz) {
+    if (STRIPS[o.t]) { var cp = o.t === 'segchain' ? chainPts(o) : stripPts(o, Math.max(4, 6 / view.zoom)), rr = o.t === 'segchain' ? Math.max(5, 9 / view.zoom) : Math.max((o.t === 'mud' ? S.width : o.w) / 2, 5 / view.zoom) + 3 / view.zoom; for (var q = 0; q < cp.length; q++) if (Math.hypot(cp[q][0] - wx, cp[q][1] - wz) < rr) return true; return false; }
+    var p = pos(o), dx = wx - p.x, dz = wz - p.z, c = Math.cos(-p.th), s = Math.sin(-p.th), lx = dx * c - dz * s, lz = dx * s + dz * c, h = halves(o), pad = 4 / view.zoom;
+    if (!h) return Math.hypot(dx, dz) < Math.max(7, 13 / view.zoom);
+    if (circR(o)) return Math.hypot(dx, dz) < circR(o) + pad;
+    return Math.abs(lx) < Math.max(h[0], 5 / view.zoom) + pad && Math.abs(lz) < Math.max(h[1], 5 / view.zoom) + pad;
+  }
+  var cragMemo = {};
+  function cragCells(o) { var k = [o.seed, o.r, o.count, o.base, o.baseV, o.hgt, o.hgtV, o.gap, o.gapV].join('|'); if (!cragMemo[k]) { if (Object.keys(cragMemo).length > 200) cragMemo = {}; cragMemo[k] = cragLayout(o); } return cragMemo[k]; }
+  function pickAll(wx, wz) { var out = []; for (var i = S.objs.length - 1; i >= 0; i--) if (objPick(S.objs[i]) && hit(S.objs[i], wx, wz)) out.push(i); return out; }
+  function pick(wx, wz) { var a = pickAll(wx, wz); return a.length ? a[0] : -1; }
+  function objInRect(o, x0, z0, x1, z1) {
+    function inR(x, z) { return x >= x0 && x <= x1 && z >= z0 && z <= z1; }
+    if (STRIPS[o.t]) { var pts = o.t === 'segchain' ? chainPts(o) : stripPts(o, 20); for (var q = 0; q < pts.length; q++) if (inR(pts[q][0], pts[q][1])) return true; return false; }
+    var p = pos(o); return inR(p.x, p.z);
+  }
+  function marqueeList(m) {
+    var x0 = Math.min(m.x0, m.x1), x1 = Math.max(m.x0, m.x1), z0 = Math.min(m.z0, m.z1), z1 = Math.max(m.z0, m.z1);
+    return S.objs.filter(function (o) { return objPick(o) && objInRect(o, x0, z0, x1, z1); });
+  }
+
+  // ---- drawing ----
+  function css(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function w2s(x, z) { return [(x - view.cx) * view.zoom + cv.width / 2 / dpr, (z - view.cz) * view.zoom + cv.height / 2 / dpr]; }
+  function s2w(px, py) { return [(px - cv.width / 2 / dpr) / view.zoom + view.cx, (py - cv.height / 2 / dpr) / view.zoom + view.cz]; }
+  function size() { dpr = Math.min(window.devicePixelRatio || 1, 2); cv.width = Math.round(cv.clientWidth * dpr); cv.height = Math.round(cv.clientHeight * dpr); draw(); }
+  var MAPMODE = false;
+  function draw() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
+    var W = cv.width / dpr, H = cv.height / dpr, z = view.zoom;
+    var a = s2w(0, 0), b = s2w(W, H), step = z < 0.2 ? 500 : z < 0.6 ? 100 : 50;
+    if (!MAPMODE) {
+    ctx.lineWidth = 1;
+    for (var gx = Math.floor(a[0] / step) * step; gx <= b[0]; gx += step) { var q = w2s(gx, 0)[0]; ctx.strokeStyle = gx % (step * 5) === 0 ? css('--grid2') : css('--grid'); ctx.beginPath(); ctx.moveTo(q, 0); ctx.lineTo(q, H); ctx.stroke(); }
+    for (var gz = Math.floor(a[1] / step) * step; gz <= b[1]; gz += step) { var r = w2s(0, gz)[1]; ctx.strokeStyle = gz % (step * 5) === 0 ? css('--grid2') : css('--grid'); ctx.beginPath(); ctx.moveTo(0, r); ctx.lineTo(W, r); ctx.stroke(); }
+    ctx.fillStyle = css('--mute'); ctx.font = '11px ' + css('--font-m');
+    for (gx = Math.ceil(a[0] / (step * 5)) * step * 5; gx <= b[0]; gx += step * 5) ctx.fillText(gx, w2s(gx, 0)[0] + 3, H - 5);
+    for (gz = Math.ceil(a[1] / (step * 5)) * step * 5; gz <= b[1]; gz += step * 5) ctx.fillText(gz, 4, w2s(0, gz)[1] - 3);
+    }
+    drawTerrain(W, H);
+    var vsamp = samples.filter(function (p) { return pathVis(Math.floor((p.s + 0.5) / STRIDE)); });
+    // tip areas go under the path
+    S.objs.forEach(function (o) { if (o.t === 'tip' && objVis(o)) drawObj(o, isSel(o)); });
+    if (vsamp.length > 1) {
+      [[5, css('--road-edge'), 1], [0, css('--road'), 0]].forEach(function (c) {          // the road is drawn as a ribbon, so a width that changes along it shows
+        ctx.fillStyle = c[1]; ctx.strokeStyle = c[1]; ctx.lineWidth = Math.max(2, c[0]); ctx.lineJoin = 'round';
+        var run = [];
+        function flush() { if (run.length > 1) { ctx.beginPath(); var i, q; for (i = 0; i < run.length; i++) { q = run[i].l; if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); } for (i = run.length - 1; i >= 0; i--) { q = run[i].r; ctx.lineTo(q[0], q[1]); } ctx.closePath(); ctx.fill(); if (c[2]) ctx.stroke(); } run = []; }
+        vsamp.forEach(function (p, i) { if (p.brk) flush(); var hwp = Math.max(1, (p.w || S.width) * z / 2), cs = Math.cos(p.th), sn = Math.sin(p.th), q = w2s(p.x, p.z); run.push({ l: [q[0] - cs * hwp, q[1] - sn * hwp], r: [q[0] + cs * hwp, q[1] + sn * hwp] }); });
+        flush();
+      });
+      if (!MAPMODE) { var rk0 = 0; vsamp.forEach(function (p, i) { if (Math.abs(p.roll || 0) < 0.5 || i % 5) return; var q = w2s(p.x, p.z), hwp = Math.max(3, (p.w || S.width) * z / 2 + 2), cs = Math.cos(p.th), sn = Math.sin(p.th); ctx.strokeStyle = p.roll > 0 ? '#e0703f' : '#5aa0e0'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(q[0] - cs * hwp, q[1] - sn * hwp); ctx.lineTo(q[0] + cs * hwp, q[1] + sn * hwp); ctx.stroke(); }); }   // banked stretches: cross-ticks, orange for the right side down, blue for the left
+      ctx.setLineDash([6, 6]); ctx.strokeStyle = css('--ink'); ctx.globalAlpha = 0.35; ctx.lineWidth = 1; ctx.beginPath();
+      vsamp.forEach(function (p, i) { var q = w2s(p.x, p.z); if (i && !p.brk) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+      ctx.fillStyle = css('--ink');
+      if (!MAPMODE) allPaths().forEach(function (pth, pk) { if (!pathVis(pk)) return; var acc = pk * STRIDE; pth.pieces.forEach(function (p, i) { acc += upg(p).len; var pt = at(acc), q = w2s(pt.x, pt.z); ctx.beginPath(); ctx.arc(q[0], q[1], 3, 0, 7); ctx.fill(); if (z > 0.3) ctx.fillText((pk ? (pk + 1) + '.' : '') + String(i + 1), q[0] + 6, q[1] - 6); }); });
+    }
+    allPaths().forEach(function (pth, pk) { if (!pathVis(pk)) return; var st = w2s(pth.x, pth.z); ctx.fillStyle = css('--accent'); ctx.beginPath(); ctx.arc(st[0], st[1], 6, 0, 7); ctx.fill(); ctx.fillText(pk ? 'PATH ' + (pk + 1) : 'START', st[0] + 9, st[1] + 4); });
+    S.objs.forEach(function (o) { if (o.t !== 'tip' && objVis(o)) drawObj(o, isSel(o)); });
+    if (marq) { var ma = w2s(Math.min(marq.x0, marq.x1), Math.min(marq.z0, marq.z1)), mb = w2s(Math.max(marq.x0, marq.x1), Math.max(marq.z0, marq.z1)); ctx.fillStyle = css('--accent'); ctx.globalAlpha = 0.12; ctx.fillRect(ma[0], ma[1], mb[0] - ma[0], mb[1] - ma[1]); ctx.globalAlpha = 1; ctx.strokeStyle = css('--accent'); ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]); ctx.strokeRect(ma[0], ma[1], mb[0] - ma[0], mb[1] - ma[1]); ctx.setLineDash([]); }
+    if (hover && tool === 'preset' && presets[armed]) { var pg0 = w2s(hover[0], hover[1]); ctx.strokeStyle = css('--accent'); ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.arc(pg0[0], pg0[1], 14, 0, 6.2832); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = css('--accent'); ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText(presets[armed].name + ' (' + presets[armed].items.length + ')', pg0[0] + 18, pg0[1] + 4); }
+    else if (hover && tool === 'forest') {
+      var fp = w2s(hover[0], hover[1]), fd = DEF.forest; ctx.save(); ctx.translate(fp[0], fp[1]); ctx.globalAlpha = 0.6; ctx.strokeStyle = css('--tree'); ctx.fillStyle = css('--tree'); ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
+      if (fd.shape === 'rect') ctx.strokeRect(-fd.w / 2 * view.zoom, -fd.d / 2 * view.zoom, fd.w * view.zoom, fd.d * view.zoom); else { ctx.beginPath(); ctx.arc(0, 0, fd.r * view.zoom, 0, 7); ctx.stroke(); }
+      ctx.setLineDash([]); ctx.globalAlpha = 0.35; forestLayout(fd, 12345).forEach(function (c) { ctx.beginPath(); ctx.arc(c.x * view.zoom, c.z * view.zoom, Math.max(2, c.rad * view.zoom), 0, 7); ctx.fill(); }); ctx.restore();
+    }
+    else if (hover && tool !== 'select' && tool !== 'erase' && tool !== 'preset') { var g = mk(tool, hover[0], hover[1]); ctx.globalAlpha = 0.5; drawObj(g, false); ctx.globalAlpha = 1; }
+  }
+  function cpKey(q) { if (q.s !== undefined) return q.s; var p = pos(q); return nearest(p.x, p.z).s; }           // how far along the path a checkpoint is (free-placed ones: the nearest bit of path)
+  function cpNumber(o) { var n = 1, ko = cpKey(o), ix = S.objs.indexOf(o); S.objs.forEach(function (q, qi) { if (q !== o && q.t === 'checkpoint') { var kq = cpKey(q); if (kq < ko || (kq === ko && qi < ix)) n++; } }); return n; }
+  function segDot(x, y, big, z) { var r = Math.max(3, (big ? 5 : 2.2) * z * 1.6); ctx.fillStyle = '#f2c230'; ctx.strokeStyle = css('--ink'); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.stroke(); if (big) { ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 7); ctx.stroke(); } }
+  function strokePts(pts) { ctx.beginPath(); pts.forEach(function (c, i) { var q = w2s(c[0], c[1]); if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }); ctx.stroke(); }
+  function drawStrip(o, selected) {
+    var z = view.zoom, pts = stripPts(o, Math.max(3, 5 / z)), pts0 = pts, W = Math.max(2, (o.t === 'mud' ? S.width : o.w) * z), acc = css('--accent');
+    ctx.lineJoin = 'round'; ctx.lineCap = 'butt';
+    if (o.t === 'gap' || o.t === 'ledge' || o.t === 'mud') {   // the true footprint, under the piece: its margin all round, and the end shape
+      var fp = stripFoot(o), fpts = pts, sq = endsOf(o) === 'square';
+      if (sq && pts.length > 1) { var a0 = pts[0], a1 = pts[pts.length - 1]; fpts = [[a0[0] - Math.sin(a0[2]) * fp.m, a0[1] + Math.cos(a0[2]) * fp.m]].concat(pts, [[a1[0] + Math.sin(a1[2]) * fp.m, a1[1] - Math.cos(a1[2]) * fp.m]]); }
+      ctx.save(); ctx.lineCap = sq ? 'butt' : 'round'; ctx.strokeStyle = o.t === 'gap' ? 'rgba(201,34,42,.22)' : o.t === 'ledge' ? 'rgba(122,106,88,.28)' : 'rgba(107,74,43,.28)'; ctx.lineWidth = Math.max(2, fp.half * 2 * z); strokePts(fpts); ctx.restore();
+    }
+    if (selected) { ctx.strokeStyle = acc; ctx.lineWidth = W + 7; ctx.setLineDash([4, 3]); strokePts(pts); ctx.setLineDash([]); }
+    if (o.t === 'platform' && (o.move === 'side' || o.move === 'forward')) {
+      var th0 = pts[0][2], v = o.move === 'side' ? [Math.cos(th0), Math.sin(th0)] : [Math.sin(th0), -Math.cos(th0)], hd = o.dist / 2;
+      if (clock !== null) { var mv = Math.sin(2 * Math.PI * (clock + (o.phase || 0)) / Math.max(0.1, o.period)); pts = pts.map(function (c) { return [c[0] + v[0] * hd * mv, c[1] + v[1] * hd * mv, c[2]]; }); }
+      ctx.strokeStyle = '#7fa6bf'; ctx.globalAlpha = 0.3; ctx.lineWidth = W;
+      var pb = pts0; [-1, 1].forEach(function (sg) { strokePts(pb.map(function (c) { return [c[0] + v[0] * hd * sg, c[1] + v[1] * hd * sg]; })); });
+      ctx.globalAlpha = 0.8; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.strokeStyle = acc; var a = w2s(pts0[0][0] - v[0] * hd, pts0[0][1] - v[1] * hd), b = w2s(pts0[0][0] + v[0] * hd, pts0[0][1] + v[1] * hd); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+    }
+    if (o.t === 'gap') { ctx.strokeStyle = '#c9222a'; ctx.lineWidth = W + 4; strokePts(pts); }
+    ctx.strokeStyle = o.t === 'ledge' ? '#7a6a58' : o.t === 'platform' ? '#7fa6bf' : o.t === 'gap' ? '#241c1c' : '#6b4a2b';
+    if (o.t === 'platform' && o.move === 'vertical' && clock !== null) ctx.globalAlpha = 0.55 + 0.45 * Math.sin(2 * Math.PI * (clock + (o.phase || 0)) / Math.max(0.1, o.period));
+    ctx.lineWidth = W; strokePts(pts); ctx.globalAlpha = 1;
+    if (o.t === 'ledge') { ctx.strokeStyle = '#4a3f33'; ctx.lineWidth = 1.5; strokePts(pts.map(function (c) { return [c[0], c[1]]; })); }
+    var m = pts[Math.floor(pts.length / 2)], q = w2s(m[0], m[1]);
+    ctx.fillStyle = css('--ink'); ctx.font = 'bold 11px ' + css('--font-d');
+    var lab = o.t === 'ledge' ? 'H ' + o.hgt : o.t === 'platform' ? 'PLATFORM +' + o.hgt + (o.move === 'vertical' ? ' ↕' : o.move === 'side' ? ' ↔' : o.move === 'forward' ? ' ⇅' : '') + (o.group ? ' · G' + o.group + ' @' + (o.phase || 0) + 's' : '') : o.t === 'gap' ? 'GAP' : 'MUD ' + o.slow + '%';
+    ctx.fillText(lab, q[0] + 8, q[1] - 8);
+  }
+  function rnd(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+  function drawObj(o, selected) {
+    if (STRIPS[o.t] && o.t !== 'segchain') { drawStrip(o, selected); return; }
+    if (o.t === 'segchain') { var cp = chainPts(o); if (selected) { ctx.strokeStyle = css('--accent'); ctx.lineWidth = 2; ctx.beginPath(); cp.forEach(function (c, i) { var q2 = w2s(c[0], c[1]); if (i) ctx.lineTo(q2[0], q2[1]); else ctx.moveTo(q2[0], q2[1]); }); ctx.stroke(); } cp.forEach(function (c) { var q2 = w2s(c[0], c[1]); segDot(q2[0], q2[1], o.big, view.zoom); }); return; }
+    var p = pos(o), q = w2s(p.x, p.z), z = view.zoom, h = halves(o), ink = css('--ink'), acc = css('--accent');
+    ctx.save(); ctx.translate(q[0], q[1]); ctx.rotate(p.th);
+    var idleTag = function (sz) { ctx.save(); ctx.rotate(-p.th); ctx.fillStyle = css('--eye'); ctx.font = 'bold 9px ' + css('--font-d'); ctx.textAlign = 'center'; ctx.fillText('IDLE', 0, sz / 2 + 11); ctx.restore(); };   // an idle mob: stands still and only turns to face her
+    if (o.t === 'tree') {
+      var r = Math.max(5, 9 * z), cwk = o.ex ? o.cW / 7.4 : 1, chk = o.ex ? o.cH / 14.9 : 1, twk = o.ex ? o.tW / 1.6 : 1, thk = o.ex ? o.tH / 15.5 : 1;
+      ctx.fillStyle = css('--trunk'); ctx.fillRect(-r * 0.15 * twk, 0, r * 0.3 * twk, r * 0.7 * thk);
+      ctx.fillStyle = css('--tree'); ctx.beginPath(); ctx.moveTo(0, -r * 1.3 * chk); ctx.lineTo(r * 0.8 * cwk, r * 0.2); ctx.lineTo(-r * 0.8 * cwk, r * 0.2); ctx.closePath(); ctx.fill();
+    } else if (o.t === 'cave') {
+      var cw = Math.max(5, o.w * z), cL = o.len * Math.cos(Math.min(85, cAng(o)) * Math.PI / 180) * z, steps = 24, ch = 0, cx = 0, cy = 0, ci2, cpts = [[0, 0]];
+      if (cAng(o) >= 80) { cL = 0; }
+      for (ci2 = 1; ci2 <= steps; ci2++) { ch = (o.bend || 0) * Math.PI / 180 * ci2 / steps; cx += Math.sin(ch) * cL / steps; cy -= Math.cos(ch) * cL / steps; cpts.push([cx, cy]); }
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(70,58,45,.35)'; ctx.lineWidth = cw; ctx.beginPath(); cpts.forEach(function (q2, i2) { if (i2) ctx.lineTo(q2[0], q2[1]); else ctx.moveTo(q2[0], q2[1]); }); ctx.stroke();
+      ctx.strokeStyle = '#3a2f24'; ctx.lineWidth = 2; ctx.setLineDash([5, 4]); ctx.beginPath(); cpts.forEach(function (q2, i2) { if (i2) ctx.lineTo(q2[0], q2[1]); else ctx.moveTo(q2[0], q2[1]); }); ctx.stroke(); ctx.setLineDash([]); ctx.lineCap = 'butt';
+      var cr = Math.max(7, o.w * z * 0.55), cn = o.shape === 'tri' ? 3 : o.shape === 'hex' ? 6 : o.shape === 'oct' ? 8 : o.shape === 'circle' ? 24 : 4, cro = (o.roll || 0) * Math.PI / 180 + (o.shape === 'rect' ? Math.PI / 4 : o.shape === 'tri' ? -Math.PI / 2 : o.shape === 'oct' ? Math.PI / 8 : 0);
+      ctx.fillStyle = '#1d1812'; ctx.strokeStyle = '#c9a77c'; ctx.lineWidth = 2; ctx.beginPath(); for (ci2 = 0; ci2 < cn; ci2++) { var ca2 = cro + ci2 * 6.2832 / cn; ctx[ci2 ? 'lineTo' : 'moveTo'](Math.cos(ca2) * cr, Math.sin(ca2) * cr); } ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = ink; ctx.font = 'bold 10px ' + css('--font-d'); ctx.textAlign = 'center'; ctx.fillText(cAng(o) >= 80 ? 'SHAFT ' + o.len : 'CAVE ' + Math.round(cAng(o)) + '°', 0, cr + 12); ctx.textAlign = 'start';
+    } else if (o.t === 'bigminion') {
+      var bm = Math.max(14, 11 * z); ctx.fillStyle = css('--minion'); ctx.fillRect(-bm / 2, -bm / 2, bm, bm); ctx.fillStyle = css('--eye'); ctx.fillRect(-bm * 0.3, -bm * 0.35, bm * 0.25, bm * 0.25); ctx.fillRect(bm * 0.05, -bm * 0.35, bm * 0.25, bm * 0.25);
+      ctx.strokeStyle = o.trap ? '#c9222a' : css('--eye'); ctx.lineWidth = 2; ctx.strokeRect(-bm / 2 - 3, -bm / 2 - 3, bm + 6, bm + 6); if (o.trap) { ctx.beginPath(); ctx.arc(0, 0, bm * 0.9, 0, 6.2832); ctx.stroke(); }
+      if (o.idle) idleTag(bm + 6);
+    } else if (o.t === 'minion') {
+      var m = Math.max(6, 7 * z); ctx.fillStyle = css('--minion'); ctx.fillRect(-m / 2, -m / 2, m, m); ctx.fillStyle = css('--eye'); ctx.fillRect(-m * 0.3, -m * 0.35, m * 0.25, m * 0.25); ctx.fillRect(m * 0.05, -m * 0.35, m * 0.25, m * 0.25);
+      if (o.idle) idleTag(m);
+    } else if (o.t === 'seg') {
+      segDot(0, 0, o.big, z);
+    } else if (o.t === 'crag') {
+      ctx.fillStyle = '#8a8478'; ctx.globalAlpha *= 0.14; ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+      ctx.strokeStyle = '#8a8478'; ctx.lineWidth = 1; ctx.setLineDash([3, 4]); ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = '#6f695e'; cragCells(o).forEach(function (c) { var cs = Math.max(2.5, c.rad * z), cx0 = c.x * z, cy0 = c.z * z; ctx.beginPath(); ctx.moveTo(cx0, cy0 - cs); ctx.lineTo(cx0 + cs * 0.9, cy0 + cs * 0.6); ctx.lineTo(cx0 - cs * 0.9, cy0 + cs * 0.6); ctx.closePath(); ctx.fill(); });
+    } else if (o.t === 'patch') {
+      var PCOL = { grass: '95,150,70', flat: '170,160,110', ocean: '61,143,214', toxic: '90,70,110' }[o.ground] || '120,120,120', phw = o.w / 2 * z, phd = o.d / 2 * z, psf = (o.edge === 'hard' ? 0 : o.soft / 2) * z;
+      function pshape(ex1, ey1) { ctx.beginPath(); if (o.shape === 'rect') ctx.rect(-ex1, -ey1, ex1 * 2, ey1 * 2); else ctx.ellipse(0, 0, Math.max(1, ex1), Math.max(1, ey1), 0, 0, 7); }
+      ctx.fillStyle = 'rgba(' + PCOL + ',.38)'; pshape(phw, phd); ctx.fill();
+      if (psf > 1) { ctx.setLineDash([2, 4]); ctx.strokeStyle = 'rgba(' + PCOL + ',.9)'; ctx.lineWidth = 1; pshape(phw + psf, phd + psf); ctx.stroke(); pshape(Math.max(1, phw - psf), Math.max(1, phd - psf)); ctx.stroke(); ctx.setLineDash([]); }
+      ctx.strokeStyle = 'rgb(' + PCOL + ')'; ctx.lineWidth = 2; pshape(phw, phd); ctx.stroke();
+      ctx.fillStyle = ink; ctx.font = 'bold 10px ' + css('--font-d'); ctx.textAlign = 'center'; ctx.fillText(({ grass: 'BUMPY GRASS', flat: 'FLAT GRASS', ocean: 'OCEAN', toxic: 'TOXIC GROUND' })[o.ground] || 'PATCH', 0, 4); ctx.textAlign = 'start';
+    } else if (o.t === 'hill') {
+      var hr = Math.max(4, o.r * z), hg = ctx.createRadialGradient(0, 0, 0, 0, 0, hr); hg.addColorStop(0, o.rock === 'rock' ? 'rgba(140,130,115,.75)' : 'rgba(95,150,70,.7)'); hg.addColorStop(1, 'rgba(120,110,90,.05)');
+      ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(0, 0, hr, 0, 7); ctx.fill(); ctx.strokeStyle = '#8a8478'; ctx.lineWidth = 1; ctx.setLineDash([3, 4]); ctx.beginPath(); ctx.arc(0, 0, hr, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = ink; ctx.font = 'bold 11px ' + css('--font-d'); ctx.textAlign = 'center'; ctx.fillText('HILL +' + o.h, 0, 4); ctx.textAlign = 'start';
+    } else if (o.t === 'lake') {
+      var lr = Math.max(4, o.r * z); ctx.fillStyle = 'rgba(70,130,200,.45)'; ctx.beginPath(); ctx.arc(0, 0, lr, 0, 7); ctx.fill(); ctx.strokeStyle = '#4682c8'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(0, 0, lr, 0, 7); ctx.stroke();
+      ctx.fillStyle = ink; ctx.font = 'bold 11px ' + css('--font-d'); ctx.textAlign = 'center'; ctx.fillText('LAKE −' + o.depth, 0, 4); ctx.textAlign = 'start';
+    } else if (o.t === 'spawner') {
+      ctx.fillStyle = '#c9222a'; ctx.globalAlpha *= 0.12; ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+      ctx.strokeStyle = '#c9222a'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 3]); ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.stroke(); ctx.setLineDash([]);
+      var sm = Math.max(7, 8 * z); ctx.fillStyle = css('--minion'); ctx.fillRect(-sm / 2, -sm / 2, sm, sm); ctx.strokeStyle = '#c9222a'; ctx.lineWidth = 2; ctx.strokeRect(-sm / 2 - 2, -sm / 2 - 2, sm + 4, sm + 4);
+    } else if (o.t === 'goal') {
+      var gw = Math.max(10, o.w * z), gc = o.kind === 'bonus' ? '#8a4fd1' : '#2f9e55';
+      if (o.style === 'ring') { ctx.strokeStyle = gc; ctx.lineWidth = 4; ctx.beginPath(); ctx.ellipse(0, 0, gw / 2, Math.max(4, gw * 0.16), 0, 0, 7); ctx.stroke(); ctx.strokeStyle = ink; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(0, 0, gw / 2 + 2, Math.max(4, gw * 0.16) + 2, 0, 0, 7); ctx.stroke(); }
+      else { ctx.fillStyle = ink; ctx.fillRect(-gw / 2 - 2, -7, 4, 14); ctx.fillRect(gw / 2 - 2, -7, 4, 14); ctx.fillStyle = gc; ctx.fillRect(-gw / 2, -6, gw, 5); ctx.fillStyle = '#fff'; for (var fx = -gw / 2; fx < gw / 2 - 3; fx += 8) ctx.fillRect(fx + 2, -5, 3, 3); }
+    } else if (o.t === 'sign') {
+      var sw = Math.max(8, 10 * z); ctx.fillStyle = css('--trunk'); ctx.fillRect(-1, 0, 2, sw * 0.9); ctx.fillStyle = '#e8b21c'; ctx.strokeStyle = ink; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(0, -sw); ctx.lineTo(sw * 0.8, sw * 0.35); ctx.lineTo(-sw * 0.8, sw * 0.35); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.fillStyle = ink; ctx.font = 'bold ' + Math.round(sw * 0.8) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('!', 0, sw * 0.2); ctx.textAlign = 'start';
+    } else if (o.t === 'toxic') {
+      var w = Math.max(3, o.w * z), d = Math.max(3, o.d * z); ctx.fillStyle = css('--tox'); ctx.fillRect(-w / 2, -d / 2, w, d);
+    } else if (o.t === 'door') {
+      var dw = Math.max(6, o.w * z), dd = Math.max(5, 3.2 * z); ctx.fillStyle = '#8b93a1'; ctx.fillRect(-dw / 2, -dd / 2, dw, dd);
+      ctx.save(); ctx.beginPath(); ctx.rect(-dw / 2, -dd / 2, dw, dd); ctx.clip(); ctx.strokeStyle = '#e8b21c'; ctx.lineWidth = Math.max(2, dd * 0.28);
+      for (var dk = -dw; dk < dw; dk += dd * 1.1) { ctx.beginPath(); ctx.moveTo(dk, dd / 2); ctx.lineTo(dk + dd, -dd / 2); ctx.stroke(); } ctx.restore();
+      ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.strokeRect(-dw / 2, -dd / 2, dw, dd);
+    } else if (o.t === 'ramp') {
+      var rw = Math.max(4, o.w * z), rl = Math.max(6, o.len * z), g = ctx.createLinearGradient(0, rl / 2, 0, -rl / 2); g.addColorStop(0, css('--road')); g.addColorStop(1, css('--road-edge'));
+      ctx.fillStyle = g; ctx.fillRect(-rw / 2, -rl / 2, rw, rl); ctx.strokeStyle = ink; ctx.lineWidth = 1; ctx.strokeRect(-rw / 2, -rl / 2, rw, rl);
+      ctx.beginPath(); ctx.moveTo(0, rl * 0.3); ctx.lineTo(0, -rl * 0.3); ctx.moveTo(-rw * 0.2, -rl * 0.12); ctx.lineTo(0, -rl * 0.3); ctx.lineTo(rw * 0.2, -rl * 0.12); ctx.stroke();
+    } else if (o.t === 'checkpoint') {
+      var cw = Math.max(8, o.w * z); ctx.strokeStyle = '#c9222a'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-cw / 2, 0); ctx.lineTo(cw / 2, 0); ctx.stroke();
+      ctx.fillStyle = '#c9222a'; ctx.fillRect(-cw / 2 - 2, -5, 4, 10); ctx.fillRect(cw / 2 - 2, -5, 4, 10);
+    } else if (o.t === 'start') {
+      var sr = Math.max(9, 12 * z); ctx.fillStyle = '#ffd24a'; ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.beginPath();
+      for (var si = 0; si < 10; si++) { var sa = -Math.PI / 2 + si * Math.PI / 5, sd = si % 2 ? sr * 0.45 : sr; ctx[si ? 'lineTo' : 'moveTo'](Math.cos(sa) * sd, Math.sin(sa) * sd); }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = ink; ctx.beginPath(); ctx.moveTo(0, -sr - 11); ctx.lineTo(6, -sr - 2); ctx.lineTo(-6, -sr - 2); ctx.closePath(); ctx.fill();
+    } else if (o.t === 'tip') {
+      ctx.fillStyle = acc; ctx.globalAlpha *= 0.16; ctx.strokeStyle = acc;
+      if (o.shape === 'circle') { ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.fill(); } else { ctx.fillRect(-o.w * z / 2, -o.d * z / 2, o.w * z, o.d * z); }
+      ctx.globalAlpha = 1; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
+      if (o.shape === 'circle') { ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.stroke(); } else ctx.strokeRect(-o.w * z / 2, -o.d * z / 2, o.w * z, o.d * z); ctx.setLineDash([]);
+      ctx.fillStyle = acc; ctx.font = 'bold 11px ' + css('--font-d'); ctx.textAlign = 'center'; ctx.fillText('TIP', 0, 4); ctx.textAlign = 'start';
+    }
+    if (selected) { ctx.strokeStyle = acc; ctx.lineWidth = 2; ctx.setLineDash([4, 3]); var bw = h ? Math.max(h[0] * z, 6) : Math.max(8, 8 * z + 4), bh = h ? Math.max(h[1] * z, 6) : bw; if (circR(o)) { ctx.beginPath(); ctx.arc(0, 0, bw + 3, 0, 7); ctx.stroke(); } else ctx.strokeRect(-bw - 3, -bh - 3, bw * 2 + 6, bh * 2 + 6); ctx.setLineDash([]); }
+    ctx.restore();
+    if (o.t === 'goal') { ctx.fillStyle = o.kind === 'bonus' ? '#8a4fd1' : '#2f9e55'; ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText(o.kind === 'bonus' ? 'BONUS GOAL' : 'GOAL', q[0] + 10, q[1] - 10); }
+    if (o.t === 'door') { ctx.fillStyle = css('--ink'); ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText('DOOR  ' + (o.mode === 'open' ? 'always open' : o.mode === 'closed' ? 'always closed' : o.open + 's open / ' + o.shut + 's shut') + (o.links && o.links.length ? '  (linked)' : '') + ((o.sTx || o.sTz || o.oTx || o.oTz) ? '  tilts' : ''), q[0] + 12, q[1] - 12); }
+    if (o.t === 'start') { ctx.fillStyle = css('--ink'); ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText('PLAYER START', q[0] + 14, q[1] - 12); }
+    if (o.t === 'checkpoint' && z > 0.15) { ctx.fillStyle = '#c9222a'; ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText('CP ' + cpNumber(o), q[0] + 8, q[1] - 8); }
+  }
+
+  // ---- the piece list ----
+  function horizOf(p) { return Math.max(1, p.len || 1); }
+  function pitchOf(p) { return Math.round(Math.atan2(p.dy || 0, horizOf(p)) * 180 / Math.PI * 10) / 10; }
+  function hasHand(p) { return p.sx !== undefined || p.sz !== undefined || p.sy !== undefined || p.sh !== undefined || p.b0 !== undefined || p.w0 > 0; }
+  function segRadius(p) { return Math.abs(p.ang || 0) < 1e-9 ? (p.r || 640) : p.len / (Math.abs(p.ang) * Math.PI / 180); }
+  function segName(p) { return Math.abs(p.ang || 0) < 1e-9 ? 'Straight' : (p.ang > 0 ? 'Curves right ' : 'Curves left ') + Math.round(Math.abs(p.ang) * 10) / 10 + '°'; }
+  function segVals(p, pk, i) {                                    // every number the segment's fields show: the ones it keeps, and the ones that follow from them (where it starts, where it ends)
+    var q = (INFO[pk] && INFO[pk][i]) || { x0: 0, z0: 0, th0: 0, y0: 0, rl0: 0, w0: S.width, x1: 0, z1: 0, y1: 0, w1: S.width }, R = function (v) { return Math.round(v * 100) / 100; };
+    var pit = p.gf ? Math.round(Math.atan2(q.y1 - q.y0, horizOf(p)) * 180 / Math.PI * 10) / 10 : pitchOf(p);
+    return { sx: R(q.x0), sy: R(q.y0), sz: R(q.z0), sh: R(q.th0 * 180 / Math.PI), ex: R(q.x1), ey: R(q.y1), ez: R(q.z1), len: R(p.len), ang: R(p.ang || 0), r: R(segRadius(p)), b0: R(q.rl0), roll: R(p.roll || 0), dy: R(p.dy || 0), pitch: pit, w0: R(q.w0), w: R(q.w1 === undefined ? S.width : q.w1), fl: p.fl || 0 };
+  }
+  function fields(p, i, pk) {
+    var v = segVals(p, pk, i);
+    var f = function (k, label, min, max, step, tip) { return '<label class="f"' + (tip ? ' title="' + tip + '"' : '') + '>' + label + '<input type="number" data-i="' + i + '" data-k="' + k + '" value="' + v[k] + '" min="' + min + '" max="' + max + '" step="' + step + '"></label>'; };
+    var sel = function (k, label, opts, cur, tip) { return '<label class="f" style="grid-column:1/-1"' + (tip ? ' title="' + tip + '"' : '') + '>' + label + '<select data-i="' + i + '" data-k="' + k + '">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (String(cur) === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>'; };
+    var g = function (t) { return '<div class="stats" style="grid-column:1/-1;margin-top:4px;text-transform:uppercase;letter-spacing:.06em;font-size:10px">' + t + '</div>'; };
+    var hand = pk === 0 || i > 0 ? hasHand(p) : false;
+    return g('Start' + (i === 0 ? ' (the start of the path)' : hand ? ' (set by hand)' : ' (where the last one ended)')) + f('sx', 'Start X', -99999, 99999, 1) + f('sy', 'Start Y', -3000, 3000, 1) + f('sz', 'Start Z', -99999, 99999, 1) + f('sh', 'Facing °', -360, 360, 1, '0 = north, 90 = east') +
+      (hand && i > 0 ? '<div style="grid-column:1/-1"><button class="small" data-act="attach" data-i="' + i + '">Start where the last segment ended</button></div>' : '') +
+      g('End') + f('ex', 'End X', -99999, 99999, 1) + f('ey', 'End Y', -3000, 3000, 1) + f('ez', 'End Z', -99999, 99999, 1) +
+      g('Shape') + f('len', 'Length', 0.5, 20000, 10) + f('ang', 'Curve angle °', -360, 360, 1, '+ curves right, − curves left, 0 = straight') + f('r', 'Curve radius', 1, 20000, 10) +
+      g('Height') + f('dy', p.gf ? 'Rise (above the ground)' : 'Rise (Y)', -3000, 3000, 1) + f('pitch', 'Slope angle °', -85, 85, 0.5) +
+      g('Bank (+ tips the right side down)') + f('b0', 'Start bank °', -90, 90, 1) + f('roll', 'End bank °', -90, 90, 1) +
+      g('Width') + f('w0', 'Start width', 1, 40, 1) + f('w', 'End width', 1, 40, 1) + sel('wm', 'Width change', [['taper', 'Taper along the segment'], ['step', 'Step at the start']], p.wm === 'step' ? 'step' : 'taper') +
+      g('Surface') + sel('tx', 'Texture', [['0', 'Stone'], ['1', 'Wood planks'], ['2', 'Metal plates'], ['3', 'Grass']], p.tx || 0) +
+      g('Ground') + sel('ov', 'Over the terrain', [['0', 'Terrain wins where it is higher'], ['1', 'Supersedes the terrain: the ground is cut or raised to the path']], p.ov ? 1 : 0) +
+      sel('gf', 'Ground', [['0', 'Independent: keeps its own height'], ['1', 'Follows the ground: terrain height + Rise']], p.gf ? 1 : 0, 'Follows the ground: the path sits at the terrain\'s own height all along the segment (the surface of the water, over water), with Rise added on top. Independent: it starts where the last segment ended and rises by its Rise, whatever the terrain does.') +
+      f('fl', 'Slab thickness', 0, 2000, 1, '0 = no slab. How far the underside is below the top of the path. Where that would be under the ground, the slab merges with the ground; otherwise the underside floats in the air.');
+  }
+  var openPaths = { 0: true };
+  function renderPieces() {
+    var out = '', np = 1 + (S.more || []).length;
+    for (var k = 0; k < np; k++) {
+      var list = pcs(k), m = k ? S.more[k - 1] : null; list.forEach(upg);
+      var body = list.map(function (p, i) {
+        return '<div class="piece"><div class="head"><span><span class="num">' + (i + 1) + '</span> ' + segName(p) + '</span><span class="row" style="gap:4px">' +
+          '<button class="small" data-act="up" data-i="' + i + '" title="Move up">↑</button><button class="small" data-act="down" data-i="' + i + '" title="Move down">↓</button>' +
+          (Math.abs(p.ang || 0) > 1e-9 ? '<button class="small" data-act="flip" data-i="' + i + '" title="Mirror the curve (left ↔ right)">⇄</button>' : '') +
+          '<button class="small" data-act="del" data-i="' + i + '" title="Delete">✕</button></span></div><div class="fields">' + fields(p, i, k) + '</div></div>';
+      }).join('') || '<div class="stats">No segments yet. Add one.</div>';
+      var plsel = '<label class="f">Layer<select data-playr="' + k + '">' + S.layers.map(function (l) { return '<option value="' + l.id + '"' + (l.id === pathLayerOf(k).id ? ' selected' : '') + '>' + l.name.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</option>'; }).join('') + '</select></label>';
+      var adds = '<div class="row"><button class="small" data-act="addSeg">+ Segment</button>' + (m ? '<button class="small" data-act="delPath">Delete this path</button>' : '') + '</div>';
+      out += '<details class="pathbox" data-path="' + k + '"' + (openPaths[k] ? ' open' : '') + '><summary><b>Path ' + (k + 1) + '</b> <span class="stats" style="display:inline">' + list.length + ' segment' + (list.length === 1 ? '' : 's') + (k ? '' : ' · where the level starts') + '</span></summary><div data-p="' + k + '" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">' + plsel + adds + body + '</div></details>';
+    }
+    $('pieces').innerHTML = out;
+  }
+  $('pieces').addEventListener('toggle', function (e) { var d = e.target; if (d && d.dataset && d.dataset.path !== undefined) openPaths[+d.dataset.path] = d.open; }, true);
+
+  // ---- the inspector for the selected stamp ----
+  function num(k, label, min, max, step, v) { return '<label class="f">' + label + '<input type="number" data-ok="' + k + '" value="' + v + '" min="' + min + '" max="' + max + '" step="' + step + '"></label>'; }
+  function layerSelect(cur, attr, label, mixed) { return '<label class="f">' + label + '<select ' + attr + '>' + (mixed ? '<option value="" selected>(mixed)</option>' : '') + S.layers.map(function (l) { return '<option value="' + l.id + '"' + (!mixed && l.id === cur ? ' selected' : '') + '>' + l.name.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</option>'; }).join('') + '</select></label>'; }
+  function renderGroup(sl) {
+    var c = {}, lids = {}; sl.forEach(function (q) { c[q.t] = (c[q.t] || 0) + 1; lids[lyrOf(q).id] = 1; });
+    var ids = Object.keys(lids), one = ids.length === 1 ? +ids[0] : -1;
+    $('insp').innerHTML = '<div class="head"><span>' + sl.length + ' stamps selected</span><span class="row" style="gap:4px"><button class="small" data-gact="copy">Copy</button><button class="small" data-gact="dup">Duplicate</button><button class="small" data-gact="del">Delete</button></span></div>' +
+      '<div class="stats">' + Object.keys(c).map(function (k) { return c[k] + ' ' + NAMES[k].toLowerCase(); }).join(' · ') + '</div>' +
+      '<div class="fields">' + layerSelect(one, 'data-gk="layer"', 'Move all to layer', one < 0) + '</div>' +
+      '<div class="stats">Drag any of them to move the lot · Ctrl+C / Ctrl+V copy and paste · Ctrl+A selects everything · Esc clears</div>';
+    $('insp').hidden = false;
+  }
+  function endsOf(o) { return o.ends === 'square' ? 'square' : 'round'; }
+  function endsF(o) { return '<label class="f">Ends<select data-ok="ends"><option value="round"' + (endsOf(o) === 'round' ? ' selected' : '') + '>Rounded (a half-circle past each end)</option><option value="square"' + (endsOf(o) === 'square' ? ' selected' : '') + '>Squared (flat, 1.5 past each end)</option></select></label>'; }
+  function stripFoot(o) { var raw = o.t === 'mud' ? S.width / 2 : o.t === 'ledge' ? Math.max(o.w / 2, 1.3) : o.w / 2, m = o.t === 'mud' ? 1 : 1.5; return { half: raw + m, m: m }; }   // what the game really covers: the piece's own half-width plus its margin (gap and ledge 1.5, mud 1) on every side, ends included
+  function renderInsp() {
+    var el = $('insp'), sl0 = selList(), o = S.objs[sel], ghost = ghostMode();
+    if (tool === 'forest') { el.hidden = true; return; }
+    if (ghost) { if (!GH || GH.t !== tool) GH = mk0(tool, 0, 0); o = GH; delete o.s; delete o.u; delete o.x; delete o.z; }   // a stamp tool is chosen: this panel sets up the NEXT stamp
+    else { if (sl0.length > 1) { renderGroup(sl0); return; } if (!o) { el.hidden = true; return; } }
+    var p = ghost ? { x: 0, z: 0, th: 0 } : pos(o), h = '<div class="head"><span>' + (ghost ? 'Next ' + NAMES[o.t].toLowerCase() + ' (set before placing)' : NAMES[o.t]) + '</span>' + (ghost ? '' : '<span class="row" style="gap:4px"><button class="small" data-oact="del">Delete</button></span>') + '</div><div class="fields">';
+    var joinedCave = !ghost && o.t === 'cave' && o.after !== undefined;
+    if (!ghost) h += layerSelect(lyrOf(o).id, 'data-ok="layer"', 'Layer', false);
+    if (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag') h += '<label class="f">Height with others<select data-ok="hm"><option value="add"' + (o.hm === 'ind' ? '' : ' selected') + '>Additive: stacks on what it crosses</option><option value="ind"' + (o.hm === 'ind' ? ' selected' : '') + '>Independent: its own height, merges in</option></select></label>';
+    if (joinedCave) h += '<label class="f">Starts from<select data-ok="after"><option value="">Its own mouth</option>' + S.objs.filter(function (q) { return q !== o && q.t === 'cave'; }).map(function (q) { return '<option value="' + q.id + '"' + (o.after === q.id ? ' selected' : '') + '>End of Cave #' + (S.objs.indexOf(q) + 1) + '</option>'; }).join('') + '</select></label>';
+    if (!STRIPS[o.t] && !joinedCave) h += '<label class="f">Snap to the path<select data-ok="noat"><option value="0"' + (o.noat ? '' : ' selected') + '>Snaps: follows the path when it changes</option><option value="1"' + (o.noat ? ' selected' : '') + '>Free: stays where it is</option></select></label>';
+    if (!ghost && !joinedCave && (!STRIPS[o.t] || (o.follow === false && o.t !== 'mud'))) h += num('X', 'X', -99999, 99999, 1, Math.round(p.x * 10) / 10) + num('Z', 'Z', -99999, 99999, 1, Math.round(p.z * 10) / 10) + (STRIPS[o.t] ? '' : num('rot', 'Rotation °', -360, 360, 5, o.rot || 0));
+    if (o.t === 'tree') h += '<label class="f">Size<select data-ok="exs"><option value="rand"' + (o.ex ? '' : ' selected') + '>Random, like the level\'s own trees</option><option value="exact"' + (o.ex ? ' selected' : '') + '>Exactly these sizes</option></select></label>' + (o.ex ? num('tH', 'Trunk height', 1, 80, 0.5, o.tH) + num('tW', 'Trunk width', 0.2, 12, 0.1, o.tW) + num('cH', 'Canopy height', 1, 80, 0.5, o.cH) + num('cW', 'Canopy width', 1, 40, 0.5, o.cW) : '');
+    if (o.t === 'tree' || o.t === 'sign' || o.t === 'goal' || o.t === 'checkpoint' || o.t === 'toxic' || o.t === 'ramp' || o.t === 'tip' || (o.t === 'cave' && !joinedCave)) h += num('y', 'Y offset (up from the ground or path)', -500, 500, 0.5, o.y || 0);
+    if (o.t === 'seg' || o.t === 'segchain') h += '<label class="f">Size<select data-ok="big"><option value="0"' + (o.big ? '' : ' selected') + '>Regular</option><option value="1"' + (o.big ? ' selected' : '') + '>Big (5×, worth 10)</option></select></label>';
+    if (o.t === 'seg') h += num('h', 'Height above the ground', -1, 500, 0.5, o.h || 0);
+    if (o.t === 'segchain') h += num('h', 'Height above the ground (at the start)', -1, 500, 0.5, o.h || 0) + num('rise', 'Rise by the end of the chain', -500, 500, 0.5, o.rise || 0) + num('arc', 'Vertical arc (extra height in the middle)', -500, 500, 0.5, o.arc || 0);
+    if (o.t === 'mud') h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10) + num('len', 'Length', 1, 5000, 1, o.len) + num('slow', 'Slowdown %', 0, 95, 1, o.slow) + endsF(o);
+    else if (STRIPS[o.t]) {
+      var canJoin = o.t === 'segchain' || o.t === 'ledge' || o.t === 'gap';
+      if (canJoin && !ghost) h += '<label class="f">Starts from<select data-ok="after"><option value="">Its own start</option>' + S.objs.filter(function (q) { return q !== o && q.t === o.t; }).map(function (q) { return '<option value="' + q.id + '"' + (o.after === q.id ? ' selected' : '') + '>End of ' + NAMES[q.t] + ' #' + (S.objs.indexOf(q) + 1) + '</option>'; }).join('') + '</select></label>';
+      if (o.after !== undefined) h += num('turn', 'Turn at the joint °', -180, 180, 1, o.turn || 0) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10);
+      else {
+        if (!ghost) {
+        h += '<label class="f">Shape<select data-ok="follow"><option value="1"' + (o.follow === false ? '' : ' selected') + '>Follows the path</option><option value="0"' + (o.follow === false ? ' selected' : '') + '>Its own curve</option></select></label>';
+        }
+        if (ghost) { if (o.follow === false) h += num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round((o.bend || 0) * 10) / 10); }
+        else if (o.follow === false) h += num('th', 'Heading ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10);
+        else h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10) + num('u', 'Across (− left, + right)', -200, 200, 0.5, Math.round(o.u * 10) / 10);
+      }
+      h += num('len', o.t === 'segchain' ? 'Chain length' : 'Length', 1, 5000, 1, o.len);
+      if (o.t === 'segchain') h += num('gap', 'Spacing', 1, 500, 1, o.gap);
+      if (o.t === 'ledge') h += num('w', 'Thickness', 0.5, 100, 0.5, o.w) + num('hgt', 'Height (any)', -500, 500, 0.5, o.hgt) + endsF(o);
+      if (o.t === 'platform') {
+        h += num('w', 'Width', 1, 300, 1, o.w) + num('hgt', 'Height of the top above the ground', -500, 500, 0.5, o.hgt) + num('thick', 'Thickness (top to bottom)', 0.5, 200, 0.5, o.thick === undefined ? 2 : o.thick);
+        h += '<label class="f">Movement<select data-ok="move">' + [['none', 'Stays put'], ['side', 'Side to side'], ['forward', 'Forward and back'], ['vertical', 'Up and down']].map(function (m) { return '<option value="' + m[0] + '"' + (o.move === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>';
+        if (o.move !== 'none') h += num('dist', 'Travel (units)', 1, 1000, 1, o.dist) + num('period', 'Seconds per full cycle', 0.5, 120, 0.5, o.period) + num('group', 'Link group (0 = none)', 0, 99, 1, o.group || 0) + num('phase', 'Phase (seconds into the cycle)', 0, 120, 0.1, o.phase || 0);
+      }
+      if (o.t === 'gap') h += num('w', 'Width (across)', 1, 300, 1, o.w) + endsF(o);
+    }
+    if (isOneCrag(o)) h += num('base', 'Base radius', 1, 15, 0.1, o.base) + num('hgt', 'Peak height', 0.3, 200, 0.1, o.hgt);
+    else if (o.t === 'crag') h += (ghost ? '' : '<div class="row"><button class="small" data-oact="split">Break into separate crags</button></div>') + num('r', 'Patch radius', 2, 2000, 1, o.r) + num('count', 'Total number of crags', 1, 500, 1, o.count) + num('base', 'Average base radius', 1, 15, 0.1, o.base) + num('baseV', 'Base radius variation (±)', 0, 14, 0.1, o.baseV) + num('hgt', 'Average peak height', 0.3, 200, 0.1, o.hgt) + num('hgtV', 'Peak height variation (±)', 0, 200, 0.1, o.hgtV) + num('gap', 'Average space between (edge to edge)', 0, 1000, 0.5, o.gap) + num('gapV', 'Spacing variation (±)', 0, 1000, 0.5, o.gapV) + '<div class="row"><button class="small" data-oact="reroll">Re-roll the layout</button></div>';
+    if (o.t === 'patch') {
+      var psel = function (k, label, opts) { return '<label class="f">' + label + '<select data-ok="' + k + '">' + opts.map(function (m) { return '<option value="' + m[0] + '"' + (o[k] === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>'; };
+      h += psel('ground', 'Terrain', [['grass', 'Bumpy grass'], ['flat', 'Flat grass'], ['ocean', 'Open ocean'], ['toxic', 'Toxic ground (hurts, like the Sink)']]) + psel('shape', 'Shape', [['ellipse', 'Ellipse'], ['rect', 'Rectangle']]) + num('w', 'Width (across)', 4, 20000, 1, o.w) + num('d', 'Length (along)', 4, 20000, 1, o.d) + psel('edge', 'Edge', [['soft', 'Soft (blends in)'], ['hard', 'Hard (abrupt)']]);
+      if (o.edge !== 'hard') h += num('soft', 'Softness (width of the blend)', 1, 2000, 1, o.soft);
+    }
+    if (o.t === 'cave') {
+      if (joinedCave) h += '<label class="f">Angle<select data-ok="angSet"><option value="0"' + (o.angSet ? '' : ' selected') + '>Carries on at the angle the last cave ended on</option><option value="1"' + (o.angSet ? ' selected' : '') + '>Its own angle (set below)</option></select></label>';
+      h += '<label class="f">Shape<select data-ok="shape">' + [['rect', 'Rectangle'], ['tri', 'Triangle'], ['hex', 'Hexagon'], ['oct', 'Octagon'], ['circle', 'Circle']].map(function (m) { return '<option value="' + m[0] + '"' + (o.shape === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>';
+      h += num('w', 'Width', 2, 100, 0.5, o.w) + num('h', 'Height', 2, 100, 0.5, o.h) + num('roll', 'Roll of the shape (degrees)', -180, 180, 5, o.roll) + num('ang', 'Angle (0 = level, up to 90 = straight down, negative = climbing)' + (joinedCave ? (o.angSet ? ' — its own' : ' — carried on from the last cave; type a new one to set its own') : ''), -85, 90, 1, joinedCave && !o.angSet ? Math.round(cAng(o) * 10) / 10 : o.ang) + num('len', 'Depth (length of the tunnel)', 4, 2000, 1, o.len) + num('bend', 'Curvature (degrees turned over its length)', -720, 720, 5, o.bend) + num('slope', 'Slope (degrees the angle changes over its length)', -90, 90, 1, o.slope) + num('carve', 'Carve (shafts, angle 80 or more): 0 = the shaft opens right at the surface, 100 = the surface slopes in all the way down (%)', 0, 100, 5, o.carve || 0);
+      h += '<p class="note" style="margin:6px 0 0;font-size:12px;opacity:.75">Rotation turns the whole cave. From 80° up it is a shaft: a pit with this outline. Below that it is a tunnel; it cuts open to the sky where it is shallower than its own height, and goes under a roof of ground past that.</p>';
+    }
+    if (MOBS.indexOf(o.t) >= 0) h += '<label class="f">Behavior<select data-ok="idle"><option value="0"' + (o.idle ? '' : ' selected') + '>Chases Molly</option><option value="1"' + (o.idle ? ' selected' : '') + '>Idle (stands still, turns to face her)</option></select></label>';
+    if (o.t === 'bigminion') h += '<label class="f">Placement<select data-ok="trap"><option value="0"' + (o.trap ? '' : ' selected') + '>Free-roaming</option><option value="1"' + (o.trap ? ' selected' : '') + '>Trapped in a pit (top of head showing)</option></select></label>';
+    if (o.t === 'hill') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('h', 'Height', 1, 500, 0.5, o.h) + '<label class="f">Surface<select data-ok="rock"><option value="rock"' + (o.rock === 'rock' ? ' selected' : '') + '>Bare rock</option><option value="grass"' + (o.rock === 'grass' ? ' selected' : '') + '>Grass</option></select></label>';
+    if (o.t === 'lake') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('depth', 'Depth', 1, 200, 0.5, o.depth) + num('wl', 'Water level adjust (+ raises it)', -500, 500, 0.5, o.wl || 0);
+    if (o.t === 'spawner') h += num('r', 'Radius', 2, 1000, 1, o.r) + num('every', 'Every (seconds)', 0.2, 120, 0.2, o.every) + num('max', 'Most alive at once', 1, 100, 1, o.max);
+    if (o.t === 'goal') {
+      var sel2 = function (k, label, opts) { return '<label class="f">' + label + '<select data-ok="' + k + '">' + opts.map(function (m) { return '<option value="' + m[0] + '"' + (o[k] === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>'; };
+      h += sel2('kind', 'Goal type', [['regular', 'Regular goal'], ['bonus', 'Bonus goal']]) + sel2('style', 'Look', [['banner', 'Banner'], ['ring', 'Ring']]) + num('w', 'Width', 4, 200, 1, o.w);
+    }
+    if (o.t === 'door') {
+      var dset = function (pre, c) {                                // one set of door behaviour: before or after what it is linked to
+        var nn = function (k, l, mn, mx, st) { return num(pre + k, l, mn, mx, st, c[k]); }, sl = function (k, l, opts) { return '<label class="f">' + l + '<select data-ok="' + pre + k + '">' + opts.map(function (m) { return '<option value="' + m[0] + '"' + (String(c[k]) === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>'; };
+        return sl('mode', 'Behaviour', [['cycle', 'Opens and shuts on a cycle'], ['open', 'Always open'], ['closed', 'Always closed']]) + (c.mode === 'cycle' ? nn('open', 'Open for (seconds)', 0.1, 600, 0.1) + nn('shut', 'Closed for (seconds)', 0.1, 600, 0.1) + nn('phase', 'Start offset (seconds)', 0, 600, 0.1) : '') + nn('speed', 'Time to open or shut (seconds)', 0.05, 60, 0.05)
+          + sl('sink', 'Slides into the floor to open', [['true', 'Yes'], ['false', 'No, it only tilts']]) + nn('sTx', 'Tilt when shut: forward / back °', -180, 180, 1) + nn('sTz', 'Tilt when shut: sideways °', -180, 180, 1) + nn('oTx', 'Tilt when open: forward / back °', -180, 180, 1) + nn('oTz', 'Tilt when open: sideways °', -180, 180, 1);
+      };
+      var dl = (o.links || []).filter(function (id) { return S.objs.some(function (q) { return q.id === id; }); });
+      h += num('w', 'Width', 2, 100, 1, o.w) + num('hgt', 'Height', 1, 60, 0.5, o.hgt);
+      if (!ghost) {
+        h += '<div class="stats" style="grid-column:1/-1"><b>Linked to</b> ' + (dl.length ? dl.map(function (id) { var q = S.objs.filter(function (z) { return z.id === id; })[0]; return '<button class="small" data-oact="unlink" data-lid="' + id + '" title="Unlink">' + NAMES[q.t] + ' #' + id + ' ✕</button>'; }).join(' ') : 'nothing') + '</div>';
+        var cand = S.objs.filter(function (q) { return (q.t === 'minion' || q.t === 'bigminion') && dl.indexOf(q.id) < 0; });
+        if (cand.length) h += '<label class="f">Link to…<select data-ok="addlink"><option value="">Choose…</option>' + cand.map(function (q) { var p2 = pos(q); return '<option value="' + q.id + '">' + NAMES[q.t] + ' #' + q.id + ' (X ' + Math.round(p2.x) + ', Z ' + Math.round(p2.z) + ')</option>'; }).join('') + '</select></label>';
+      }
+      if (dl.length && o.af) h += '<h3 style="grid-column:1/-1;margin:8px 0 0">Before interaction</h3>' + dset('', o) + '<h3 style="grid-column:1/-1;margin:8px 0 0">After interaction (once everything linked is beaten)</h3>' + dset('af.', o.af);
+      else h += dset('', o);
+      h += '<div class="stats" style="grid-column:1/-1">Tilts pivot at the door\'s base: forward / back leans its top along the way ahead, sideways leans it to the right. If it shuts on someone in the doorway, they are pushed out the side they came from.</div>';
+    }
+    if (o.t === 'ramp') h += num('len', 'Length', 5, 300, 1, o.len) + num('w', 'Width', 2, 100, 1, o.w) + num('ang', 'Slope °', 0, 60, 1, o.ang) + num('boost', 'Style Boost (last units)', 0, 100, 1, o.boost);
+    if (o.t === 'checkpoint') h += num('w', 'Gate width', 4, 200, 1, o.w);
+    if (o.t === 'tip') {
+      h += '<label class="f">Shape<select data-ok="shape"><option value="circle"' + (o.shape === 'circle' ? ' selected' : '') + '>Circle</option><option value="rect"' + (o.shape === 'rect' ? ' selected' : '') + '>Rectangle</option></select></label>';
+      h += o.shape === 'circle' ? num('r', 'Radius', 2, 1000, 1, o.r) : num('w', 'Width (across)', 2, 2000, 1, o.w) + num('d', 'Length (along)', 2, 2000, 1, o.d);
+      h += num('up', 'Activates up to this far above it (0 = no limit)', 0, 5000, 1, o.up || 0) + num('dn', 'Activates up to this far below it (0 = no limit)', 0, 5000, 1, o.dn || 0);
+    }
+    h += '</div>';
+    if (o.t === 'segchain' || o.t === 'ledge' || o.t === 'gap' || o.t === 'cave') h += '<div class="row"><button class="small" data-oact="next">' + (o.t === 'cave' ? 'Add a tunnel from this one\'s end' : 'Add next piece (joined)') + '</button></div>';
+    if (o.t === 'platform' && o.group && o.move !== 'none') h += '<div class="row"><button class="small" data-oact="space">Space this group evenly</button></div>';
+    if (o.t === 'tip') h += '<label class="f">Tip text<textarea data-ok="text" style="height:64px">' + (o.text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</textarea></label>';
+    if (!ghost) h += '<div class="stats">' + (o.t === 'segchain' ? (chainPts(o).length + ' segs' + (o.follow === false ? ', on its own curve' : ', following the path')) : o.s !== undefined ? 'attached to the path: ' + Math.round(o.s) + ' along, ' + Math.round(o.u * 10) / 10 + ' across' : 'free on the map') + '</div>';
+    el.innerHTML = h; el.hidden = false;
+  }
+  $('insp').addEventListener('change', function (e) {
+    var t = e.target, ghost = ghostMode(), o = ghost ? GH : S.objs[sel]; if (!o) return;
+    if (t.dataset.oact) return;
+    var k = t.dataset.ok; if (!k) return; if (!ghost) snap();
+    if (k === 'ang' && !ghost && o.t === 'cave' && o.after !== undefined) o.angSet = true;     // typing an angle on a linked cave sets its own
+    if (ghost) DEFUSER[o.t + '.' + k] = 1;
+    if (k === 'addlink') { var lid = parseInt(t.value, 10); if (lid) { o.links = (o.links || []).concat([lid]); if (!o.af) { o.af = JSON.parse(JSON.stringify({ mode: 'open', open: o.open, shut: o.shut, phase: o.phase, speed: o.speed, sink: o.sink, sTx: o.sTx, sTz: o.sTz, oTx: o.oTx, oTz: o.oTz })); } } afterEdit(false); renderInsp(); return; }
+    if (k.indexOf('af.') === 0) { var ak = k.slice(3), ac = o.af || (o.af = {}); ac[ak] = ak === 'mode' ? t.value : ak === 'sink' ? t.value === 'true' : parseFloat(t.value) || 0; afterEdit(false); renderInsp(); return; }
+    if (k === 'X' || k === 'Z') { var p = pos(o), x = k === 'X' ? parseFloat(t.value) || 0 : p.x, z = k === 'Z' ? parseFloat(t.value) || 0 : p.z; place2(o, x, z); }
+    else if (k === 'after') {
+      if (t.value === '') { if (o.after !== undefined) { var b0 = base(o, 0); o.x = b0.x; o.z = b0.z; o.th = b0.th * 180 / Math.PI; delete o.after; o.turn = 0; o.follow = false; } }
+      else { var tid = +t.value, cyc = false, w = byId(tid), g = 0; while (w && g++ < 60) { if (w === o) cyc = true; w = w.after !== undefined ? byId(w.after) : null; } if (!cyc) { o.after = tid; o.turn = 0; o.follow = false; } }
+    }
+    else if (k === 'follow') {
+      if (t.value === '0' && o.follow !== false) {        // cut loose: keep the shape it has now, then it can be edited
+        var cp0 = [[shapeAt(o, 0).x, shapeAt(o, 0).z]], sp = at(o.s), sq = at(o.s + o.len);
+        o.x = cp0[0][0]; o.z = cp0[0][1]; o.th = sp.th * 180 / Math.PI; o.bend = (sq.th - sp.th) * 180 / Math.PI; o.follow = false; delete o.s; delete o.u;
+      } else if (t.value === '1' && o.follow === false) { var nn = nearest(o.x, o.z); o.s = nn.s; o.u = nn.u; o.follow = true; delete o.x; delete o.z; delete o.th; delete o.bend; }
+    }
+    else if (k === 'exs') { o.ex = t.value === 'exact'; if (o.ex && !(o.tH > 0)) { o.tH = 15.5; o.tW = 1.6; o.cH = 14.9; o.cW = 7.4; } }
+    else if (k === 'mode' && o.t === 'door') { o.mode = t.value; }
+    else if (k === 'sink' && o.t === 'door') { o.sink = t.value === 'true'; }
+    else if (k === 'hm') { o.hm = t.value === 'ind' ? 'ind' : 'add'; }
+    else if (k === 'angSet') { o.angSet = t.value === '1'; }
+    else if (k === 'noat') {
+      var free = t.value === '1', pn = ghost ? null : pos(o); o.noat = free; DEF[o.t] = DEF[o.t] || {}; DEF[o.t].noat = free;
+      if (pn && free && o.s !== undefined) { delete o.s; delete o.u; o.x = pn.x; o.z = pn.z; o.rot = Math.round(pn.th * 180 / Math.PI * 10) / 10; }     // let go: it stays exactly where it is, facing the same way
+      else if (pn && !free && o.s === undefined && samples.length) { var na = nearest(o.x, o.z); if (na.d < 120) { var pa2 = at(na.s); o.rot = Math.round((o.rot || 0) - pa2.th * 180 / Math.PI); o.s = na.s; o.u = na.u; delete o.x; delete o.z; } }     // snap back: onto the path at the nearest spot
+    }
+    else if (k === 'trap') { o.trap = t.value === '1'; DEF[o.t].trap = o.trap; }
+    else if (k === 'idle') { o.idle = t.value === '1'; DEF[o.t] = DEF[o.t] || {}; DEF[o.t].idle = o.idle; }
+    else if (k === 'big') { o.big = t.value === '1'; DEF[o.t].big = o.big; }
+    else if (k === 'text' || k === 'shape' || k === 'move' || k === 'kind' || k === 'style' || k === 'rock' || k === 'ground' || k === 'edge' || k === 'ends') { o[k] = t.value; DEF[o.t][k] = t.value; }
+    else { o[k] = parseFloat(t.value) || 0; if (DEF[o.t] && DEF[o.t][k] !== undefined && !isOneCrag(o)) DEF[o.t][k] = o[k]; }   // what you set is what the next one starts with
+    if (o.t === 'platform' && o.group) {
+      if (k === 'group') { var mate = S.objs.filter(function (q) { return q !== o && q.t === 'platform' && q.group === o.group; })[0]; if (mate) { o.period = mate.period; o.dist = mate.dist; o.move = mate.move; } }
+      else if (k === 'period' || k === 'dist' || k === 'move') S.objs.forEach(function (q) { if (q.t === 'platform' && q.group === o.group) q[k] = o[k]; });
+    }
+    if (ghost) { var dd = DEF[o.t] || (DEF[o.t] = {}); for (var gk in o) if (!/^(t|x|z|s|u|id|layer|follow|th|seed|after|turn)$/.test(gk)) dd[gk] = o[gk]; renderInsp(); draw(); return; }   // what is set here is what the next stamp starts with
+    afterEdit(false); renderInsp();
+  });
+  $('insp').addEventListener('click', function (e) { var b = e.target.closest('button[data-gact]'); if (!b) return; var a = b.dataset.gact; if (a === 'copy') copySel(); else if (a === 'dup') dupSel(); else if (a === 'del') deleteSel(); });
+  $('insp').addEventListener('change', function (e) { var t = e.target; if (t.dataset.gk !== 'layer' || t.value === '') return; var sl = selList(); if (sl.length < 2) return; snap(); sl.forEach(function (q) { q.layer = +t.value; }); afterEdit(false); renderInsp(); });
+  $('insp').addEventListener('input', function (e) { if (e.target.tagName === 'TEXTAREA') { var o = S.objs[sel]; if (o) { o.text = e.target.value; DEF[o.t].text = o.text; afterEdit(false); } } });
+  $('insp').addEventListener('click', function (e) { var b = e.target.closest('button[data-oact]'); if (!b || sel < 0) return; var o = S.objs[sel], a = b.dataset.oact; snap();
+    if (a === 'unlink') { var ul = parseInt(b.dataset.lid, 10); o.links = (o.links || []).filter(function (id) { return id !== ul; }); if (!o.links.length) delete o.af; afterEdit(false); renderInsp(); return; }
+    if (a === 'split') { var parts2 = splitCrags(o), at2 = S.objs.indexOf(o); S.objs.splice(at2, 1); parts2.forEach(function (c) { S.objs.push(c); }); setSelList(parts2); afterEdit(false); renderInsp(); return; }
+    if (a === 'reroll') { o.seed = 1 + Math.floor(Math.random() * 2000000000); afterEdit(false); renderInsp(); return; }
+    if (a === 'next') { var c = JSON.parse(JSON.stringify(o)); delete c.id; c.after = o.id; c.turn = 0; c.follow = false; if (o.t === 'cave') { c.rot = 0; c.angSet = false; c.y = 0; } S.objs.push(c); setSel(S.objs.length - 1); afterEdit(false); renderInsp(); return; }
+    if (a === 'space') { var ms = S.objs.filter(function (q) { return q.t === 'platform' && q.group === o.group; }); ms.forEach(function (q, i) { q.phase = Math.round(i * o.period / ms.length * 10) / 10; }); afterEdit(false); renderInsp(); return; }
+    removeAt(sel); setSel(-1); afterEdit(false); renderInsp(); });
+
+  function afterEdit(rerender) {
+    ensureLayers(); ensureIds();
+    build(); $('terrain').value = S.terrain || ''; $('tlim').value = S.timeLimit || 0; ['S', 'A', 'B', 'C', 'D'].forEach(function (k) { $('rk' + k).value = S.ranks && S.ranks[k] !== undefined ? S.ranks[k] : DEFR[k]; }); if (rerender) { renderPieces(); $('width').value = S.width; }
+    var e = samples[PEND.length ? samples.length - 1 : 0] || { x: 0, z: 0, y: 0 }, e0 = samples.filter(function (q) { return q.s < STRIDE; }).pop() || e;
+    $('stats').textContent = 'Path 1: length ' + Math.round(e0.s) + ', ends at X ' + Math.round(e0.x) + ', Z ' + Math.round(e0.z) + ', rise ' + Math.round(e0.y) + (PEND.length > 1 ? '   (' + PEND.length + ' paths in all)' : '');
+    var c = {}; S.objs.forEach(function (o) { c[o.t] = (c[o.t] || 0) + 1; });
+    $('counts').textContent = Object.keys(NAMES).filter(function (k) { return c[k]; }).map(function (k) { return c[k] + ' ' + NAMES[k].toLowerCase() + (c[k] > 1 && k !== 'tip' ? 's' : ''); }).join(' · ') || 'No stamps yet';
+    var R = function (v) { return Math.round(v * 10) / 10; };
+    $('json').value = JSON.stringify({ version: 2, width: S.width, terrain: S.terrain || undefined, timeLimit: S.timeLimit || undefined, ranks: S.ranks && Object.keys(DEFR).some(function (k) { return S.ranks[k] !== undefined && S.ranks[k] !== DEFR[k]; }) ? S.ranks : undefined, pieces: S.pieces, extraPaths: S.more && S.more.length ? S.more.map(function (m) { return { x: m.x || 0, z: m.z || 0, heading: m.th || 0, rise: m.y || 0, layer: m.layer !== undefined && m.layer !== S.layers[0].id ? m.layer : undefined, pieces: m.pieces }; }) : undefined, layers: S.layers.length > 1 || S.layers[0].name !== 'Layer 1' || S.layers[0].vis === false || S.layers[0].lock ? S.layers.map(function (l) { return { id: l.id, name: l.name, visible: l.vis !== false, locked: !!l.lock }; }) : undefined, pathLayer: S.pathLayer !== undefined && S.pathLayer !== S.layers[0].id ? S.pathLayer : undefined, motion: { clock: 'the level\'s own clock, never time since a platform loaded', offset: 'travel / 2 * sin(2 * pi * (T + phase) / period)' }, objects: S.objs.map(function (o) {
+      var r = { type: o.t, id: o.id }; if (o.hm === 'ind' && (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag')) r.heightMode = 'independent'; if (o.layer !== undefined && o.layer !== S.layers[0].id) r.layer = o.layer; if (o.s !== undefined) { r.s = R(o.s); r.u = R(o.u); } else { r.x = R(o.x); r.z = R(o.z); }
+      if (o.rot) r.rot = o.rot; if (o.y) r.y = o.y; if (o.noat) r.noAttach = true;
+      if (o.t === 'tree' && o.ex) { r.exact = true; r.trunkHeight = o.tH; r.trunkWidth = o.tW; r.canopyHeight = o.cH; r.canopyWidth = o.cW; }
+      if (o.t === 'toxic') { r.width = o.w; r.length = o.d; }
+      if (o.t === 'door') {
+        var dx = function (c, r2) { if (c.mode && c.mode !== 'cycle') r2.mode = c.mode; r2.open = c.open; r2.closed = c.shut; r2.phase = c.phase; if (c.speed !== 0.5) r2.speed = c.speed; if (c.sink === false) r2.sink = false; if (c.sTx) r2.shutTiltX = c.sTx; if (c.sTz) r2.shutTiltZ = c.sTz; if (c.oTx) r2.openTiltX = c.oTx; if (c.oTz) r2.openTiltZ = c.oTz; };
+        r.width = o.w; r.height = o.hgt; dx(o, r);
+        var dls = (o.links || []).filter(function (id) { return S.objs.some(function (q) { return q.id === id; }); });
+        if (dls.length && o.af) { r.links = dls; r.after = {}; dx(o.af, r.after); }
+      }
+      if (o.t === 'ramp') { r.length = o.len; r.width = o.w; r.slope = o.ang; r.boost = o.boost; }
+      if (o.t === 'checkpoint') { r.width = o.w; r.number = cpNumber(o); }
+      if (STRIPS[o.t] && o.t !== 'segchain') { r.length = o.len; if (o.follow === false) { r.heading = R(o.th); r.bend = R(o.bend); } }
+      if (o.t === 'ledge') { r.thickness = o.w; r.height = o.hgt; }
+      if (o.t === 'platform') { r.width = o.w; r.height = o.hgt; r.thick = o.thick === undefined ? 2 : o.thick; r.move = o.move; if (o.move !== 'none') { r.travel = o.dist; r.period = o.period; r.phase = o.phase || 0; if (o.group) r.group = o.group; } }
+      if (o.t === 'gap') r.width = o.w;
+      if (o.t === 'gap' || o.t === 'ledge' || o.t === 'mud') r.ends = endsOf(o);
+      if (o.t === 'mud') r.slowdown = o.slow;
+      if (o.t === 'crag') { r.radius = o.r; r.count = o.count; r.baseRadius = o.base; r.baseRadiusVar = o.baseV; r.height = o.hgt; r.heightVar = o.hgtV; r.spacing = o.gap; r.spacingVar = o.gapV; r.seed = o.seed; }
+      if (o.t === 'patch') { r.shape = o.shape; r.width = o.w; r.length = o.d; r.ground = o.ground; r.edge = o.edge; if (o.edge !== 'hard') r.soften = o.soft; }
+      if (o.t === 'spawner') { r.radius = o.r; r.every = o.every; r.max = o.max; }
+      if (o.t === 'bigminion') r.trapped = !!o.trap;
+      if (MOBS.indexOf(o.t) >= 0 && o.idle) r.idle = true;
+      if (o.t === 'cave') { r.shape = o.shape; r.width = o.w; r.height = o.h; r.roll = o.roll; r.angle = o.ang; r.depth = o.len; r.curvature = o.bend; r.slope = o.slope; if (o.carve) r.carve = o.carve; if (o.angSet && o.after !== undefined) r.angleSet = true; }
+      if (o.t === 'hill') { r.radius = o.r; r.height = o.h; r.surface = o.rock; }
+      if (o.t === 'lake') { r.radius = o.r; r.depth = o.depth; if (o.wl) r.waterAdjust = o.wl; }
+      if (o.t === 'goal') { r.kind = o.kind; r.style = o.style; r.width = o.w; }
+      if (o.t === 'seg') { r.big = !!o.big; if (o.h) r.height = o.h; }
+      if (o.t === 'segchain') { r.big = !!o.big; if (o.h) r.height = o.h; if (o.rise) r.rise = o.rise; if (o.arc) r.arc = o.arc; r.length = o.len; r.spacing = o.gap; r.count = chainPts(o).length; if (o.follow === false) { r.follow = false; r.heading = R(o.th); r.bend = R(o.bend); } }
+      if (o.t === 'tip') { r.shape = o.shape; if (o.shape === 'circle') r.radius = o.r; else { r.width = o.w; r.length = o.d; } r.text = o.text; if (o.up) r.above = o.up; if (o.dn) r.below = o.dn; }
+      if (o.after !== undefined) { delete r.x; delete r.z; delete r.s; delete r.u; delete r.heading; r.after = o.after; r.turn = o.turn || 0; }
+      return r; }) }, null, 1);
+    save(); terEnsure(); terNote(); draw(); if (document.activeElement && document.activeElement.closest && !document.activeElement.closest('#insp')) renderInsp();
+    if (!(document.activeElement && document.activeElement.closest && document.activeElement.closest('#layers'))) renderLayers();
+    liveSoon();
+  }
+
+  // ---- events ----
+  var D2R = Math.PI / 180;
+  function segEdit(pk, pi, k, v, raw) {                          // one field of a segment was typed into; the others that follow from it change with it
+    var list = pcs(pk), pc = upg(list[pi]), info = (INFO[pk] || [])[pi] || {}, A0 = Math.abs(pc.ang || 0), straight = A0 < 1e-9, m = pk ? S.more[pk - 1] : null, rr;
+    if (k === 'ov') { if (raw === '1') pc.ov = 1; else delete pc.ov; }
+    else if (k === 'gf') { if (raw === '1') pc.gf = 1; else delete pc.gf; }
+    else if (k === 'tx') { if (+raw > 0) pc.tx = +raw; else delete pc.tx; }
+    else if (k === 'wm') { if (raw === 'step') pc.wm = 'step'; else delete pc.wm; }
+    else if (k === 'len') {
+      v = Math.max(0.5, v);
+      if (straight) pc.len = v; else { rr = pc.len / (A0 * D2R); var a1 = v / rr / D2R; if (a1 > 360) { a1 = 360; v = rr * 2 * Math.PI; } pc.ang = (pc.ang > 0 ? 1 : -1) * a1; pc.len = v; pc.r = rr; }
+    }
+    else if (k === 'ang') {
+      v = Math.max(-360, Math.min(360, v));
+      if (Math.abs(v) < 1e-9) { pc.r = straight ? pc.r : segRadius(pc); pc.ang = 0; }
+      else if (straight) { pc.len = Math.max(1, pc.len); pc.r = pc.len / (Math.abs(v) * D2R); pc.ang = v; }
+      else { rr = pc.len / (A0 * D2R); pc.r = rr; pc.ang = v; pc.len = rr * Math.abs(v) * D2R; }
+    }
+    else if (k === 'r') { v = Math.max(1, v); pc.r = v; if (!straight) pc.len = v * A0 * D2R; }
+    else if (k === 'dy') pc.dy = v;
+    else if (k === 'pitch') pc.dy = Math.round(Math.tan(Math.max(-85, Math.min(85, v)) * D2R) * horizOf(pc) * 10) / 10;   // set by angle: the rise follows from the segment's length
+    else if (k === 'roll') pc.roll = v;
+    else if (k === 'b0') pc.b0 = v;
+    else if (k === 'w') pc.w = Math.max(0, v);
+    else if (k === 'w0') { if (v > 0) pc.w0 = v; else delete pc.w0; }
+    else if (k === 'fl') { if (v > 0) pc.fl = v; else delete pc.fl; }
+    else if (k === 'sx' || k === 'sz' || k === 'sy' || k === 'sh') {
+      if (pi === 0 && m) { m[{ sx: 'x', sz: 'z', sy: 'y', sh: 'th' }[k]] = v; }                 // the first segment of another path starts where that path starts
+      else if (k === 'sx' || k === 'sz') { pc.sx = k === 'sx' ? v : (pc.sx !== undefined ? pc.sx : info.x0); pc.sz = k === 'sz' ? v : (pc.sz !== undefined ? pc.sz : info.z0); }
+      else pc[k] = v;
+    }
+    else if (k === 'ex' || k === 'ez') {                          // the end point is typed in: the curve that leaves the start along its heading and arrives there
+      var X = k === 'ex' ? v : info.x1, Z = k === 'ez' ? v : info.z1, dx = X - info.x0, dz = Z - info.z0, fw = dx * Math.sin(info.th0) - dz * Math.cos(info.th0), lt = dx * Math.cos(info.th0) + dz * Math.sin(info.th0);
+      if (Math.hypot(dx, dz) < 0.5 || (fw <= 0 && Math.abs(lt) < 0.01)) return false;
+      if (Math.abs(lt) < 0.01) { if (fw > 20000) return false; pc.len = fw; pc.ang = 0; }
+      else { var th2 = 2 * Math.atan2(Math.abs(lt), fw), Rv = (fw * fw + lt * lt) / (2 * Math.abs(lt)); if (Rv * th2 > 20000) return false; pc.ang = (lt > 0 ? 1 : -1) * th2 / D2R; pc.len = Rv * th2; pc.r = Rv; }   // an end point that would take more than the longest segment allowed is refused
+      pc.len = Math.round(pc.len * 10000) / 10000;
+    }
+    else if (k === 'ey') {
+      if (pc.gf) pc.dy = Math.round((v - terrRel(info.x1, info.z1)) * 100) / 100; else pc.dy = Math.round((v - info.y0) * 100) / 100;
+    }
+    else return false;
+    if (k === 'ang' || k === 'len' || k === 'r' || k === 'ex' || k === 'ez') pc.len = Math.round(pc.len * 10000) / 10000;
+    return true;
+  }
+  $('pieces').addEventListener('change', function (e) {
+    var t = e.target, box = t.closest('[data-p]'); if (!box) return; var pk = +box.dataset.p;
+    if (t.dataset.playr !== undefined) { snap(); if (pk) S.more[pk - 1].layer = +t.value; else S.pathLayer = +t.value; afterEdit(false); return; }
+    if (t.dataset.k === undefined) return; snap();
+    var pi = +t.dataset.i, pc = pcs(pk)[pi], v = parseFloat(t.value);
+    if (t.tagName !== 'SELECT' && isNaN(v)) { renderPieces(); hist.pop(); return; }   // not a number: the field goes back to what it was
+    if (t.tagName !== 'SELECT') {                                 // a typed number is held to the field's own range (a length of a million would lay a million samples and hang the editor); 0 still means "not set" for the start width and the slab
+      var mn = parseFloat(t.min), mx = parseFloat(t.max), k0 = t.dataset.k;
+      if (v > mx) v = mx; else if (v < mn && !(v === 0 && (k0 === 'w0' || k0 === 'fl'))) v = mn;
+      if (String(v) !== t.value) t.value = v;
+    }
+    var wasHand = hasHand(upg(pc));
+    if (!segEdit(pk, pi, t.dataset.k, v, t.value)) { hist.pop(); renderPieces(); return; }
+    afterEdit(false);
+    if (t.dataset.k === 'gf' || wasHand !== hasHand(pc)) { renderPieces(); return; }
+    var vals = segVals(upg(pc), pk, pi);                          // the other fields show what now follows
+    box.querySelectorAll('[data-i="' + pi + '"][data-k]').forEach(function (inp) { if (inp !== t && inp.tagName === 'INPUT' && vals[inp.dataset.k] !== undefined && document.activeElement !== inp) inp.value = vals[inp.dataset.k]; });
+    var head = t.closest('.piece'); if (head) { var nm = head.querySelector('.head > span:first-child'); if (nm) nm.innerHTML = '<span class="num">' + (pi + 1) + '</span> ' + segName(pc); }
+  });
+  $('pieces').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b || !b.dataset.act) return; var box = b.closest('[data-p]'), pk = +box.dataset.p, list = pcs(pk), i = +b.dataset.i, a = b.dataset.act; snap();
+    if (a === 'del') list.splice(i, 1);
+    else if (a === 'flip') list[i].ang = -(list[i].ang || 0);
+    else if (a === 'up' && i > 0) list.splice(i - 1, 0, list.splice(i, 1)[0]);
+    else if (a === 'down' && i < list.length - 1) list.splice(i + 1, 0, list.splice(i, 1)[0]);
+    else if (a === 'addSeg') list.push({ len: 200, ang: 0, r: 640, dy: 0 });
+    else if (a === 'attach') { var c0 = list[i]; ['sx', 'sz', 'sy', 'sh', 'b0', 'w0'].forEach(function (q) { delete c0[q]; }); }
+    else if (a === 'delPath') {                                    // stamps on that path go with it; stamps on later paths move up one
+      S.objs = S.objs.filter(function (o) { return o.s === undefined || Math.floor((o.s + 0.5) / STRIDE) !== pk; });
+      S.objs.forEach(function (o) { if (o.s !== undefined && Math.floor((o.s + 0.5) / STRIDE) > pk) o.s -= STRIDE; });
+      S.more.splice(pk - 1, 1); setSel(-1); openPaths = { 0: true };
+    }
+    else return;
+    afterEdit(true); renderInsp();
+  });
+  $('addPath').onclick = function () { snap(); var e = samples[samples.length - 1] || { x: 0, z: 0 }; S.more.push({ x: Math.round(e.x / 10) * 10 + 200, z: Math.round(e.z / 10) * 10, th: 0, y: 0, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }] }); openPaths[S.more.length] = true; afterEdit(true); };
+  $('width').onchange = function () { snap(); S.width = Math.max(2, Math.min(40, +this.value || 9)); afterEdit(false); };
+  var DEFR = { S: 800000, A: 720000, B: 640000, C: 560000, D: 480000 };
+  $('tlim').onchange = function () { snap(); S.timeLimit = Math.max(0, parseFloat(this.value) || 0); afterEdit(false); };
+  ['S', 'A', 'B', 'C', 'D'].forEach(function (k) { $('rk' + k).onchange = function () { snap(); S.ranks = S.ranks || {}; ['S', 'A', 'B', 'C', 'D'].forEach(function (q) { S.ranks[q] = S.ranks[q] === undefined ? DEFR[q] : S.ranks[q]; }); S.ranks[k] = Math.max(0, parseFloat(this.value) || 0); afterEdit(false); }; });
+  $('terrain').onchange = function () { snap(); S.terrain = this.value; afterEdit(false); };
+  $('undo').onclick = undo;
+  var raf = 0, t0 = 0;
+  $('pv').onclick = function () {
+    if (clock !== null) { clock = null; cancelAnimationFrame(raf); this.textContent = '▶ Preview motion'; draw(); return; }
+    t0 = performance.now(); var self = this;
+    (function loop() { clock = (performance.now() - t0) / 1000; self.textContent = '■ Stop (T = ' + clock.toFixed(1) + 's)'; draw(); raf = requestAnimationFrame(loop); })();
+  };
+  $('dup').onclick = function () { if (selList().length > 1) { dupSel(); return; } var o = S.objs[sel]; if (!o) return; snap(); var c = JSON.parse(JSON.stringify(o)), p = pos(o); delete c.id; if (STRIPS[c.t]) { if (c.follow === false) { c.x += 20; c.z += 20; } else c.s = Math.min(total, c.s + c.len + (c.gap || 0)); } else place(c, p.x + 12, p.z + 12); S.objs.push(c); setSel(S.objs.length - 1); afterEdit(false); renderInsp(); };
+  $('tools').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-tool]'); if (!b) return; tool = b.dataset.tool;
+    [].forEach.call($('tools').querySelectorAll('button[data-tool]'), function (x) { x.classList.toggle('on', x === b); });
+    if (armed >= 0) { armed = -1; renderPresets(); }
+    renderCluster(); renderInsp();
+    cv.style.cursor = tool === 'select' ? 'grab' : 'crosshair';
+    $('hint').textContent = tool === 'select' ? 'click a stamp to select it (click again to cycle through stamps stacked there), drag it to move it · shift+drag box-selects · alt+click adds or removes one · drag empty ground to pan' : tool === 'erase' ? 'click a stamp to remove it' : 'click to stamp · drag to pan · wheel to zoom';
+    draw();
+  });
+  $('clusterOpts').addEventListener('input', function (e) { var k = e.target.dataset.ck; if (!k) return; var d = DEF[tool]; if (k === 'shape') return; d[k] = parseFloat(e.target.value) || 0; draw(); });
+  $('clusterOpts').addEventListener('change', function (e) { var k = e.target.dataset.ck; if (k === 'shape') { DEF[tool].shape = e.target.value; renderCluster(); draw(); } });
+  $('copy').onclick = function () {
+    var t = $('json'); t.select();
+    var done = function (ok) { $('msg').textContent = ok ? 'Copied.' : 'Select the box and copy it yourself (Ctrl+C).'; };
+    try { navigator.clipboard.writeText(t.value).then(function () { done(true); }, function () { done(false); }); } catch (e) { done(false); }
+  };
+  $('load').onclick = function () {
+    try {
+      var j = JSON.parse($('json').value); if (!j.pieces) throw 0; snap();
+      S = { layers: (j.layers || []).map(function (l) { return { id: +l.id, name: String(l.name || 'Layer'), vis: l.visible !== false, lock: !!l.locked }; }), pathLayer: j.pathLayer, more: (j.extraPaths || []).map(function (m) { return { x: m.x || 0, z: m.z || 0, th: m.heading || 0, y: m.rise || 0, layer: m.layer, pieces: m.pieces || [] }; }), width: j.width || 9, pieces: j.pieces, terrain: j.terrain || '', timeLimit: j.timeLimit || 0, ranks: j.ranks || null, objs: (j.objects || []).map(function (r) {
+        var o = { t: r.type, rot: r.rot || 0, y: r.y || 0 }; if (r.noAttach) o.noat = true; if (r.s !== undefined) { o.s = r.s; o.u = r.u; } else { o.x = r.x; o.z = r.z; }
+        if (r.type === 'toxic') { o.w = r.width || r.size || 12; o.d = r.length || r.size || 12; }
+        if (r.type === 'door') {
+          var dr = function (q, d) { return { mode: q.mode || 'cycle', open: q.open === undefined ? d.open : q.open, shut: q.closed === undefined ? d.shut : q.closed, phase: q.phase === undefined ? d.phase : q.phase, speed: q.speed === undefined ? d.speed : q.speed, sink: q.sink === undefined ? d.sink : q.sink !== false, sTx: q.shutTiltX === undefined ? d.sTx : q.shutTiltX, sTz: q.shutTiltZ === undefined ? d.sTz : q.shutTiltZ, oTx: q.openTiltX === undefined ? d.oTx : q.openTiltX, oTz: q.openTiltZ === undefined ? d.oTz : q.openTiltZ }; };
+          var d0 = dr(r, { open: 3, shut: 3, phase: 0, speed: 0.5, sink: true, sTx: 0, sTz: 0, oTx: 0, oTz: 0 });
+          o.w = r.width || 12; o.hgt = r.height === undefined ? 10 : r.height; for (var dk0 in d0) o[dk0] = d0[dk0];
+          if (r.links && r.links.length) { o.links = r.links.slice(); o.af = dr(r.after || {}, d0); }
+        }
+        if (r.type === 'ramp') { o.len = r.length || 45; o.w = r.width || 9; o.ang = r.slope === undefined ? 30 : r.slope; o.boost = r.boost || 0; }
+        if (r.type === 'checkpoint') o.w = r.width || 16;
+        if (r.type === 'sign') o.text = r.text || '';
+        if (r.type === 'ledge') { o.w = r.thickness || 4; o.hgt = r.height === undefined ? 5 : r.height; }
+        if (r.type === 'platform') { o.w = r.width || 16; o.thick = r.thick === undefined ? 2 : r.thick; o.hgt = r.height === undefined ? 10 : r.height; o.move = r.move || 'none'; o.dist = r.travel || 40; o.period = r.period || 4; o.phase = r.phase || 0; o.group = r.group || 0; }
+        if (r.type === 'gap') o.w = r.width || 15;
+        if (r.type === 'gap' || r.type === 'ledge' || r.type === 'mud') o.ends = r.ends === 'square' ? 'square' : 'round';
+        if (r.type === 'mud') { o.slow = r.slowdown === undefined ? 50 : r.slowdown; o.len = r.length || 150; o.follow = true; }
+        if (r.type === 'ledge' || r.type === 'platform' || r.type === 'gap') { o.len = r.length || 40; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.heading || 0; o.bend = r.bend || 0; } }
+        if (r.id !== undefined) o.id = r.id; if (r.layer !== undefined) o.layer = r.layer; if (r.heightMode === 'independent') o.hm = 'ind';
+        if (r.after !== undefined) { o.after = r.after; o.turn = r.turn || 0; o.follow = false; }
+        if (r.type === 'tree' && r.exact) { o.ex = true; o.tH = r.trunkHeight || 15.5; o.tW = r.trunkWidth || 1.6; o.cH = r.canopyHeight || 14.9; o.cW = r.canopyWidth || 7.4; }
+        if (r.type === 'crag') { o.r = r.radius || 60; o.count = r.count || 25; o.seed = r.seed || (1 + Math.floor(Math.random() * 2000000000)); if (r.heightVar !== undefined) { o.base = r.baseRadius || 5.5; o.baseV = r.baseRadiusVar || 0; o.hgt = r.height || 4; o.hgtV = r.heightVar || 0; o.gap = r.spacing || 0; o.gapV = r.spacingVar || 0; } else { o.base = 5.5; o.baseV = 2; o.hgt = Math.round(0.675 * (r.height || 6) * 10) / 10; o.hgtV = Math.round(0.325 * (r.height || 6) * 10) / 10; o.gap = 0; o.gapV = 0; } }
+        if (r.type === 'patch') { o.shape = r.shape || 'ellipse'; o.w = r.width || 200; o.d = r.length || 150; o.ground = r.ground || 'grass'; o.edge = r.edge === 'hard' ? 'hard' : 'soft'; o.soft = r.soften === undefined ? 30 : r.soften; }
+        if (r.type === 'bigminion') o.trap = !!r.trapped;
+        if (MOBS.indexOf(r.type) >= 0 && r.idle) o.idle = true;
+        if (r.type === 'cave') { o.shape = r.shape || 'rect'; o.w = r.width || 8; o.h = r.height || 8; o.roll = r.roll || 0; o.ang = r.angle === undefined ? 20 : r.angle; o.len = r.depth || 60; o.bend = r.curvature || 0; o.slope = r.slope || 0; o.carve = r.carve || 0; o.angSet = !!r.angleSet; }
+        if (r.type === 'hill') { o.r = r.radius || 80; o.h = r.height || 20; o.rock = r.surface || 'rock'; }
+        if (r.type === 'lake') { o.r = r.radius || 100; o.depth = r.depth || 12; o.wl = r.waterAdjust || 0; }
+        if (r.type === 'spawner') { o.r = r.radius || 40; o.every = r.every || 3; o.max = r.max || 6; }
+        if (r.type === 'goal') { o.kind = r.kind || 'regular'; o.style = r.style || 'banner'; o.w = r.width || 16; }
+        if (r.type === 'seg') { o.big = !!r.big; o.h = r.height || 0; }
+        if (r.type === 'segchain') { o.big = !!r.big; o.h = r.height || 0; o.rise = r.rise || 0; o.arc = r.arc || 0; o.len = r.length || 120; o.gap = r.spacing || 12; if (r.follow === false) { o.follow = false; o.th = r.heading || 0; o.bend = r.bend || 0; } }
+        if (r.type === 'tip') { o.shape = r.shape || 'circle'; o.r = r.radius || 40; o.w = r.width || 80; o.d = r.length || 60; o.text = r.text || ''; o.up = r.above || 0; o.dn = r.below || 0; }
+        return o; }) };
+      setSel(-1); afterEdit(true); renderInsp(); fitView(); $('msg').textContent = 'Loaded.';
+    } catch (e) { $('msg').textContent = 'That is not a path file.'; }
+  };
+  $('reset').onclick = function () { snap(); S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }], objs: [] }; setSel(-1); afterEdit(true); renderInsp(); };
+
+  var drag = null, hintT = 0;
+  function flashHint(t) { var h = $('hint'), old = h.textContent; h.textContent = t; clearTimeout(hintT); hintT = setTimeout(function () { h.textContent = tool === 'select' ? 'click a stamp to select it (click again to cycle through stamps stacked there), drag it to move it · shift+drag box-selects · alt+click adds or removes one · drag empty ground to pan' : tool === 'erase' ? 'click a stamp to remove it' : 'click to stamp · drag to pan · wheel to zoom'; }, 3200); }
+  function stampTool(t, x, z) {
+    if (t === 'start') { var ex = S.objs.filter(function (q) { return q.t === 'start'; })[0]; if (ex) { place(ex, x, z); setSel(S.objs.indexOf(ex)); return; } }   // only one player start: stamping again moves it
+    if (t === 'forest') {
+      var tp = DEF.forest, tl = forestLayout(tp, 1 + Math.floor(Math.random() * 2000000000)), made = [];
+      tl.forEach(function (c) { var o = { t: 'tree', rot: 0, x: x + c.x, z: z + c.z, y: 0, tH: Math.round(c.tH * 10) / 10, tW: Math.round(c.tW * 100) / 100, cH: Math.round(c.cH * 10) / 10, cW: Math.round(c.cW * 10) / 10, ex: true, layer: S.activeLayer }; S.objs.push(o); made.push(o); });
+      setSelList(made); return;
+    }
+    var n0 = mk(t, x, z);
+    if (t === 'crag') { var parts = splitCrags(n0); parts.forEach(function (c) { S.objs.push(c); }); setSelList(parts); return; }   // a stamped cluster lands as separate crags, so each can be moved or tuned alone
+    S.objs.push(n0); setSel(S.objs.length - 1);
+  }
+  cv.addEventListener('pointerdown', function (e) {
+    cv.setPointerCapture(e.pointerId);
+    var r = cv.getBoundingClientRect(), w = s2w(e.clientX - r.left, e.clientY - r.top);
+    if (e.shiftKey && tool !== 'erase') {                       // shift + drag: box-select
+      drag = { x: e.clientX, y: e.clientY, marquee: true, add: e.altKey || e.ctrlKey || e.metaKey, base: selList().slice(), moved: false, obj: -1, hit: -1 };
+      marq = { x0: w[0], z0: w[1], x1: w[0], z1: w[1] }; return;
+    }
+    var all = tool === 'select' || tool === 'erase' ? pickAll(w[0], w[1]) : [], hi = all.length ? all[0] : -1, cur = selList(), prevSel = cur.length === 1 ? S.objs.indexOf(cur[0]) : -1;
+    for (var k = 0; k < all.length; k++) if (isSel(S.objs[all[k]])) { hi = all[k]; break; }   // a stamp that is already selected wins, so one under others can still be dragged
+    if ((e.altKey || e.ctrlKey || e.metaKey) && tool === 'select') { drag = { x: e.clientX, y: e.clientY, cx: view.cx, cz: view.cz, moved: false, obj: -1, hit: hi, alt: true, all: all }; return; }
+    drag = { x: e.clientX, y: e.clientY, cx: view.cx, cz: view.cz, moved: false, obj: tool === 'select' && hi >= 0 ? hi : -1, hit: hi, all: all, prevSel: prevSel, snapped: false };
+    if (drag.obj >= 0) {
+      if (cur.length > 1 && isSel(S.objs[drag.obj])) {           // a group: they all move together
+        drag.group = cur.map(function (q) { var p = pos(q); return { o: q, x: p.x, z: p.z }; }); drag.w0 = w;
+      } else { setSel(drag.obj); var p = pos(S.objs[sel]); drag.dx = p.x - w[0]; drag.dz = p.z - w[1]; renderInsp(); draw(); }
+    }
+  });
+  cv.addEventListener('pointermove', function (e) {
+    var r = cv.getBoundingClientRect(), px = e.clientX - r.left, py = e.clientY - r.top, w = s2w(px, py);
+    hover = [w[0], w[1]]; $('coord').textContent = 'X ' + Math.round(w[0]) + '   Z ' + Math.round(w[1]);
+    if (drag) {
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+      if (drag.marquee) { marq.x1 = w[0]; marq.z1 = w[1]; draw(); return; }
+      if (drag.moved) {
+        if (drag.group) { if (!drag.snapped) { snap(); drag.snapped = true; } drag.group.forEach(function (g) { if (g.o.after === undefined) place2(g.o, g.x + w[0] - drag.w0[0], g.z + w[1] - drag.w0[1]); }); afterEdit(false); return; }
+        if (drag.obj >= 0) { if (S.objs[drag.obj].after !== undefined) return; if (!drag.snapped) { snap(); drag.snapped = true; } place2(S.objs[drag.obj], w[0] + drag.dx, w[1] + drag.dz); afterEdit(false); renderInsp(); return; }
+        view.cx = drag.cx - dx / view.zoom; view.cz = drag.cz - dy / view.zoom;
+      }
+    }
+    draw();
+  });
+  cv.addEventListener('pointerleave', function () { hover = null; draw(); });
+  cv.addEventListener('pointerup', function (e) {
+    var d = drag; drag = null;
+    if (d && d.marquee) {
+      var found = marqueeList(marq); marq = null;
+      if (d.add) found = d.base.concat(found.filter(function (q) { return d.base.indexOf(q) < 0; }));
+      setSelList(found); renderInsp(); draw(); if (found.length > 1) flashHint(found.length + ' stamps selected'); return;
+    }
+    if (!d || d.moved) return;
+    var r = cv.getBoundingClientRect(), w = s2w(e.clientX - r.left, e.clientY - r.top);
+    if (d.alt) {                                                 // alt/ctrl + click: add or remove one stamp
+      if (d.hit >= 0) { var q = S.objs[d.hit], cur = selList().slice(), ai = cur.indexOf(q); if (ai >= 0) cur.splice(ai, 1); else cur.push(q); setSelList(cur); renderInsp(); draw(); }
+      return;
+    }
+    if (tool === 'erase') { if (d.hit >= 0) { snap(); removeAt(d.hit); setSel(-1); afterEdit(false); renderInsp(); } }
+    else if (tool === 'preset') { if (presets[armed]) pasteSnap(presets[armed], w[0], w[1]); }
+    else if (tool === 'select') {
+      var pick1 = d.hit;
+      if (d.all.length > 1 && d.prevSel >= 0 && d.all.indexOf(d.prevSel) >= 0) pick1 = d.all[(d.all.indexOf(d.prevSel) + 1) % d.all.length];   // clicking the same spot again steps down through whatever is stacked there
+      setSel(pick1);
+      renderInsp(); draw(); if (d.all.length > 1) flashHint(d.all.length + ' stamps here — click again to cycle through them');
+    }
+    else { snap(); stampTool(tool, w[0], w[1]); afterEdit(false); renderInsp(); }
+  });
+  cv.addEventListener('wheel', function (e) {
+    e.preventDefault(); var r = cv.getBoundingClientRect(), px = e.clientX - r.left, py = e.clientY - r.top, before = s2w(px, py);
+    view.zoom = Math.max(0.05, Math.min(6, view.zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15)));
+    var after = s2w(px, py); view.cx += before[0] - after[0]; view.cz += before[1] - after[1]; draw();
+  }, { passive: false });
+  window.addEventListener('keydown', function (e) {
+    var tag = document.activeElement.tagName, typing = tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT', mod = e.ctrlKey || e.metaKey, k = (e.key || '').toLowerCase();
+    if (mod && !typing) {
+      if (k === 'z') { e.preventDefault(); undo(); }
+      else if (k === 'c' && selList().length) { e.preventDefault(); copySel(); }
+      else if (k === 'x' && selList().length) { e.preventDefault(); copySel(); deleteSel(); }
+      else if (k === 'v') { e.preventDefault(); pasteClip(); }
+      else if (k === 'd' && selList().length) { e.preventDefault(); dupSel(); }
+      else if (k === 'a') { e.preventDefault(); setSelList(S.objs.filter(objPick)); renderInsp(); draw(); }
+    }
+    if ((e.key === 'Delete' || e.key === 'Backspace') && !typing && selList().length) { e.preventDefault(); deleteSel(); }
+    if (e.key === 'Escape' && !typing) { if (tool === 'preset') { armed = -1; $('tools').querySelector('[data-tool=select]').click(); renderPresets(); } setSel(-1); renderInsp(); draw(); }
+  });
+  window.addEventListener('resize', size);
+
+  // ---- copy, paste, delete, duplicate for one stamp or a whole selection ----
+  function deleteSel() { var sl = selList(); if (!sl.length) return; snap(); sl.forEach(function (o) { var i = S.objs.indexOf(o); if (i >= 0) removeAt(i); }); setSel(-1); afterEdit(false); renderInsp(); }
+  function snapshotSel(sl) {                                   // the stamps as plain data, with where each one stands on the map
+    var ids = {}; sl.forEach(function (o) { ids[o.id] = 1; });
+    var items = sl.map(function (o) {
+      var c = JSON.parse(JSON.stringify(o)), p = pos(o);
+      if (c.after !== undefined && !ids[c.after]) {            // joined to something that is not being copied: it stands on its own, where it is now
+        var b = base(o, 0), deg = b.th * 180 / Math.PI;
+        if (c.t === 'cave') { c.ang = Math.round(cAng(o)); c.rot = deg; } else c.th = deg;
+        c.x = b.x; c.z = b.z; delete c.after; c.turn = 0; if (c.t !== 'cave') c.follow = false;
+      }
+      return { c: c, x: p.x, z: p.z, linked: c.after !== undefined };
+    });
+    var cx = 0, cz = 0; items.forEach(function (it) { cx += it.x; cz += it.z; });
+    return { items: items, cx: cx / Math.max(1, items.length), cz: cz / Math.max(1, items.length) };
+  }
+  function pasteSnap(cl, tx, tz) {
+    snap(); var dx = tx - cl.cx, dz = tz - cl.cz, map = {}, made = [];
+    cl.items.forEach(function (it) {
+      var c = JSON.parse(JSON.stringify(it.c)), oid = c.id; delete c.id; if (!lyrById(c.layer)) c.layer = S.activeLayer;
+      S.objs.push(c); ensureIds(); if (oid !== undefined) map[oid] = c.id; made.push({ c: c, it: it });
+    });
+    made.forEach(function (m) {
+      var c = m.c;
+      if (c.links) { c.links = c.links.map(function (id) { return map[id]; }).filter(function (id) { return id !== undefined; }); if (!c.links.length) { delete c.links; delete c.af; } }
+      if (c.after !== undefined) { c.after = map[c.after]; return; }
+      if (STRIPS[c.t]) place2(c, m.it.x + dx, m.it.z + dz); else place(c, m.it.x + dx, m.it.z + dz);
+    });
+    setSelList(made.map(function (m) { return m.c; })); afterEdit(false); renderInsp();
+  }
+  function copySel() {
+    var sl = selList(); if (!sl.length) return; clip = snapshotSel(sl);
+    try { localStorage.setItem('polyrun-pe-clip', JSON.stringify(clip)); } catch (e) {}
+    flashHint(sl.length + (sl.length === 1 ? ' stamp' : ' stamps') + ' copied — Ctrl+V pastes at the pointer');
+  }
+  function pasteClip() {
+    if (!clip) { try { clip = JSON.parse(localStorage.getItem('polyrun-pe-clip')); } catch (e) { clip = null; } }
+    if (!clip || !clip.items || !clip.items.length) { flashHint('Nothing copied yet'); return; }
+    var t = hover || [view.cx, view.cz]; pasteSnap(clip, t[0], t[1]);
+  }
+  function dupSel() {
+    var sl = selList(); if (sl.length < 2) { $('dup').onclick(); return; }
+    var cl = snapshotSel(sl); pasteSnap(cl, cl.cx + 20, cl.cz + 20);
+  }
+  $('cpy').onclick = copySel; $('pst').onclick = pasteClip;
+
+  // ---- presets: a saved group of stamps you can drop anywhere, on any level ----
+  var presets = [], armed = -1;
+  try { presets = JSON.parse(localStorage.getItem('polyrun-pe-presets') || '[]') || []; } catch (e) { presets = []; }
+  function savePresets() { try { localStorage.setItem('polyrun-pe-presets', JSON.stringify(presets)); } catch (e) { flashHint('Could not save: this browser is blocking storage'); } }
+  function renderPresets() {
+    $('presets').innerHTML = presets.map(function (p, i) {
+      return '<div class="lrow" data-pi="' + i + '"><button class="small' + (armed === i ? ' on' : '') + '" data-pact="arm" title="Click, then click the map to stamp a copy">' + (armed === i ? 'Stamping…' : 'Stamp') + '</button>' +
+        '<input type="text" data-pname value="' + p.name.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" maxlength="40"><span class="stats" style="min-width:24px;text-align:right">' + p.items.length + '</span>' +
+        '<button class="small" data-pact="del" title="Delete this preset">✕</button></div>';
+    }).join('');
+  }
+  $('prSave').onclick = function () {
+    var sl = selList(); if (!sl.length) { flashHint('Select some stamps first, then save them as a preset'); return; }
+    var cl = snapshotSel(sl), nm = ($('prName').value || '').trim() || 'Preset ' + (presets.length + 1);
+    presets.push({ name: nm, items: cl.items, cx: cl.cx, cz: cl.cz }); savePresets(); $('prName').value = ''; renderPresets(); flashHint('Saved “' + nm + '” (' + sl.length + (sl.length === 1 ? ' stamp' : ' stamps') + ')');
+  };
+  $('presets').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-pact]'); if (!b) return; var i = +b.closest('[data-pi]').dataset.pi;
+    if (b.dataset.pact === 'del') { presets.splice(i, 1); if (armed === i) { armed = -1; $('tools').querySelector('[data-tool=select]').click(); } else if (armed > i) armed--; savePresets(); }
+    else { if (armed === i) { armed = -1; $('tools').querySelector('[data-tool=select]').click(); } else { var a = i; $('tools').querySelector('[data-tool=select]').click(); armed = a; tool = 'preset'; [].forEach.call($('tools').querySelectorAll('button[data-tool]'), function (x) { x.classList.remove('on'); }); cv.style.cursor = 'crosshair'; $('hint').textContent = 'click the map to stamp “' + presets[a].name + '” · Esc to stop'; } }
+    renderPresets(); draw();
+  });
+  $('presets').addEventListener('change', function (e) { var t = e.target; if (t.dataset.pname === undefined) return; var p = presets[+t.closest('[data-pi]').dataset.pi]; if (p) { p.name = (t.value || '').trim() || 'Preset'; savePresets(); } });
+
+  // ---- layers (editor only: the game never sees them) ----
+  function renderLayers() {
+    var cnt = {}; S.layers.forEach(function (l) { cnt[l.id] = 0; });
+    S.objs.forEach(function (o) { cnt[lyrOf(o).id]++; });
+    allPaths().forEach(function (p, k) { cnt[pathLayerOf(k).id]++; });
+    $('layers').innerHTML = S.layers.map(function (l) {
+      return '<div class="lrow' + (l.vis === false ? ' off' : '') + '" data-lid="' + l.id + '">' +
+        '<button class="small' + (S.activeLayer === l.id ? ' on' : '') + '" data-lact="act" title="New stamps go on this layer">' + (S.activeLayer === l.id ? '★' : '☆') + '</button>' +
+        '<button class="small' + (l.vis === false ? '' : ' on') + '" data-lact="vis" title="Show / hide (alt+click: show only this one)">' + (l.vis === false ? '—' : '👁') + '</button>' +
+        '<button class="small' + (l.lock ? ' on' : '') + '" data-lact="lock" title="Lock: its stamps cannot be selected or moved">' + (l.lock ? '🔒' : '🔓') + '</button>' +
+        '<input type="text" data-lname value="' + l.name.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" maxlength="30">' +
+        '<span class="stats" style="min-width:22px;text-align:right">' + cnt[l.id] + '</span>' +
+        '<button class="small" data-lact="del" title="Delete this layer (its stamps move to the first layer)"' + (S.layers.length < 2 ? ' disabled' : '') + '>✕</button></div>';
+    }).join('');
+  }
+  $('layers').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-lact]'); if (!b) return; var row = b.closest('[data-lid]'), id = +row.dataset.lid, l = lyrById(id), a = b.dataset.lact;
+    if (a === 'act') S.activeLayer = id;
+    else if (a === 'vis') { if (e.altKey) { var only = S.layers.every(function (q) { return q.id === id ? q.vis !== false : q.vis === false; }); S.layers.forEach(function (q) { q.vis = only ? true : q.id === id; }); } else l.vis = l.vis === false; }
+    else if (a === 'lock') l.lock = !l.lock;
+    else if (a === 'del') {
+      if (S.layers.length < 2) return; snap(); var rest = S.layers.filter(function (q) { return q.id !== id; })[0];
+      S.objs.forEach(function (o) { if (lyrOf(o).id === id) o.layer = rest.id; }); if (S.pathLayer === id || !lyrById(S.pathLayer)) S.pathLayer = rest.id; S.more.forEach(function (m) { if (m.layer === id) m.layer = rest.id; });
+      S.layers = S.layers.filter(function (q) { return q.id !== id; }); if (S.activeLayer === id) S.activeLayer = rest.id; renderPieces();
+    }
+    var keepSel = selList().filter(objPick); setSelList(keepSel); afterEdit(false); renderLayers(); renderInsp();
+  });
+  $('layers').addEventListener('change', function (e) { var t = e.target; if (t.dataset.lname === undefined) return; var l = lyrById(+t.closest('[data-lid]').dataset.lid); if (!l) return; snap(); l.name = (t.value || '').trim() || 'Layer'; afterEdit(false); renderPieces(); renderInsp(); });
+  $('addLayer').onclick = function () { snap(); S.layers.push({ id: nextLayer++, name: 'Layer ' + (S.layers.length + 1), vis: true, lock: false }); S.activeLayer = S.layers[S.layers.length - 1].id; afterEdit(false); renderPieces(); renderLayers(); };
+  $('showAllL').onclick = function () { S.layers.forEach(function (l) { l.vis = true; }); afterEdit(false); renderLayers(); };
+
+  // ---- the ground under the layout: read from the game's own terrain code, so it appears where the editor runs inside the game ----
+  var TER = { key: '', b: null, cell: 0, nx: 0, nz: 0, h: null, k: null, img: null, done: false, ver: 0, rows: 0, timer: 0 };
+  function terHost() { return typeof HOST !== 'undefined' && HOST.__terrain ? HOST.__terrain : null; }
+  function terWanted() { return $('terShow').checked && (S.terrain === 'level1' || S.terrain === 'level2'); }
+  function terNote() {
+    var t = '';
+    if ($('terShow').checked && (S.terrain === 'level1' || S.terrain === 'level2')) { if (!terHost()) t = 'The ground only shows when this editor runs inside the game (Dev Mode).'; else if (!TER.done && TER.nz) t = 'Reading the ground… ' + Math.round(100 * TER.rows / TER.nz) + '%'; }
+    if ($('terNote').textContent !== t) $('terNote').textContent = t;
+  }
+  function terBounds() {
+    var x0 = 1e18, x1 = -1e18, z0 = 1e18, z1 = -1e18;
+    function ext(x, z) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (z < z0) z0 = z; if (z > z1) z1 = z; }
+    samples.forEach(function (p) { ext(p.x, p.z); }); S.objs.forEach(function (o) { var q = pos(o); ext(q.x, q.z); });
+    if (x0 > x1) { x0 = -200; x1 = 200; z0 = -600; z1 = 200; }
+    var pad = 600, b = { x0: Math.floor((x0 - pad) / 500) * 500, x1: Math.ceil((x1 + pad) / 500) * 500, z0: Math.floor((z0 - pad) / 500) * 500, z1: Math.ceil((z1 + pad) / 500) * 500 };
+    var o = TER.key === S.terrain && TER.b; if (o) { b.x0 = Math.min(b.x0, o.x0); b.x1 = Math.max(b.x1, o.x1); b.z0 = Math.min(b.z0, o.z0); b.z1 = Math.max(b.z1, o.z1); }   // it only ever grows, so dragging things about does not keep rebuilding it
+    return b;
+  }
+  function terPaint() {
+    var nx = TER.nx, nz = TER.nz, c = document.createElement('canvas'); c.width = nx; c.height = nz;
+    var g = c.getContext('2d'), im = g.createImageData(nx, nz), d = im.data, h = TER.h, k = TER.k, cell = TER.cell;
+    var COL = [[112, 160, 86], [150, 142, 128], [156, 186, 104], [158, 116, 74], [196, 166, 124], [166, 122, 84], [96, 78, 116], [61, 143, 214]];
+    for (var j = 0; j < nz; j++) for (var i = 0; i < nx; i++) {
+      var q = j * nx + i, kk = k[q], bc = COL[kk & 7] || COL[0], r = bc[0], gg = bc[1], bb = bc[2], sh;
+      var hl = h[j * nx + Math.max(0, i - 1)], hr = h[j * nx + Math.min(nx - 1, i + 1)], hu = h[Math.max(0, j - 1) * nx + i], hd = h[Math.min(nz - 1, j + 1) * nx + i];
+      sh = 1 + Math.max(-0.28, Math.min(0.28, ((hl - hr) + (hu - hd)) / (2 * cell) * ((kk & 7) === 1 ? 0.35 : 0.9)));   // bare rock is rough at this size, so it is shaded less       // lit from the north-west
+      if (kk & 32) { r = 52; gg = 124; bb = 196; sh = 1; }                                           // under the sea
+      else if (kk & 16) { r *= 0.8; gg *= 0.8; bb *= 0.8; }                                          // a ledge
+      var p = q * 4; d[p] = Math.min(255, r * sh); d[p + 1] = Math.min(255, gg * sh); d[p + 2] = Math.min(255, bb * sh); d[p + 3] = 255;
+    }
+    g.putImageData(im, 0, 0); TER.img = c;
+  }
+  function terEnsure(sync) {
+    if (!terWanted()) return; var host = terHost(); if (!host) return;
+    var b = terBounds(), same = TER.key === S.terrain && TER.b && TER.b.x0 === b.x0 && TER.b.x1 === b.x1 && TER.b.z0 === b.z0 && TER.b.z1 === b.z1;
+    if (same) { if (sync && !TER.done) { TER.ver++; clearTimeout(TER.timer); } else return; }   // (one still being read in the background is finished at once)
+    else {
+      TER.key = S.terrain; TER.b = b; TER.done = false; TER.img = null; TER.ver++; clearTimeout(TER.timer);
+      var sx = b.x1 - b.x0, sz = b.z1 - b.z0; TER.cell = Math.max(5, Math.ceil(Math.sqrt(sx * sz / (sync ? 70000 : 140000))));
+      TER.nx = Math.ceil(sx / TER.cell); TER.nz = Math.ceil(sz / TER.cell); TER.h = new Float32Array(TER.nx * TER.nz); TER.k = new Uint8Array(TER.nx * TER.nz); TER.rows = 0;
+    }
+    var ver = TER.ver;
+    (function step() {
+      if (ver !== TER.ver) return;
+      do {
+        var n = Math.min(Math.max(1, Math.floor(12000 / TER.nx)), TER.nz - TER.rows), r = host(S.terrain, TER.b.x0, TER.b.z0 + TER.rows * TER.cell, TER.nx, n, TER.cell);
+        TER.h.set(r.h, TER.rows * TER.nx); TER.k.set(r.k, TER.rows * TER.nx); TER.rows += n;
+      } while (sync && TER.rows < TER.nz);
+      if (TER.rows >= TER.nz) { terPaint(); TER.done = true; terNote(); draw(); } else { terNote(); TER.timer = setTimeout(step, 0); }
+    })();
+  }
+  $('terShow').onchange = function () { terEnsure(); terNote(); draw(); };
+  function drawTerrain(W, H) {
+    if (!$('terShow').checked) return;
+    if (S.terrain === 'ocean') { ctx.fillStyle = 'rgb(61,143,214)'; ctx.fillRect(0, 0, W, H); return; }
+    if (S.terrain === 'grass') { ctx.fillStyle = 'rgba(112,160,86,.55)'; ctx.fillRect(0, 0, W, H); return; }
+    if (S.terrain === 'crags') { ctx.fillStyle = 'rgba(140,136,128,.55)'; ctx.fillRect(0, 0, W, H); return; }
+    if (S.terrain === 'giant') { ctx.fillStyle = 'rgba(92,148,70,.55)'; ctx.fillRect(0, 0, W, H); return; }
+    if (!TER.img || TER.key !== S.terrain || !TER.b) return;
+    var a = w2s(TER.b.x0, TER.b.z0), zz = view.zoom * TER.cell; ctx.imageSmoothingEnabled = true; ctx.drawImage(TER.img, a[0], a[1], TER.nx * zz, TER.nz * zz);
+  }
+
+  // ---- live preview: when the editor is hosted by the game with Live preview on, edits are sent over a moment after you stop ----
+  var liveT = 0;
+  function liveSoon() {
+    if (typeof HOST === 'undefined' || !HOST.__liveOn || !HOST.__live) return;
+    clearTimeout(liveT); liveT = setTimeout(function () { var j = null; try { j = JSON.parse($('json').value); } catch (e) {} if (j) HOST.__live(j); }, 600);
+  }
+
+  renderPresets();
+  load(); $('width').value = S.width; renderPieces(); build(); afterEdit(false); size();
+  function mapImage(w, h) {                                 // the whole layout as one picture (the game's level maps are drawn this way, so they follow the levels)
+    var keep = { cv: cv, ctx: ctx, cx: view.cx, cz: view.cz, zoom: view.zoom, dpr: dpr, sel: sel, hover: hover }, c2 = document.createElement('canvas');
+    c2.width = w; c2.height = h; cv = c2; ctx = c2.getContext('2d'); dpr = 1; sel = -1; hover = null; MAPMODE = true;
+    try {
+      var x0 = 1e18, x1 = -1e18, z0 = 1e18, z1 = -1e18; function ext(x, z) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (z < z0) z0 = z; if (z > z1) z1 = z; }
+      samples.forEach(function (p) { ext(p.x, p.z); }); S.objs.forEach(function (o) { var q = pos(o); ext(q.x, q.z); });
+      if (x0 > x1) { x0 = -50; x1 = 50; z0 = -50; z1 = 50; }
+      var pad = 60, sx = (w - 2 * pad) / Math.max(200, x1 - x0), sz = (h - 2 * pad) / Math.max(200, z1 - z0);
+      view.zoom = Math.min(sx, sz); view.cx = (x0 + x1) / 2; view.cz = (z0 + z1) / 2; try { terEnsure(true); } catch (e) {} draw();
+    } finally { cv = keep.cv; ctx = keep.ctx; view.cx = keep.cx; view.cz = keep.cz; view.zoom = keep.zoom; dpr = keep.dpr; sel = keep.sel; hover = keep.hover; MAPMODE = false; }
+    return c2;
+  }
+  function fitView() {
+    if (samples.length) { var xs = samples.map(function (p) { return p.x; }), zs = samples.map(function (p) { return p.z; }), x0 = Math.min.apply(0, xs), x1 = Math.max.apply(0, xs), z0 = Math.min.apply(0, zs), z1 = Math.max.apply(0, zs); view.cx = (x0 + x1) / 2; view.cz = (z0 + z1) / 2; view.zoom = Math.max(0.1, Math.min(1.2, 0.85 * Math.min(cv.clientWidth / (x1 - x0 + 200), cv.clientHeight / (z1 - z0 + 200)))); draw(); }
+  }
+  fitView();
+})();
+</script>
