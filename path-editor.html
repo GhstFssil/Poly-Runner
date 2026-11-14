@@ -206,7 +206,11 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   function allPaths() { return [{ x: 0, z: 0, th: 0, y: 0, pieces: S.pieces }].concat((S.more || []).map(function (m) { return { x: m.x || 0, z: m.z || 0, th: (m.th || 0) * Math.PI / 180, y: m.y || 0, pieces: m.pieces }; })); }
   function pcs(k) { return k === 0 ? S.pieces : S.more[k - 1].pieces; }
   function smoothS(t) { return t * t * (3 - 2 * t); }
-  function upg(p) {                                              // every piece is the same kind of segment: an old straight or left/right arc is turned into one (a straight is a curve of no angle; a left arc has a negative angle)
+  function upg(p) {
+    if (p.disc) { p.rad = Math.max(2, p.rad > 0 ? p.rad : 40); p.len = 2 * p.rad; p.ang = 0; if (!(p.r > 0)) p.r = 640; p.dy = 0; return p; }   // a circular deck: its radius stands in for a length (in and out through the centre)
+    return upgSeg(p);
+  }
+  function upgSeg(p) {                                           // every piece is the same kind of segment: an old straight or left/right arc is turned into one (a straight is a curve of no angle; a left arc has a negative angle)
     if (p.t === 'straight') { p.ang = 0; if (!(p.r > 0)) p.r = 640; p.len = Math.max(0, p.len || 0); delete p.t; delete p.dir; }
     else if (p.t === 'arc') { var a = Math.abs(p.ang || 0), r = Math.max(1, p.r || 1); p.len = Math.round(r * a * Math.PI / 180 * 10000) / 10000; p.ang = p.dir === 'R' ? a : -a; p.r = r; delete p.t; delete p.dir; }
     else { if (p.ang === undefined) p.ang = 0; if (!(p.r > 0)) p.r = 640; if (p.len === undefined) p.len = 200; }
@@ -215,7 +219,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   var INFO = [];                                                  // INFO[path][piece]: where that segment starts and ends (position, heading, height, bank, width)
   function terrRel(x, z) { return typeof HOST !== 'undefined' && HOST.__terrBase ? HOST.__terrBase(S.terrain || '', x, z) : 0; }   // the ground's height here, measured the way the path's heights are (only known inside the game)
   function build() {
-    samples = []; PSTART = []; PEND = []; INFO = []; var x = 0, z = 0, th = 0, s = 0, y = 0, STEP = 4, brk = false, rl = 0, wd = S.width, wc = S.width;   // wd: the width the last piece ended at; wc: the width at the sample being made
+    samples = []; PSTART = []; PEND = []; INFO = []; DISCS = []; var x = 0, z = 0, th = 0, s = 0, y = 0, STEP = 4, brk = false, rl = 0, wd = S.width, wc = S.width;   // wd: the width the last piece ended at; wc: the width at the sample being made
     function push() { var q = { x: x, z: z, th: th, s: s, y: y, roll: rl, w: wc }; if (brk) { q.brk = true; brk = false; } samples.push(q); }
     allPaths().forEach(function (pth, pk) {
       var inf = []; INFO.push(inf); pth.pieces.forEach(upg); var f0 = pth.pieces[0];
@@ -232,7 +236,17 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         }
         var rl0 = rl, rl1 = p.roll || 0, w0 = wd, w1 = p.w > 0 ? p.w : wd, wstep = p.wm === 'step', gf = p.gf ? 1 : 0, inf1 = { x0: x, z0: z, th0: th, y0: y, rl0: rl, w0: wd };
         var vj = { i0: samples.length - 1, len: p.len, g: p.len > 0 ? (p.dy || 0) / p.len : 0, sm: !!p.sm, smL: p.smL > 0 ? p.smL : 20, gf: !!gf, cont: pi > 0 && Math.hypot(x - px0, z - pz0) < 0.5 && Math.abs(y - py0) < 0.01 };
-        if (Math.abs(p.ang || 0) < 1e-9) {
+        if (p.disc) {                                             // a circular deck: in at the rim, centre a radius straight ahead, out at the rim where its heading points (the same as the game's)
+          var Rd = Math.max(2, p.rad > 0 ? p.rad : 40), hh = p.h !== undefined && p.h !== null ? p.h * Math.PI / 180 : th, dcx = x + Math.sin(th) * Rd, dcz = z - Math.cos(th) * Rd;
+          var D = { cx: dcx, cz: dcz, R: Rd, hh: hh, tanC: Math.tan(Math.max(-89, Math.min(89, p.cs || 0)) * Math.PI / 180), tanB: Math.tan(Math.max(-89, Math.min(89, p.bk || 0)) * Math.PI / 180), base: 0, tx: p.tx || 0, pk: pk, pi: pi };
+          D.base = y - (discY(D, x, z) - D.base); DISCS.push(D); inf1.disc = D; inf1.th0 = th;
+          var ex0 = x, ez0 = z, nl = Math.max(1, Math.round(Rd / STEP)), qi;
+          for (qi = 1; qi <= nl; qi++) { x = ex0 + (dcx - ex0) * qi / nl; z = ez0 + (dcz - ez0) * qi / nl; s += Rd / nl; y = discY(D, x, z); rl = 0; wc = wd; push(); samples[samples.length - 1].dsk = 1; }
+          var ox1 = dcx + Math.sin(hh) * Rd, oz1 = dcz - Math.cos(hh) * Rd; th = hh; push(); samples[samples.length - 1].dsk = 1;
+          for (qi = 1; qi <= nl; qi++) { x = dcx + (ox1 - dcx) * qi / nl; z = dcz + (oz1 - dcz) * qi / nl; s += Rd / nl; y = discY(D, x, z); push(); samples[samples.length - 1].dsk = 1; }
+          vj.gf = true; w1 = wd;
+        }
+        else if (Math.abs(p.ang || 0) < 1e-9) {
           var n = Math.max(1, Math.round(p.len / STEP)), d = p.len / n, y0 = y;
           for (var i = 1; i <= n; i++) { x += Math.sin(th) * d; z -= Math.cos(th) * d; s += d; y = gf ? terrRel(x, z) + (p.dy || 0) : y0 + (p.dy || 0) * i / n; rl = rl0 + (rl1 - rl0) * smoothS(i / n); wc = wstep ? w1 : w0 + (w1 - w0) * smoothS(i / n); push(); }
         } else {
@@ -249,6 +263,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     });
     total = samples.length ? samples[samples.length - 1].s : 0;
   }
+  var DISCS = [];
+  function discY(D, x, z) { var dx = x - D.cx, dz = z - D.cz, r = Math.hypot(dx, dz); return D.base + (D.R - Math.min(D.R, r)) * D.tanC - (dx * Math.cos(D.hh) + dz * Math.sin(D.hh)) * D.tanB; }   // a circular deck's height: its slope rises (+) or falls (-) toward the centre, its bank tips it right (+) of its heading
   function vcurves(sm, VJ) {                                    // gradual slope changes: where either segment at a joint asks for it, the grade eases from one to the other over the blend length (half each side), as a parabola that meets both straight grades. The heights at the far ends of the blend are untouched, so nothing else moves. (The game does exactly the same.) Start Y and End Y in the fields stay the straight-line values.
     for (var q = 1; q < VJ.length; q++) {
       var A = VJ[q - 1], B = VJ[q]; if (!B.cont || A.gf || B.gf || !(A.sm || B.sm)) continue;
@@ -433,6 +449,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (vsamp.length > 1) {
       [[5, css('--road-edge'), 1], [0, css('--road'), 0]].forEach(function (c) {          // the road is drawn as a ribbon, so a width that changes along it shows
         ctx.fillStyle = c[1]; ctx.strokeStyle = c[1]; ctx.lineWidth = Math.max(2, c[0]); ctx.lineJoin = 'round';
+        DISCS.forEach(function (D) { if (!pathVis(D.pk)) return; var qc = w2s(D.cx, D.cz); ctx.beginPath(); ctx.arc(qc[0], qc[1], Math.max(2, D.R * z), 0, 6.2832); ctx.fill(); if (c[2]) ctx.stroke(); });   // circular decks
         var run = [];
         function flush() { if (run.length > 1) { ctx.beginPath(); var i, q; for (i = 0; i < run.length; i++) { q = run[i].l; if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); } for (i = run.length - 1; i >= 0; i--) { q = run[i].r; ctx.lineTo(q[0], q[1]); } ctx.closePath(); ctx.fill(); if (c[2]) ctx.stroke(); } run = []; }
         vsamp.forEach(function (p, i) { if (p.brk) flush(); var hwp = Math.max(1, (p.w || S.width) * z / 2), cs = Math.cos(p.th), sn = Math.sin(p.th), q = w2s(p.x, p.z); run.push({ l: [q[0] - cs * hwp, q[1] - sn * hwp], r: [q[0] + cs * hwp, q[1] + sn * hwp] }); });
@@ -442,6 +459,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       ctx.setLineDash([6, 6]); ctx.strokeStyle = css('--ink'); ctx.globalAlpha = 0.35; ctx.lineWidth = 1; ctx.beginPath();
       vsamp.forEach(function (p, i) { var q = w2s(p.x, p.z); if (i && !p.brk) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
       ctx.fillStyle = css('--ink');
+      if (!MAPMODE) DISCS.forEach(function (D) { if (!pathVis(D.pk) || z < 0.15) return; var qc = w2s(D.cx, D.cz), cs = Math.atan(D.tanC) * 180 / Math.PI, bk = Math.atan(D.tanB) * 180 / Math.PI, ox = qc[0] + Math.sin(D.hh) * D.R * z, oy = qc[1] - Math.cos(D.hh) * D.R * z; ctx.strokeStyle = css('--accent'); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(qc[0], qc[1]); ctx.lineTo(ox, oy); ctx.stroke(); ctx.fillText('DECK r ' + Math.round(D.R) + (Math.abs(cs) > 0.05 ? (cs > 0 ? ' · hill ' : ' · bowl ') + Math.round(Math.abs(cs) * 10) / 10 + '°' : '') + (Math.abs(bk) > 0.05 ? ' · bank ' + Math.round(bk * 10) / 10 + '°' : ''), qc[0] + 6, qc[1] + 14); });
       if (!MAPMODE) allPaths().forEach(function (pth, pk) { if (!pathVis(pk)) return; var acc = pk * STRIDE; pth.pieces.forEach(function (p, i) { acc += upg(p).len; var pt = at(acc), q = w2s(pt.x, pt.z); ctx.beginPath(); ctx.arc(q[0], q[1], 3, 0, 7); ctx.fill(); if (z > 0.3) ctx.fillText((pk ? (pk + 1) + '.' : '') + String(i + 1), q[0] + 6, q[1] - 6); }); });
     }
     allPaths().forEach(function (pth, pk) { if (!pathVis(pk)) return; var st = w2s(pth.x, pth.z); ctx.fillStyle = css('--accent'); ctx.beginPath(); ctx.arc(st[0], st[1], 6, 0, 7); ctx.fill(); ctx.fillText(pk ? 'PATH ' + (pk + 1) : 'START', st[0] + 9, st[1] + 4); });
@@ -586,7 +604,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   function segVals(p, pk, i) {                                    // every number the segment's fields show: the ones it keeps, and the ones that follow from them (where it starts, where it ends)
     var q = (INFO[pk] && INFO[pk][i]) || { x0: 0, z0: 0, th0: 0, y0: 0, rl0: 0, w0: S.width, x1: 0, z1: 0, y1: 0, w1: S.width }, R = function (v) { return Math.round(v * 100) / 100; };
     var pit = p.gf ? Math.round(Math.atan2(q.y1 - q.y0, horizOf(p)) * 180 / Math.PI * 10) / 10 : pitchOf(p);
-    return { sx: R(q.x0), sy: R(q.y0), sz: R(q.z0), sh: R(q.th0 * 180 / Math.PI), ex: R(q.x1), ey: R(q.y1), ez: R(q.z1), len: R(p.len), ang: R(p.ang || 0), r: R(segRadius(p)), b0: R(q.rl0), roll: R(p.roll || 0), dy: R(p.dy || 0), smL: R(p.smL > 0 ? p.smL : 20), pitch: pit, w0: R(q.w0), w: R(q.w1 === undefined ? S.width : q.w1), fl: p.fl || 0 };
+    return { sx: R(q.x0), sy: R(q.y0), sz: R(q.z0), sh: R(q.th0 * 180 / Math.PI), ex: R(q.x1), ey: R(q.y1), ez: R(q.z1), len: R(p.len), ang: R(p.ang || 0), r: R(segRadius(p)), b0: R(q.rl0), roll: R(p.roll || 0), rad: R(p.rad || 40), dh: R(p.h !== undefined && p.h !== null ? p.h : q.th0 * 180 / Math.PI), cs: R(p.cs || 0), bk: R(p.bk || 0), dy: R(p.dy || 0), smL: R(p.smL > 0 ? p.smL : 20), pitch: pit, w0: R(q.w0), w: R(q.w1 === undefined ? S.width : q.w1), fl: p.fl || 0 };
   }
   function fields(p, i, pk) {
     var v = segVals(p, pk, i);
@@ -597,6 +615,9 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     return g('Start' + (i === 0 ? ' (the start of the path)' : hand ? ' (set by hand)' : ' (where the last one ended)')) + f('sx', 'Start X', -99999, 99999, 1) + f('sy', 'Start Y', -3000, 3000, 1) + f('sz', 'Start Z', -99999, 99999, 1) + f('sh', 'Facing °', -360, 360, 1, '0 = north, 90 = east') +
       (hand && i > 0 ? '<div style="grid-column:1/-1"><button class="small" data-act="attach" data-i="' + i + '">Start where the last segment ended</button></div>' : '') +
       g('End') + f('ex', 'End X', -99999, 99999, 1) + f('ey', 'End Y', -3000, 3000, 1) + f('ez', 'End Z', -99999, 99999, 1) +
+      (p.disc ? g('Circular deck') + f('rad', 'Radius', 2, 5000, 1) + f('dh', 'Heading °', -360, 360, 1, 'Where the next segment leaves the rim, and the way it then faces: 0 = north, 90 = east. The same heading as the way in leaves straight across, on the far side') + f('cs', 'Slope °', -89, 89, 0.5, '+ rises toward the centre (a hill), − falls toward it (a bowl), 0 = flat') + f('bk', 'Bank °', -89, 89, 0.5, 'Tips the whole deck: + lowers its right side, looking along its heading') +
+        g('Surface') + sel('tx', 'Texture', [['0', 'Stone'], ['1', 'Wood planks'], ['2', 'Metal plates'], ['3', 'Grass']], p.tx || 0) + g('Ground') + sel('ov', 'Over the terrain', [['0', 'Terrain wins where it is higher'], ['1', 'Supersedes the terrain: the ground is cut or raised to the deck']], p.ov ? 1 : 0) + f('fl', 'Deck thickness (Oceana)', 0, 2000, 1, 'On Oceana terrain every path is a deck of its own: how deep this one is (0 = the usual 2)') : '') +
+      (p.disc ? '' : 
       g('Shape') + f('len', 'Length', 0.5, 20000, 10) + f('ang', 'Curve angle °', -360, 360, 1, '+ curves right, − curves left, 0 = straight') + f('r', 'Curve radius', 1, 20000, 10) +
       g('Height') + f('dy', p.gf ? 'Rise (above the ground)' : 'Rise (Y)', -3000, 3000, 1) + f('pitch', 'Slope angle °', -85, 85, 0.5) +
       sel('sm', 'Slope change at its ends', [['0', 'Sharp: the slope changes at the joint'], ['1', 'Gradual: eases from the last segment\'s slope and into the next one\'s']], p.sm ? 1 : 0, 'Gradual blends the slope over the blend length, half before each joint and half after, so the path has no kink. It applies at both ends of this segment (a joint is gradual if either segment asks for it). The path rounds the joint off, so right at the joint it sits a little above or below the Start/End Y shown (by an eighth of the slope change times the blend length); away from the joint nothing moves.') + (p.sm ? f('smL', 'Blend length', 1, 2000, 1, 'How far the change is spread, centred on each joint (at most the length of the shorter segment)') : '') +
@@ -605,7 +626,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       g('Surface') + sel('tx', 'Texture', [['0', 'Stone'], ['1', 'Wood planks'], ['2', 'Metal plates'], ['3', 'Grass']], p.tx || 0) +
       g('Ground') + sel('ov', 'Over the terrain', [['0', 'Terrain wins where it is higher'], ['1', 'Supersedes the terrain: the ground is cut or raised to the path']], p.ov ? 1 : 0) +
       sel('gf', 'Ground', [['0', 'Independent: keeps its own height'], ['1', 'Follows the ground: terrain height + Rise']], p.gf ? 1 : 0, 'Follows the ground: the path sits at the terrain\'s own height all along the segment (the surface of the water, over water), with Rise added on top. Independent: it starts where the last segment ended and rises by its Rise, whatever the terrain does.') +
-      f('fl', 'Slab thickness', 0, 2000, 1, '0 = no slab. How far the underside is below the top of the path. Where that would be under the ground, the slab merges with the ground; otherwise the underside floats in the air.');
+      f('fl', 'Slab thickness', 0, 2000, 1, '0 = no slab. How far the underside is below the top of the path. Where that would be under the ground, the slab merges with the ground; otherwise the underside floats in the air.'));
   }
   var openPaths = { 0: true };
   function renderPieces() {
@@ -619,7 +640,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
           '<button class="small" data-act="del" data-i="' + i + '" title="Delete">✕</button></span></div><div class="fields">' + fields(p, i, k) + '</div></div>';
       }).join('') || '<div class="stats">No segments yet. Add one.</div>';
       var plsel = '<label class="f">Layer<select data-playr="' + k + '">' + S.layers.map(function (l) { return '<option value="' + l.id + '"' + (l.id === pathLayerOf(k).id ? ' selected' : '') + '>' + l.name.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</option>'; }).join('') + '</select></label>';
-      var adds = '<div class="row"><button class="small" data-act="addSeg">+ Segment</button>' + (m ? '<button class="small" data-act="delPath">Delete this path</button>' : '') + '</div>';
+      var adds = '<div class="row"><button class="small" data-act="addSeg">+ Segment</button><button class="small" data-act="addDisc">+ Circular deck</button>' + (m ? '<button class="small" data-act="delPath">Delete this path</button>' : '') + '</div>';
       out += '<details class="pathbox" data-path="' + k + '"' + (openPaths[k] ? ' open' : '') + '><summary><b>Path ' + (k + 1) + '</b> <span class="stats" style="display:inline">' + list.length + ' segment' + (list.length === 1 ? '' : 's') + (k ? '' : ' · where the level starts') + '</span></summary><div data-p="' + k + '" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">' + plsel + adds + body + '</div></details>';
     }
     $('pieces').innerHTML = out;
@@ -847,6 +868,10 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var list = pcs(pk), pc = upg(list[pi]), info = (INFO[pk] || [])[pi] || {}, A0 = Math.abs(pc.ang || 0), straight = A0 < 1e-9, m = pk ? S.more[pk - 1] : null, rr;
     if (k === 'ov') { if (raw === '1') pc.ov = 1; else delete pc.ov; }
     else if (k === 'gf') { if (raw === '1') pc.gf = 1; else delete pc.gf; }
+    else if (k === 'rad') { pc.rad = Math.max(2, v); pc.len = 2 * pc.rad; }
+    else if (k === 'dh') pc.h = v;
+    else if (k === 'cs') pc.cs = Math.max(-89, Math.min(89, v));
+    else if (k === 'bk') pc.bk = Math.max(-89, Math.min(89, v));
     else if (k === 'sm') { if (raw === '1') { pc.sm = 1; if (!(pc.smL > 0)) pc.smL = 20; } else { delete pc.sm; delete pc.smL; } }
     else if (k === 'smL') pc.smL = Math.max(1, v);
     else if (k === 'tx') { if (+raw > 0) pc.tx = +raw; else delete pc.tx; }
@@ -914,6 +939,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     else if (a === 'up' && i > 0) list.splice(i - 1, 0, list.splice(i, 1)[0]);
     else if (a === 'down' && i < list.length - 1) list.splice(i + 1, 0, list.splice(i, 1)[0]);
     else if (a === 'addSeg') list.push({ len: 200, ang: 0, r: 640, dy: 0 });
+    else if (a === 'addDisc') list.push({ disc: 1, rad: 40, cs: 0, bk: 0, len: 80, ang: 0, r: 640, dy: 0 });
     else if (a === 'attach') { var c0 = list[i]; ['sx', 'sz', 'sy', 'sh', 'b0', 'w0'].forEach(function (q) { delete c0[q]; }); }
     else if (a === 'delPath') {                                    // stamps on that path go with it; stamps on later paths move up one
       S.objs = S.objs.filter(function (o) { return o.s === undefined || Math.floor((o.s + 0.5) / STRIDE) !== pk; });
