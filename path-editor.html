@@ -130,6 +130,11 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       <button class="small" id="load">Load from box</button>
       <button class="small" id="reset">Start over</button>
     </div>
+    <div class="row">
+      <button class="small" id="saveFile" title="Download the layout as a file you keep anywhere (a backup that does not depend on this browser)">Save to file</button>
+      <button class="small" id="openFile" title="Open a layout file saved earlier; it replaces the layout here (Ctrl+Z undoes it)">Open from file</button>
+      <input type="file" id="fileIn" accept=".json,.txt,application/json,text/plain" hidden>
+    </div>
     <div class="stats" id="msg"></div>
   </div>
 
@@ -911,6 +916,23 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var t = $('json'); t.select();
     var done = function (ok) { $('msg').textContent = ok ? 'Copied.' : 'Select the box and copy it yourself (Ctrl+C).'; };
     try { navigator.clipboard.writeText(t.value).then(function () { done(true); }, function () { done(false); }); } catch (e) { done(false); }
+  };
+  $('saveFile').onclick = function () {                           // the same text as the box, as a file: a copy of the layout that lives outside the browser's own storage
+    try {
+      var d = new Date(), p2 = function (n) { return (n < 10 ? '0' : '') + n; }, name = 'polyrun-layout-' + d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + '-' + p2(d.getHours()) + p2(d.getMinutes()) + '.json';
+      var blob = new Blob([$('json').value], { type: 'application/json' }), url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = name; a.style.display = 'none'; var hb = document.body || document.documentElement; if (hb && hb.appendChild) hb.appendChild(a); a.click();
+      setTimeout(function () { try { URL.revokeObjectURL(url); a.remove(); } catch (e) {} }, 4000);
+      $('msg').textContent = 'Saving ' + name + ' (your browser or the app may ask where to put it).';
+    } catch (e) { $('msg').textContent = 'Could not make the file here. Use Copy and paste the text into a file yourself.'; }
+  };
+  $('openFile').onclick = function () { $('fileIn').value = ''; $('fileIn').click(); };
+  $('fileIn').onchange = function () {
+    var f = this.files && this.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function () { var prev = $('json').value; $('json').value = String(r.result || ''); $('load').onclick(); if ($('msg').textContent !== 'That is not a path file.') $('msg').textContent = 'Opened ' + f.name + '. Ctrl+Z undoes it.'; else { $('json').value = prev; $('msg').textContent = f.name + ' is not a Poly Run layout file, so nothing changed.'; } };
+    r.onerror = function () { $('msg').textContent = 'Could not read that file.'; };
+    r.readAsText(f);
   };
   $('load').onclick = function () {
     try {
