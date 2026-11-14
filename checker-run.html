@@ -1,4 +1,4 @@
-<title>Poly Run</title>
+<title>Poly Runner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700&family=DM+Mono:wght@400;500&family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -737,6 +737,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     <div class="row">
       <button class="small" id="saveFile" title="Download the layout as a file you keep anywhere (a backup that does not depend on this browser)">Save to file</button>
       <button class="small" id="openFile" title="Open a layout file saved earlier; it replaces the layout here (Ctrl+Z undoes it)">Open from file</button>
+      <button class="small" id="restoreBk" title="Open the layout the desktop app last copied to ~/PolyRun/layouts" hidden>Open latest backup</button>
       <input type="file" id="fileIn" accept=".json,.txt,application/json,text/plain" hidden>
     </div>
     <div class="stats" id="msg"></div>
@@ -777,9 +778,21 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var m = 0; S.layers.forEach(function (l) { m = Math.max(m, l.id); }); nextLayer = m + 1;
     if (S.activeLayer === undefined || !lyrById(S.activeLayer)) S.activeLayer = S.layers[0].id;
   }
+  // In the desktop app (it gives the page window.polyrun) the layout and the presets are also copied to ordinary files, so losing the app's own storage cannot lose the work.
+  var bkTimer = 0;
+  function backupNow() {
+    bkTimer = 0;
+    try {
+      if (!window.polyrun || !window.polyrun.backup) return;
+      var t = $('json').value; if (t) window.polyrun.backup('layout', t);
+      var pr = localStorage.getItem('polyrun-pe-presets'); if (pr) window.polyrun.backup('presets', pr);
+    } catch (e) {}
+  }
+  function backupSoon() { if (!bkTimer && window.polyrun && window.polyrun.backup) bkTimer = setTimeout(backupNow, 20000); }   // at most one copy every 20 seconds while editing
+  window.addEventListener('beforeunload', function () { if (bkTimer) backupNow(); });
   function save() {                                               // every change is kept in this browser; if its storage is full (a big saved Molly model shares it) that fails, and it must not fail silently
     if (typeof HOST !== 'undefined' && HOST.__nosave) return;
-    try { localStorage.setItem(KEY, JSON.stringify(S)); localStorage.setItem('polyrun-last-export', $('json').value); }
+    try { localStorage.setItem(KEY, JSON.stringify(S)); localStorage.setItem('polyrun-last-export', $('json').value); backupSoon(); }
     catch (e) { if (!save.warned || Date.now() - save.warned > 20000) { save.warned = Date.now(); try { flashHint('Not autosaved: this browser\'s storage is full. Copy the layout text to keep it.'); } catch (e2) {} } }
   }
   function load() {
@@ -1529,11 +1542,20 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       $('msg').textContent = 'Saving ' + name + ' (your browser or the app may ask where to put it).';
     } catch (e) { $('msg').textContent = 'Could not make the file here. Use Copy and paste the text into a file yourself.'; }
   };
+  function openText(text, label) {                                // put layout text in the box and load it; if it is not a layout, the box and the layout stay as they were
+    var prev = $('json').value; $('json').value = text; $('load').onclick();
+    if ($('msg').textContent !== 'That is not a path file.') $('msg').textContent = 'Opened ' + label + '. Ctrl+Z undoes it.';
+    else { $('json').value = prev; $('msg').textContent = label + ' is not a Poly Runner layout file, so nothing changed.'; }
+  }
+  if (window.polyrun && window.polyrun.restore) $('restoreBk').hidden = false;
+  $('restoreBk').onclick = function () {
+    window.polyrun.restore('layout').then(function (t) { if (!t) { $('msg').textContent = 'No automatic backup yet. (They are kept in ~/PolyRun/layouts while you edit.)'; return; } openText(t, 'the latest automatic backup'); }, function () { $('msg').textContent = 'Could not read the backup.'; });
+  };
   $('openFile').onclick = function () { $('fileIn').value = ''; $('fileIn').click(); };
   $('fileIn').onchange = function () {
     var f = this.files && this.files[0]; if (!f) return;
     var r = new FileReader();
-    r.onload = function () { var prev = $('json').value; $('json').value = String(r.result || ''); $('load').onclick(); if ($('msg').textContent !== 'That is not a path file.') $('msg').textContent = 'Opened ' + f.name + '. Ctrl+Z undoes it.'; else { $('json').value = prev; $('msg').textContent = f.name + ' is not a Poly Run layout file, so nothing changed.'; } };
+    r.onload = function () { openText(String(r.result || ''), f.name); };
     r.onerror = function () { $('msg').textContent = 'Could not read that file.'; };
     r.readAsText(f);
   };
@@ -1716,7 +1738,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   // ---- presets: a saved group of stamps you can drop anywhere, on any level ----
   var presets = [], armed = -1;
   try { presets = JSON.parse(localStorage.getItem('polyrun-pe-presets') || '[]') || []; } catch (e) { presets = []; }
-  function savePresets() { try { localStorage.setItem('polyrun-pe-presets', JSON.stringify(presets)); } catch (e) { flashHint('Could not save: this browser is blocking storage'); } }
+  function savePresets() { try { localStorage.setItem('polyrun-pe-presets', JSON.stringify(presets)); backupSoon(); } catch (e) { flashHint('Could not save: this browser is blocking storage'); } }
   function renderPresets() {
     $('presets').innerHTML = presets.map(function (p, i) {
       return '<div class="lrow" data-pi="' + i + '"><button class="small' + (armed === i ? ' on' : '') + '" data-pact="arm" title="Click, then click the map to stamp a copy">' + (armed === i ? 'Stamping…' : 'Stamp') + '</button>' +
@@ -8720,7 +8742,9 @@ var CHANGELOG = [
   { v: 'v175', d: 'Nov 14, 2026', t: 'Layouts you can keep as files', g: [
     ['Path Editor', [
       'New Save to file and Open from file buttons under File: the layout (the same text as the box) goes into a file you keep anywhere, and a saved file opens back into the editor (Ctrl+Z undoes an open). Layouts are autosaved only inside the browser or app, so a file is the copy that cannot be lost with it.',
-      'Opening a file that is not a Poly Run layout changes nothing.'
+      'Opening a file that is not a Poly Runner layout changes nothing.',
+      'The game is called Poly Runner everywhere it shows: the page title, the Path Editor, and the desktop app (window title, launcher, app name). Folder and storage names are unchanged on purpose, so no saved data is touched.',
+      'Desktop app 1.1: only one copy of the app can run at a time (two copies sharing one storage folder can corrupt it and lose saved layouts), and the Path Editor\'s layout and presets are copied to ordinary files in ~/PolyRun/layouts while you work (the latest, plus dated snapshots). Open latest backup (under File) brings the last one back. Needs the new desktop app; the game alone just has Save to file and Open from file.'
     ]]
   ] },
   { v: 'v174', d: 'Nov 14, 2026', t: 'Ends, Zips and a truer Rig Editor', g: [

@@ -1,0 +1,43 @@
+{
+  "name": "polyrun",
+  "productName": "Poly Runner",
+  "version": "1.1.0",
+  "description": "Poly Runner: a 3D platformer starring Molly",
+  "main": "main.js",
+  "author": "Ricky",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --linux AppImage --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.ricky.polyrun",
+    "productName": "Poly Runner",
+    "files": [
+      "main.js",
+      "preload.js",
+      "backup.js",
+      "icon.png",
+      "game/**/*"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Game",
+      "icon": "icon.png",
+      "artifactName": "PolyRun-${version}.AppImage",
+      "executableArgs": [
+        "--no-sandbox"
+      ]
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "publish": null
+  }
+}
