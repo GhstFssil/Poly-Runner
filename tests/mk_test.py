@@ -16,6 +16,9 @@ hooks=r"""
   window.__vy = function (v) { if (v !== undefined) { vy = v; grounded = false; } return vy; };
   window.__ball = function () { return ballOn; };
   window.__spd = function (v) { if (v !== undefined) speed = v; return speed; };
+  window.__hd = function (v) { heading = v; yaw = v; return heading; };
+  window.__gr = function () { return grounded; };
+  window.__grad = function (x, z) { gradAt(x, z); return [ggx, ggz, typeof ggPath === 'undefined' ? null : ggPath, typeof tooSteep === 'function' ? tooSteep(x, z) : null]; };
   window.__chunks = function (x, z) { updateChunks(x, z, 99); scene.updateMatrixWorld(true); };
   window.__ray = function (x, z, y0) { var r = new THREE.Raycaster(new THREE.Vector3(x, y0 === undefined ? 2000 : y0, z), new THREE.Vector3(0, -1, 0)); return r.intersectObjects(scene.children, true).filter(function (h) { var o = h.object; while (o) { if (o === player) return false; o = o.parent; } return h.object.visible !== false; }).slice(0, 4).map(function (h) { var o = h.object, kind = o.userData && o.userData.ci !== undefined ? 'chunk' : (o.geometry && o.geometry.type === 'PlaneGeometry' && o.material === waterMesh.material) ? 'water' : (SB && SB.meshes.indexOf(o) >= 0) ? 'sb' + SB.meshes.indexOf(o) : o.type; return [+h.point.y.toFixed(3), kind]; }); };
   window.__l3m = function (x, z) { return level3H(x, z); };

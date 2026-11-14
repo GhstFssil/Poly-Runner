@@ -4328,6 +4328,11 @@ requestAnimationFrame(tick);
   var LAUNCH_ANGLE = 0.4;  // how sharply the slope under her must steepen (radians, about 23 degrees) to throw her into the air
   var sgx = 0, sgz = 0;    // the ground's gradient as she has been running over it (smoothed over a few units), so turning does not look like a change in slope
   function gradAt(x, z) { groundGrad(x, z); }
+  function tooSteep(x, z) {                                     // open ground too steep to stand on: steeper than she can walk up (CLIMB_SLOPE). Paths keep their banks and slopes, as do decks, platforms and lanes; she can always stand on those
+    gradAt(x, z); if (ggx * ggx + ggz * ggz <= CLIMB_SLOPE * CLIMB_SLOPE || ggPath) return false;
+    if (level === 3 && SB) { worldH0(x, z); if (wL2 === 1) return false; }
+    return true;
+  }
   var slideBlend = 0;      // 0 standing/running pose, 1 full baseball slide
   var STRIDE_REF = 9;      // speed at which the run animation reaches full amplitude
   var CAM_DIST = 8.5;
@@ -4563,7 +4568,9 @@ requestAnimationFrame(tick);
     return gcD + (1 - u) * (gcC - gcD) + (1 - v) * (gcB - gcD);
   }
   // The slope of the very triangle she stands on (ggx, ggz = rise per unit run), so the foot of a ledge face is not mistaken for a hillside.
+  var ggPath = false;   // set by groundGrad: the slope came from a running surface (a lane, deck, slab, platform, banked path, shaft or cave floor), not the open ground
   function groundGrad(x, z) {
+    ggPath = true;
     if (level === 2 && x > L2_MIN && laneAt(x, z)) { ggx = lnGX; ggz = lnGZ; return; }
     if (level === 3 && SB && SB.terrain === 'level2' && sbLane(x, z)) { ggx = lnGX; ggz = lnGZ; return; }
     if (level === 3 && SB && SB.movers.length && sbMoverTop(x, z, sbMovPy(x, z)) > groundH0(x, z)) { ggx = 0; ggz = 0; return; }
@@ -4579,6 +4586,7 @@ requestAnimationFrame(tick);
     if (level === 3 && SB && SB.shafts.length && sbShaftIn(x, z, 0)) { ggx = 0; ggz = 0; return; }
     groundH0(x, z);
     if (gcBk) { ggx = ggxB; ggz = ggzB; return; }
+    ggPath = false;
     var gx = Math.floor(x / GRID) * GRID, gz = Math.floor(z / GRID) * GRID;
     if ((x - gx) / GRID + (z - gz) / GRID <= 1) { ggx = (gcB - gcA) / GRID; ggz = (gcC - gcA) / GRID; }
     else { ggx = (gcD - gcC) / GRID; ggz = (gcD - gcB) / GRID; }
@@ -9732,13 +9740,22 @@ function showScreen(name) {                                // the menu shows one
         var dNow = -(ggx * fx + ggz * fz), runDrop = -(sgx * fx + sgz * fz);
         if (pp.y - g > 0.05 && (Math.atan(dNow) - Math.atan(runDrop) > LAUNCH_ANGLE || pp.y - g > 0.35 + Math.max(0, dNow, runDrop) * Math.max(stepLen, 0.4))) {
           grounded = false; speed *= 1 / Math.sqrt(1 + runDrop * runDrop); cfac = 1; vy = Math.max(-FALL_MAX, Math.min(40, -speed * runDrop));
+        } else if (!ballOn && tooSteep(pp.x, pp.z)) {
+          pp.y = g; grounded = false; vy = Math.min(vy, 0); cfac = 1;   // ground this steep is not somewhere to stand: she loses her footing and slides down it
         } else {
           pp.y = g;
           var kq = Math.min(1, Math.max(stepLen, 0.4) / 6);
           sgx += (ggx - sgx) * kq; sgz += (ggz - sgz) * kq;
         }
       }
-      if (!grounded && pp.y <= g) {
+      var slidSteep = false;
+      if (!grounded && pp.y <= g && !ballOn && vy <= 0 && tooSteep(pp.x, pp.z)) {   // come down on ground too steep to stand on: no landing. She slides down it, moved downhill as far as she sank, so she stays on its face and falls along it
+        var sgl = Math.sqrt(ggx * ggx + ggz * ggz), sink = g - pp.y, smv = Math.min(2, sink / sgl + 0.02);
+        pp.x -= ggx / sgl * smv; pp.z -= ggz / sgl * smv;
+        var g2 = groundH(pp.x, pp.z); if (pp.y < g2) pp.y = g2;
+        g = g2; slidSteep = tooSteep(pp.x, pp.z);   // still on the face: no landing this step
+      }
+      if (!grounded && pp.y <= g && !slidSteep) {
         pp.y = g;
         if (vy <= 0 && ballOn && playing && Math.floor(-vy * BOUNCE_KEEP / TILE) >= 1) { vy = Math.floor(-vy * BOUNCE_KEEP / TILE) * TILE; shake(Math.min(0.3, vy * 0.004)); }   // the Barrier does not land: it bounces back up at half the speed it came down at, keeping its run along the ground
         else if (vy <= 0) { grounded = true; vy = 0; gradAt(pp.x, pp.z); sgx = ggx; sgz = ggz; landFall(fallTop - pp.y); }
