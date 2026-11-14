@@ -753,7 +753,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   var $ = function (id) { return SR.getElementById(id); };
   var cv = $('cv'), ctx = cv.getContext('2d');
   var KEY = 'polyrun-path-editor-v2';
-  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: { trap: false }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, sink: true, sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round' }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4 }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round' }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {} };
+  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: { trap: false }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, sink: true, sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {} };
   var S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }, { len: 1005.3, ang: 90, r: 640, dy: 0 }, { len: 400, ang: 0, r: 640, dy: 20 }, { len: 502.65, ang: -45, r: 640, dy: 0 }, { len: 300, ang: 0, r: 640, dy: 0 }], objs: [] };
   var GH = null, DEFUSER = {};                                  // GH: the not-yet-placed stamp whose settings the panel shows while a stamp tool is chosen
   function ghostMode() { return tool !== 'select' && tool !== 'erase' && tool !== 'preset' && tool !== 'forest'; }
@@ -937,7 +937,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (t === 'gap' && !U('w')) o.w = S.width + 6; if (t === 'goal' && !U('w')) o.w = Math.max(16, S.width + 7);
     if (STRIPS[t]) {
       var nn = nearest(x, z);
-      if (t === 'segchain' || t === 'mud') { o.s = nn.s; o.u = t === 'mud' ? 0 : nn.u; o.follow = true; return o; }
+      if (t === 'segchain' || (t === 'mud' && nn.d <= S.width / 2 + 4)) { o.s = nn.s; o.u = t === 'mud' ? 0 : nn.u; o.follow = true; return o; }   // mud stamped on the path follows it; anywhere else it is a strip of its own
       o.follow = false; o.x = x; o.z = z; o.th = nn.d < 200 ? at(nn.s).th * 180 / Math.PI : 0; o.bend = 0; return o;
     }
     place(o, x, z); return o;
@@ -980,7 +980,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     return null;
   }
   function hit(o, wx, wz) {
-    if (STRIPS[o.t]) { var cp = o.t === 'segchain' ? chainPts(o) : stripPts(o, Math.max(4, 6 / view.zoom)), rr = o.t === 'segchain' ? Math.max(5, 9 / view.zoom) : Math.max((o.t === 'mud' ? S.width : o.w) / 2, 5 / view.zoom) + 3 / view.zoom; for (var q = 0; q < cp.length; q++) if (Math.hypot(cp[q][0] - wx, cp[q][1] - wz) < rr) return true; return false; }
+    if (STRIPS[o.t]) { var cp = o.t === 'segchain' ? chainPts(o) : stripPts(o, Math.max(4, 6 / view.zoom)), rr = o.t === 'segchain' ? Math.max(5, 9 / view.zoom) : Math.max((o.t === 'mud' ? mudW(o) : o.w) / 2, 5 / view.zoom) + 3 / view.zoom; for (var q = 0; q < cp.length; q++) if (Math.hypot(cp[q][0] - wx, cp[q][1] - wz) < rr) return true; return false; }
     var p = pos(o), dx = wx - p.x, dz = wz - p.z, c = Math.cos(-p.th), s = Math.sin(-p.th), lx = dx * c - dz * s, lz = dx * s + dz * c, h = halves(o), pad = 4 / view.zoom;
     if (!h) return Math.hypot(dx, dz) < Math.max(7, 13 / view.zoom);
     if (circR(o)) return Math.hypot(dx, dz) < circR(o) + pad;
@@ -1052,7 +1052,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   function segDot(x, y, big, z) { var r = Math.max(3, (big ? 5 : 2.2) * z * 1.6); ctx.fillStyle = '#f2c230'; ctx.strokeStyle = css('--ink'); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.stroke(); if (big) { ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 7); ctx.stroke(); } }
   function strokePts(pts) { ctx.beginPath(); pts.forEach(function (c, i) { var q = w2s(c[0], c[1]); if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }); ctx.stroke(); }
   function drawStrip(o, selected) {
-    var z = view.zoom, pts = stripPts(o, Math.max(3, 5 / z)), pts0 = pts, W = Math.max(2, (o.t === 'mud' ? S.width : o.w) * z), acc = css('--accent');
+    var z = view.zoom, pts = stripPts(o, Math.max(3, 5 / z)), pts0 = pts, W = Math.max(2, (o.t === 'mud' ? mudW(o) : o.w) * z), acc = css('--accent');
     ctx.lineJoin = 'round'; ctx.lineCap = 'butt';
     if (o.t === 'gap' || o.t === 'ledge' || o.t === 'mud') {   // the true footprint, under the piece: its margin all round, and the end shape
       var fp = stripFoot(o), fpts = pts, sq = endsOf(o) === 'square';
@@ -1068,13 +1068,13 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       ctx.globalAlpha = 0.8; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.strokeStyle = acc; var a = w2s(pts0[0][0] - v[0] * hd, pts0[0][1] - v[1] * hd), b = w2s(pts0[0][0] + v[0] * hd, pts0[0][1] + v[1] * hd); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
     }
     if (o.t === 'gap') { ctx.strokeStyle = '#c9222a'; ctx.lineWidth = W + 4; strokePts(pts); }
-    ctx.strokeStyle = o.t === 'ledge' ? '#7a6a58' : o.t === 'platform' ? '#7fa6bf' : o.t === 'gap' ? '#241c1c' : '#6b4a2b';
+    ctx.strokeStyle = o.tox ? '#3c4f3a' : o.t === 'ledge' ? '#7a6a58' : o.t === 'platform' ? '#7fa6bf' : o.t === 'gap' ? '#241c1c' : '#6b4a2b';
     if (o.t === 'platform' && o.move === 'vertical' && clock !== null) ctx.globalAlpha = 0.55 + 0.45 * Math.sin(2 * Math.PI * (clock + (o.phase || 0)) / Math.max(0.1, o.period));
     ctx.lineWidth = W; strokePts(pts); ctx.globalAlpha = 1;
     if (o.t === 'ledge') { ctx.strokeStyle = '#4a3f33'; ctx.lineWidth = 1.5; strokePts(pts.map(function (c) { return [c[0], c[1]]; })); }
     var m = pts[Math.floor(pts.length / 2)], q = w2s(m[0], m[1]);
     ctx.fillStyle = css('--ink'); ctx.font = 'bold 11px ' + css('--font-d');
-    var lab = o.t === 'ledge' ? 'H ' + o.hgt : o.t === 'platform' ? 'PLATFORM +' + o.hgt + (o.move === 'vertical' ? ' ↕' : o.move === 'side' ? ' ↔' : o.move === 'forward' ? ' ⇅' : '') + (o.group ? ' · G' + o.group + ' @' + (o.phase || 0) + 's' : '') : o.t === 'gap' ? 'GAP' : 'MUD ' + o.slow + '%';
+    var lab = (o.tox ? 'TOXIC ' : '') + (o.t === 'ledge' ? 'H ' + o.hgt : o.t === 'platform' ? 'PLATFORM +' + o.hgt + (o.move === 'vertical' ? ' ↕' : o.move === 'side' ? ' ↔' : o.move === 'forward' ? ' ⇅' : '') + (o.group ? ' · G' + o.group + ' @' + (o.phase || 0) + 's' : '') : o.t === 'gap' ? 'GAP' : 'MUD ' + o.slow + '%');
     ctx.fillText(lab, q[0] + 8, q[1] - 8);
   }
   function rnd(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
@@ -1231,7 +1231,9 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   }
   function endsOf(o) { return o.ends === 'square' ? 'square' : 'round'; }
   function endsF(o) { return '<label class="f">Ends<select data-ok="ends"><option value="round"' + (endsOf(o) === 'round' ? ' selected' : '') + '>Rounded (a half-circle past each end)</option><option value="square"' + (endsOf(o) === 'square' ? ' selected' : '') + '>Squared (flat, 1.5 past each end)</option></select></label>'; }
-  function stripFoot(o) { var raw = o.t === 'mud' ? S.width / 2 : o.t === 'ledge' ? Math.max(o.w / 2, 1.3) : o.w / 2, m = o.t === 'mud' ? 1 : 1.5; return { half: raw + m, m: m }; }   // what the game really covers: the piece's own half-width plus its margin (gap and ledge 1.5, mud 1) on every side, ends included
+  function mudW(o) { return o.follow === false ? (o.w > 0 ? o.w : 12) : S.width; }   // mud on the path is as wide as the path; mud of its own has a width
+  function stripFoot(o) { var raw = o.t === 'mud' ? mudW(o) / 2 : o.t === 'ledge' ? Math.max(o.w / 2, 1.3) : o.w / 2, m = o.t === 'mud' ? 1 : 1.5; return { half: raw + m, m: m }; }   // what the game really covers: the piece's own half-width plus its margin (gap and ledge 1.5, mud 1) on every side, ends included
+  function toxF(o) { return '<label class="f">Surface<select data-ok="tox"><option value="0"' + (o.tox ? '' : ' selected') + '>Normal</option><option value="1"' + (o.tox ? ' selected' : '') + '>Toxic (a heart a second to stand on, like a toxic patch)</option></select></label>'; }
   function renderInsp() {
     var el = $('insp'), sl0 = selList(), o = S.objs[sel], ghost = ghostMode();
     if (tool === 'forest') { el.hidden = true; return; }
@@ -1243,13 +1245,18 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag') h += '<label class="f">Height with others<select data-ok="hm"><option value="add"' + (o.hm === 'ind' ? '' : ' selected') + '>Additive: stacks on what it crosses</option><option value="ind"' + (o.hm === 'ind' ? ' selected' : '') + '>Independent: its own height, merges in</option></select></label>';
     if (joinedCave) h += '<label class="f">Starts from<select data-ok="after"><option value="">Its own mouth</option>' + S.objs.filter(function (q) { return q !== o && q.t === 'cave'; }).map(function (q) { return '<option value="' + q.id + '"' + (o.after === q.id ? ' selected' : '') + '>End of Cave #' + (S.objs.indexOf(q) + 1) + '</option>'; }).join('') + '</select></label>';
     if (!STRIPS[o.t] && !joinedCave) h += '<label class="f">Snap to the path<select data-ok="noat"><option value="0"' + (o.noat ? '' : ' selected') + '>Snaps: follows the path when it changes</option><option value="1"' + (o.noat ? ' selected' : '') + '>Free: stays where it is</option></select></label>';
-    if (!ghost && !joinedCave && (!STRIPS[o.t] || (o.follow === false && o.t !== 'mud'))) h += num('X', 'X', -99999, 99999, 1, Math.round(p.x * 10) / 10) + num('Z', 'Z', -99999, 99999, 1, Math.round(p.z * 10) / 10) + (STRIPS[o.t] ? '' : num('rot', 'Rotation °', -360, 360, 5, o.rot || 0));
+    if (!ghost && !joinedCave && (!STRIPS[o.t] || o.follow === false)) h += num('X', 'X', -99999, 99999, 1, Math.round(p.x * 10) / 10) + num('Z', 'Z', -99999, 99999, 1, Math.round(p.z * 10) / 10) + (STRIPS[o.t] ? '' : num('rot', 'Rotation °', -360, 360, 5, o.rot || 0));
     if (o.t === 'tree') h += '<label class="f">Size<select data-ok="exs"><option value="rand"' + (o.ex ? '' : ' selected') + '>Random, like the level\'s own trees</option><option value="exact"' + (o.ex ? ' selected' : '') + '>Exactly these sizes</option></select></label>' + (o.ex ? num('tH', 'Trunk height', 1, 80, 0.5, o.tH) + num('tW', 'Trunk width', 0.2, 12, 0.1, o.tW) + num('cH', 'Canopy height', 1, 80, 0.5, o.cH) + num('cW', 'Canopy width', 1, 40, 0.5, o.cW) : '');
     if (o.t === 'tree' || o.t === 'sign' || o.t === 'goal' || o.t === 'checkpoint' || o.t === 'toxic' || o.t === 'ramp' || o.t === 'tip' || (o.t === 'cave' && !joinedCave)) h += num('y', 'Y offset (up from the ground or path)', -500, 500, 0.5, o.y || 0);
     if (o.t === 'seg' || o.t === 'segchain') h += '<label class="f">Size<select data-ok="big"><option value="0"' + (o.big ? '' : ' selected') + '>Regular</option><option value="1"' + (o.big ? ' selected' : '') + '>Big (5×, worth 10)</option></select></label>';
     if (o.t === 'seg') h += num('h', 'Height above the ground', -1, 500, 0.5, o.h || 0);
     if (o.t === 'segchain') h += num('h', 'Height above the ground (at the start)', -1, 500, 0.5, o.h || 0) + num('rise', 'Rise by the end of the chain', -500, 500, 0.5, o.rise || 0) + num('arc', 'Vertical arc (extra height in the middle)', -500, 500, 0.5, o.arc || 0);
-    if (o.t === 'mud') h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10) + num('len', 'Length', 1, 5000, 1, o.len) + num('slow', 'Slowdown %', 0, 95, 1, o.slow) + endsF(o);
+    if (o.t === 'mud') {
+      if (!ghost) h += '<label class="f">Shape<select data-ok="follow"><option value="1"' + (o.follow === false ? '' : ' selected') + '>On the path (as wide as the path)</option><option value="0"' + (o.follow === false ? ' selected' : '') + '>Anywhere, on its own curve</option></select></label>';
+      if (o.follow === false) h += num('th', 'Heading ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10) + num('w', 'Width', 1, 300, 1, mudW(o));
+      else h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10);
+      h += num('len', 'Length', 1, 5000, 1, o.len) + num('slow', 'Slowdown %', 0, 95, 1, o.slow) + endsF(o);
+    }
     else if (STRIPS[o.t]) {
       var canJoin = o.t === 'segchain' || o.t === 'ledge' || o.t === 'gap';
       if (canJoin && !ghost) h += '<label class="f">Starts from<select data-ok="after"><option value="">Its own start</option>' + S.objs.filter(function (q) { return q !== o && q.t === o.t; }).map(function (q) { return '<option value="' + q.id + '"' + (o.after === q.id ? ' selected' : '') + '>End of ' + NAMES[q.t] + ' #' + (S.objs.indexOf(q) + 1) + '</option>'; }).join('') + '</select></label>';
@@ -1264,9 +1271,9 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       }
       h += num('len', o.t === 'segchain' ? 'Chain length' : 'Length', 1, 5000, 1, o.len);
       if (o.t === 'segchain') h += num('gap', 'Spacing', 1, 500, 1, o.gap);
-      if (o.t === 'ledge') h += num('w', 'Thickness', 0.5, 100, 0.5, o.w) + num('hgt', 'Height (any)', -500, 500, 0.5, o.hgt) + endsF(o);
+      if (o.t === 'ledge') h += num('w', 'Thickness', 0.5, 100, 0.5, o.w) + num('hgt', 'Height (any)', -500, 500, 0.5, o.hgt) + endsF(o) + toxF(o);
       if (o.t === 'platform') {
-        h += num('w', 'Width', 1, 300, 1, o.w) + num('hgt', 'Height of the top above the ground', -500, 500, 0.5, o.hgt) + num('thick', 'Thickness (top to bottom)', 0.5, 200, 0.5, o.thick === undefined ? 2 : o.thick);
+        h += num('w', 'Width', 1, 300, 1, o.w) + num('hgt', 'Height of the top above the ground', -500, 500, 0.5, o.hgt) + num('thick', 'Thickness (top to bottom)', 0.5, 200, 0.5, o.thick === undefined ? 2 : o.thick) + toxF(o);
         h += '<label class="f">Movement<select data-ok="move">' + [['none', 'Stays put'], ['side', 'Side to side'], ['forward', 'Forward and back'], ['vertical', 'Up and down']].map(function (m) { return '<option value="' + m[0] + '"' + (o.move === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>';
         if (o.move !== 'none') h += num('dist', 'Travel (units)', 1, 1000, 1, o.dist) + num('period', 'Seconds per full cycle', 0.5, 120, 0.5, o.period) + num('group', 'Link group (0 = none)', 0, 99, 1, o.group || 0) + num('phase', 'Phase (seconds into the cycle)', 0, 120, 0.1, o.phase || 0);
       }
@@ -1341,8 +1348,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     else if (k === 'follow') {
       if (t.value === '0' && o.follow !== false) {        // cut loose: keep the shape it has now, then it can be edited
         var cp0 = [[shapeAt(o, 0).x, shapeAt(o, 0).z]], sp = at(o.s), sq = at(o.s + o.len);
-        o.x = cp0[0][0]; o.z = cp0[0][1]; o.th = sp.th * 180 / Math.PI; o.bend = (sq.th - sp.th) * 180 / Math.PI; o.follow = false; delete o.s; delete o.u;
-      } else if (t.value === '1' && o.follow === false) { var nn = nearest(o.x, o.z); o.s = nn.s; o.u = nn.u; o.follow = true; delete o.x; delete o.z; delete o.th; delete o.bend; }
+        o.x = cp0[0][0]; o.z = cp0[0][1]; o.th = sp.th * 180 / Math.PI; o.bend = (sq.th - sp.th) * 180 / Math.PI; o.follow = false; delete o.s; delete o.u; if (o.t === 'mud' && !(o.w > 0)) o.w = S.width;
+      } else if (t.value === '1' && o.follow === false) { var nn = nearest(o.x, o.z); o.s = nn.s; o.u = o.t === 'mud' ? 0 : nn.u; o.follow = true; delete o.x; delete o.z; delete o.th; delete o.bend; }
     }
     else if (k === 'exs') { o.ex = t.value === 'exact'; if (o.ex && !(o.tH > 0)) { o.tH = 15.5; o.tW = 1.6; o.cH = 14.9; o.cW = 7.4; } }
     else if (k === 'mode' && o.t === 'door') { o.mode = t.value; }
@@ -1358,6 +1365,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     else if (k === 'idle') { o.idle = t.value === '1'; DEF[o.t] = DEF[o.t] || {}; DEF[o.t].idle = o.idle; }
     else if (k === 'big') { o.big = t.value === '1'; DEF[o.t].big = o.big; }
     else if (k === 'text' || k === 'shape' || k === 'move' || k === 'kind' || k === 'style' || k === 'rock' || k === 'ground' || k === 'edge' || k === 'ends') { o[k] = t.value; DEF[o.t][k] = t.value; }
+    else if (k === 'tox') { o.tox = t.value === '1'; DEF[o.t].tox = o.tox; }
     else { o[k] = parseFloat(t.value) || 0; if (DEF[o.t] && DEF[o.t][k] !== undefined && !isOneCrag(o)) DEF[o.t][k] = o[k]; }   // what you set is what the next one starts with
     if (o.t === 'platform' && o.group) {
       if (k === 'group') { var mate = S.objs.filter(function (q) { return q !== o && q.t === 'platform' && q.group === o.group; })[0]; if (mate) { o.period = mate.period; o.dist = mate.dist; o.move = mate.move; } }
@@ -1403,7 +1411,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (o.t === 'platform') { r.width = o.w; r.height = o.hgt; r.thick = o.thick === undefined ? 2 : o.thick; r.move = o.move; if (o.move !== 'none') { r.travel = o.dist; r.period = o.period; r.phase = o.phase || 0; if (o.group) r.group = o.group; } }
       if (o.t === 'gap') r.width = o.w;
       if (o.t === 'gap' || o.t === 'ledge' || o.t === 'mud') r.ends = endsOf(o);
-      if (o.t === 'mud') r.slowdown = o.slow;
+      if ((o.t === 'ledge' || o.t === 'platform') && o.tox) r.toxic = true;
+      if (o.t === 'mud') { r.slowdown = o.slow; if (o.follow === false) r.width = mudW(o); }
       if (o.t === 'crag') { r.radius = o.r; r.count = o.count; r.baseRadius = o.base; r.baseRadiusVar = o.baseV; r.height = o.hgt; r.heightVar = o.hgtV; r.spacing = o.gap; r.spacingVar = o.gapV; r.seed = o.seed; }
       if (o.t === 'patch') { r.shape = o.shape; r.width = o.w; r.length = o.d; r.ground = o.ground; r.edge = o.edge; if (o.edge !== 'hard') r.soften = o.soft; }
       if (o.t === 'spawner') { r.radius = o.r; r.every = o.every; r.max = o.max; }
@@ -1578,7 +1587,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         if (r.type === 'platform') { o.w = r.width || 16; o.thick = r.thick === undefined ? 2 : r.thick; o.hgt = r.height === undefined ? 10 : r.height; o.move = r.move || 'none'; o.dist = r.travel || 40; o.period = r.period || 4; o.phase = r.phase || 0; o.group = r.group || 0; }
         if (r.type === 'gap') o.w = r.width || 15;
         if (r.type === 'gap' || r.type === 'ledge' || r.type === 'mud') o.ends = r.ends === 'square' ? 'square' : 'round';
-        if (r.type === 'mud') { o.slow = r.slowdown === undefined ? 50 : r.slowdown; o.len = r.length || 150; o.follow = true; }
+        if (r.type === 'ledge' || r.type === 'platform') o.tox = !!r.toxic;
+        if (r.type === 'mud') { o.slow = r.slowdown === undefined ? 50 : r.slowdown; o.len = r.length || 150; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.heading || 0; o.bend = r.bend || 0; o.w = r.width || 12; } }
         if (r.type === 'ledge' || r.type === 'platform' || r.type === 'gap') { o.len = r.length || 40; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.heading || 0; o.bend = r.bend || 0; } }
         if (r.id !== undefined) o.id = r.id; if (r.layer !== undefined) o.layer = r.layer; if (r.heightMode === 'independent') o.hm = 'ind';
         if (r.after !== undefined) { o.after = r.after; o.turn = r.turn || 0; o.follow = false; }
@@ -3081,7 +3091,7 @@ Object.keys(MOVES).forEach(function(n){var cur={},k;for(k in KD)cur[k]=KD[k];
 var DEF={},k,q;
 for(k in GLOBAL)DEF[k]=GLOBAL[k];
 Object.keys(MOVEX).forEach(function(n){DEF['m.'+n+'.dur']=MOVEDUR[n];MOVEX[n].forEach(function(e,i){DEF['m.'+n+'.'+i+'.t']=e[0];for(var f in KD)DEF['m.'+n+'.'+i+'.'+f]=e[1][f];});});
-DEF['stat.top']=80;DEF['stat.accelT']=7;DEF['stat.brake']=3;DEF['stat.jumpH']=7.2;DEF['stat.grav']=20;DEF['stat.gripZ']=20;DEF['stat.fadeSlope']=0;DEF['stat.fadeWall']=1;DEF['stat.fall']=50;DEF['stat.hearts']=3;DEF['stat.colH']=3.6;DEF['stat.colW']=1;DEF['stat.wallGrip']=1;DEF['stat.fric']=11.4;DEF['m.drift.lean']=28.6;DEF['m.drift.angle']=15;DEF['m.drift.time']=.15;DEF['m.drift.minZips']=30;DEF['m.drift.cool']=1;DEF['m.drift.rate']=9;DEF['slope.side']=.85;
+DEF['stat.top']=80;DEF['stat.accelT']=7;DEF['stat.brake']=3;DEF['stat.jumpH']=7.2;DEF['stat.grav']=20;DEF['stat.gripZ']=20;DEF['stat.fadeSlope']=0;DEF['stat.fadeWall']=1;DEF['stat.fall']=50;DEF['stat.hearts']=3;DEF['stat.colH']=3.6;DEF['stat.colW']=1;DEF['stat.wallGrip']=1;DEF['stat.fric']=11.4;DEF['stat.slamAcc']=40;DEF['stat.slamMax']=60;DEF['m.drift.lean']=28.6;DEF['m.drift.angle']=15;DEF['m.drift.time']=.15;DEF['m.drift.minZips']=30;DEF['m.drift.cool']=1;DEF['m.drift.rate']=9;DEF['slope.side']=.85;
 var BARRIER_DEF={'barrier.radius':1.76,'barrier.height':1.64,'barrier.spin':1,'barrier.sphereAt':40,'barrier.squeezeAt':75,'barrier.squeezeLen':5,'barrier.squeeze':.2,'barrier.stretch':.12,'barrier.chargeSphere':2,'barrier.chargeSqueeze':3.5,'barrier.glow':.2,'barrier.glowSize':1.14,'barrier.dashLen':.32,'barrier.dashGap':.22,
   'barrier.cBody':'#ff2a1f','barrier.cEmis':'#b3140c','barrier.cEdge':'#ffc7b8','barrier.cDash':'#ff9a88','barrier.cGlow':'#ff3a2a','barrier.preview':0};
 for(k in BARRIER_DEF)DEF[k]=BARRIER_DEF[k];
@@ -3139,7 +3149,7 @@ var HOLDS=[[/\.len$/,.5,400],[/\.dia$/,.2,400],[/\.depth$/,.02,20],[/\.peak$/,.0
  [/^scale$/,.05,20],[/^sides$/,5,48,1],[/^rings$/,1,8,1],[/^ringGap$/,0,20],[/^fmt$/,2,2],[/^hairVol$/,.05,10],[/^bangL$/,0,10],[/^j[A-Z]/,0,100],[/^(jit|irr|irrC)$/,0,5],
  [/\.dur$/,.05,600],[/^m\.drift\.time$/,.02,10],[/^m\.drift\.rate$/,.1,200],[/^m\.drift\.(cool|minZips)$/,0,1000],
  [/^barrier\.radius$/,.2,20],[/^barrier\.squeezeLen$/,.5,1e4],[/^barrier\.squeeze$/,-2,.95],[/^barrier\.stretch$/,-.95,10],[/^barrier\.glow$/,0,1],[/^barrier\.glowSize$/,.1,10],[/^barrier\.dash(Len|Gap)$/,.005,20],
- [/^stat\.top$/,1,1e4],[/^stat\.accelT$/,.5,1e4],[/^stat\.(brake|jumpH|wallGrip|fric)$/,0,1e4],[/^stat\.gripZ$/,.5,5e5],[/^stat\.grav$/,1,1e4],[/^stat\.fade(Wall|Slope)$/,0,1,1],[/^stat\.fall$/,1,1e4],[/^stat\.hearts$/,1,12,1],[/^stat\.colH$/,1.2,100],[/^stat\.colW$/,.2,100]];
+ [/^stat\.top$/,1,1e4],[/^stat\.accelT$/,.5,1e4],[/^stat\.(brake|jumpH|wallGrip|fric)$/,0,1e4],[/^stat\.gripZ$/,.5,5e5],[/^stat\.grav$/,1,1e4],[/^stat\.fade(Wall|Slope)$/,0,1,1],[/^stat\.fall$/,1,1e4],[/^stat\.slam(Acc|Max)$/,1,1e4],[/^stat\.hearts$/,1,12,1],[/^stat\.colH$/,1.2,100],[/^stat\.colW$/,.2,100]];
 function hold(key,v){
   if(typeof DEF[key]==='string')return typeof v==='string'&&/^#[0-9a-f]{6}$/i.test(v)?v:DEF[key];   /* a colour */
   if(typeof v!=='number'||!isFinite(v))return DEF[key];
@@ -4087,7 +4097,7 @@ function renderAnim(){
       addRows(d,g[1].map(function(r){return [kp+r[0]].concat(r.slice(1));}),{anim:1});});
   }
 }
-var STAT_ROWS=[['stat.top','Top speed','Zips',20,160,1],['stat.accelT','Time from 0 to top speed','s',1,20,.1],['stat.brake','Braking strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip fades on slopes (× the cosine of the slope)','tog'],['stat.fall','Max fall speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision box height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision box width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1]];
+var STAT_ROWS=[['stat.top','Top speed','Zips',20,160,1],['stat.accelT','Time from 0 to top speed','s',1,20,.1],['stat.brake','Braking strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip fades on slopes (× the cosine of the slope)','tog'],['stat.fall','Max fall speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision box height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision box width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier slam: top speed','Zips',10,200,1]];
 function renderStats(){var h=$('#statRows');if(!h)return;h.innerHTML='';addRows(h,STAT_ROWS,{anim:1,stat:1});var sc=document.createElement('div');sc.id='statLive';sc.style.cssText='margin-top:10px;max-width:460px';h.appendChild(sc);statCardRefresh();}   /* the Stats menu at the top of the panel */
 try{renderStats();}catch(e){}
 try{SR.querySelector('#moveBox').addEventListener('toggle',function(){moveScenBuild();moveRefresh();});}catch(e){}
@@ -4187,7 +4197,9 @@ requestAnimationFrame(tick);
   var segsEl = document.getElementById('segs'), segValEl = document.getElementById('segval'), seglineEl = document.getElementById('segline');
   var POWER_MAX = 100, BARRIER_COST = 12, BARRIER_DRAIN = 1;   // the Power Line: collected Segs, out of 100. Switching the Barrier on costs 12, keeping it up costs 1 per second
   function setSegLine(n) { seglineEl.style.width = Math.min(n, POWER_MAX) + '%'; }
-  function setPower(v) { segCount = Math.max(0, Math.min(POWER_MAX, v)); var f = Math.floor(segCount + 1e-9); if (f !== +segValEl.textContent) segValEl.textContent = f; setSegLine(segCount); }   // a glowing red line along the bottom of the screen: 1% per Seg, full width at 100
+  function setPower(v) { segCount = Math.max(0, Math.min(POWER_MAX, v)); setSegLine(segCount); }
+  var SEGS_MAX = 999;   // the SEGS counter: every Seg she has picked up this run (a Big Seg counts 10), up to 999. It never goes down; spending the Power Line does not touch it
+  function addSegs(n) { segTotal = Math.max(0, Math.min(SEGS_MAX, segTotal + n)); var f = Math.floor(segTotal + 1e-9); if (f !== +segValEl.textContent) segValEl.textContent = f; }   // a glowing red line along the bottom of the screen: 1% per Seg, full width at 100
   var timerEl = document.getElementById('timer'), timeValEl = document.getElementById('timeval'), toastEl = document.getElementById('toast');
 
   var SKY = 0x9fc7e8;
@@ -5116,7 +5128,8 @@ requestAnimationFrame(tick);
       if (r.type === 'platform') { o.w = r.width || 16; o.hgt = r.height === undefined ? 10 : r.height; o.move = r.move || 'none'; }
       if (r.type === 'gap') o.w = r.width || 15;
       o.sq = (r.type === 'gap' || r.type === 'ledge' || r.type === 'mud') && r.ends === 'square';
-      if (r.type === 'mud') { o.len = r.length || 150; o.follow = true; }
+      o.tox = (r.type === 'ledge' || r.type === 'platform') && !!r.toxic;   // a toxic top: it hurts to stand on, like a toxic patch
+      if (r.type === 'mud') { o.len = r.length || 150; o.follow = r.s !== undefined; if (!o.follow) o.w = r.width || 12; }   // mud on the path follows it and is as wide as it; mud anywhere else has its own curve and width
       if (r.type === 'ledge' || r.type === 'platform' || r.type === 'gap') { o.len = r.length || 40; o.follow = r.s !== undefined; }
       if (STRIPT[r.type] && !o.follow) { o.th = r.heading || 0; o.bend = r.bend || 0; }
       if (r.after !== undefined) { o.after = r.after; o.turn = r.turn || 0; o.follow = false; o.bend = r.bend || 0; }
@@ -5144,7 +5157,8 @@ requestAnimationFrame(tick);
       B.objs.push(o);
     });
     B.indep = B.objs.some(function (q) { return q.ind && (q.t === 'ledge' || q.t === 'hill' || q.t === 'crag'); });   // any hill, crag or ledge that keeps its own height instead of stacking
-    var ledgeH = sbHash(12), gapH = sbHash(12), mudH = sbHash(12), coneH = sbHash(12), pathH = sbHash(24), maxL = 6, maxG = 6;
+    B.toxLedge = false; B.toxLedgePts = [];
+    var ledgeH = sbHash(12), gapH = sbHash(12), mudH = sbHash(12), coneH = sbHash(12), pathH = sbHash(24), maxL = 6, maxG = 6, maxM = 6;
     B.objs.forEach(function (o, oi) {
       var p = STRIPT[o.t] || !o.t ? null : pos(o), n, k, q;
       if (o.t === 'tree') B.trees.push([p.x, p.z, o.y, o.ex ? { tH: o.tH, tW: o.tW, cH: o.cH, cW: o.cW } : null]);
@@ -5173,15 +5187,16 @@ requestAnimationFrame(tick);
       else if (o.t === 'checkpoint') B.cps.push({ y: o.y, x: p.x, z: p.z, th: p.th, hw: o.w / 2, num: o.num || 0, ord: oi });
       else if (o.t === 'sign') B.signs.push({ y: o.y, x: p.x, z: p.z, th: p.th, text: o.text });
       else if (o.t === 'ledge' || o.t === 'platform' || o.t === 'gap' || o.t === 'mud') {
-        var half = o.t === 'mud' ? B.hw + 1 : o.t === 'ledge' ? Math.max(o.w / 2, 1.3) : o.w / 2, tgt = o.t === 'gap' ? gapH : o.t === 'mud' ? mudH : ledgeH;
+        var half = o.t === 'mud' ? (o.follow === false ? o.w / 2 : B.hw) + 1 : o.t === 'ledge' ? Math.max(o.w / 2, 1.3) : o.w / 2, tgt = o.t === 'gap' ? gapH : o.t === 'mud' ? mudH : ledgeH;
         var mg = o.t === 'mud' ? 0 : 1.5, mgEnd = o.t === 'mud' ? 1 : 1.5;   // rounded: a disc of (half + mg) every 3 units. squared: boxes 1 unit apart (1.5 long, so they overlap on a bend), plus a cap of mgEnd past each end
+        if (o.tox && o.t === 'ledge') { B.toxLedge = true; for (k = 0; k <= Math.ceil(o.len / 4); k++) { q = shapeAt(o, Math.min(o.len, k * 4)); B.toxLedgePts.push({ x: q.x, z: q.z, th: q.th, half: half + mg }); } }
         if (o.sq) {
           var sqH = half + mg, nq = Math.ceil(o.len);
           for (k = 0; k <= nq; k++) { q = shapeAt(o, Math.min(o.len, k)); sbAdd(tgt, q.x, q.z, { x: q.x, z: q.z, half: sqH, hl: 0.75, th: q.th, sq: true, o: o }); }
           [0, o.len].forEach(function (de, ei) { var qe = shapeAt(o, de), sgn = ei ? 1 : -1, cx2 = qe.x + Math.sin(qe.th) * sgn * mgEnd / 2, cz2 = qe.z - Math.cos(qe.th) * sgn * mgEnd / 2; sbAdd(tgt, cx2, cz2, { x: cx2, z: cz2, half: sqH, hl: mgEnd / 2 + 0.1, th: qe.th, sq: true, o: o }); });
         }
         else { n = Math.ceil(o.len / 3); for (k = 0; k <= n; k++) { q = shapeAt(o, Math.min(o.len, k * 3)); sbAdd(tgt, q.x, q.z, { x: q.x, z: q.z, half: half + mg, o: o }); } }
-        if (o.t === 'gap') maxG = Math.max(maxG, half + 3); else if (o.t === 'mud') maxL = maxL; else maxL = Math.max(maxL, half + 3);
+        if (o.t === 'gap') maxG = Math.max(maxG, half + 3); else if (o.t === 'mud') maxM = Math.max(maxM, half + 3); else maxL = Math.max(maxL, half + 3);
       }
       else if (o.t === 'crag') { cragLayout(o).forEach(function (c) { var cxp = p.x + c.x, czp = p.z + c.z; sbAdd(coneH, cxp, czp, { x: cxp, z: czp, rad: c.rad, h: c.h, ind: !!o.ind }); }); }
       else if (o.t === 'patch') B.patches.push({ x: p.x, z: p.z, th: p.th, hw: o.w / 2, hd: o.d / 2, shape: o.shape, ground: o.ground, hard: o.hard, soft: Math.max(0.5, o.soft), rr: Math.hypot(o.w, o.d) / 2 + o.soft });
@@ -5197,7 +5212,7 @@ requestAnimationFrame(tick);
     var wallH = sbHash(24), nWl = 0; for (var wj = 0; wj < sm.length - 1; wj++) if (sm[wj].wl && sm[wj + 1].wl && !sm[wj + 1].brk) { sbAdd(wallH, sm[wj].x, sm[wj].z, sm[wj]); nWl++; }
     B.wallH = nWl ? wallH : null;                                  // wall pieces: found by sbWallFind
     B.slabH = nSl ? slabH : null;                                  // floating pieces: their own slabs, found here
-    B.ledgeH = ledgeH; B.gapH = gapH; B.mudH = mudH; B.coneH = coneH; B.pathH = pathH; B.maxL = maxL; B.maxG = maxG;
+    B.ledgeH = ledgeH; B.gapH = gapH; B.mudH = mudH; B.coneH = coneH; B.pathH = pathH; B.maxL = maxL; B.maxG = maxG; B.maxM = maxM;
     return B;
   }
   function sbDispose() { if (SB) { SB.meshes.forEach(function (m) { scene.remove(m); }); } SB = null; }
@@ -5361,7 +5376,7 @@ requestAnimationFrame(tick);
   // Oceana Crags (Sandbox ground 'level2'): the path is not part of the ground at all. It is a deck of its own: an exact strip, drawn by sbMakeMeshes and stood on through sbDeckTop, with the ground under it left as it is. Her floor is whichever is higher, the deck or the ground, so what she stands on and what is drawn are the same surface by construction
   var DECK_TH = 2, DECK_CUT = 0.3, DECK_EDGE = 4.5;            // a deck's thickness where the segment gives no slab thickness; how far under a superseding deck taller rock is cut down; and how far past the deck's edges that cut stays full before it eases back up (a grid cell and its jitter, so no rock pokes through the deck's edge)
   var l3Tx = 0, l3Ps = 0, l3Pu = 0;                               // the path surface nearest the last ground point read: its texture (0 stone, 1 wood planks, 2 metal plates, 3 grass), how far along the path and how far across it
-  var l3Bk = 0, l3A = 0, l3P = -Infinity, l3N = Infinity, l3S0 = 0, ledI = NaN, ledA = 0, ledCA = 0, ledCI = NaN;   // what the last ground height was built from: stacked bumps, the highest and lowest independent ones, and what was added in all
+  var l3Bk = 0, l3A = 0, l3P = -Infinity, l3N = Infinity, l3S0 = 0, ledI = NaN, ledA = 0, ledCA = 0, ledCI = NaN, ledTox = false;   // what the last ground height was built from: stacked bumps, the highest and lowest independent ones, and what was added in all
   function sbComb(hA, P, N, La, Li) {                            // ground rise at a corner: stacked bumps plus stacked ledges, but an independent bump or ledge only reaches its own height and merges into whatever is higher (or lower, for a trench)
     var S = hA + La; if (P > S) S = P; if (Li > 0 && Li > S) S = Li; if (N < S) S = N; if (Li < 0 && Li < S) S = Li; return S;
   }
@@ -5450,15 +5465,15 @@ requestAnimationFrame(tick);
       if (Math.abs(lx) <= rp.hw && lf >= -rp.hl && lf <= rp.hl) { y = (rp.base === undefined ? y : rp.base) + rp.tn * (lf + rp.hl) + rp.y; wL2 = 1; }   // a flat plane rising from the height she stands on at its foot (the path, a slab of path, or the ground there), the same for the ground mesh and for her feet
     }
     for (i = 0; i < B.toxic.length; i++) { var t = B.toxic[i]; if (Math.abs(t.x - ex) > t.rr || Math.abs(t.z - z) > t.rr) continue; var c = Math.cos(-t.th), sn = Math.sin(-t.th), tdx = ex - t.x, tdz = z - t.z, lx2 = tdx * c - tdz * sn, lz2 = tdx * sn + tdz * c; if (Math.abs(lx2) <= t.hw && Math.abs(lz2) <= t.hd) { tox = true; break; } }
-    { var mud = false; sbNear(B.mudH, ex, z, HW + 2, function (e) { if (!mud && sbIn(e, ex, z, 0)) mud = true; }); if (mud) { wMud = 1; wL2 = 0; } }
+    { var mud = false; sbNear(B.mudH, ex, z, B.maxM, function (e) { if (!mud && sbIn(e, ex, z, 0)) mud = true; }); if (mud) { wMud = 1; wL2 = 0; } }
     return y;
   }
   function sbLedge(x, z) {
     if (!SB) return 0;
-    var best = 0, bi = 0, ex = x - L3_X, base = 0;
+    var best = 0, bi = 0, bt = false, bit = false, ex = x - L3_X, base = 0; ledTox = false;
     if (SB.terrain === 'level1' || SB.terrain === 'level2') base = SB.terrain === 'level2' ? ledgeH(L2_X + ex, z + L2_SBZ) : ledgeH(ex, z);
-    sbNear(SB.ledgeH, ex, z, SB.maxL, function (e) { if (sbIn(e, ex, z, 0)) { if (e.o.ind) { if (Math.abs(e.o.hgt) > Math.abs(bi)) bi = e.o.hgt; } else if (Math.abs(e.o.hgt) > Math.abs(best)) best = e.o.hgt; } });
-    ledA = base + best; ledI = bi === 0 ? NaN : bi;
+    sbNear(SB.ledgeH, ex, z, SB.maxL, function (e) { if (sbIn(e, ex, z, 0)) { if (e.o.ind) { if (Math.abs(e.o.hgt) > Math.abs(bi)) { bi = e.o.hgt; bit = !!e.o.tox; } } else if (Math.abs(e.o.hgt) > Math.abs(best)) { best = e.o.hgt; bt = !!e.o.tox; } } });
+    ledA = base + best; ledI = bi === 0 ? NaN : bi; ledTox = ledI === ledI && Math.abs(ledI) > Math.abs(best) ? bit : bt;   // ledTox: the ledge whose top this is has a toxic surface
     return ledI === ledI && Math.abs(ledI) > Math.abs(best) ? ledI + (base ? base : 0) : base + best;   // for anything that only wants one number: the taller of the two
   }
   function sbDoorSpan(m, ex, z) {                              // where the vertical line through (ex, z) passes through the door's slab right now: its lowest and highest world height there (null if it misses). The slab is tilted about its base, forward-and-back (tx) and side to side (tz)
@@ -5773,7 +5788,7 @@ requestAnimationFrame(tick);
   }
   function sbMudAt(x, z) {
     if (!SB) return false; var ex = x - L3_X, m = false;
-    sbNear(SB.mudH, ex, z, SB.hw + 2, function (e) { if (!m && sbIn(e, ex, z, 0)) m = true; });
+    sbNear(SB.mudH, ex, z, SB.maxM, function (e) { if (!m && sbIn(e, ex, z, 0)) m = true; });
     return m;
   }
   var sbGoalMat = {}, sbGoalPrev = null;
@@ -5808,8 +5823,8 @@ requestAnimationFrame(tick);
         var dgrp = new THREE.Group(), dmesh = new THREE.Mesh(dg, new THREE.MeshLambertMaterial({ color: 0x7c8493, flatShading: true, side: THREE.DoubleSide })); dmesh.castShadow = true; dmesh.receiveShadow = true; dmesh.frustumCulled = false; dgrp.add(dmesh);
         m.grp = dgrp; m.geo = dg; scene.add(dgrp); B.meshes.push(dgrp); sbDoorPose(m, true); return;
       }
-      var P = [], C = [], col = new THREE.Color(), tc = 0, topY = m.base + m.hgt, botY = topY - m.thick, n = m.pts.length, i;
-      function tri(a, b, c, k) { var j1 = rand01(tc, 11, 71), j2 = rand01(tc, 5, 72); tc++; col.setHSL((m.door ? 0.6 : 0.085) + (j1 - 0.5) * 0.012, (m.door ? 0.1 : 0.19) + (j1 - 0.5) * 0.05, (0.5 + (j1 - 0.5) * 0.07 + (j2 - 0.5) * 0.03) * k); [a, b, c].forEach(function (v) { P.push(v[0], v[1], v[2]); C.push(col.r, col.g, col.b); }); }
+      var P = [], C = [], col = new THREE.Color(), tc = 0, topY = m.base + m.hgt, botY = topY - m.thick, n = m.pts.length, i, toxTop = !!(m.o && m.o.tox);
+      function tri(a, b, c, k) { var j1 = rand01(tc, 11, 71), j2 = rand01(tc, 5, 72); tc++; if (toxTop && k === 1) col.setHSL(0.64 + (j1 - 0.5) * 0.02, 0.05, 0.21 + (j1 - 0.5) * 0.04 + (j2 - 0.5) * 0.02); else col.setHSL((m.door ? 0.6 : 0.085) + (j1 - 0.5) * 0.012, (m.door ? 0.1 : 0.19) + (j1 - 0.5) * 0.05, (0.5 + (j1 - 0.5) * 0.07 + (j2 - 0.5) * 0.03) * k); [a, b, c].forEach(function (v) { P.push(v[0], v[1], v[2]); C.push(col.r, col.g, col.b); }); }
       function V(q, side, y) { return [L3_X + q[0] + Math.cos(q[2]) * m.half * side, y, q[1] + Math.sin(q[2]) * m.half * side]; }
       for (i = 0; i + 1 < n; i++) {
         var a = m.pts[i], b = m.pts[i + 1];
@@ -5849,7 +5864,7 @@ requestAnimationFrame(tick);
       (function () {
         var sm2 = B.samples, D2R = Math.PI / 180, Pp = [], Cc = [], col2 = new THREE.Color(), tc2 = 0, segs = [], i2, k2, c2;
         function gapAt(x, z, grow) { var g = false; sbNear(B.gapH, x, z, B.maxG + grow, function (e) { if (!g && sbIn(e, x, z, grow)) g = true; }); return g; }
-        function mudOn(x, z) { var m = false; sbNear(B.mudH, x, z, 2, function (e) { if (!m && sbIn(e, x, z, 0)) m = true; }); return m; }
+        function mudOn(x, z) { var m = false; sbNear(B.mudH, x, z, B.maxM, function (e) { if (!m && sbIn(e, x, z, 0)) m = true; }); return m; }
         function sect(a, b, t) { return { x: a.x + (b.x - a.x) * t, z: a.z + (b.z - a.z) * t, th: a.th + wrapA(b.th - a.th) * t, y: a.y + (b.y - a.y) * t, rl: (a.rl !== undefined ? a.rl : a.roll || 0) + ((b.rl !== undefined ? b.rl : b.roll || 0) - (a.rl !== undefined ? a.rl : a.roll || 0)) * t, hw: (a.hw !== undefined ? a.hw : (a.w || B.width) / 2) + ((b.hw !== undefined ? b.hw : (b.w || B.width) / 2) - (a.hw !== undefined ? a.hw : (a.w || B.width) / 2)) * t, s: a.s + (b.s - a.s) * t }; }   // one cross-section between two (samples, or cross-sections already made)
         function pt(o, u, dy) { var l = o.hw * u, c = Math.cos(o.rl * D2R); return [L3_X + o.x + Math.cos(o.th) * l * c, o.y - l * Math.sin(o.rl * D2R) - dy, o.z + Math.sin(o.th) * l * c]; }   // a point of it: u from -1 (left edge) to 1 (right edge), dy below the top. A banked deck keeps its width along the slope: the right side lower for a positive bank
         function tri(a1, b1, c1) { [a1, b1, c1].forEach(function (v) { Pp.push(v[0], v[1], v[2]); Cc.push(col2.r, col2.g, col2.b); }); }
@@ -5935,7 +5950,7 @@ requestAnimationFrame(tick);
   }
   function sbTick(dt, now) {
     var B = SB; if (!B || !playing) return;
-    var pp = player.position, ex = pp.x - L3_X, ez = pp.z, i, c, sn;
+    var pp = player.position, ex = pp.x - L3_X, ez = pp.z, i, c, sn, onTox = false;
     if (B.movers.length) {                                       // the platforms: new positions on the level clock, and whoever stands on one is carried
       B.T += dt;
       B.movers.forEach(function (m) {
@@ -5943,6 +5958,7 @@ requestAnimationFrame(tick);
         var px = ex - m.off[0], pz = ez - m.off[1];
         if (m.door) { dhit0 = sbMovInside(m, ex, ez); if (dhit0 && Math.abs(pp.y - dhit0.hi) < 1.5) riding = true; }
         else if (Math.abs(pp.y - top) < 1.5 && sbMovInside(m, ex, ez)) riding = true;
+        if (riding && o.tox) onTox = true;
         var ox = m.off[0], oz = m.off[1], oy = m.dy, w, half;
         if (m.door) {
           var sdx = ex - m.cx, sdz = ez - m.cz, sal = sdx * Math.sin(m.th0) - sdz * Math.cos(m.th0), sla = sdx * Math.cos(m.th0) + sdz * Math.sin(m.th0);
@@ -5976,6 +5992,11 @@ requestAnimationFrame(tick);
       });
       gcI = 1e9; gcJ = 1e9;
     }
+    if (hp > 0 && !ballOn && now >= toxUntil && !onTox && B.toxLedge) {   // the top of a toxic ledge
+      var tlh = sbLedge(pp.x, pp.z);
+      if (ledTox && Math.abs(tlh) > 0.4) { var tgl = groundH(pp.x, pp.z); if (pp.y < tgl + 2.2 && pp.y > tgl - 3) onTox = true; }
+    }
+    if (onTox && hp > 0 && !ballOn && now >= toxUntil) { toxUntil = now + 1000; hp -= 1; drawHearts(); flashHurt(); shake(0.3); }   // standing on a toxic platform or ledge: a heart a second, as on a toxic patch
     if (hp > 0 && !ballOn && now >= toxUntil) {
       for (i = 0; i < B.toxic.length; i++) {
         var t = B.toxic[i]; if (Math.abs(t.x - ex) > t.rr || Math.abs(t.z - ez) > t.rr) continue;
@@ -6048,7 +6069,7 @@ requestAnimationFrame(tick);
     }
   }
   window.__tp = function (x, z) { player.position.set(x, groundH(x, z), z); fallTop = player.position.y; };
-  window.__dbg = function () { return { SB: SB, level: level, x: player.position.x, y: player.position.y, z: player.position.z, hp: hp, segs: segCount, playing: playing, cleared: cleared, hintTxt: hintFull, toxUntil: toxUntil, ballOn: ballOn, now: performance.now(), ground: groundH(player.position.x, player.position.z), en: ENEMIES.filter(function (e) { return e.sbp && e.act; }).length }; };
+  window.__dbg = function () { return { SB: SB, level: level, x: player.position.x, y: player.position.y, z: player.position.z, hp: hp, segs: segCount, segTotal: segTotal, playing: playing, cleared: cleared, hintTxt: hintFull, toxUntil: toxUntil, ballOn: ballOn, now: performance.now(), ground: groundH(player.position.x, player.position.z), en: ENEMIES.filter(function (e) { return e.sbp && e.act; }).length }; };
   window.__en = function () { return ENEMIES; };
   window.__enUpd = function (dt) { updateEnemies(dt, performance.now()); };
   window.__enemies = function () { return ENEMIES; };
@@ -6190,7 +6211,8 @@ requestAnimationFrame(tick);
         var gx = x0 + i * GRID, gz = z0 + j * GRID;
         var ix = ci * NX + i, jz = cj * NZ + j;
         l3Bk = 0; var y = worldH0(gx, gz), kind = wL2 === 3 ? 6 : wL2 === 2 ? 5 : wL2 ? 4 : wSt ? 1 : wPl ? 2 : wMud ? 3 : 0, px = gx, pz = gz;
-        if (kind === 4 && gx > L3_MIN && l3Tx) kind = 6 + l3Tx;   // a sandbox path segment with its own surface: 7 planks, 8 metal, 9 grass
+        if (kind === 4 && gx > L3_MIN && l3Tx) kind = 6 + l3Tx;
+        if (gx > L3_MIN && SB && SB.toxLedge && kind !== 6) { var tlg = sbLedge(gx, gz); if (ledTox && Math.abs(tlg) > 0.4) kind = 6; }   // the top of a toxic ledge: poisoned ground   // a sandbox path segment with its own surface: 7 planks, 8 metal, 9 grass
         vTs[j * W + i] = l3Ps; vTu[j * W + i] = l3Pu;
         if (kind === 1) {
           px += (rand01(ix, jz, 2) * 2 - 1) * 0.9; pz += (rand01(ix, jz, 3) * 2 - 1) * 0.9;
@@ -6758,7 +6780,7 @@ requestAnimationFrame(tick);
     'barrier.chargeSphere': 2, 'barrier.chargeSqueeze': 3.5, 'barrier.glow': 0.2, 'barrier.glowSize': 1.14, 'barrier.dashLen': 0.32, 'barrier.dashGap': 0.22,
     'barrier.cBody': '#ff2a1f', 'barrier.cEmis': '#b3140c', 'barrier.cEdge': '#ffc7b8', 'barrier.cDash': '#ff9a88', 'barrier.cGlow': '#ff3a2a',
     'm.drift.lean': 28.6, 'm.drift.angle': 15, 'm.drift.time': 0.15, 'm.drift.minZips': 30, 'm.drift.cool': 1, 'm.drift.rate': 9, 'slope.side': 0.85,
-    'stat.top': 80, 'stat.accelT': 7, 'stat.brake': 3, 'stat.jumpH': 7.2, 'stat.grav': 20, 'stat.gripZ': 20, 'stat.fadeSlope': 0, 'stat.fall': 50, 'stat.hearts': 3, 'stat.colH': 3.6, 'stat.colW': 1, 'stat.wallGrip': 1, 'stat.fadeWall': 1, 'stat.fric': 11.4
+    'stat.top': 80, 'stat.accelT': 7, 'stat.brake': 3, 'stat.jumpH': 7.2, 'stat.grav': 20, 'stat.gripZ': 20, 'stat.fadeSlope': 0, 'stat.fall': 50, 'stat.hearts': 3, 'stat.colH': 3.6, 'stat.colW': 1, 'stat.wallGrip': 1, 'stat.fadeWall': 1, 'stat.fric': 11.4, 'stat.slamAcc': 40, 'stat.slamMax': 60
   };
   var MAXHP = 3;
   var mollyScale = 1, SLIDE_H = 1;   // mollyScale: the Overall scale the model in use was saved with (the Rig Editor's dial). She stands 3.6 units x this, and her collision box (standing and sliding) is multiplied by it too
@@ -6774,7 +6796,7 @@ requestAnimationFrame(tick);
     var C = RIGCFG;
     // any number can be typed into a stat, so the ones that would break the game (a negative jump, no grip at all, a top speed below nothing) are held to the nearest value that still works
     RUN_SPEED = Math.max(1, C['stat.top']) * TILE; ACCEL_TIME = Math.max(0.5, C['stat.accelT']); ACCEL = RUN_SPEED / ACCEL_TIME; BRAKE_MULT = Math.max(0, C['stat.brake']);
-    GRAV = Math.max(1, C['stat.grav']) * TILE; GRIP = Math.max(0.5, C['stat.gripZ']) * TILE; JUMP_H = Math.max(0, C['stat.jumpH']); JUMP_V = Math.sqrt(2 * GRAV * JUMP_H); FALL_MAX = Math.max(1, C['stat.fall']) * TILE;   // (Grass Canyon's big curve keeps the radius it was built with, TURN_R: it is part of the level, not of her stats)
+    GRAV = Math.max(1, C['stat.grav']) * TILE; GRIP = Math.max(0.5, C['stat.gripZ']) * TILE; JUMP_H = Math.max(0, C['stat.jumpH']); JUMP_V = Math.sqrt(2 * GRAV * JUMP_H); FALL_MAX = Math.max(1, C['stat.fall']) * TILE; SLAM_ACC = Math.max(1, C['stat.slamAcc']) * TILE; SLAM_MAX = Math.max(1, C['stat.slamMax']) * TILE;   // (Grass Canyon's big curve keeps the radius it was built with, TURN_R: it is part of the level, not of her stats)
     WALL_FADE = C['stat.fadeWall'] ? 1 : 0; SLOPE_FADE = C['stat.fadeSlope'] ? 1 : 0;
     MAXHP = Math.max(1, Math.min(12, Math.round(C['stat.hearts']))); WALL_GRIP = Math.max(0, C['stat.wallGrip']); FRIC = Math.max(0, C['stat.fric']) * TILE;
     PLAYER_H = Math.max(1.2, C['stat.colH']) * mollyScale; PLAYER_RADIUS = Math.max(0.1, C['stat.colW'] / 2) * mollyScale; SLIDE_H = mollyScale;   // her collision box: how tall standing (a slide squeezes it to 1) and how wide, all times the model's Overall scale
@@ -7425,13 +7447,13 @@ requestAnimationFrame(tick);
   function liveRebuild(j) {                                       // rebuild the layout under Molly and put her back exactly where she was
     if (!liveOn) return; var t0 = performance.now();
     if (!SB || level !== 3) { startSandbox(j); return; }
-    var pp = player.position, k = { x: pp.x, y: pp.y, z: pp.z, h: heading, yw: yaw, sp: speed, sx: spawn.x, sz: spawn.z, sc: spawn.cp, sy: spawn.yaw, tl: timeLeft, hp: hp, pw: segCount, ball: ballOn }, keepSB = SB, nb;
+    var pp = player.position, k = { x: pp.x, y: pp.y, z: pp.z, h: heading, yw: yaw, sp: speed, sx: spawn.x, sz: spawn.z, sc: spawn.cp, sy: spawn.yaw, tl: timeLeft, hp: hp, pw: segCount, st: segTotal, ball: ballOn }, keepSB = SB, nb;
     try { SB = null; nb = sbBuild(j); SB = keepSB; } catch (er) { SB = keepSB; peHost.__liveMsg('Not rebuilt: the layout is mid-edit (' + (er && er.message || er) + ')'); return; }   // half-finished edits leave the running level as it was
     sbDispose(); SB = nb; sbPitInit(); sbCaveInit(); sbMoverInit(); gcI = 1e9; gcJ = 1e9;
     for (var key in chunks) { scene.remove(chunks[key]); delete chunks[key]; }
     TIME_LIMIT = SB.timeLimit > 0 ? SB.timeLimit : 300; sbMakeMeshes(); sbRampInit(); sbBoostZones();
     spawnAt(k.x, k.z, 0, '', k.yw); endSpawnFx();
-    spawn.x = k.sx; spawn.z = k.sz; spawn.cp = k.sc; spawn.yaw = k.sy; timeLeft = k.tl; heading = k.h; yaw = k.yw; speed = k.sp; hp = k.hp; drawHearts(); setPower(k.pw); if (k.ball) { setPower(k.pw + BARRIER_COST); setBall(true); } sbLight(k.sc);
+    spawn.x = k.sx; spawn.z = k.sz; spawn.cp = k.sc; spawn.yaw = k.sy; timeLeft = k.tl; heading = k.h; yaw = k.yw; speed = k.sp; hp = k.hp; drawHearts(); setPower(k.pw); segTotal = 0; addSegs(k.st || 0); if (k.ball) { setPower(k.pw + BARRIER_COST); setBall(true); } sbLight(k.sc);
     var gy = groundH(k.x, k.z); player.position.y = Math.max(gy, k.y); if (k.y > gy + 0.05) { grounded = false; fallTop = k.y; }
     peHost.__liveMsg('Rebuilt in ' + Math.round(performance.now() - t0) + ' ms');
   }
@@ -7807,6 +7829,22 @@ requestAnimationFrame(tick);
         put(L3_X + bx, sbFoot(L3_X + bx, bz) + t.y + 0.4 + life * TOX_H, bz, (0.3 + 0.55 * rand01(i, k, 165)) * Math.sin(Math.PI * life), r1, r2);
       }
     }
+    for (i = 0; i < B.toxLedgePts.length && n < 800; i++) {      // toxic ledge tops: a few bubbles along each one near her
+      var tq = B.toxLedgePts[i]; if (Math.abs(tq.x - ex) > 150 || Math.abs(tq.z - pp.z) > 150) continue;
+      for (k = 0; k < 3; k++) {
+        var tr1 = rand01(i, k, 181), tlife = (toxT * (0.35 + 0.3 * rand01(i, k, 182)) + rand01(i, k, 183)) % 1, tl = (tr1 * 2 - 1) * tq.half * 0.8, ta = (rand01(i, k, 184) * 2 - 1) * 2;
+        var tbx = tq.x + Math.cos(tq.th) * tl + Math.sin(tq.th) * ta, tbz = tq.z + Math.sin(tq.th) * tl - Math.cos(tq.th) * ta;
+        put(L3_X + tbx, groundH(L3_X + tbx, tbz) + 0.4 + tlife * TOX_H, tbz, (0.3 + 0.55 * rand01(i, k, 185)) * Math.sin(Math.PI * tlife), tr1, rand01(i, k, 186));
+      }
+    }
+    for (i = 0; i < B.movers.length && n < 800; i++) {          // toxic platforms: bubbles off the top, moving with it
+      var tm = B.movers[i]; if (tm.door || !tm.o || !tm.o.tox || ex < tm.minx - 150 || ex > tm.maxx + 150 || pp.z < tm.minz - 150 || pp.z > tm.maxz + 150) continue;
+      var tcnt = Math.min(60, Math.max(4, Math.round(tm.pts.length * 1.5)));
+      for (k = 0; k < tcnt; k++) {
+        var tpq = tm.pts[Math.floor(rand01(i, k, 191) * tm.pts.length)], tside = (rand01(i, k, 192) * 2 - 1) * tm.half * 0.85, tlf = (toxT * (0.35 + 0.3 * rand01(i, k, 193)) + rand01(i, k, 194)) % 1;
+        put(L3_X + tpq[0] + Math.cos(tpq[2]) * tside + tm.off[0], tm.base + tm.hgt + tm.dy + 0.4 + tlf * TOX_H, tpq[1] + Math.sin(tpq[2]) * tside + tm.off[1], (0.3 + 0.55 * rand01(i, k, 195)) * Math.sin(Math.PI * tlf), rand01(i, k, 196), rand01(i, k, 197));
+      }
+    }
     for (i = 0; i < B.patches.length && n < 800; i++) {
       var pa = B.patches[i]; if (pa.ground !== 'toxic' || Math.abs(pa.x - ex) > pa.rr + 100 || Math.abs(pa.z - pp.z) > pa.rr + 100) continue;
       var CS = 7, ca = Math.floor(ex / CS), cb = Math.floor(pp.z / CS);
@@ -7917,7 +7955,7 @@ requestAnimationFrame(tick);
   var rampSegX = [], rampSegZ = [];
   for (var rq = 0; rq < 50; rq++) { rampSegX.push(PX0 - (20 + (RMP_END - 40) * rq / 49)); rampSegZ.push(RMP_ZC); }
   var segX = [], segY = [], segZ = [], segId = [], segAlive = [];
-  var segGot = {}, segCount = 0, segBuiltX = 1e9, segBuiltZ = 1e9;
+  var segGot = {}, segCount = 0, segTotal = 0, segBuiltX = 1e9, segBuiltZ = 1e9;
   var sm4 = new THREE.Matrix4(), sq = new THREE.Quaternion(), sp3 = new THREE.Vector3(), ss3 = new THREE.Vector3(1, 1, 1), ss5 = new THREE.Vector3(5, 5, 5), sUp = new THREE.Vector3(0, 1, 0);
   (function () {                                            // five big Segs (5 times the size, worth 10 each) 100 apart along the last 400 units of the path, before the drop
     var last = L2_PIECES[L2_PIECES.length - 1], send = last.s0 + last.len;
@@ -7990,7 +8028,7 @@ requestAnimationFrame(tick);
         var dx = segX[i] - (x0 + ex * t), dz = segZ[i] - (z0 + ez * t), dy = segY[i] - py;
         var bigS = segId[i].charAt(0) === 'b' && segId[i].indexOf('big,') === 0, rr = bigS ? SEG_RADIUS * 5 : SEG_RADIUS;
         if (dx * dx + dz * dz < rr * rr && dy > (bigS ? -14 : -2.6) && dy < (bigS ? 30 : 6.5)) {
-          segAlive[i] = false; segGot[segId[i]] = true; setPower(segCount + styleMult() * (bigS ? 10 : 1));
+          segAlive[i] = false; segGot[segId[i]] = true; setPower(segCount + styleMult() * (bigS ? 10 : 1)); addSegs(bigS ? 10 : 1);
           segsEl.classList.remove('bump'); void segsEl.offsetWidth; segsEl.classList.add('bump');
           continue;
         }
@@ -8281,7 +8319,7 @@ requestAnimationFrame(tick);
     player.rotation.y = face;
     updateChunks(sx, sz, 99);
     builtAtZ = 1e9; builtAtX = 1e9; updateTrees(sx, sz);
-    segCount = 0; segGot = {}; segValEl.textContent = '0'; setSegLine(0); segBuiltX = 1e9; updateSegs(sx, sz);
+    segCount = 0; segTotal = 0; segGot = {}; segValEl.textContent = '0'; setSegLine(0); segBuiltX = 1e9; updateSegs(sx, sz);
     lightGates(cpNo);
     if (level === 3) sbLight(cpNo);
     hp = MAXHP; drawHearts(); breathReset(); fallTop = player.position.y; drownT = 0; styleStacks = 0; styleUntil = 0; confLife = 0; confetti.visible = false;

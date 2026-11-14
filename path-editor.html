@@ -150,7 +150,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   var $ = function (id) { return document.getElementById(id); };
   var cv = $('cv'), ctx = cv.getContext('2d');
   var KEY = 'polyrun-path-editor-v2';
-  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: { trap: false }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, sink: true, sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round' }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4 }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round' }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {} };
+  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: { trap: false }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, sink: true, sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {} };
   var S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }, { len: 1005.3, ang: 90, r: 640, dy: 0 }, { len: 400, ang: 0, r: 640, dy: 20 }, { len: 502.65, ang: -45, r: 640, dy: 0 }, { len: 300, ang: 0, r: 640, dy: 0 }], objs: [] };
   var GH = null, DEFUSER = {};                                  // GH: the not-yet-placed stamp whose settings the panel shows while a stamp tool is chosen
   function ghostMode() { return tool !== 'select' && tool !== 'erase' && tool !== 'preset' && tool !== 'forest'; }
@@ -334,7 +334,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (t === 'gap' && !U('w')) o.w = S.width + 6; if (t === 'goal' && !U('w')) o.w = Math.max(16, S.width + 7);
     if (STRIPS[t]) {
       var nn = nearest(x, z);
-      if (t === 'segchain' || t === 'mud') { o.s = nn.s; o.u = t === 'mud' ? 0 : nn.u; o.follow = true; return o; }
+      if (t === 'segchain' || (t === 'mud' && nn.d <= S.width / 2 + 4)) { o.s = nn.s; o.u = t === 'mud' ? 0 : nn.u; o.follow = true; return o; }   // mud stamped on the path follows it; anywhere else it is a strip of its own
       o.follow = false; o.x = x; o.z = z; o.th = nn.d < 200 ? at(nn.s).th * 180 / Math.PI : 0; o.bend = 0; return o;
     }
     place(o, x, z); return o;
@@ -377,7 +377,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     return null;
   }
   function hit(o, wx, wz) {
-    if (STRIPS[o.t]) { var cp = o.t === 'segchain' ? chainPts(o) : stripPts(o, Math.max(4, 6 / view.zoom)), rr = o.t === 'segchain' ? Math.max(5, 9 / view.zoom) : Math.max((o.t === 'mud' ? S.width : o.w) / 2, 5 / view.zoom) + 3 / view.zoom; for (var q = 0; q < cp.length; q++) if (Math.hypot(cp[q][0] - wx, cp[q][1] - wz) < rr) return true; return false; }
+    if (STRIPS[o.t]) { var cp = o.t === 'segchain' ? chainPts(o) : stripPts(o, Math.max(4, 6 / view.zoom)), rr = o.t === 'segchain' ? Math.max(5, 9 / view.zoom) : Math.max((o.t === 'mud' ? mudW(o) : o.w) / 2, 5 / view.zoom) + 3 / view.zoom; for (var q = 0; q < cp.length; q++) if (Math.hypot(cp[q][0] - wx, cp[q][1] - wz) < rr) return true; return false; }
     var p = pos(o), dx = wx - p.x, dz = wz - p.z, c = Math.cos(-p.th), s = Math.sin(-p.th), lx = dx * c - dz * s, lz = dx * s + dz * c, h = halves(o), pad = 4 / view.zoom;
     if (!h) return Math.hypot(dx, dz) < Math.max(7, 13 / view.zoom);
     if (circR(o)) return Math.hypot(dx, dz) < circR(o) + pad;
@@ -449,7 +449,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   function segDot(x, y, big, z) { var r = Math.max(3, (big ? 5 : 2.2) * z * 1.6); ctx.fillStyle = '#f2c230'; ctx.strokeStyle = css('--ink'); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.stroke(); if (big) { ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 7); ctx.stroke(); } }
   function strokePts(pts) { ctx.beginPath(); pts.forEach(function (c, i) { var q = w2s(c[0], c[1]); if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }); ctx.stroke(); }
   function drawStrip(o, selected) {
-    var z = view.zoom, pts = stripPts(o, Math.max(3, 5 / z)), pts0 = pts, W = Math.max(2, (o.t === 'mud' ? S.width : o.w) * z), acc = css('--accent');
+    var z = view.zoom, pts = stripPts(o, Math.max(3, 5 / z)), pts0 = pts, W = Math.max(2, (o.t === 'mud' ? mudW(o) : o.w) * z), acc = css('--accent');
     ctx.lineJoin = 'round'; ctx.lineCap = 'butt';
     if (o.t === 'gap' || o.t === 'ledge' || o.t === 'mud') {   // the true footprint, under the piece: its margin all round, and the end shape
       var fp = stripFoot(o), fpts = pts, sq = endsOf(o) === 'square';
@@ -465,13 +465,13 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       ctx.globalAlpha = 0.8; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.strokeStyle = acc; var a = w2s(pts0[0][0] - v[0] * hd, pts0[0][1] - v[1] * hd), b = w2s(pts0[0][0] + v[0] * hd, pts0[0][1] + v[1] * hd); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
     }
     if (o.t === 'gap') { ctx.strokeStyle = '#c9222a'; ctx.lineWidth = W + 4; strokePts(pts); }
-    ctx.strokeStyle = o.t === 'ledge' ? '#7a6a58' : o.t === 'platform' ? '#7fa6bf' : o.t === 'gap' ? '#241c1c' : '#6b4a2b';
+    ctx.strokeStyle = o.tox ? '#3c4f3a' : o.t === 'ledge' ? '#7a6a58' : o.t === 'platform' ? '#7fa6bf' : o.t === 'gap' ? '#241c1c' : '#6b4a2b';
     if (o.t === 'platform' && o.move === 'vertical' && clock !== null) ctx.globalAlpha = 0.55 + 0.45 * Math.sin(2 * Math.PI * (clock + (o.phase || 0)) / Math.max(0.1, o.period));
     ctx.lineWidth = W; strokePts(pts); ctx.globalAlpha = 1;
     if (o.t === 'ledge') { ctx.strokeStyle = '#4a3f33'; ctx.lineWidth = 1.5; strokePts(pts.map(function (c) { return [c[0], c[1]]; })); }
     var m = pts[Math.floor(pts.length / 2)], q = w2s(m[0], m[1]);
     ctx.fillStyle = css('--ink'); ctx.font = 'bold 11px ' + css('--font-d');
-    var lab = o.t === 'ledge' ? 'H ' + o.hgt : o.t === 'platform' ? 'PLATFORM +' + o.hgt + (o.move === 'vertical' ? ' ↕' : o.move === 'side' ? ' ↔' : o.move === 'forward' ? ' ⇅' : '') + (o.group ? ' · G' + o.group + ' @' + (o.phase || 0) + 's' : '') : o.t === 'gap' ? 'GAP' : 'MUD ' + o.slow + '%';
+    var lab = (o.tox ? 'TOXIC ' : '') + (o.t === 'ledge' ? 'H ' + o.hgt : o.t === 'platform' ? 'PLATFORM +' + o.hgt + (o.move === 'vertical' ? ' ↕' : o.move === 'side' ? ' ↔' : o.move === 'forward' ? ' ⇅' : '') + (o.group ? ' · G' + o.group + ' @' + (o.phase || 0) + 's' : '') : o.t === 'gap' ? 'GAP' : 'MUD ' + o.slow + '%');
     ctx.fillText(lab, q[0] + 8, q[1] - 8);
   }
   function rnd(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
@@ -628,7 +628,9 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   }
   function endsOf(o) { return o.ends === 'square' ? 'square' : 'round'; }
   function endsF(o) { return '<label class="f">Ends<select data-ok="ends"><option value="round"' + (endsOf(o) === 'round' ? ' selected' : '') + '>Rounded (a half-circle past each end)</option><option value="square"' + (endsOf(o) === 'square' ? ' selected' : '') + '>Squared (flat, 1.5 past each end)</option></select></label>'; }
-  function stripFoot(o) { var raw = o.t === 'mud' ? S.width / 2 : o.t === 'ledge' ? Math.max(o.w / 2, 1.3) : o.w / 2, m = o.t === 'mud' ? 1 : 1.5; return { half: raw + m, m: m }; }   // what the game really covers: the piece's own half-width plus its margin (gap and ledge 1.5, mud 1) on every side, ends included
+  function mudW(o) { return o.follow === false ? (o.w > 0 ? o.w : 12) : S.width; }   // mud on the path is as wide as the path; mud of its own has a width
+  function stripFoot(o) { var raw = o.t === 'mud' ? mudW(o) / 2 : o.t === 'ledge' ? Math.max(o.w / 2, 1.3) : o.w / 2, m = o.t === 'mud' ? 1 : 1.5; return { half: raw + m, m: m }; }   // what the game really covers: the piece's own half-width plus its margin (gap and ledge 1.5, mud 1) on every side, ends included
+  function toxF(o) { return '<label class="f">Surface<select data-ok="tox"><option value="0"' + (o.tox ? '' : ' selected') + '>Normal</option><option value="1"' + (o.tox ? ' selected' : '') + '>Toxic (a heart a second to stand on, like a toxic patch)</option></select></label>'; }
   function renderInsp() {
     var el = $('insp'), sl0 = selList(), o = S.objs[sel], ghost = ghostMode();
     if (tool === 'forest') { el.hidden = true; return; }
@@ -640,13 +642,18 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag') h += '<label class="f">Height with others<select data-ok="hm"><option value="add"' + (o.hm === 'ind' ? '' : ' selected') + '>Additive: stacks on what it crosses</option><option value="ind"' + (o.hm === 'ind' ? ' selected' : '') + '>Independent: its own height, merges in</option></select></label>';
     if (joinedCave) h += '<label class="f">Starts from<select data-ok="after"><option value="">Its own mouth</option>' + S.objs.filter(function (q) { return q !== o && q.t === 'cave'; }).map(function (q) { return '<option value="' + q.id + '"' + (o.after === q.id ? ' selected' : '') + '>End of Cave #' + (S.objs.indexOf(q) + 1) + '</option>'; }).join('') + '</select></label>';
     if (!STRIPS[o.t] && !joinedCave) h += '<label class="f">Snap to the path<select data-ok="noat"><option value="0"' + (o.noat ? '' : ' selected') + '>Snaps: follows the path when it changes</option><option value="1"' + (o.noat ? ' selected' : '') + '>Free: stays where it is</option></select></label>';
-    if (!ghost && !joinedCave && (!STRIPS[o.t] || (o.follow === false && o.t !== 'mud'))) h += num('X', 'X', -99999, 99999, 1, Math.round(p.x * 10) / 10) + num('Z', 'Z', -99999, 99999, 1, Math.round(p.z * 10) / 10) + (STRIPS[o.t] ? '' : num('rot', 'Rotation °', -360, 360, 5, o.rot || 0));
+    if (!ghost && !joinedCave && (!STRIPS[o.t] || o.follow === false)) h += num('X', 'X', -99999, 99999, 1, Math.round(p.x * 10) / 10) + num('Z', 'Z', -99999, 99999, 1, Math.round(p.z * 10) / 10) + (STRIPS[o.t] ? '' : num('rot', 'Rotation °', -360, 360, 5, o.rot || 0));
     if (o.t === 'tree') h += '<label class="f">Size<select data-ok="exs"><option value="rand"' + (o.ex ? '' : ' selected') + '>Random, like the level\'s own trees</option><option value="exact"' + (o.ex ? ' selected' : '') + '>Exactly these sizes</option></select></label>' + (o.ex ? num('tH', 'Trunk height', 1, 80, 0.5, o.tH) + num('tW', 'Trunk width', 0.2, 12, 0.1, o.tW) + num('cH', 'Canopy height', 1, 80, 0.5, o.cH) + num('cW', 'Canopy width', 1, 40, 0.5, o.cW) : '');
     if (o.t === 'tree' || o.t === 'sign' || o.t === 'goal' || o.t === 'checkpoint' || o.t === 'toxic' || o.t === 'ramp' || o.t === 'tip' || (o.t === 'cave' && !joinedCave)) h += num('y', 'Y offset (up from the ground or path)', -500, 500, 0.5, o.y || 0);
     if (o.t === 'seg' || o.t === 'segchain') h += '<label class="f">Size<select data-ok="big"><option value="0"' + (o.big ? '' : ' selected') + '>Regular</option><option value="1"' + (o.big ? ' selected' : '') + '>Big (5×, worth 10)</option></select></label>';
     if (o.t === 'seg') h += num('h', 'Height above the ground', -1, 500, 0.5, o.h || 0);
     if (o.t === 'segchain') h += num('h', 'Height above the ground (at the start)', -1, 500, 0.5, o.h || 0) + num('rise', 'Rise by the end of the chain', -500, 500, 0.5, o.rise || 0) + num('arc', 'Vertical arc (extra height in the middle)', -500, 500, 0.5, o.arc || 0);
-    if (o.t === 'mud') h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10) + num('len', 'Length', 1, 5000, 1, o.len) + num('slow', 'Slowdown %', 0, 95, 1, o.slow) + endsF(o);
+    if (o.t === 'mud') {
+      if (!ghost) h += '<label class="f">Shape<select data-ok="follow"><option value="1"' + (o.follow === false ? '' : ' selected') + '>On the path (as wide as the path)</option><option value="0"' + (o.follow === false ? ' selected' : '') + '>Anywhere, on its own curve</option></select></label>';
+      if (o.follow === false) h += num('th', 'Heading ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10) + num('w', 'Width', 1, 300, 1, mudW(o));
+      else h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10);
+      h += num('len', 'Length', 1, 5000, 1, o.len) + num('slow', 'Slowdown %', 0, 95, 1, o.slow) + endsF(o);
+    }
     else if (STRIPS[o.t]) {
       var canJoin = o.t === 'segchain' || o.t === 'ledge' || o.t === 'gap';
       if (canJoin && !ghost) h += '<label class="f">Starts from<select data-ok="after"><option value="">Its own start</option>' + S.objs.filter(function (q) { return q !== o && q.t === o.t; }).map(function (q) { return '<option value="' + q.id + '"' + (o.after === q.id ? ' selected' : '') + '>End of ' + NAMES[q.t] + ' #' + (S.objs.indexOf(q) + 1) + '</option>'; }).join('') + '</select></label>';
@@ -661,9 +668,9 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       }
       h += num('len', o.t === 'segchain' ? 'Chain length' : 'Length', 1, 5000, 1, o.len);
       if (o.t === 'segchain') h += num('gap', 'Spacing', 1, 500, 1, o.gap);
-      if (o.t === 'ledge') h += num('w', 'Thickness', 0.5, 100, 0.5, o.w) + num('hgt', 'Height (any)', -500, 500, 0.5, o.hgt) + endsF(o);
+      if (o.t === 'ledge') h += num('w', 'Thickness', 0.5, 100, 0.5, o.w) + num('hgt', 'Height (any)', -500, 500, 0.5, o.hgt) + endsF(o) + toxF(o);
       if (o.t === 'platform') {
-        h += num('w', 'Width', 1, 300, 1, o.w) + num('hgt', 'Height of the top above the ground', -500, 500, 0.5, o.hgt) + num('thick', 'Thickness (top to bottom)', 0.5, 200, 0.5, o.thick === undefined ? 2 : o.thick);
+        h += num('w', 'Width', 1, 300, 1, o.w) + num('hgt', 'Height of the top above the ground', -500, 500, 0.5, o.hgt) + num('thick', 'Thickness (top to bottom)', 0.5, 200, 0.5, o.thick === undefined ? 2 : o.thick) + toxF(o);
         h += '<label class="f">Movement<select data-ok="move">' + [['none', 'Stays put'], ['side', 'Side to side'], ['forward', 'Forward and back'], ['vertical', 'Up and down']].map(function (m) { return '<option value="' + m[0] + '"' + (o.move === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>';
         if (o.move !== 'none') h += num('dist', 'Travel (units)', 1, 1000, 1, o.dist) + num('period', 'Seconds per full cycle', 0.5, 120, 0.5, o.period) + num('group', 'Link group (0 = none)', 0, 99, 1, o.group || 0) + num('phase', 'Phase (seconds into the cycle)', 0, 120, 0.1, o.phase || 0);
       }
@@ -738,8 +745,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     else if (k === 'follow') {
       if (t.value === '0' && o.follow !== false) {        // cut loose: keep the shape it has now, then it can be edited
         var cp0 = [[shapeAt(o, 0).x, shapeAt(o, 0).z]], sp = at(o.s), sq = at(o.s + o.len);
-        o.x = cp0[0][0]; o.z = cp0[0][1]; o.th = sp.th * 180 / Math.PI; o.bend = (sq.th - sp.th) * 180 / Math.PI; o.follow = false; delete o.s; delete o.u;
-      } else if (t.value === '1' && o.follow === false) { var nn = nearest(o.x, o.z); o.s = nn.s; o.u = nn.u; o.follow = true; delete o.x; delete o.z; delete o.th; delete o.bend; }
+        o.x = cp0[0][0]; o.z = cp0[0][1]; o.th = sp.th * 180 / Math.PI; o.bend = (sq.th - sp.th) * 180 / Math.PI; o.follow = false; delete o.s; delete o.u; if (o.t === 'mud' && !(o.w > 0)) o.w = S.width;
+      } else if (t.value === '1' && o.follow === false) { var nn = nearest(o.x, o.z); o.s = nn.s; o.u = o.t === 'mud' ? 0 : nn.u; o.follow = true; delete o.x; delete o.z; delete o.th; delete o.bend; }
     }
     else if (k === 'exs') { o.ex = t.value === 'exact'; if (o.ex && !(o.tH > 0)) { o.tH = 15.5; o.tW = 1.6; o.cH = 14.9; o.cW = 7.4; } }
     else if (k === 'mode' && o.t === 'door') { o.mode = t.value; }
@@ -755,6 +762,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     else if (k === 'idle') { o.idle = t.value === '1'; DEF[o.t] = DEF[o.t] || {}; DEF[o.t].idle = o.idle; }
     else if (k === 'big') { o.big = t.value === '1'; DEF[o.t].big = o.big; }
     else if (k === 'text' || k === 'shape' || k === 'move' || k === 'kind' || k === 'style' || k === 'rock' || k === 'ground' || k === 'edge' || k === 'ends') { o[k] = t.value; DEF[o.t][k] = t.value; }
+    else if (k === 'tox') { o.tox = t.value === '1'; DEF[o.t].tox = o.tox; }
     else { o[k] = parseFloat(t.value) || 0; if (DEF[o.t] && DEF[o.t][k] !== undefined && !isOneCrag(o)) DEF[o.t][k] = o[k]; }   // what you set is what the next one starts with
     if (o.t === 'platform' && o.group) {
       if (k === 'group') { var mate = S.objs.filter(function (q) { return q !== o && q.t === 'platform' && q.group === o.group; })[0]; if (mate) { o.period = mate.period; o.dist = mate.dist; o.move = mate.move; } }
@@ -800,7 +808,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (o.t === 'platform') { r.width = o.w; r.height = o.hgt; r.thick = o.thick === undefined ? 2 : o.thick; r.move = o.move; if (o.move !== 'none') { r.travel = o.dist; r.period = o.period; r.phase = o.phase || 0; if (o.group) r.group = o.group; } }
       if (o.t === 'gap') r.width = o.w;
       if (o.t === 'gap' || o.t === 'ledge' || o.t === 'mud') r.ends = endsOf(o);
-      if (o.t === 'mud') r.slowdown = o.slow;
+      if ((o.t === 'ledge' || o.t === 'platform') && o.tox) r.toxic = true;
+      if (o.t === 'mud') { r.slowdown = o.slow; if (o.follow === false) r.width = mudW(o); }
       if (o.t === 'crag') { r.radius = o.r; r.count = o.count; r.baseRadius = o.base; r.baseRadiusVar = o.baseV; r.height = o.hgt; r.heightVar = o.hgtV; r.spacing = o.gap; r.spacingVar = o.gapV; r.seed = o.seed; }
       if (o.t === 'patch') { r.shape = o.shape; r.width = o.w; r.length = o.d; r.ground = o.ground; r.edge = o.edge; if (o.edge !== 'hard') r.soften = o.soft; }
       if (o.t === 'spawner') { r.radius = o.r; r.every = o.every; r.max = o.max; }
@@ -975,7 +984,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         if (r.type === 'platform') { o.w = r.width || 16; o.thick = r.thick === undefined ? 2 : r.thick; o.hgt = r.height === undefined ? 10 : r.height; o.move = r.move || 'none'; o.dist = r.travel || 40; o.period = r.period || 4; o.phase = r.phase || 0; o.group = r.group || 0; }
         if (r.type === 'gap') o.w = r.width || 15;
         if (r.type === 'gap' || r.type === 'ledge' || r.type === 'mud') o.ends = r.ends === 'square' ? 'square' : 'round';
-        if (r.type === 'mud') { o.slow = r.slowdown === undefined ? 50 : r.slowdown; o.len = r.length || 150; o.follow = true; }
+        if (r.type === 'ledge' || r.type === 'platform') o.tox = !!r.toxic;
+        if (r.type === 'mud') { o.slow = r.slowdown === undefined ? 50 : r.slowdown; o.len = r.length || 150; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.heading || 0; o.bend = r.bend || 0; o.w = r.width || 12; } }
         if (r.type === 'ledge' || r.type === 'platform' || r.type === 'gap') { o.len = r.length || 40; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.heading || 0; o.bend = r.bend || 0; } }
         if (r.id !== undefined) o.id = r.id; if (r.layer !== undefined) o.layer = r.layer; if (r.heightMode === 'independent') o.hm = 'ind';
         if (r.after !== undefined) { o.after = r.after; o.turn = r.turn || 0; o.follow = false; }
