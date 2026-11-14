@@ -11,6 +11,15 @@ Purpose: every night, one small slice of the code is looked at through one lens 
 6. Update the table (slice `done`, date, one line of result), write the night's report in `sweep-reports/YYYY-MM-DD.md` (what was read, what was found, what was fixed with its test, what is left for Ricky, any limits hit), commit, and push the branch.
 7. If a session is cut off by the usage limit, note in the report which slice and which step it reached.
 
+## Staying current: new and changed code is never skipped
+The table is a map, not a fence. Every night, BEFORE choosing a slice:
+1. **Find what changed.** Run `git diff <Last checked commit>..<base> -- checker-run.html path-editor.html` (the commit is recorded just below; on the first night it is the starting commit). Look at which sections the changes fall in (the `// ---- name` comment above each hunk). Every slice that has changes goes back to `todo` for the lenses that apply to it, and changed slices go to the FRONT of the queue (oldest change first), ahead of slices that were never swept. A new interactive session's changes are therefore picked up within a night or two, in whichever slice they land in.
+2. **Find what the table does not cover.** List every `// ---- ` section comment in both files (`grep -n "// ---- "`) and every top-level function or `<template>`/`<script>` block that sits outside any section. Anything that does not clearly belong to a slice gets a new row at the bottom of the table (next number, all lenses `todo`, with a note of what it is and which tests relate), or is added to the closest slice's description if it is a small extension of it. A new feature is never left out because it has no row.
+3. **Record the new commit** in "Last checked commit" at the end of the night, on the night's branch, so the next night diffs from there. If a night ends early, still do steps 1 and 2 and record them, even if no slice got swept.
+4. A slice is a starting point for what to read, not a limit: if a change in a slice leans on code elsewhere (a helper, a shared value), read that too.
+
+Last checked commit: 90188525203664ad98e208eb64ff9020a673d557
+
 ## Lenses (a six-night cycle: Bugs, Bugs, Visual, Bugs, Bugs, Performance; keep a counter in the table header comment below)
 Each slice has its own status for each lens. A night takes the first slice that is `todo` for that night's lens. A Visual night skips slices with nothing to see (the PE JSON, menus); a Performance night skips slices with no hot path.
 

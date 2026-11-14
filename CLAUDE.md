@@ -14,6 +14,8 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (level detai
 - Units: TILE 2 (1 Zip = 2 u/s). Show speeds in Zips.
 - Interactive sessions that change the game: bump the version label (`<div class="ver">`) and add a CHANGELOG entry (top of `var CHANGELOG`), keep `audit-notes.md` current.
 
+- When you add a NEW section, feature or file in an interactive session, add a row for it to the SWEEP.md coverage table in the same commit (all lenses `todo`), and mention in the commit message which slice the change belongs to. The nightly sweep also finds changed and new code by itself (see "Staying current" in SWEEP.md), so this is a courtesy that speeds it up, not something the sweep depends on.
+
 ## Branches (so two sessions never edit the same thing)
 - Interactive work with Ricky happens on `main`.
 - The nightly sweep NEVER touches `main`. It works on a branch `nightly/YYYY-MM-DD`, based on the newest unmerged `origin/nightly/*` branch if there is one (so the nights stack and merge as a chain), otherwise on `main`.
