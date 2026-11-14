@@ -1,0 +1,42 @@
+# Builds the downloads whenever the game changes on main, and puts them on the Releases page under the game's version (v176, v177, ...).
+# A new push with the same version label replaces that release's files; a new version label makes a new release.
+name: Build downloads
+on:
+  push:
+    branches: [main]
+    paths: ['checker-run.html', 'desktop/**', 'tools/build_release.py', '.github/workflows/release.yml']
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Fetch three.js r128 and the fonts
+        run: |
+          mkdir -p "$RUNNER_TEMP/deps" && cd "$RUNNER_TEMP/deps"
+          npm init -y > /dev/null
+          npm install --no-audit --no-fund three@0.128.0 @fontsource/rubik@5.3.0 @fontsource/dm-mono@5.3.0 @fontsource/press-start-2p@5.3.0 @fontsource/ibm-plex-sans@5.3.0 @fontsource/ibm-plex-mono@5.3.0
+      - name: Build the game and desktop zips
+        id: build
+        run: python3 tools/build_release.py "$RUNNER_TEMP/deps/node_modules/three" "$RUNNER_TEMP/deps/node_modules/@fontsource" "$RUNNER_TEMP/out"
+      - name: Publish to Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VER: ${{ steps.build.outputs.version }}
+          APP: ${{ steps.build.outputs.app }}
+        run: |
+          NOTES="Poly Runner $VER, desktop app $APP. Built from commit ${GITHUB_SHA::7}.
+
+          - polyrunner-game-$VER.zip: the game folder. For the desktop app, paste its contents over ~/.config/PolyRun/game (or use Game > Use built-in version after installing the app below). It also runs on its own: open game/index.html in a browser.
+          - polyrunner-desktop-$APP.zip: the desktop app with this game built in. Unzip it and run: bash build-and-install.sh"
+          if gh release view "$VER" > /dev/null 2>&1; then
+            gh release edit "$VER" --notes "$NOTES"
+          else
+            gh release create "$VER" --target "$GITHUB_SHA" --title "Poly Runner $VER" --notes "$NOTES"
+          fi
+          gh release upload "$VER" "$RUNNER_TEMP"/out/*.zip --clobber

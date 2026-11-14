@@ -4,6 +4,7 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (level detai
 - `checker-run.html` is THE game (about 9,600 lines). It embeds the Path Editor (between `<!--PE-BEGIN-->` and `<!--PE-END-->`, generated) and the Rig Editor (`<template id="rig-tpl">`), plus Molly's baked model (`<script id="molly-glb">`) and settings (`<script id="molly-settings">`).
 - `path-editor.html` is the SOURCE of the embedded Path Editor. Edit it, then run `python3 tools/mk_pe_embed.py` (idempotent) to regenerate the embed. Never hand-edit between PE-BEGIN and PE-END.
 - `tests/` is the headless harness (Playwright + swiftshader). Run `sh tests/setup.sh` once per fresh session (installs three r128 into /tmp/polyrun-work and builds the hooked test copy). After every edit to the game, rerun `python3 tests/mk_test.py`, then run tests from inside `tests/`. `python3 tests/chk.py` is the syntax + swallowed-comment check; run it after every edit.
+- Downloads: `.github/workflows/release.yml` builds the offline game zip and the desktop app zip (`tools/build_release.py`) on every push to `main` that touches the game or the app, and publishes them on the Releases page under the game's version label. So bump the version label for anything Ricky should download.
 - `audit-notes.md` is the long audit log. `SWEEP.md` is the nightly sweep plan, its state and the table of 20 slices.
 
 ## Standing rules from Ricky
