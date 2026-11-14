@@ -4463,6 +4463,16 @@ requestAnimationFrame(tick);
   scene.fog = new THREE.Fog(SKY, 160 * GFX.fog, 640 * GFX.fog);
 
   var camera = new THREE.PerspectiveCamera(65, 1, 0.1, 700 * GFX.fog);
+  // See-through: any opaque surface between the camera and Molly is drawn see-through (a fine stipple, most of it left out) inside a narrow cone along the line from the camera to her, so she is never hidden. It stops short of her, so she and the ground at her feet are drawn as usual.
+  var SEE = { on: { value: 0 }, a: { value: new THREE.Vector3() }, b: { value: new THREE.Vector3() }, r: { value: 2.2 }, t1: { value: 0.8 } };
+  THREE.Material.prototype.onBeforeCompile = function (shader) {
+    if (this.transparent || this.isShaderMaterial || this.isPointsMaterial || this.isLineBasicMaterial || this.isSpriteMaterial || this.userData.noSee) return;
+    if (shader.vertexShader.indexOf('#include <project_vertex>') < 0 || shader.fragmentShader.indexOf('void main() {') < 0) return;
+    shader.uniforms.uSeeOn = SEE.on; shader.uniforms.uSeeA = SEE.a; shader.uniforms.uSeeB = SEE.b; shader.uniforms.uSeeR = SEE.r; shader.uniforms.uSeeT = SEE.t1;
+    shader.vertexShader = 'varying vec3 vSeeW;\n' + shader.vertexShader.replace('#include <project_vertex>', '#include <project_vertex>\n#ifdef USE_INSTANCING\n vSeeW = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;\n#else\n vSeeW = (modelMatrix * vec4(transformed, 1.0)).xyz;\n#endif');
+    shader.fragmentShader = 'varying vec3 vSeeW;\nuniform float uSeeOn; uniform vec3 uSeeA; uniform vec3 uSeeB; uniform float uSeeR; uniform float uSeeT;\n' + shader.fragmentShader.replace('void main() {', 'void main() {\n if (uSeeOn > 0.5) { vec3 sAB = uSeeB - uSeeA; float sT = dot(vSeeW - uSeeA, sAB) / max(1e-4, dot(sAB, sAB)); if (sT > 0.0 && sT < uSeeT) { float sD = length(vSeeW - (uSeeA + sAB * sT)), sR = uSeeR * (0.3 + 0.7 * sT / uSeeT); if (sD < sR) { float sB = fract(52.9829189 * fract(dot(floor(gl_FragCoord.xy), vec2(0.06711056, 0.00583715)))); if (sB > mix(0.28, 1.0, smoothstep(0.7, 1.0, sD / sR))) discard; } } }');
+  };
+  THREE.Material.prototype.customProgramCacheKey = function () { return 'see1'; };
 
   scene.add(new THREE.HemisphereLight(0xffffff, 0x7a7a52, 0.75));
   var sun = new THREE.DirectionalLight(0xfff3e0, 0.9);
@@ -10018,7 +10028,11 @@ function showScreen(name) {                                // the menu shows one
     if (shakeAmp > 0.004) { camera.position.x += (Math.random() - 0.5) * 2 * shakeAmp; camera.position.y += (Math.random() - 0.5) * 2 * shakeAmp; camera.position.z += (Math.random() - 0.5) * 2 * shakeAmp; shakeAmp *= Math.exp(-dt * 9); } else shakeAmp = 0;
     camera.lookAt(focus);
 
+    var seeD = camera.position.distanceTo(focus);                 // see-through: from the camera to her middle, stopping 2.5 short of her
+    SEE.a.value.copy(camera.position); SEE.b.value.set(player.position.x, player.position.y + PLAYER_H * 0.5, player.position.z); SEE.r.value = 2.2 * mollyScale; SEE.t1.value = Math.max(0, 1 - 2.5 * mollyScale / Math.max(0.01, SEE.a.value.distanceTo(SEE.b.value)));
+    SEE.on.value = seeD > 0.5 ? 1 : 0;
     renderer.render(scene, camera);
+    SEE.on.value = 0;
   }
   requestAnimationFrame(frame);
 })();
