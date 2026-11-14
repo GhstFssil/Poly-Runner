@@ -8,6 +8,7 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (level detai
 
 ## Standing rules from Ricky
 - Do not send a zip or publish an artifact unless he asks.
+- The nightly sweep has three lenses (bugs, visual seams and edges, performance); see SWEEP.md. It never changes features, physics, tuning, looks or design on its own: those suggestions go in the report.
 - If unsure about a decision, ask. In an unattended session, do not guess: write the question in the report and leave that thing alone.
 - No physics changes to compensate for level problems.
 - Units: TILE 2 (1 Zip = 2 u/s). Show speeds in Zips.
