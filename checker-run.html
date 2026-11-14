@@ -662,8 +662,9 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
 .hint{position:absolute;left:10px;bottom:8px;font:12px var(--font-m);color:var(--mute);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:3px 8px;pointer-events:none}
 .mapcol{display:flex;flex-direction:column;gap:8px;min-width:0;position:sticky;top:16px}
 @media(max-width:820px){.mapcol{position:static}}
-.lrow{display:flex;gap:4px;align-items:center}
-.lrow input[type=text]{flex:1}
+.lrow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding-bottom:4px;border-bottom:1px solid var(--grid)}
+.lrow input[type=text]{flex:1 1 90px;min-width:90px}
+.lrow .lr2{display:flex;gap:4px;margin-left:auto}
 .lrow.off input[type=text]{opacity:.5;text-decoration:line-through}
 .legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--mute);font-size:12px}
 </style>
@@ -733,7 +734,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     <h2>Layers</h2>
     <div id="layers" style="display:flex;flex-direction:column;gap:6px"></div>
     <div class="row"><button class="small" id="addLayer">+ Layer</button><button class="small" id="showAllL">Show all</button><label style="display:flex;gap:6px;align-items:center;font-size:12px;color:var(--mute)"><input type="checkbox" id="terShow" checked> Show the ground</label></div>
-    <div class="stats" style="font-size:12px;line-height:1.4">Layers only exist in the editor: hiding one never changes the game. ★ = new stamps go on that layer. Alt+click an eye to show only that layer.</div>
+    <div class="stats" style="font-size:12px;line-height:1.4">Layers only exist in the editor: hiding one never changes the game. The top row is drawn on top (▲ ▼ reorder). A hidden layer shows as a faint shadow. ★ = new stamps go on that layer. Alt+click an eye to show only that layer. Select picks every stamp on a layer; with several stamps selected, Layer-Split Overlap spreads overlapping ones across layers.</div>
     <div class="stats" id="terNote"></div>
     <div id="insp" class="piece" hidden></div>
 
@@ -781,6 +782,9 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   function lyrOf(o) { return lyrById(o.layer) || S.layers[0]; }
   function objVis(o) { return MAPMODE || lyrOf(o).vis !== false; }
   function objPick(o) { var l = lyrOf(o); return l.vis !== false && !l.lock; }
+  function lyrRank(o) { var l = lyrOf(o); return S.layers.indexOf(l); }   // the layer list runs front to back: the top row is drawn on top
+  function drawOrder(list) { return list.map(function (o, i) { return [o, i]; }).sort(function (a, b) { return (lyrRank(b[0]) - lyrRank(a[0])) || (a[1] - b[1]); }).map(function (q) { return q[0]; }); }   // back layers first, the front layer last; within a layer, in the order they were made
+  function ghostObj(o) { return !MAPMODE && lyrOf(o).vis === false; }   // a hidden layer's stamps: drawn as faint shadows, never picked
   function pathLayerOf(k) { return lyrById(k ? S.more[k - 1].layer : S.pathLayer) || S.layers[0]; }
   function pathVis(k) { return MAPMODE || pathLayerOf(k).vis !== false; }
   function ensureLayers() {
@@ -1025,12 +1029,48 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   }
   var cragMemo = {};
   function cragCells(o) { var k = [o.seed, o.r, o.count, o.base, o.baseV, o.hgt, o.hgtV, o.gap, o.gapV].join('|'); if (!cragMemo[k]) { if (Object.keys(cragMemo).length > 200) cragMemo = {}; cragMemo[k] = cragLayout(o); } return cragMemo[k]; }
-  function pickAll(wx, wz) { var out = []; for (var i = S.objs.length - 1; i >= 0; i--) if (objPick(S.objs[i]) && hit(S.objs[i], wx, wz)) out.push(i); return out; }
+  function pickAll(wx, wz) { var out = []; for (var i = S.objs.length - 1; i >= 0; i--) if (objPick(S.objs[i]) && hit(S.objs[i], wx, wz)) out.push(i); return out.sort(function (a, b) { return (lyrRank(S.objs[a]) - lyrRank(S.objs[b])) || (b - a); }); }   // what is drawn on top is picked first
   function pick(wx, wz) { var a = pickAll(wx, wz); return a.length ? a[0] : -1; }
   function objInRect(o, x0, z0, x1, z1) {
     function inR(x, z) { return x >= x0 && x <= x1 && z >= z0 && z <= z1; }
     if (STRIPS[o.t]) { var pts = o.t === 'segchain' ? chainPts(o) : stripPts(o, 20); for (var q = 0; q < pts.length; q++) if (inR(pts[q][0], pts[q][1])) return true; return false; }
     var p = pos(o); return inR(p.x, p.z);
+  }
+  // ---- Layer-Split Overlap ----
+  function footR(o) { var h = halves(o); if (h) return null; return o.t === 'tree' ? Math.max(1, (o.cW || 7.4) / 2) : o.t === 'bigminion' ? 3 : o.t === 'sign' ? 1.5 : o.t === 'forest' ? Math.max(o.r || 0, (o.w || 0) / 2) : 2; }   // a round footprint for stamps with no box
+  function footIn(o, wx, wz) {                                   // is (wx, wz) on this stamp's footprint (its real size, no padding for the mouse)?
+    if (STRIPS[o.t]) { var cp = o.t === 'segchain' ? chainPts(o) : stripPts(o, 3), rr = o.t === 'segchain' ? 1.5 : (o.t === 'mud' ? mudW(o) : o.w || 2) / 2; for (var k = 0; k < cp.length; k++) if (Math.hypot(wx - cp[k][0], wz - cp[k][1]) <= rr) return true; return false; }
+    var p = pos(o), dx = wx - p.x, dz = wz - p.z; if (circR(o)) return Math.hypot(dx, dz) <= circR(o); var h = halves(o); if (!h) return Math.hypot(dx, dz) <= footR(o);
+    var c = Math.cos(-p.th), s = Math.sin(-p.th), lx = dx * c - dz * s, lz = dx * s + dz * c; return Math.abs(lx) <= h[0] && Math.abs(lz) <= h[1];
+  }
+  function footPts(o) {                                          // points spread over the footprint, to test it against another
+    var out = [];
+    if (STRIPS[o.t]) { var cp = o.t === 'segchain' ? chainPts(o) : stripPts(o, 3), rr = o.t === 'segchain' ? 1.5 : (o.t === 'mud' ? mudW(o) : o.w || 2) / 2; cp.forEach(function (q) { var th = q[2] || 0; [-1, -0.5, 0, 0.5, 1].forEach(function (f) { out.push([q[0] + Math.cos(th) * rr * f, q[1] + Math.sin(th) * rr * f]); }); }); return out; }
+    var p = pos(o), r = circR(o), h = halves(o), i, j;
+    if (r || !h) { r = r || footR(o); out.push([p.x, p.z]); for (i = 0; i < 16; i++) for (j = 1; j <= 2; j++) out.push([p.x + Math.cos(i * Math.PI / 8) * r * j / 2, p.z + Math.sin(i * Math.PI / 8) * r * j / 2]); return out; }
+    var c = Math.cos(p.th), s = Math.sin(p.th);
+    for (i = -2; i <= 2; i++) for (j = -2; j <= 2; j++) { var lx = h[0] * i / 2, lz = h[1] * j / 2; out.push([p.x + lx * c - lz * s, p.z + lx * s + lz * c]); }
+    return out;
+  }
+  function overlaps(a, b) { var pa = footPts(a), pb = footPts(b), k; for (k = 0; k < pa.length; k++) if (footIn(b, pa[k][0], pa[k][1])) return true; for (k = 0; k < pb.length; k++) if (footIn(a, pb[k][0], pb[k][1])) return true; return false; }
+  function splitOverlap() {                                      // every pile of overlapping selected stamps: no two that overlap stay on the same layer. The first of each pile keeps its layer; the others go to the layers below it, then to new ones
+    var sl = selList(); if (sl.length < 2) return;
+    var n = sl.length, adj = sl.map(function () { return []; }), i, j;
+    for (i = 0; i < n; i++) for (j = i + 1; j < n; j++) if (overlaps(sl[i], sl[j])) { adj[i].push(j); adj[j].push(i); }
+    var seen = new Array(n), moved = 0, made = 0, piles = 0; snap();
+    for (i = 0; i < n; i++) {
+      if (seen[i] || !adj[i].length) continue; piles++;
+      var pile = [], st = [i]; seen[i] = true; while (st.length) { var q = st.pop(); pile.push(q); adj[q].forEach(function (r) { if (!seen[r]) { seen[r] = true; st.push(r); } }); }
+      pile.sort(function (a, b) { return S.objs.indexOf(sl[a]) - S.objs.indexOf(sl[b]); });
+      var base = S.layers.indexOf(lyrOf(sl[pile[0]])), col = {};
+      pile.forEach(function (q) {
+        var used = {}; adj[q].forEach(function (r) { if (col[r] !== undefined) used[col[r]] = 1; }); var c = 0; while (used[c]) c++; col[q] = c;
+        while (base + c >= S.layers.length) { S.layers.push({ id: nextLayer++, name: 'Layer ' + (S.layers.length + 1), vis: true, lock: false }); made++; }
+        var tl = S.layers[base + c]; if (tl.vis === false) tl.vis = true; if (lyrOf(sl[q]).id !== tl.id) { sl[q].layer = tl.id; moved++; }
+      });
+    }
+    afterEdit(false); renderLayers(); renderInsp();
+    $('msg').textContent = piles ? 'Split ' + piles + ' overlapping pile' + (piles > 1 ? 's' : '') + ': moved ' + moved + ' stamp' + (moved === 1 ? '' : 's') + (made ? ', made ' + made + ' new layer' + (made > 1 ? 's' : '') : '') + '.' : 'None of the selected stamps overlap.';
   }
   function marqueeList(m) {
     var x0 = Math.min(m.x0, m.x1), x1 = Math.max(m.x0, m.x1), z0 = Math.min(m.z0, m.z1), z1 = Math.max(m.z0, m.z1);
@@ -1058,7 +1098,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     drawTerrain(W, H);
     var vsamp = samples.filter(function (p) { return pathVis(Math.floor((p.s + 0.5) / STRIDE)); });
     // tip areas go under the path
-    S.objs.forEach(function (o) { if (o.t === 'tip' && objVis(o)) drawObj(o, isSel(o)); });
+    drawOrder(S.objs).forEach(function (o) { if (o.t !== 'tip') return; if (objVis(o)) drawObj(o, isSel(o)); else if (ghostObj(o)) { ctx.save(); ctx.globalAlpha = 0.16; drawObj(o, false); ctx.restore(); } });
+    drawGhostPaths();
     if (vsamp.length > 1) {
       [[5, css('--road-edge'), 1], [0, css('--road'), 0]].forEach(function (c) {          // the road is drawn as a ribbon, so a width that changes along it shows
         ctx.fillStyle = c[1]; ctx.strokeStyle = c[1]; ctx.lineWidth = Math.max(2, c[0]); ctx.lineJoin = 'round';
@@ -1076,7 +1117,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (!MAPMODE) allPaths().forEach(function (pth, pk) { if (!pathVis(pk)) return; var acc = pk * STRIDE; pth.pieces.forEach(function (p, i) { acc += upg(p).len; var pt = at(acc), q = w2s(pt.x, pt.z); ctx.beginPath(); ctx.arc(q[0], q[1], 3, 0, 7); ctx.fill(); if (z > 0.3) ctx.fillText((pk ? (pk + 1) + '.' : '') + String(i + 1), q[0] + 6, q[1] - 6); }); });
     }
     allPaths().forEach(function (pth, pk) { if (!pathVis(pk)) return; var st = w2s(pth.x, pth.z); ctx.fillStyle = css('--accent'); ctx.beginPath(); ctx.arc(st[0], st[1], 6, 0, 7); ctx.fill(); ctx.fillText(pk ? 'PATH ' + (pk + 1) : 'START', st[0] + 9, st[1] + 4); });
-    S.objs.forEach(function (o) { if (o.t !== 'tip' && objVis(o)) drawObj(o, isSel(o)); });
+    drawOrder(S.objs).forEach(function (o) { if (o.t === 'tip') return; if (objVis(o)) drawObj(o, isSel(o)); else if (ghostObj(o)) { ctx.save(); ctx.globalAlpha = 0.16; drawObj(o, false); ctx.restore(); } });   // layer by layer, back to front; hidden layers as faint shadows
     if (marq) { var ma = w2s(Math.min(marq.x0, marq.x1), Math.min(marq.z0, marq.z1)), mb = w2s(Math.max(marq.x0, marq.x1), Math.max(marq.z0, marq.z1)); ctx.fillStyle = css('--accent'); ctx.globalAlpha = 0.12; ctx.fillRect(ma[0], ma[1], mb[0] - ma[0], mb[1] - ma[1]); ctx.globalAlpha = 1; ctx.strokeStyle = css('--accent'); ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]); ctx.strokeRect(ma[0], ma[1], mb[0] - ma[0], mb[1] - ma[1]); ctx.setLineDash([]); }
     if (hover && tool === 'preset' && presets[armed]) { var pg0 = w2s(hover[0], hover[1]); ctx.strokeStyle = css('--accent'); ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.arc(pg0[0], pg0[1], 14, 0, 6.2832); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = css('--accent'); ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText(presets[armed].name + ' (' + presets[armed].items.length + ')', pg0[0] + 18, pg0[1] + 4); }
     else if (hover && tool === 'forest') {
@@ -1117,6 +1158,16 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     ctx.fillText(lab, q[0] + 8, q[1] - 8);
   }
   function rnd(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+  function drawGhostPaths() {                                    // paths on hidden layers: a faint shadow of the road, so you can see they are there
+    if (MAPMODE) return; var z = view.zoom;
+    ctx.save(); ctx.globalAlpha = 0.16; ctx.strokeStyle = css('--road-edge'); ctx.fillStyle = css('--road-edge'); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    var run = [], prevK = -1;
+    function flush() { if (run.length > 1) { ctx.lineWidth = Math.max(2, (run.w || S.width) * z); ctx.beginPath(); run.forEach(function (q, i) { var p = w2s(q.x, q.z); if (i) ctx.lineTo(p[0], p[1]); else ctx.moveTo(p[0], p[1]); }); ctx.stroke(); } run = []; }
+    samples.forEach(function (q) { var k = Math.floor((q.s + 0.5) / STRIDE); if (pathVis(k) || q.brk || k !== prevK) flush(); prevK = k; if (!pathVis(k)) { run.push(q); run.w = q.w; } });
+    flush();
+    DISCS.forEach(function (D) { if (pathVis(D.pk)) return; var qc = w2s(D.cx, D.cz); ctx.beginPath(); ctx.arc(qc[0], qc[1], Math.max(2, D.R * z), 0, 6.2832); ctx.fill(); });
+    ctx.restore();
+  }
   function drawObj(o, selected) {
     if (STRIPS[o.t] && o.t !== 'segchain') { drawStrip(o, selected); return; }
     if (o.t === 'segchain') { var cp = chainPts(o); if (selected) { ctx.strokeStyle = css('--accent'); ctx.lineWidth = 2; ctx.beginPath(); cp.forEach(function (c, i) { var q2 = w2s(c[0], c[1]); if (i) ctx.lineTo(q2[0], q2[1]); else ctx.moveTo(q2[0], q2[1]); }); ctx.stroke(); } cp.forEach(function (c) { var q2 = w2s(c[0], c[1]); segDot(q2[0], q2[1], o.big, view.zoom); }); return; }
@@ -1269,6 +1320,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     $('insp').innerHTML = '<div class="head"><span>' + sl.length + ' stamps selected</span><span class="row" style="gap:4px"><button class="small" data-gact="copy">Copy</button><button class="small" data-gact="dup">Duplicate</button><button class="small" data-gact="del">Delete</button></span></div>' +
       '<div class="stats">' + Object.keys(c).map(function (k) { return c[k] + ' ' + NAMES[k].toLowerCase(); }).join(' · ') + '</div>' +
       '<div class="fields">' + layerSelect(one, 'data-gk="layer"', 'Move all to layer', one < 0) + '</div>' +
+      '<div class="row" style="gap:6px;margin:6px 0"><button class="small" data-gact="split" title="Wherever selected stamps overlap, put each one of the pile on its own layer (new layers are made when needed)">Layer-Split Overlap</button></div>' +
       '<div class="stats">Drag any of them to move the lot · Ctrl+C / Ctrl+V copy and paste · Ctrl+A selects everything · Esc clears</div>';
     $('insp').hidden = false;
   }
@@ -1419,7 +1471,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (ghost) { var dd = DEF[o.t] || (DEF[o.t] = {}); for (var gk in o) if (!/^(t|x|z|s|u|id|layer|follow|th|seed|after|turn)$/.test(gk)) dd[gk] = o[gk]; renderInsp(); draw(); return; }   // what is set here is what the next stamp starts with
     afterEdit(false); renderInsp();
   });
-  $('insp').addEventListener('click', function (e) { var b = e.target.closest('button[data-gact]'); if (!b) return; var a = b.dataset.gact; if (a === 'copy') copySel(); else if (a === 'dup') dupSel(); else if (a === 'del') deleteSel(); });
+  $('insp').addEventListener('click', function (e) { var b = e.target.closest('button[data-gact]'); if (!b) return; var a = b.dataset.gact; if (a === 'copy') copySel(); else if (a === 'dup') dupSel(); else if (a === 'del') deleteSel(); else if (a === 'split') splitOverlap(); });
   $('insp').addEventListener('change', function (e) { var t = e.target; if (t.dataset.gk !== 'layer' || t.value === '') return; var sl = selList(); if (sl.length < 2) return; snap(); sl.forEach(function (q) { q.layer = +t.value; }); afterEdit(false); renderInsp(); });
   $('insp').addEventListener('input', function (e) { if (e.target.tagName === 'TEXTAREA') { var o = S.objs[sel]; if (o) { o.text = e.target.value; DEF[o.t].text = o.text; afterEdit(false); } } });
   $('insp').addEventListener('click', function (e) { var b = e.target.closest('button[data-oact]'); if (!b || sel < 0) return; var o = S.objs[sel], a = b.dataset.oact; snap();
@@ -1833,7 +1885,10 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         '<button class="small' + (l.lock ? ' on' : '') + '" data-lact="lock" title="Lock: its stamps cannot be selected or moved">' + (l.lock ? '🔒' : '🔓') + '</button>' +
         '<input type="text" data-lname value="' + l.name.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" maxlength="30">' +
         '<span class="stats" style="min-width:22px;text-align:right">' + cnt[l.id] + '</span>' +
-        '<button class="small" data-lact="del" title="Delete this layer (its stamps move to the first layer)"' + (S.layers.length < 2 ? ' disabled' : '') + '>✕</button></div>';
+        '<span class="lr2"><button class="small" data-lact="sel" title="Select every stamp on this layer">Select</button>' +
+        '<button class="small" data-lact="up" title="Move this layer up: drawn above the ones below it"' + (S.layers[0] === l ? ' disabled' : '') + '>▲</button>' +
+        '<button class="small" data-lact="dn" title="Move this layer down: drawn under the ones above it"' + (S.layers[S.layers.length - 1] === l ? ' disabled' : '') + '>▼</button>' +
+        '<button class="small" data-lact="del" title="Delete this layer (its stamps move to the first layer)"' + (S.layers.length < 2 ? ' disabled' : '') + '>✕</button></span></div>';
     }).join('');
   }
   $('layers').addEventListener('click', function (e) {
@@ -1841,6 +1896,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (a === 'act') S.activeLayer = id;
     else if (a === 'vis') { if (e.altKey) { var only = S.layers.every(function (q) { return q.id === id ? q.vis !== false : q.vis === false; }); S.layers.forEach(function (q) { q.vis = only ? true : q.id === id; }); } else l.vis = l.vis === false; }
     else if (a === 'lock') l.lock = !l.lock;
+    else if (a === 'up' || a === 'dn') { var li = S.layers.indexOf(l), lj = li + (a === 'up' ? -1 : 1); if (lj < 0 || lj >= S.layers.length) return; snap(); S.layers.splice(li, 1); S.layers.splice(lj, 0, l); }
+    else if (a === 'sel') { if (l.vis === false || l.lock) { $('msg').textContent = 'That layer is ' + (l.lock ? 'locked' : 'hidden') + ': show or unlock it to select its stamps.'; return; } var ls = S.objs.filter(function (o) { return lyrOf(o).id === id; }); setSelList(ls); renderLayers(); renderInsp(); draw(); $('msg').textContent = ls.length + ' stamp' + (ls.length === 1 ? '' : 's') + ' selected on ' + l.name + '.'; return; }
     else if (a === 'del') {
       if (S.layers.length < 2) return; snap(); var rest = S.layers.filter(function (q) { return q.id !== id; })[0];
       S.objs.forEach(function (o) { if (lyrOf(o).id === id) o.layer = rest.id; }); if (S.pathLayer === id || !lyrById(S.pathLayer)) S.pathLayer = rest.id; S.more.forEach(function (m) { if (m.layer === id) m.layer = rest.id; });
@@ -1849,7 +1906,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var keepSel = selList().filter(objPick); setSelList(keepSel); afterEdit(false); renderLayers(); renderInsp();
   });
   $('layers').addEventListener('change', function (e) { var t = e.target; if (t.dataset.lname === undefined) return; var l = lyrById(+t.closest('[data-lid]').dataset.lid); if (!l) return; snap(); l.name = (t.value || '').trim() || 'Layer'; afterEdit(false); renderPieces(); renderInsp(); });
-  $('addLayer').onclick = function () { snap(); S.layers.push({ id: nextLayer++, name: 'Layer ' + (S.layers.length + 1), vis: true, lock: false }); S.activeLayer = S.layers[S.layers.length - 1].id; afterEdit(false); renderPieces(); renderLayers(); };
+  $('addLayer').onclick = function () { snap(); S.layers.unshift({ id: nextLayer++, name: 'Layer ' + (S.layers.length + 1), vis: true, lock: false }); S.activeLayer = S.layers[0].id; afterEdit(false); renderPieces(); renderLayers(); };
   $('showAllL').onclick = function () { S.layers.forEach(function (l) { l.vis = true; }); afterEdit(false); renderLayers(); };
 
   // ---- the ground under the layout: read from the game's own terrain code, so it appears where the editor runs inside the game ----
