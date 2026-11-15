@@ -539,6 +539,7 @@ aside:not([data-page=mobs]) #mobBox{display:none!important}
 aside:not([data-page=comet]) #cometBox{display:none!important}
 #app[data-page=mobs] #modes,#app[data-page=mobs] #modes2,#app[data-page=mobs] #views{display:none!important}
 #app[data-page=comet] [data-m=barrier]{display:none!important}
+#app:not([data-page=comet]) .cometOnly{display:none!important}
 #pages{margin:4px 0 2px}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}</style>
 <div class="rigwrap"><div id="app">
@@ -552,7 +553,7 @@ aside:not([data-page=comet]) #cometBox{display:none!important}
         <button data-m="rest" aria-pressed="false">Rest</button><button data-m="idle" aria-pressed="false">Idle</button><button data-m="runS" aria-pressed="false">Slow run</button><button data-m="run" aria-pressed="true">Mid run</button><button data-m="runF" aria-pressed="false">Fast run</button>
       </div>
       <div class="seg" id="modes2" role="group" aria-label="Moves">
-        <button data-m="jump" aria-pressed="false">Jump</button><button data-m="slide" aria-pressed="false">Slide</button><button data-m="fall" aria-pressed="false">Faceplant</button><button data-m="set" aria-pressed="false">Runner's pose</button><button data-m="drift" aria-pressed="false">Drift</button><button data-m="barrier" aria-pressed="false">Hedron Barrier</button>
+        <button data-m="jump" aria-pressed="false">Jump</button><button data-m="slide" aria-pressed="false">Slide</button><button data-m="fall" aria-pressed="false">Faceplant</button><button data-m="set" aria-pressed="false">Runner's pose</button><button data-m="drift" aria-pressed="false">Drift</button><button data-m="barrier" aria-pressed="false">Hedron Barrier</button><button data-m="cThrow" class="cometOnly" aria-pressed="false">Star throw</button><button data-m="cHover" class="cometOnly" aria-pressed="false">Hover</button><button data-m="cFly" class="cometOnly" aria-pressed="false">Fly</button>
       </div>
       <button class="btn" id="play" aria-pressed="false">Pause</button>
       <label class="phase"><span class="mono" style="color:var(--muted)">cycle</span><input type="range" id="phase" min="0" max="1" step="0.005" value="0.25" aria-label="Animation cycle position"></label>
@@ -3343,7 +3344,7 @@ var P=JSON.parse(JSON.stringify(DEF));
 var HOLDS=[[/\.len$/,.5,400],[/\.dia$/,.2,400],[/\.depth$/,.02,20],[/\.peak$/,.005,.995],[/\.t[SE]$/,.005,20],[/\.c[SE]$/,.05,50],
  [/\.u[12]w[lr]$/,.5,360],[/\.u[12]w[se]$/,.002,5],[/\.u[12]d$/,-100,100],[/\.u[12]p$/,-1,2],[/\.u[12]k[lrse]$/,-4,4],[/^Foot\.flat$/,0,.98],[/\.band[AL]$|^Shin\.pad$|^Foot\.(heel|sole|ankleH)$/,0,400],
  [/^scale$/,.05,20],[/^sides$/,5,48,1],[/^rings$/,1,8,1],[/^ringGap$/,0,20],[/^fmt$/,2,2],[/^hairVol$/,.05,10],[/^bangL$/,0,10],[/^j[A-Z]/,0,100],[/^(jit|irr|irrC)$/,0,5],
- [/\.dur$/,.05,600],[/^comet\./,0,1e4],[/^dA\.(hyf|hz)$/,-1,1],[/^dA\./,-180,180],[/^m\.drift\.time$/,.02,10],[/^m\.drift\.rate$/,.1,200],[/^m\.drift\.(cool|minZips)$/,0,1000],
+ [/\.dur$/,.05,600],[/^comet\.(pc|pt|pf|fl|ho)\.(hyf|hz)$/,-2,2],[/^comet\.(pc|pt|pf|fl|ho)\./,-180,180],[/^comet\.hov\.(ankleY|backY)$/,-5,5],[/^comet\.hov\.(ankleTilt|backTilt)$/,-180,180],[/^comet\./,0,1e4],[/^dA\.(hyf|hz)$/,-1,1],[/^dA\./,-180,180],[/^m\.drift\.time$/,.02,10],[/^m\.drift\.rate$/,.1,200],[/^m\.drift\.(cool|minZips)$/,0,1000],
  [/^barrier\.radius$/,.2,20],[/^barrier\.squeezeLen$/,.5,1e4],[/^barrier\.squeeze$/,-2,.95],[/^barrier\.stretch$/,-.95,10],[/^barrier\.glow$/,0,1],[/^barrier\.glowSize$/,.1,10],[/^barrier\.dash(Len|Gap)$/,.005,20],
  [/^stat\.top$/,1,1e4],[/^stat\.accelT$/,.5,1e4],[/^stat\.(brake|jumpH|wallGrip|fric)$/,0,1e4],[/^stat\.gripZ$/,.5,5e5],[/^stat\.grav$/,1,1e4],[/^stat\.fade(Wall|Slope)$/,0,1,1],[/^stat\.fall$/,1,1e4],[/^stat\.slam(Acc|Max)$/,1,1e4],[/^mn\.\w+\.(scale|head[WHD]|torso[WHD]|arm[WL]|leg[WDL])$/,.05,100],[/^mn\.\w+\.hearts$/,1,99,1],[/^mn\.\w+\.dmg$/,0,99,1],[/^mn\.\w+\.(radius|top|acc|see|cool|k[123]|stomp|stride|bob)$/,0,1e4],[/^mn\.\w+\.(legSwing|armSwing|armRaise)$/,-180,180],[/^stat\.hearts$/,1,12,1],[/^stat\.colH$/,1.2,100],[/^stat\.colW$/,.2,100]];
 function hold(key,v){
@@ -4021,7 +4022,11 @@ function toPose(v){
   return o;
 }
 function mirrorV(v){var o={},k;for(k in v)o[k]=v[k];[['aLp','aRp'],['aLr','aRr'],['aLe','aRe'],['hL','hR'],['kL','kR'],['dL','dR']].forEach(function(p){o[p[0]]=v[p[1]];o[p[1]]=v[p[0]];});return o;}
+function cThrowParts(){return [P['comet.throw.in'],1,P['comet.throw.swing'],P['comet.throw.hold'],P['comet.throw.out'],.45];}   /* in, charge (1 s here), swing, follow-through, ease back, rest */
 function modeDur(m){
+  if(m==='cThrow')return cThrowParts().reduce(function(a,b){return a+b;},0);
+  if(m==='cHover')return Math.max(.1,P['comet.hov.bobT']);
+  if(m==='cFly')return 2;
   if(m==='drift')return P['runF.dur'];   /* a drift is her fast run with changes laid over it, stride for stride */
   if(m==='idle')return P['idle.dur'];
   if(m==='runS'||m==='run'||m==='runF')return P['run'+(m==='runS'?'S':m==='runF'?'F':'M')+'.dur'];
@@ -4039,7 +4044,24 @@ function poseDrift(ph,right){   /* the game's drift: her fast run cycle, with th
   mul('Pony1',qx(v.p1*rad));mul('Pony2',qx(v.p2*rad));mul('Pony3',qx(v.p3*rad));
   return o;
 }
+/* Comet's poses, laid over her own clips the way the game does it (window.__cometQ is the game's) */
+function cqV(pre,mir){var v={};['hyf','hz','hp','sp','hd','aLp','aLr','aLe','aRp','aRr','aRe','hL','kL','dL','hR','kR','dR','p1','p2','p3'].forEach(function(k){v[k]=P[pre+k]||0;});return mir?window.__cometMirror(v):v;}
+var CQUB=['Spine','Head','ShoulderL','ElbowL','ShoulderR','ElbowR'],CQLEG=['HipL','KneeL','AnkleL','HipR','KneeR','AnkleR'],CQALL=['Hips','Spine','Head','ShoulderL','ElbowL','ShoulderR','ElbowR','HipL','KneeL','AnkleL','HipR','KneeR','AnkleR','Pony1','Pony2','Pony3'];
+function cqOv(o,names,v,w,v2,s2){names.forEach(function(n){var q=window.__cometQ(n,v);if(v2)q.slerp(window.__cometQ(n,v2),s2);o[n]=o[n]||{};var b=o[n].q?o[n].q.clone():new THREE.Quaternion();o[n].q=b.slerp(q,w);});}
+function cqAd(o,names,v,w){names.forEach(function(n){o[n]=o[n]||{};var b=o[n].q?o[n].q.clone():new THREE.Quaternion();o[n].q=b.multiply(new THREE.Quaternion().slerp(window.__cometQ(n,v),w));});}
+function cThrowAt(u){var p=cThrowParts(),T=p.reduce(function(a,b){return a+b;},0),t=(u-Math.floor(u))*T,a=p[0],c=a+p[1],sw=c+p[2],h=sw+p[3],ou=h+p[4];
+  if(t<a)return {w:smooth(t/Math.max(.01,p[0])),s:0,held:true};if(t<c)return {w:1,s:0,held:true};
+  if(t<sw){var f=(t-c)/Math.max(.01,p[2]);return {w:1,s:smooth(f),held:f<P['comet.throw.rel']};}
+  if(t<h)return {w:1,s:1,held:false};if(t<ou)return {w:1-smooth((t-h)/Math.max(.01,p[4])),s:1,held:false};return {w:0,s:1,held:false};}
+function poseComet(mode,ph){
+  if(!window.__cometQ)return poseRun(ph,'M');
+  var o,u=ph/(2*Math.PI);
+  if(mode==='cHover'){o=poseRun(2*Math.PI*((u*modeDur('cHover')/Math.max(.05,P['runM.dur']))%1),'M');var v=cqV('comet.ho.');cqAd(o,CQALL,v,1);var hp=(o.Hips&&o.Hips.pos)||hipsBase;o.Hips.pos=[hp[0],hp[1]+hipsBase[1]*v.hyf,hp[2]+v.hz];return o;}
+  if(mode==='cFly'){o=toPose(moveAt('jump',.45));o.Hips.pos=[hipsBase[0],hipsBase[1],0];cqOv(o,CQUB,cqV('comet.pf.'),1);cqAd(o,CQLEG,cqV('comet.fl.'),1);return o;}
+  var st=cThrowAt(u);o=poseRun(2*Math.PI*((u*modeDur('cThrow')/Math.max(.05,P['runM.dur']))%1),'M');if(st.w>0)cqOv(o,CQUB,cqV('comet.pc.'),st.w,cqV('comet.pt.'),st.s);return o;
+}
 function poseFor(mode,ph){
+  if(/^c[A-Z]/.test(mode))return poseComet(mode,ph);
   if(mode==='drift')return poseDrift(ph,false);
   if(mode==='run')return poseRun(ph,'M');if(mode==='runS')return poseRun(ph,'S');if(mode==='runF')return poseRun(ph,'F');
   if(mode==='idle')return poseIdle(ph);
@@ -4232,6 +4254,7 @@ function setPage(pg){
   SR.querySelectorAll('#pages button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.pg===pg));});
   $('#rigH1').textContent=pg==='mobs'?'Mobs':CHARNAME[c]+': rig editor';
   if(pg==='comet'&&ui.mode==='barrier')setMode('run');
+  if(pg!=='comet'&&/^c[A-Z]/.test(ui.mode))setMode('run');
   if(pg==='mobs'){minDirty=true;try{renderMinions();}catch(e){}}
   try{renderComet();statCardRefresh();}catch(e){}
 }
@@ -4268,7 +4291,7 @@ $('#resetAll').addEventListener('click',function(){P=JSON.parse(JSON.stringify(D
 
 /* ================= animation dials ================= */
 var STAGES={jump:['Ready','Crouch','Takeoff','Peak','Fall','Land','Recover'],slide:['Run in','Drop','Slide','Get up'],fall:['Run','Trip','Fall','Impact','Bounce','Settle'],set:['Pose'],drift:['Pose']};
-var MOVELABEL={jump:'Jump',slide:'Slide',fall:'Faceplant',set:"Runner's pose",drift:'Drift',barrier:'Hedron Barrier'};
+var MOVELABEL={jump:'Jump',slide:'Slide',fall:'Faceplant',set:"Runner's pose",drift:'Drift',barrier:'Hedron Barrier',cThrow:'Star throw',cHover:'Hover',cFly:'Fly'};
 var KEYGROUPS=[
  ['Body',[['hyf','Hips height (1 = standing)','x',.1,1.7,.01],['hz','Hips forward (m)','x',-1,1,.01],['hp','Body lean (+ forward)','deg',-110,110,1],['sp','Spine bend','deg',-60,60,1],['hd','Head tilt','deg',-70,70,1]]],
  ['Arms',[['aLp','Left arm raise','deg',-120,180,1],['aLr','Left arm out','deg',-20,120,1],['aLe','Left elbow bend','deg',0,150,1],['aRp','Right arm raise','deg',-120,180,1],['aRr','Right arm out','deg',-20,120,1],['aRe','Right elbow bend','deg',0,150,1]]],
@@ -4303,6 +4326,24 @@ function renderAnim(){
       var l=document.createElement('label');l.style.cssText='display:flex;gap:6px;align-items:center;font-size:12px';l.textContent=c[1];
       var i=document.createElement('input');i.type='color';i.value=P[c[0]];i.addEventListener('input',function(){P[c[0]]=i.value;save();barrierDirty=true;});l.appendChild(i);ch.appendChild(l);});
     rows.appendChild(ch);
+  }else if(/^c[A-Z]/.test(m)){
+    var UBR=[['sp','Spine bend (+ forward)'],['hd','Head tilt'],['aLp','Left arm raise'],['aLr','Left arm out'],['aLe','Left elbow bend'],['aRp','Right arm raise'],['aRr','Right arm out'],['aRe','Right elbow bend']];
+    var poseRows=function(pre,list){return list.map(function(r){return [pre+r[0],r[1],'deg',-180,180,1];});};
+    var grp=function(title,list){var h3=document.createElement('h3');h3.textContent=title;kh.appendChild(h3);var d=document.createElement('div');kh.appendChild(d);addRows(d,list,{anim:1});};
+    if(m==='cThrow'){
+      $('#animNote').textContent='Star Throw. Holding Q or E she leans in with a star in her hand behind her (it grows as she charges); letting go, her arm swings through and the star leaves her hand part way. Her legs keep running. E throws with her right hand, Q mirrors it to her left. The preview charges for 1 s.';
+      addRows(rows,[['comet.throw.in','Into the charging pose','s',.02,1,.01],['comet.throw.swing','The swing','s',.02,1,.01],['comet.throw.rel','Star leaves her hand at (% of the swing)','pct',0,1,.01],['comet.throw.hold','Follow-through held','s',0,1,.01],['comet.throw.out','Back to running','s',.02,2,.01],['comet.hold.scale','Star in her hand (× the star she will throw)','x',.1,2,.05],['comet.hold.out','Star in her hand: out from her wrist','units',-1,1,.01]],{anim:1});
+      grp('Charging pose (holding the star behind her)',poseRows('comet.pc.',UBR));grp('Throw pose (the arm swung through)',poseRows('comet.pt.',UBR));
+    }else if(m==='cHover'){
+      $('#animNote').textContent='Hover. She floats over the ground doing whatever she would be doing; the changes below are laid over it (all 0: just her run). Two stars at her ankles and a bigger one behind her back.';
+      addRows(rows,[['comet.hov.height','Floats above the ground by','units',0,3,.05],['comet.hov.bob','Bob','units',0,1,.01],['comet.hov.bobT','Bob: seconds a cycle','s',.2,6,.05],['comet.hov.spinS','Stars: turns a second','x',0,6,.1],['comet.hov.ankle','Ankle stars: size','units',.05,2,.01],['comet.hov.ankleY','Ankle stars: up or down','units',-1,1,.01],['comet.hov.ankleTilt','Ankle stars: tilt','deg',-90,90,1],['comet.hov.back','Back star: size','units',.1,3,.01],['comet.hov.backD','Back star: behind her by','units',0,2,.01],['comet.hov.backY','Back star: up or down','units',-2,2,.01],['comet.hov.backTilt','Back star: tilt','deg',-90,90,1]],{anim:1});
+      KEYGROUPS.forEach(function(g){grp(g[0]+' (changes while hovering)',g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['comet.ho.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}));});
+    }else{
+      $('#animNote').textContent='Fly (Space held in the air while hovering). This pose takes over her arms, spine and head; the leg dials are changes to her jump. The star from her back goes up to her hands.';
+      addRows(rows,[['comet.fly.arms','How fast she goes into it','x',1,30,.5],['comet.fly.starY','Star above her hands','units',-1,2,.01],['comet.fly.starS','Star size there (× the back star)','x',.2,3,.05]],{anim:1});
+      grp('Arms, spine and head',poseRows('comet.pf.',UBR));
+      grp('Legs (changes to her jump)',[['hL','Left thigh forward'],['kL','Left knee bend'],['dL','Left toes up'],['hR','Right thigh forward'],['kR','Right knee bend'],['dR','Right toes up']].map(function(r){return ['comet.fl.'+r[0],r[1],'deg',-120,120,1];}));
+    }
   }else if(m==='drift'){
     $('#animNote').textContent='What she does while drifting left (A held); drifting right is the same, mirrored. In the game she keeps running, stride for stride, and leans into the corner from her feet. The changes below are added on top of her Fast run (all 0: just the run). Save to game to use them.';
     addRows(rows,[[pre+'lean','Lean into the corner','deg',0,60,.5],[pre+'angle','Momentum shift when it starts','deg',0,45,.5],[pre+'time','Time to make the shift','s',.03,.6,.01],[pre+'minZips','Needs at least','Zips',0,80,1],[pre+'cool','Cooldown after release','s',0,5,.1],[pre+'rate','How fast she settles into it','x',2,20,.5],['slope.side','Tilt to sideways slopes (all running)','x',0,1.2,.05]],{anim:1});
@@ -4331,8 +4372,8 @@ function renderStats(){var h=$('#statRows');if(!h)return;h.innerHTML='';addRows(
 try{renderStats();}catch(e){}
 var COMET_HOV=[['comet.hov.cost','Power to switch it on','n',0,50,1],['comet.hov.drain','Power a second while on','n',0,20,.1],['comet.hov.height','Floats above the ground by','units',0,3,.05],
  ['comet.hov.top','Top speed','Zips',10,200,1],['comet.hov.accelT','Time from 0 to top speed','s',.5,20,.1],['comet.hov.brake','Braking strength (x coasting)','x',0,8,.1],['comet.hov.fric','Friction (coasting)','Zips/s²',0,40,.1],['comet.hov.gripZ','Sideways grip (turning)','Zips/s²',1,80,.5],['comet.hov.jumpH','Jump height','units',0,30,.1],
- ['comet.hov.ankle','Ankle stars: size','units',.05,2,.01],['comet.hov.back','Back star: size','units',.1,3,.01],['comet.hov.spinS','Stars: turns a second','x',0,6,.1]];
-var COMET_FLY=[['comet.fly.drain','Extra power a second while flying','n',0,40,.1],['comet.fly.lift','Lift (× gravity: 1 cancels it)','x',0,3,.01],['comet.fly.arms','Arms up: how fast she raises them','x',1,30,.5]];
+];
+var COMET_FLY=[['comet.fly.drain','Extra power a second while flying','n',0,40,.1],['comet.fly.lift','Lift (× gravity: 1 cancels it)','x',0,3,.01]];
 var COMET_STAR=[['comet.star.cost','Power per throw (needs more than 0)','n',0,20,1],['comet.star.range','Range','units',5,400,1],['comet.star.dmg','Damage','hearts',0,10,.5],['comet.star.cool','Cooldown','s',0,10,.1],['comet.star.speed','Speed','Zips',5,400,1],['comet.star.size','Size (across)','units',.1,5,.05],['comet.star.spin','Spin (turns a second)','x',0,20,.1],
  ['comet.star.cMax','Charge: most seconds','s',0,6,1],['comet.star.cCost','Charge: power per second','n',0,20,1],['comet.star.cSize','Charge: size per second (+ × its size)','x',0,3,.05],['comet.star.cDmg','Charge: damage per second','hearts',0,5,.5],['comet.star.cRange','Charge: range per second','units',0,400,1]];
 function renderComet(){if(PAGE!=='comet')return;['#cHov','#cFly','#cStar','#cCols'].forEach(function(q){$(q).innerHTML='';});
@@ -4378,7 +4419,9 @@ function minPreview(dt){
   window.__poseMinion(minModel,c,minPhase,Math.min(1,spd/12),true);
 }
 $('#resetAnim').addEventListener('click',function(){var pre=animPrefix(ui.mode),key;for(key in DEF){if(key.indexOf(pre)===0)P[key]=DEF[key];}
-  if(ui.mode==='drift'){P['slope.side']=DEF['slope.side'];for(key in DEF)if(key.indexOf('dA.')===0)P[key]=DEF[key];}   /* the sideways-slope tilt and the changes to her run sit with the drift dials */
+  if(ui.mode==='drift'){P['slope.side']=DEF['slope.side'];for(key in DEF)if(key.indexOf('dA.')===0)P[key]=DEF[key];}
+  var CRS={cThrow:/^comet\.(pc\.|pt\.|throw\.|hold\.)/,cHover:/^comet\.(ho\.|hov\.(height|bob|bobT|spinS|ankle|ankleY|ankleTilt|back|backD|backY|backTilt)$)/,cFly:/^comet\.(pf\.|fl\.|fly\.(arms|starY|starS)$)/};
+  if(CRS[ui.mode])for(key in DEF)if(CRS[ui.mode].test(key))P[key]=DEF[key];   /* the sideways-slope tilt and the changes to her run sit with the drift dials */
   barrierDirty=true;save();renderAnim();statCardRefresh();status('Animation reset.');});
 
 /* ================= export ================= */
@@ -4439,6 +4482,31 @@ function barrierPreview(dt){
   var sc=barrierScale;barrierGroup.scale.set(sc*(1-P['barrier.squeeze']*dist),sc*(1+P['barrier.stretch']*dist),sc*(1+P['barrier.stretch']*dist));
   barrierGroup.position.set(0,P['barrier.height']*barrierScale,0);
 }
+/* ================= Comet's stars in the preview ================= */
+var cpv=null,cpvA=0,cpvK=0,cpvBuilt=null;
+function cometPreview(dt){
+  var on=/^c[A-Z]/.test(ui.mode)&&PAGE==='comet'&&!!window.__cometStar&&!!rigRoot;
+  if(rigRoot&&!/^c[A-Z]/.test(ui.mode))rigRoot.position.y=0;
+  if(!cpv&&on){cpv={L:window.__cometStar(1,P['comet.cStar'],P['comet.cGlow']),R:window.__cometStar(1,P['comet.cStar'],P['comet.cGlow']),B:window.__cometStar(1,P['comet.cStar'],P['comet.cGlow']),H:window.__cometStar(1,P['comet.cStar'],P['comet.cGlow'])};[cpv.L,cpv.R,cpv.B,cpv.H].forEach(function(m){scene.add(m);});}
+  if(!cpv)return;
+  [cpv.L,cpv.R,cpv.B,cpv.H].forEach(function(m){m.visible=false;m.spin.children[0].material.color.set(P['comet.cStar']);m.glow.material.color.set(P['comet.cGlow']);});
+  if(!on)return;
+  if(cpvBuilt!==skMesh&&skMesh){skMesh.geometry.computeBoundingBox();var bb=skMesh.geometry.boundingBox;cpvK=(bb.max.y-bb.min.y)/3.6;cpvBuilt=skMesh;}   /* the game's units in this view: she is 3.6 of them tall */
+  var k=cpvK||.5,u=ui.phase,m=ui.mode;if(ui.playing)cpvA+=dt*2*Math.PI;
+  var wp=function(n){var b=bones[n];return b?b.getWorldPosition(new THREE.Vector3()):new THREE.Vector3();};
+  rigRoot.position.y=(m==='cHover'||m==='cFly')?(P['comet.hov.height']+(m==='cHover'?P['comet.hov.bob']*Math.sin(2*Math.PI*u):0))*k:0;
+  rigRoot.updateMatrixWorld(true);
+  if(m==='cHover'||m==='cFly'){
+    var aL=wp('AnkleL'),aR=wp('AnkleR'),spn=wp('Spine'),sA=P['comet.hov.ankle']*k,at=P['comet.hov.ankleTilt']*rad,ay=P['comet.hov.ankleY']*k;
+    [[cpv.L,aL,1],[cpv.R,aR,-1]].forEach(function(e){e[0].visible=true;e[0].position.set(e[1].x,e[1].y+ay,e[1].z);e[0].scale.setScalar(Math.max(.001,sA));e[0].spin.rotation.set(-Math.PI/2+at,0,e[2]*cpvA*P['comet.hov.spinS']);});
+    cpv.B.visible=true;
+    if(m==='cFly'){var wl=wp('WristL'),wr=wp('WristR');cpv.B.position.copy(wl.add(wr).multiplyScalar(.5)).add(new THREE.Vector3(0,P['comet.fly.starY']*k,0));cpv.B.scale.setScalar(Math.max(.001,P['comet.hov.back']*P['comet.fly.starS']*k));}
+    else{cpv.B.position.set(spn.x,spn.y+P['comet.hov.backY']*k,spn.z-P['comet.hov.backD']*k);cpv.B.scale.setScalar(Math.max(.001,P['comet.hov.back']*k));}
+    cpv.B.spin.rotation.set(P['comet.hov.backTilt']*rad,0,0);cpv.B.spin.children[0].rotation.z=cpvA*.7*P['comet.hov.spinS'];
+  }
+  if(m==='cThrow'&&cThrowAt(u).held){var w=wp('WristR'),e=wp('ElbowR'),hp=w.clone().add(w.clone().sub(e).normalize().multiplyScalar(P['comet.hold.out']*k));
+    cpv.H.visible=true;cpv.H.position.copy(hp);cpv.H.scale.setScalar(Math.max(.001,P['comet.star.size']*P['comet.hold.scale']*k));cpv.H.spin.children[0].rotation.z=cpvA*P['comet.star.spin']*.5;}
+}
 /* ================= loop ================= */
 var last=performance.now();
 function tick(now){
@@ -4451,7 +4519,7 @@ function tick(now){
     var dur=Math.max(.05,modeDur(ui.mode));ui.phase=(ui.phase+dt/dur)%1;$('#phase').value=ui.phase;}
   applyPose(poseFor(ui.mode,2*Math.PI*ui.phase));
   if(rigRoot)rigRoot.rotation.z=ui.mode==='drift'?-P['m.drift.lean']*rad:0;   /* the lean the game adds while drifting: the whole of her, tipped from her feet */
-  barrierPreview(dt);minPreview(dt);
+  barrierPreview(dt);minPreview(dt);cometPreview(dt);
   controls.update();renderer.render(scene,camera);
 }
 bandReady=true;                                                     /* the part tables exist now: any arm band numbers still in the old meaning are converted, the defaults' and the dials' each against their own other dials */
@@ -7309,7 +7377,28 @@ requestAnimationFrame(tick);
   var COMET_DEF = { 'comet.hov.cost': 6, 'comet.hov.drain': 1, 'comet.hov.height': 0.5, 'comet.hov.top': 80, 'comet.hov.accelT': 7, 'comet.hov.brake': 3, 'comet.hov.fric': 11.4, 'comet.hov.gripZ': 20, 'comet.hov.jumpH': 7.2,
     'comet.hov.ankle': 0.35, 'comet.hov.back': 0.75, 'comet.hov.spinS': 1.5, 'comet.fly.drain': 4, 'comet.fly.lift': 1, 'comet.fly.arms': 8,
     'comet.star.cost': 1, 'comet.star.range': 50, 'comet.star.dmg': 0.5, 'comet.star.cool': 2, 'comet.star.speed': 100, 'comet.star.size': 1.2, 'comet.star.spin': 4,
-    'comet.star.cMax': 3, 'comet.star.cCost': 2, 'comet.star.cSize': 0.5, 'comet.star.cDmg': 0.5, 'comet.star.cRange': 50, 'comet.cStar': '#4fc3ff', 'comet.cGlow': '#a8e6ff' };
+    'comet.star.cMax': 3, 'comet.star.cCost': 2, 'comet.star.cSize': 0.5, 'comet.star.cDmg': 0.5, 'comet.star.cRange': 50, 'comet.cStar': '#4fc3ff', 'comet.cGlow': '#a8e6ff',
+    // her animations (the Rig Editor's Star throw, Hover and Fly modes), with the Rig Editor's key dials in degrees. Groups: pc the charging pose (right hand; Q mirrors it), pt the follow-through, pf Fly's arms and body, ho the changes while hovering, fl Fly's changes to her legs
+    'comet.throw.in': 0.15, 'comet.throw.swing': 0.14, 'comet.throw.rel': 0.6, 'comet.throw.hold': 0.12, 'comet.throw.out': 0.3, 'comet.hold.scale': 0.8, 'comet.hold.out': 0.15,
+    'comet.hov.bob': 0.08, 'comet.hov.bobT': 1.6, 'comet.hov.ankleY': 0, 'comet.hov.ankleTilt': 0, 'comet.hov.backD': 0.55, 'comet.hov.backY': 0.15, 'comet.hov.backTilt': 0, 'comet.fly.starY': 0.25, 'comet.fly.starS': 1 };
+  var CQ_KEYS = ['hyf', 'hz', 'hp', 'sp', 'hd', 'aLp', 'aLr', 'aLe', 'aRp', 'aRr', 'aRe', 'hL', 'kL', 'dL', 'hR', 'kR', 'dR', 'p1', 'p2', 'p3'];
+  (function () {
+    var P0 = { pc: { sp: 24, hd: -14, aLp: 45, aLr: 18, aLe: 35, aRp: -55, aRr: 25, aRe: 75 }, pt: { sp: 32, hd: -10, aLp: -25, aLr: 12, aLe: 30, aRp: 115, aRr: 8, aRe: 12 }, pf: { sp: 0, hd: 0, aLp: 170, aLr: 8, aLe: 8, aRp: 170, aRr: 8, aRe: 8 } };
+    ['pc', 'pt', 'pf', 'ho', 'fl'].forEach(function (g) { CQ_KEYS.forEach(function (k) { COMET_DEF['comet.' + g + '.' + k] = (P0[g] && P0[g][k]) || 0; }); });
+  })();
+  // A pose dial set's turn for one bone (the Rig Editor's key-pose rules), shared by the game and the Rig Editor's preview
+  window.__cometQ = function (n, v) {
+    var D = Math.PI / 180, X = new THREE.Vector3(1, 0, 0), Z = new THREE.Vector3(0, 0, 1), qx = function (a) { return new THREE.Quaternion().setFromAxisAngle(X, a * D); }, qz = function (a) { return new THREE.Quaternion().setFromAxisAngle(Z, a * D); };
+    switch (n) {
+      case 'Hips': return qx(v.hp); case 'Spine': return qx(v.sp); case 'Head': return qx(v.hd);
+      case 'ShoulderL': return qx(-v.aLp).multiply(qz(v.aLr)); case 'ShoulderR': return qx(-v.aRp).multiply(qz(-v.aRr));
+      case 'ElbowL': return qx(-v.aLe); case 'ElbowR': return qx(-v.aRe);
+      case 'HipL': return qx(-v.hL); case 'HipR': return qx(-v.hR); case 'KneeL': return qx(v.kL); case 'KneeR': return qx(v.kR); case 'AnkleL': return qx(-v.dL); case 'AnkleR': return qx(-v.dR);
+      case 'Pony1': return qx(v.p1); case 'Pony2': return qx(v.p2); case 'Pony3': return qx(v.p3);
+    }
+    return new THREE.Quaternion();
+  };
+  window.__cometMirror = function (v) { var o = {}, k; for (k in v) o[k] = v[k]; [['aLp', 'aRp'], ['aLr', 'aRr'], ['aLe', 'aRe'], ['hL', 'hR'], ['kL', 'kR'], ['dL', 'dR']].forEach(function (p) { o[p[0]] = v[p[1]]; o[p[1]] = v[p[0]]; }); return o; };
   for (var ck in COMET_DEF) RIGCFG[ck] = COMET_DEF[ck];
   window.__COMET_DEF = COMET_DEF;
   var RIGDEF = JSON.parse(JSON.stringify(RIGCFG));
@@ -7330,7 +7419,15 @@ requestAnimationFrame(tick);
     if (o && o['stat.gripZ'] === undefined && typeof o['stat.grip'] === 'number') o['stat.gripZ'] = o['stat.grip'] / 2;   // dials saved by an older build kept her grip in units/s^2 (1 Zip = 2 units)
     for (var k in RIGDEF) { var src = k.indexOf('mn.') === 0 ? om : o; RIGCFG[k] = src && typeof src[k] === typeof RIGDEF[k] && (typeof src[k] !== 'string' || /^#[0-9a-f]{6}$/i.test(src[k])) ? src[k] : RIGDEF[k]; }
     RIGCFG['barrier.radius'] = Math.max(0.2, RIGCFG['barrier.radius']); RIGCFG['m.drift.rate'] = Math.max(0.1, RIGCFG['m.drift.rate']);   // a Barrier with no size or a drift that never settles would break her spin and her lean
-    applyStats(); if (typeof enRestyle === 'function') enRestyle();
+    applyStats(); if (typeof enRestyle === 'function') enRestyle(); applyCharColors();
+  }
+  function applyCharColors() {                                   // playing as Comet: her Power line, charge bar and every Seg take the colour of her stars (the Segs keep their brightness, only the hue moves)
+    var com = CHAR === 'comet', cs = RIGCFG['comet.cStar'], c = new THREE.Color(cs), rgb = function (a) { return 'rgba(' + Math.round(c.r * 255) + ',' + Math.round(c.g * 255) + ',' + Math.round(c.b * 255) + ',' + a + ')'; };
+    var sl = document.getElementById('segline'); if (sl) { sl.style.background = com ? cs : ''; sl.style.boxShadow = com ? '0 0 8px 2px ' + rgb(0.9) + ', 0 0 24px 7px ' + rgb(0.5) : ''; }
+    var cf = document.getElementById('chfill'), ct = document.getElementById('chtrack'); if (cf) { cf.style.stroke = com ? cs : ''; cf.style.filter = com ? 'drop-shadow(0 0 2px ' + rgb(0.8) + ')' : ''; } if (ct) ct.style.stroke = com ? cs : '';
+    var gm = document.querySelector('#segs .gem'); if (gm) { gm.style.background = com ? cs : ''; gm.style.boxShadow = com ? '0 0 6px ' + rgb(0.9) : ''; }
+    var hue = function (orig) { var o = new THREE.Color(orig); if (!com) return o; var h1 = {}, h2 = {}; o.getHSL(h1); c.getHSL(h2); return o.setHSL(h2.h, h1.s, h1.l); };
+    if (typeof segMesh !== 'undefined' && segMesh) { segMesh.material.color.copy(hue(0xff2a1f)); segGlow.material.color.copy(hue(0xff3a2a)); }
   }
   function applyStats() {                                        // Molly's stat card: the numbers the Rig Editor's Stats tab sets. They replace the built-in values for running, braking, jumping, turning, falling and hearts
     var C = RIGCFG;
@@ -7915,7 +8012,7 @@ requestAnimationFrame(tick);
           var c = THREE.AnimationClip.findByName(g.animations, n); if (!c) return;
           var a = mollyMix.clipAction(c); a.play(); a.timeScale = 0; a.setEffectiveWeight(0); mollyAct[n] = a; mollyW[n] = 0; mollyT[n] = 0;
         });
-        cometRest = {}; model.traverse(function (o) { if (o.isBone) cometRest[o.name] = o.quaternion.clone(); });   // the bones' rest pose, for Fly's arms
+        cometRest = {}; cometRestPos = null; model.traverse(function (o) { if (o.isBone) { cometRest[o.name] = o.quaternion.clone(); if (o.name === 'Hips') cometRestPos = o.position.clone(); } });   // the bones' rest pose, for Fly's arms
         mollyDriftRun = false; model.traverse(function (o) { if (o.userData && o.userData.driftRun) mollyDriftRun = true; });   // a model saved from v179's Rig Editor carries drift clips made from her run (older ones carry a held pose, which the game does not use)
         mollyHoldF = {};                                          // a model saved from the Rig Editor carries where its slide and face-plant are held; the built-in one uses the built-in settings
         model.traverse(function (o) { var ud = o.userData; if (ud && typeof ud.slideHold === 'number' && ud.slideHold > 0 && ud.slideHold <= 1) mollyHoldF.Slide = ud.slideHold; if (ud && typeof ud.fallHold === 'number' && ud.fallHold > 0 && ud.fallHold <= 1) mollyHoldF.Faceplant = ud.fallHold; });
@@ -8519,6 +8616,7 @@ requestAnimationFrame(tick);
     new THREE.MeshBasicMaterial({ color: 0xff3a2a, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false }), SEG_MAX);
   segMesh.frustumCulled = false; segMesh.count = 0; scene.add(segMesh);
   segGlow.frustumCulled = false; segGlow.count = 0; scene.add(segGlow);
+  applyCharColors();
   // A chain of 150 leads out of the curve's mouth in a broad sweep to the right (west, since she leaves heading +Z) and on into the plateau.
   var CHAIN_N = 150, chainX = [], chainZ = [];
   (function () {
@@ -9404,6 +9502,16 @@ requestAnimationFrame(tick);
 
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v180', d: 'Nov 15, 2026', t: 'Comet\'s moves, made to order', g: [
+    ['Comet', [
+      'Star Throw has a throw: holding Q or E she leans in with a star in her hand behind her, growing as she charges; letting go, her arm swings through and the star leaves her hand part way. Her legs keep running. E throws right-handed, Q left-handed.',
+      'While she charges, a marker on the screen shows where the star will go: the end of its range at this charge, or where it would hit the ground. It grows with each second of charge.',
+      'Her Power line, the charge bar and the Seg icon are the colour of her stars, and every Seg in the level turns blue while you play as her (Molly keeps them red).'
+    ]],
+    ['Rig Editor', [
+      'Comet\'s page has three more animations: Star throw (timing, the star in her hand, a charging pose and a throw pose), Hover (float, bob, every star\'s size, place, tilt and spin, and changes laid over her run) and Fly (her arms, spine and head, changes to her legs, and the star at her hands). Each previews with its stars. The Hover box keeps Hover\'s costs and movement stats.'
+    ]]
+  ]},
   { v: 'v179', d: 'Nov 15, 2026', t: 'Comet, pressure plates, targets and a new Grass Canyon', g: [
     ['Levels', [
       'Grass Canyon, Act 1 is Ricky\'s re-edited layout: a door, a mud pad and two more Seg chains, with the trees thinned (1,411, down from 1,976). Opening it in the Path Editor loads the same layout.'
@@ -9913,10 +10021,11 @@ function showScreen(name) {                                // the menu shows one
   // Held, it charges (the speedometer's charge bar): each whole second, up to 3, costs 2 Power and adds 50% size, half a heart and 50 units. Out of Power or at 3 seconds it goes by itself. 2 s cooldown.
   // Hover: 2. Costs 6 Power, then 1 a second; she floats half a unit over whatever she would stand on (no mud, toxic ground, pressure plates or hard landings) on Hover's own movement stats.
   // Fly: Space held in the air while hovering: lift against gravity (1 = cancels it) for 4 more Power a second. Arms up, and the star on her back goes up to her hands.
-  window.__comet = function () { return { char: CHAR, hov: hovOn, fly: flyOn, power: +segCount.toFixed(2), charging: starCharging, lvl: starLvl, stars: STARS.filter(function (q) { return !q.hitAt; }).map(function (q) { return [+q.r.toFixed(2), +q.dmg.toFixed(2), +q.left.toFixed(1)]; }), cool: starCoolUntil, vy: +vy.toFixed(2), y: +player.position.y.toFixed(2), bodyY: +body.position.y.toFixed(2), grounded: grounded, top: RUN_SPEED / TILE }; };
+  window.__comet = function () { return { char: CHAR, hov: hovOn, fly: flyOn, power: +segCount.toFixed(2), charging: starCharging, lvl: starLvl, stars: STARS.filter(function (q) { return !q.hitAt; }).map(function (q) { return [+q.r.toFixed(2), +q.dmg.toFixed(2), +q.left.toFixed(1)]; }), cool: starCoolUntil, vy: +vy.toFixed(2), y: +player.position.y.toFixed(2), bodyY: +body.position.y.toFixed(2), grounded: grounded, top: RUN_SPEED / TILE, thr: thrPh, held: !!(heldStar && heldStar.visible), aim: aimEl ? aimEl.style.display !== 'none' : false, aimXY: aimEl ? [aimEl.style.left, aimEl.style.top, aimEl.style.width] : null, segCol: segMesh.material.color.getHexString(), line: (document.getElementById('segline').style.background || '') }; };
   window.__hovFx = function () { var p = player.position; return hovFx ? { flyBlend: +flyBlend.toFixed(2), B: [+(hovFx.B.position.x - p.x).toFixed(2), +(hovFx.B.position.y - p.y).toFixed(2), +(hovFx.B.position.z - p.z).toFixed(2)], L: +(hovFx.L.position.y - p.y).toFixed(2), vis: hovFx.B.visible, rest: !!cometRest && Object.keys(cometRest).length, bone: !!(mollyRoot && mollyRoot.getObjectByName('WristL')) } : null; };
   window.__setChar = function (c) { setChar(c); }; window.__setPower = function (v) { setPower(v); };
   var starCharging = false, starKey = null, starT = 0, starLvl = 0, starCoolUntil = 0, STARS = [];
+  var thrPh = 0, thrT = 0, thrW = 0, thrMir = false, thrPend = null, heldStar = null, aimEl = null, cometRestPos = null;   // the throw: 1 charging, 2 swinging (the star leaves her hand part way), 3 follow-through held, 4 easing back
   var hovOn = false, flyOn = false, hovBlend = 0, flyBlend = 0, hovFx = null, cometRest = null;
   function powerDeny() { seglineEl.classList.remove('deny'); void seglineEl.offsetWidth; seglineEl.classList.add('deny'); }
   function cometC(k) { return RIGCFG['comet.' + k]; }
@@ -9925,28 +10034,33 @@ function showScreen(name) {                                // the menu shows one
     var g = new THREE.ExtrudeGeometry(sh, { depth: R * 0.14, bevelEnabled: false }); g.translate(0, 0, -R * 0.07); return g;
   }
   var starGlowTex = null;
-  function starMesh(size) {                                      // the star and a soft glow round it; .spin is the part that turns
+  function starMesh(size, cS, cG) {                              // the star and a soft glow round it; .spin is the part that turns
     if (!starGlowTex) { var cv = document.createElement('canvas'); cv.width = cv.height = 64; var g2 = cv.getContext('2d'), gr = g2.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.35, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 64, 64); starGlowTex = new THREE.CanvasTexture(cv); }
     var grp = new THREE.Group(), spin = new THREE.Group(); grp.add(spin);
-    var m = new THREE.Mesh(starGeo(size / 2), new THREE.MeshBasicMaterial({ color: new THREE.Color(cometC('cStar')) })); spin.add(m);
-    var gl = new THREE.Sprite(new THREE.SpriteMaterial({ map: starGlowTex, color: new THREE.Color(cometC('cGlow')), transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false })); gl.scale.setScalar(size * 2.2); grp.add(gl);
+    var m = new THREE.Mesh(starGeo(size / 2), new THREE.MeshBasicMaterial({ color: new THREE.Color(cS || cometC('cStar')) })); spin.add(m);
+    var gl = new THREE.Sprite(new THREE.SpriteMaterial({ map: starGlowTex, color: new THREE.Color(cG || cometC('cGlow')), transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false })); gl.scale.setScalar(size * 2.2); grp.add(gl);
     grp.spin = spin; grp.glow = gl; return grp;
   }
+  window.__cometStar = starMesh;
   function starPress(code) {
     if (!playing || starCharging || fpOn) return;
     if (starCoolUntil > 0) return;                                 // still cooling down (game time: it waits while paused)
     if (segCount <= 0) { powerDeny(); return; }                  // it needs some Power
     setPower(segCount - cometC('star.cost')); starCharging = true; starKey = code; starT = 0; starLvl = 0;
+    thrPh = 1; thrT = 0; thrW = 0; thrMir = code === 'KeyQ'; thrPend = null;          // E throws with her right hand, Q with her left
   }
-  function starRelease() {
+  function starParams(lvl) { return { size: cometC('star.size') * (1 + cometC('star.cSize') * lvl), dmg: cometC('star.dmg') + cometC('star.cDmg') * lvl, range: cometC('star.range') + cometC('star.cRange') * lvl }; }
+  function starAimDir() { var ev = Math.max(-1.4, Math.min(1.4, 0.35 - pitch)); return new THREE.Vector3(-Math.sin(yaw) * Math.cos(ev), Math.sin(ev), -Math.cos(yaw) * Math.cos(ev)); }   // where the camera faces; level at the camera's resting tilt (it looks down at her), up or down as the camera tilts from there
+  function starRelease() {                                       // let go (or out of Power, or 3 s): the swing starts, and the star leaves her hand part way through it
     if (!starCharging) return; starCharging = false; starKey = null;
-    var lvl = starLvl, size = cometC('star.size') * (1 + cometC('star.cSize') * lvl), dmg = cometC('star.dmg') + cometC('star.cDmg') * lvl, range = cometC('star.range') + cometC('star.cRange') * lvl;
-    var ev = Math.max(-1.4, Math.min(1.4, 0.35 - pitch)), d = new THREE.Vector3(-Math.sin(yaw) * Math.cos(ev), Math.sin(ev), -Math.cos(yaw) * Math.cos(ev));   // where the camera faces; level at the camera's resting tilt (it looks down at her), up or down as the camera tilts from there
-    var up = new THREE.Vector3(0, 1, 0), nrm = up.clone().sub(d.clone().multiplyScalar(d.y)); if (nrm.lengthSq() < 1e-4) nrm.set(1, 0, 0); nrm.normalize();   // it flies flat: its face turned up, square to the way it goes
-    var g = starMesh(size), pp = player.position; g.position.set(pp.x + d.x * 1.2, pp.y + PLAYER_H * 0.62 + d.y * 1.2, pp.z + d.z * 1.2);
-    g.spin.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), nrm); scene.add(g);
-    STARS.push({ g: g, d: d, left: range, dmg: dmg, r: size / 2, a: 0, nrm: nrm, hitAt: 0 });
+    thrPend = starParams(starLvl); thrPh = 2; thrT = 0; thrW = 1;
     starCoolUntil = cometC('star.cool');
+  }
+  function spawnStar(pos, pr) {
+    var d = starAimDir(), nrm = new THREE.Vector3(0, 1, 0).sub(d.clone().multiplyScalar(d.y)); if (nrm.lengthSq() < 1e-4) nrm.set(1, 0, 0); nrm.normalize();   // it flies flat: its face turned up, square to the way it goes
+    var g = starMesh(pr.size); g.position.copy(pos);
+    g.spin.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), nrm); scene.add(g);
+    STARS.push({ g: g, d: d, left: pr.range, dmg: pr.dmg, r: pr.size / 2, a: 0, nrm: nrm, hitAt: 0 });
   }
   function starHitTarget(tg, dmg, now) { if (tg.on) return false; tg.hp = (tg.hp === undefined ? 1 : tg.hp) - dmg; if (tg.hp <= 1e-6) sbTargetBreak(tg, now); return true; }
   function setHover(on, quiet) {
@@ -9957,6 +10071,14 @@ function showScreen(name) {                                // the menu shows one
   function cometInput(dt) {                                      // per step: the charge, the Power that Hover and Fly use, and whether she is flying
     if (!isComet()) { if (hovOn) setHover(false, true); starCharging = false; return; }
     if (playing) starCoolUntil = Math.max(0, starCoolUntil - dt);
+    if (thrPh && playing) {                                      // the throw's timeline
+      thrT += dt;
+      if (thrPh === 1) thrW = Math.min(1, thrT / Math.max(0.01, cometC('throw.in')));
+      else if (thrPh === 2 && thrT >= cometC('throw.swing')) { if (thrPend) { spawnStar(new THREE.Vector3(player.position.x, player.position.y + PLAYER_H * 0.62, player.position.z), thrPend); thrPend = null; } thrPh = 3; thrT = 0; }
+      else if (thrPh === 3 && thrT >= cometC('throw.hold')) { thrPh = 4; thrT = 0; }
+      else if (thrPh === 4) { thrW = 1 - thrT / Math.max(0.01, cometC('throw.out')); if (thrW <= 0) { thrW = 0; thrPh = 0; } }
+    }
+    if (!playing && thrPh === 1) { thrPh = 0; thrW = 0; }
     if (starCharging) {
       if (!playing) { starCharging = false; }
       else {
@@ -9992,32 +10114,67 @@ function showScreen(name) {                                // the menu shows one
       if (st.left <= 1e-6) { st.hitAt = now; }                   // its range used up: it fades out where it is
     }
   }
-  function cometPose(dt) {                                       // the Hover stars and Fly's arms
-    var hv = isComet() && hovOn, fl = hv && flyOn;
+  function cqVals(pre, mir) { var v = {}; CQ_KEYS.forEach(function (k) { v[k] = RIGCFG[pre + k] || 0; }); return mir ? window.__cometMirror(v) : v; }
+  var CQ_UB = ['Spine', 'Head', 'ShoulderL', 'ElbowL', 'ShoulderR', 'ElbowR'], CQ_LEGS = ['HipL', 'KneeL', 'AnkleL', 'HipR', 'KneeR', 'AnkleR'], CQ_ALL = ['Hips', 'Spine', 'Head', 'ShoulderL', 'ElbowL', 'ShoulderR', 'ElbowR', 'HipL', 'KneeL', 'AnkleL', 'HipR', 'KneeR', 'AnkleR', 'Pony1', 'Pony2', 'Pony3'];
+  function cqOver(bn, names, v, w, v2, s2) { names.forEach(function (n) { var b = bn.getObjectByName(n); if (!b || !cometRest[n]) return; var q = window.__cometQ(n, v); if (v2) q.slerp(window.__cometQ(n, v2), s2); b.quaternion.slerp(cometRest[n].clone().multiply(q), w); }); }   // this pose instead of the clip's, by w
+  function cqAdd(bn, names, v, w) { names.forEach(function (n) { var b = bn.getObjectByName(n); if (!b) return; b.quaternion.multiply(new THREE.Quaternion().slerp(window.__cometQ(n, v), w)); }); }   // these changes on top of the clip's pose, by w
+  function hexA(h, a) { var c = new THREE.Color(h); return 'rgba(' + Math.round(c.r * 255) + ',' + Math.round(c.g * 255) + ',' + Math.round(c.b * 255) + ',' + a + ')'; }
+  function cometPose(dt) {                                       // her Hover, Fly and throw poses and the stars that go with them
+    var com = isComet(), hv = com && hovOn, fl = hv && flyOn, now = performance.now();
     hovBlend += ((hv ? 1 : 0) - hovBlend) * Math.min(1, dt * 10); flyBlend += ((fl ? 1 : 0) - flyBlend) * Math.min(1, dt * cometC('fly.arms'));
-    if (hovBlend > 0.001) body.position.y += cometC('hov.height') * hovBlend;   // she floats over whatever she would be standing on
-    if (!hovFx) { hovFx = { L: starMesh(1), R: starMesh(1), B: starMesh(1), a: 0 }; [hovFx.L, hovFx.R, hovFx.B].forEach(function (m) { m.visible = false; scene.add(m); }); }
+    if (hovBlend > 0.001) body.position.y += (cometC('hov.height') + cometC('hov.bob') * Math.sin(now / 1000 * 2 * Math.PI / Math.max(0.1, cometC('hov.bobT')))) * hovBlend;   // she floats over whatever she would be standing on, bobbing gently
+    var bn = com && mollyOn && mollyRoot && cometRest ? mollyRoot : null;
+    if (bn) {
+      if (hovBlend > 0.001) { var hvv = cqVals('comet.ho.'); cqAdd(bn, CQ_ALL, hvv, hovBlend); var hb = bn.getObjectByName('Hips'); if (hb && cometRestPos) { hb.position.y += cometRestPos.y * hvv.hyf * hovBlend; hb.position.z += hvv.hz * hovBlend; } }
+      if (flyBlend > 0.001) { cqOver(bn, CQ_UB, cqVals('comet.pf.'), flyBlend); cqAdd(bn, CQ_LEGS, cqVals('comet.fl.'), flyBlend); }
+      if (thrPh) { var sw = thrPh === 1 ? 0 : thrPh === 2 ? smooth01(Math.min(1, thrT / Math.max(0.01, cometC('throw.swing')))) : 1; cqOver(bn, CQ_UB, cqVals('comet.pc.', thrMir), thrW, cqVals('comet.pt.', thrMir), sw); }
+    }
+    if (!hovFx) { hovFx = { L: starMesh(1), R: starMesh(1), B: starMesh(1), a: 0 }; [hovFx.L, hovFx.R, hovFx.B].forEach(function (m) { m.visible = false; scene.add(m); }); heldStar = starMesh(1); heldStar.visible = false; scene.add(heldStar); }
+    player.updateMatrixWorld(true);
+    var bone = function (n) { var b = bn && bn.getObjectByName(n); return b ? b.getWorldPosition(new THREE.Vector3()) : null; };
+    var rot = player.rotation.y, fx = -Math.sin(rot), fz = -Math.cos(rot), pp = player.position, H = PLAYER_H, lift = cometC('hov.height') * hovBlend;
+    // the star in her throwing hand, growing with the charge, until it leaves her hand
+    var holding = com && (thrPh === 1 || (thrPh === 2 && thrPend));
+    heldStar.visible = holding;
+    if (holding) {
+      var S = thrMir ? 'L' : 'R', wr = bone('Wrist' + S), elb = bone('Elbow' + S), pr = thrPend || starParams(starLvl), hs = pr.size * cometC('hold.scale');
+      if (!wr) wr = new THREE.Vector3(pp.x - fx * 0.6 + (thrMir ? -1 : 1) * Math.cos(rot) * 0.5, pp.y + H * 0.7, pp.z - fz * 0.6 - (thrMir ? -1 : 1) * Math.sin(rot) * 0.5);
+      var hpos = wr.clone(); if (elb) hpos.add(wr.clone().sub(elb).normalize().multiplyScalar(cometC('hold.out')));
+      heldStar.position.copy(hpos); heldStar.scale.setScalar(Math.max(0.01, hs)); heldStar.spin.children[0].material.color.set(cometC('cStar')); heldStar.glow.material.color.set(cometC('cGlow'));
+      heldStar.spin.rotation.set(0, rot, now / 1000 * cometC('star.spin') * Math.PI);
+      if (thrPh === 2 && thrPend && thrT >= cometC('throw.rel') * cometC('throw.swing')) { spawnStar(hpos, thrPend); thrPend = null; heldStar.visible = false; }   // it leaves her hand part way through the swing
+    }
+    cometAim(com && starCharging);
     var show = hovBlend > 0.02; hovFx.L.visible = hovFx.R.visible = hovFx.B.visible = show; if (!show) return;
-    var sA = cometC('hov.ankle') * hovBlend, sB = cometC('hov.back') * hovBlend; hovFx.L.scale.setScalar(sA); hovFx.R.scale.setScalar(sA); hovFx.B.scale.setScalar(sB);
+    var sA = cometC('hov.ankle') * hovBlend, sB = cometC('hov.back') * hovBlend * (1 + (cometC('fly.starS') - 1) * flyBlend); hovFx.L.scale.setScalar(Math.max(0.001, sA)); hovFx.R.scale.setScalar(Math.max(0.001, sA)); hovFx.B.scale.setScalar(Math.max(0.001, sB));
     [hovFx.L, hovFx.R, hovFx.B].forEach(function (m) { m.spin.children[0].material.color.set(cometC('cStar')); m.glow.material.color.set(cometC('cGlow')); });
     hovFx.a += cometC('hov.spinS') * 2 * Math.PI * dt;
-    var rot = player.rotation.y, fx = -Math.sin(rot), fz = -Math.cos(rot), v = new THREE.Vector3(), pp = player.position, bn = mollyOn && mollyRoot ? mollyRoot : null;
-    var bone = function (n) { var b = bn && bn.getObjectByName(n); return b ? b.getWorldPosition(new THREE.Vector3()) : null; };
-    if (fl && bn && cometRest) {                                   // Fly: both arms straight up over her head
-      ['L', 'R'].forEach(function (S, i) { var g = i ? -1 : 1, sh = bn.getObjectByName('Shoulder' + S), el = bn.getObjectByName('Elbow' + S);
-        if (sh && cometRest['Shoulder' + S]) sh.quaternion.slerp(cometRest['Shoulder' + S].clone().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-170 * Math.PI / 180, 0, 0))).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, g * 8 * Math.PI / 180))), flyBlend);
-        if (el && cometRest['Elbow' + S]) el.quaternion.slerp(cometRest['Elbow' + S].clone().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-8 * Math.PI / 180, 0, 0))), flyBlend); });
-    }
-    player.updateMatrixWorld(true);
-    var aL = bone('AnkleL'), aR = bone('AnkleR'), sp = bone('Spine'), wL = bone('WristL'), wR = bone('WristR'), H = PLAYER_H, lift = cometC('hov.height') * hovBlend;
+    var aL = bone('AnkleL'), aR = bone('AnkleR'), sp = bone('Spine'), wL = bone('WristL'), wR = bone('WristR');
     if (!aL) aL = new THREE.Vector3(pp.x - Math.cos(rot) * 0.3, pp.y + lift + 0.3, pp.z + Math.sin(rot) * 0.3);
     if (!aR) aR = new THREE.Vector3(pp.x + Math.cos(rot) * 0.3, pp.y + lift + 0.3, pp.z - Math.sin(rot) * 0.3);
     if (!sp) sp = new THREE.Vector3(pp.x, pp.y + lift + H * 0.62, pp.z);
-    hovFx.L.position.copy(aL); hovFx.R.position.copy(aR);
-    [hovFx.L, hovFx.R].forEach(function (m, i) { m.spin.rotation.set(-Math.PI / 2, 0, (i ? -1 : 1) * hovFx.a); });   // flat round her ankles, turning
-    var back = new THREE.Vector3(sp.x - fx * 0.55, sp.y + 0.15, sp.z - fz * 0.55), top = wL && wR ? wL.clone().add(wR).multiplyScalar(0.5).add(new THREE.Vector3(0, 0.25, 0)) : new THREE.Vector3(pp.x, pp.y + lift + H + 0.9, pp.z);
+    var ay = cometC('hov.ankleY'), at = cometC('hov.ankleTilt') * Math.PI / 180;
+    hovFx.L.position.set(aL.x, aL.y + ay, aL.z); hovFx.R.position.set(aR.x, aR.y + ay, aR.z);
+    [hovFx.L, hovFx.R].forEach(function (m, i) { m.spin.rotation.set(-Math.PI / 2 + at, 0, (i ? -1 : 1) * hovFx.a); });   // flat round her ankles (tilted by the dial), turning
+    var bd = cometC('hov.backD'), back = new THREE.Vector3(sp.x - fx * bd, sp.y + cometC('hov.backY'), sp.z - fz * bd);
+    var top = wL && wR ? wL.clone().add(wR).multiplyScalar(0.5).add(new THREE.Vector3(0, cometC('fly.starY'), 0)) : new THREE.Vector3(pp.x, pp.y + lift + H + 0.9, pp.z);
     hovFx.B.position.copy(back.lerp(top, flyBlend));
-    hovFx.B.spin.rotation.set(0, rot, 0); hovFx.B.spin.children[0].rotation.z = hovFx.a * 0.7;   // upright behind her, facing back, turning slowly
+    hovFx.B.spin.rotation.set(cometC('hov.backTilt') * Math.PI / 180, rot, 0); hovFx.B.spin.children[0].rotation.z = hovFx.a * 0.7;   // upright behind her, facing back, turning slowly
+  }
+  function cometAim(on) {                                        // while she charges a throw: a marker where the star will go (its range at this charge), or where it would hit the ground
+    if (!aimEl) {
+      aimEl = document.createElement('div'); aimEl.id = 'starAim'; aimEl.setAttribute('aria-hidden', 'true');
+      aimEl.style.cssText = 'position:fixed;left:0;top:0;pointer-events:none;z-index:6;display:none;border-radius:50%;box-sizing:border-box;transform:translate(-50%,-50%)';
+      aimEl.innerHTML = '<div style="position:absolute;left:50%;top:-30%;bottom:-30%;width:2px;margin-left:-1px;background:currentColor;opacity:.85"></div><div style="position:absolute;top:50%;left:-30%;right:-30%;height:2px;margin-top:-1px;background:currentColor;opacity:.85"></div>';
+      document.body.appendChild(aimEl);
+    }
+    if (!on || !playing) { aimEl.style.display = 'none'; return; }
+    var pr = starParams(starLvl), d = starAimDir(), pp = player.position, x = pp.x, y = pp.y + PLAYER_H * 0.62, z = pp.z, k, n = Math.ceil(pr.range);
+    for (k = 1; k <= n; k++) { var f = Math.min(k, pr.range); var nx = pp.x + d.x * f, ny = pp.y + PLAYER_H * 0.62 + d.y * f, nz = pp.z + d.z * f; x = nx; y = ny; z = nz; if (ny < groundH(nx, nz)) break; }
+    var v = new THREE.Vector3(x, y, z).project(camera); if (v.z > 1) { aimEl.style.display = 'none'; return; }
+    var r = canvas.getBoundingClientRect(), sz = 26 + 10 * starLvl, cs = cometC('cStar');
+    aimEl.style.display = ''; aimEl.style.left = (r.left + (v.x + 1) / 2 * r.width) + 'px'; aimEl.style.top = (r.top + (1 - v.y) / 2 * r.height) + 'px';
+    aimEl.style.width = aimEl.style.height = sz + 'px'; aimEl.style.color = cs; aimEl.style.border = '2px solid ' + cs; aimEl.style.boxShadow = '0 0 8px 2px ' + hexA(cs, 0.6) + ', inset 0 0 6px ' + hexA(cs, 0.5);
   }
   function setBall(on, quiet) {
     if (on === ballOn) return;
