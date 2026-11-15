@@ -265,7 +265,7 @@
 <div id="stage">
   <canvas id="view" aria-label="3D view of a girl in a red jumpsuit with a ponytail running through a long grass valley with stone walls"></canvas>
   <div id="start" class="splash">
-    <div class="ver">v178</div>
+    <div class="ver">v178.1</div>
     <button id="bClog" class="clogBtn" type="button" title="What changed in each version">Changes</button>
     <section class="scr on" id="scr-main" aria-label="Main menu">
       <h1 class="logo"><span>POLY</span><span>RUNNER</span></h1>
@@ -1772,6 +1772,10 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         if (r.type === 'segchain') { o.big = !!r.big; o.h = r.height || 0; o.rise = r.rise || 0; o.arc = r.arc || 0; o.len = r.length || 120; o.gap = r.spacing || 12; if (r.follow === false) { o.follow = false; o.th = r.heading || 0; o.bend = r.bend || 0; } }
         if (r.type === 'tip') { o.shape = r.shape || 'circle'; o.r = r.radius || 40; o.w = r.width || 80; o.d = r.length || 60; o.text = r.text || ''; o.up = r.above || 0; o.dn = r.below || 0; }
         return o; }) };
+      S.objs.forEach(function (o) {                              // a file whose joined pieces loop round (A starts from B, B from A) would crash the editor on every redraw: the piece that closes the loop stands on its own instead
+        var w = o.after !== undefined ? byId(o.after) : null, g = 0, cyc = false; while (w && g++ < 100) { if (w === o) { cyc = true; break; } w = w.after !== undefined ? byId(w.after) : null; }
+        if (cyc) { delete o.after; o.turn = 0; o.follow = false; if (o.x === undefined && o.s === undefined) { o.x = 0; o.z = 0; } }
+      });
       setSel(-1); afterEdit(true); renderInsp(); fitView(); $('msg').textContent = 'Loaded.';
     } catch (e) { $('msg').textContent = 'That is not a path file.'; }
   };
@@ -9291,6 +9295,11 @@ var CHANGELOG = [
       'Target: an upright wooden disc with a red ring and middle, on a sign post or hanging in the air. Size, height, tilt, spin and heading; it can move side to side and/or up and down on the level clock, like platforms. One heart: the Barrier breaks it when it hits at its break speed (20 Zips unless set), and it splits in two and falls apart like a beaten minion. Otherwise it is solid. Its hitbox matches its size and can be scaled.',
       'Doors can be linked to plates and targets as well as minions: a linked door changes to its After mode once every minion linked is beaten, every plate pressed and every target broken. Plates and targets reset when she respawns, as minions do.',
       'Every stamp is now free by default (Snap to the path is still a choice per stamp). A stamp placed near the path still faces along it. Mud and Seg chains stamp on their own curve, and can be set to follow the path afterwards.'
+    ]]
+  ]},
+  { v: 'v178.1', d: 'Nov 15, 2026', t: 'Nightly fixes', g: [
+    ['Path Editor', [
+      'Opening a layout file whose joined pieces loop round (one cave joined after another that is joined after the first) no longer breaks the editor: the piece that closes the loop stands on its own. (Nightly sweep, Nov 15.)'
     ]]
   ]},
   { v: 'v178', d: 'Nov 14, 2026', t: 'True heights, layers and a clear view', g: [
