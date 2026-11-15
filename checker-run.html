@@ -1730,6 +1730,10 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         if (r.type === 'segchain') { o.big = !!r.big; o.h = r.height || 0; o.rise = r.rise || 0; o.arc = r.arc || 0; o.len = r.length || 120; o.gap = r.spacing || 12; if (r.follow === false) { o.follow = false; o.th = r.heading || 0; o.bend = r.bend || 0; } }
         if (r.type === 'tip') { o.shape = r.shape || 'circle'; o.r = r.radius || 40; o.w = r.width || 80; o.d = r.length || 60; o.text = r.text || ''; o.up = r.above || 0; o.dn = r.below || 0; }
         return o; }) };
+      S.objs.forEach(function (o) {                              // a file whose joined pieces loop round (A starts from B, B from A) would crash the editor on every redraw: the piece that closes the loop stands on its own instead
+        var w = o.after !== undefined ? byId(o.after) : null, g = 0, cyc = false; while (w && g++ < 100) { if (w === o) { cyc = true; break; } w = w.after !== undefined ? byId(w.after) : null; }
+        if (cyc) { delete o.after; o.turn = 0; o.follow = false; if (o.x === undefined && o.s === undefined) { o.x = 0; o.z = 0; } }
+      });
       setSel(-1); afterEdit(true); renderInsp(); fitView(); $('msg').textContent = 'Loaded.';
     } catch (e) { $('msg').textContent = 'That is not a path file.'; }
   };
