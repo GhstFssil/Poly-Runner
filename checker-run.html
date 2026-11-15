@@ -265,7 +265,7 @@
 <div id="stage">
   <canvas id="view" aria-label="3D view of a girl in a red jumpsuit with a ponytail running through a long grass valley with stone walls"></canvas>
   <div id="start" class="splash">
-    <div class="ver">v178</div>
+    <div class="ver">v178.1</div>
     <button id="bClog" class="clogBtn" type="button" title="What changed in each version">Changes</button>
     <section class="scr on" id="scr-main" aria-label="Main menu">
       <h1 class="logo"><span>POLY</span><span>RUNNER</span></h1>
@@ -9090,6 +9090,11 @@ requestAnimationFrame(tick);
 
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v178.1', d: 'Nov 15, 2026', t: 'Nightly fixes', g: [
+    ['Path Editor', [
+      'Opening a layout file whose joined pieces loop round (one cave joined after another that is joined after the first) no longer breaks the editor: the piece that closes the loop stands on its own. (Nightly sweep, Nov 15.)'
+    ]]
+  ]},
   { v: 'v178', d: 'Nov 14, 2026', t: 'True heights, layers and a clear view', g: [
     ['Path Editor', [
       'Every stamp has a Y: one flat height for the whole world, 0 where her feet are at the start of the path. A stamp sits on the ground (and the editor shows how high that is, when opened from the game) until you type a Y; then it stays at that height. Back on the ground undoes it. What Y means: the foot of a tree, sign, goal, checkpoint or door; a Seg\'s middle; the top of a ledge or platform where it starts; the floor a minion stands on; the height a hill or crag is built up from; a lake\'s water; the ground of a terrain patch or under mud; where a spawner\'s minions appear; the base of a tip area\'s range. Gaps stay bottomless.',

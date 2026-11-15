@@ -20,5 +20,6 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (level detai
 ## Branches (so two sessions never edit the same thing)
 - Interactive work with Ricky happens on the branch `next` (push it freely). Ricky controls version numbers: ALWAYS ask him before bumping the version label or merging `next` into `main` (a push to `main` publishes a release). He batches changes into versions.
 - The nightly sweep NEVER touches `main`. It works on a branch `nightly/YYYY-MM-DD`, based on the newest unmerged `origin/nightly/*` branch if there is one (so the nights stack and merge as a chain), otherwise on `main`.
-- At the start of each interactive session: `git fetch`, then merge any unmerged `nightly/*` branches into `main` oldest first (after reading their reports), tell Ricky what they fixed and what they left for him, add the fixes to the next CHANGELOG entry, and push `main`.
+- At the start of each interactive session: `git fetch`, read any unmerged `nightly/*` reports and tell Ricky what they fixed and what they left for him. Merging nightly fixes into `main` publishes them, so it follows the version rule below.
+- Version numbering for nightly fixes (Ricky's rule): fixes pushed to `main` from a nightly sweep add the next decimal to the current version (v178 -> v178.1 -> v178.2; after v179, v179.1). Each such push gets its own CHANGELOG entry and version label. Then merge `main` into `next`. Ricky's own versions (v179, v180, ...) stay his call: always ask before those.
 - Commit messages end with the attribution lines the session was given.
