@@ -124,3 +124,6 @@ RESUMED Nov 13 11:50 PM after a usage-limit stop; nothing of the follow-ups was 
 - Gradual slopes: per-segment sm / smL; vcurves (editor) = sbVcurves (game); tests fu/vc1.py.
 - Circular decks: piece {disc:1, rad, h, cs, bk, tx, ov, fl}; sbDiscY / discY; samples flagged dsk (skipped by the ribbon ground and the Oceana deck); level3H override; Oceana disc mesh; tests fu/disc1.py, fu/disc2.py.
 - Minions: MN_DEF (game) = MNE (editor), keys mn.min.* / mn.big.*; __makeMinion / __poseMinion shared by game and preview; enBuild / enRestyle on rigRead; stomp = top quarter of the head, falling; bounce stomp Zips per kind; Barrier damage tiers k1/k2/k3 (0 = never). Tests fu/mn1-4.py.
+
+## v179 (next, unreleased)
+- Grass Canyon Act 1: OFFICIAL_L1 replaced with Ricky's re-edited layout (Nov 14): 1,467 stamps (1,411 trees, 17 ledges, 14 tips, 12 segchains, 1 door, 1 mud, 1 lake). Builds with 0 errors, all stamps built; reg2 unchanged. Test fu/gc_new.py.
