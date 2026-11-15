@@ -3,9 +3,9 @@
 Purpose: every night, one slice of the code (about 5% of it, 20 slices in all) is looked at through one lens (bugs, visual seams and edges, or running lighter and smoother), tested, and fixed only where the fix is proven and safe. A slice is small enough that a night's run stays cheap.
 
 ## State (updated by each night, on its branch)
-Next slice: 1
-Night counter: 0
-Last checked commit: 3c78a09de2612ff454838f734ed9ae7e8fbb19d9
+Next slice: 2
+Night counter: 1
+Last checked commit: 0347d07c1f6ae1cec07defe1345ceb65a918d8e3
 
 ## What a nightly session does
 1. `git fetch`; choose the base (see CLAUDE.md: newest unmerged `origin/nightly/*`, else `main`); create `nightly/YYYY-MM-DD` from it; run `sh tests/setup.sh`.
