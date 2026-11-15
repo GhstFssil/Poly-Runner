@@ -719,6 +719,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       <button data-tool="checkpoint">Checkpoint</button>
       <button data-tool="ramp">Ramp</button>
       <button data-tool="door">Door</button>
+      <button data-tool="plate">Pressure plate</button>
+      <button data-tool="target">Target</button>
       <button data-tool="tip">Tip area</button>
       <button data-tool="start">Player start</button>
       <button data-tool="erase">Erase</button>
@@ -764,14 +766,14 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   var $ = function (id) { return SR.getElementById(id); };
   var cv = $('cv'), ctx = cv.getContext('2d');
   var KEY = 'polyrun-path-editor-v2';
-  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: { trap: false }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, slide: 'down', sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {} };
+  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: { trap: false }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, slide: 'down', sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {}, plate: { shape: 'rect', w: 8, d: 8, r: 4, look: 'gray', whl: false }, target: { size: 6, post: true, h: 7, tilt: 0, spin: 0, hb: 1, k: 20, sd: 0, sp: 4, vd: 0, vp: 4, phase: 0 } };
   var S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }, { len: 1005.3, ang: 90, r: 640, dy: 0 }, { len: 400, ang: 0, r: 640, dy: 20 }, { len: 502.65, ang: -45, r: 640, dy: 0 }, { len: 300, ang: 0, r: 640, dy: 0 }], objs: [] };
   var GH = null, DEFUSER = {};                                  // GH: the not-yet-placed stamp whose settings the panel shows while a stamp tool is chosen
   function ghostMode() { return tool !== 'select' && tool !== 'erase' && tool !== 'preset' && tool !== 'forest'; }
   var tool = 'select', view = { cx: 300, cz: -300, zoom: 0.5 }, samples = [], total = 0, hist = [], hover = null, sel = -1, dpr = 1;
   var STRIPS = { segchain: 1, ledge: 1, platform: 1, gap: 1, mud: 1 };
   var MOBS = ['minion', 'bigminion'];                         // enemies that can be set Idle (add any new mob type here)
-  var NAMES = { tree: 'Tree', minion: 'Minion', bigminion: 'Big minion', cave: 'Cave', toxic: 'Toxic patch', sign: 'Caution sign', seg: 'Seg', segchain: 'Seg chain', ledge: 'Ledge', platform: 'Platform', gap: 'Gap', mud: 'Mud stretch', crag: 'Crag patch', patch: 'Terrain patch', spawner: 'Spawner', hill: 'Hill', lake: 'Lake', goal: 'Goal', checkpoint: 'Checkpoint', ramp: 'Ramp', tip: 'Tip area', start: 'Player start', door: 'Door' };
+  var NAMES = { tree: 'Tree', minion: 'Minion', bigminion: 'Big minion', cave: 'Cave', toxic: 'Toxic patch', sign: 'Caution sign', seg: 'Seg', segchain: 'Seg chain', ledge: 'Ledge', platform: 'Platform', gap: 'Gap', mud: 'Mud stretch', crag: 'Crag patch', patch: 'Terrain patch', spawner: 'Spawner', hill: 'Hill', lake: 'Lake', goal: 'Goal', checkpoint: 'Checkpoint', ramp: 'Ramp', tip: 'Tip area', start: 'Player start', door: 'Door', plate: 'Pressure plate', target: 'Target' };
 
   var msel = [], clip = null, marq = null, nextLayer = 2;
   function setSel(i) { sel = i; msel = []; }
@@ -969,16 +971,20 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     delete o.s; delete o.u; delete o.x; delete o.z;
     if ($('attach').checked && !o.noat && near.d < 120) { o.s = near.s; o.u = near.u; } else { o.x = x; o.z = z; }
   }
-  function mk(t, x, z) { var o = mk0(t, x, z); o.layer = S.activeLayer; return o; }
+  function mk(t, x, z) {
+    var o = mk0(t, x, z); o.layer = S.activeLayer;
+    if (!STRIPS[o.t] && o.s === undefined && o.x !== undefined && samples.length) { var nf = nearest(x, z); if (nf.d < 120) o.rot = Math.round(((o.rot || 0) + at(nf.s).th * 180 / Math.PI) * 10) / 10; }   // free near the path: it still faces along the path, as a snapped stamp would
+    return o;
+  }
   function mk0(t, x, z) {
     var o = { t: t, rot: 0 }, d = DEF[t]; if (d) for (var k in d) o[k] = d[k];
+    if (o.noat === undefined && !STRIPS[t]) o.noat = true;                               // every stamp is free by default (Snap to the path is a choice)
     if (t === 'crag') o.seed = 1 + Math.floor(Math.random() * 2000000000);               // every crag patch stamped gets a layout of its own
     var U = function (k) { return DEFUSER[t + '.' + k]; };
     if (t === 'door' && !U('w')) o.w = S.width + 2; if (t === 'ramp' && !U('w')) o.w = S.width; if (t === 'checkpoint' && !U('w')) o.w = Math.max(DEF.checkpoint.w, S.width + 7);
     if (t === 'gap' && !U('w')) o.w = S.width + 6; if (t === 'goal' && !U('w')) o.w = Math.max(16, S.width + 7);
     if (STRIPS[t]) {
       var nn = nearest(x, z);
-      if (t === 'segchain' || (t === 'mud' && nn.d <= S.width / 2 + 4)) { o.s = nn.s; o.u = t === 'mud' ? 0 : nn.u; o.follow = true; return o; }   // mud stamped on the path follows it; anywhere else it is a strip of its own
       o.follow = false; o.x = x; o.z = z; o.th = nn.d < 200 ? at(nn.s).th * 180 / Math.PI : 0; o.bend = 0; return o;
     }
     place(o, x, z); return o;
@@ -1000,7 +1006,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   }
   function removeAt(i) { var o = S.objs[i]; S.objs.forEach(function (q) { if (q.after !== undefined && q.after === o.id) { var b = base(q, 0); q.x = b.x; q.z = b.z; q.th = b.th * 180 / Math.PI; delete q.after; q.turn = 0; q.follow = false; } }); S.objs.splice(i, 1); }
   function stripPts(o, step) { var n = Math.max(1, Math.ceil(o.len / step)), out = []; for (var i = 0; i <= n; i++) { var q = shapeAt(o, Math.min(o.len, i * o.len / n)); out.push([q.x, q.z, q.th]); } return out; }
-  function circR(o) { return isOneCrag(o) ? Math.max(2, o.base) : o.t === 'tip' ? (o.shape === 'circle' ? o.r : 0) : (o.t === 'crag' || o.t === 'spawner' || o.t === 'hill' || o.t === 'lake') ? o.r : 0; }
+  function circR(o) { return isOneCrag(o) ? Math.max(2, o.base) : o.t === 'tip' || o.t === 'plate' ? (o.shape === 'circle' ? o.r : 0) : (o.t === 'crag' || o.t === 'spawner' || o.t === 'hill' || o.t === 'lake') ? o.r : 0; }
   function chainPts(o) {
     var n = Math.max(1, Math.floor(o.len / Math.max(1, o.gap)) + 1), out = [];
     for (var k = o.after !== undefined ? 1 : 0; k < n; k++) { var q = shapeAt(o, Math.min(o.len, k * o.gap)); out.push([q.x, q.z]); }
@@ -1012,6 +1018,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (o.t === 'toxic' || o.t === 'patch') return [o.w / 2, o.d / 2];
     if (o.t === 'ramp') return [o.w / 2, o.len / 2];
     if (o.t === 'door') return [o.w / 2, 2];
+    if (o.t === 'plate') return o.shape === 'circle' ? [o.r, o.r] : [o.w / 2, o.d / 2];
+    if (o.t === 'target') return [o.size / 2, 1];
     if (o.t === 'checkpoint') return [o.w / 2, 3];
     if (o.t === 'tip') return o.shape === 'circle' ? [o.r, o.r] : [o.w / 2, o.d / 2];
     if (isOneCrag(o)) return [Math.max(2, o.base), Math.max(2, o.base)];
@@ -1232,6 +1240,19 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       ctx.save(); ctx.beginPath(); ctx.rect(-dw / 2, -dd / 2, dw, dd); ctx.clip(); ctx.strokeStyle = '#e8b21c'; ctx.lineWidth = Math.max(2, dd * 0.28);
       for (var dk = -dw; dk < dw; dk += dd * 1.1) { ctx.beginPath(); ctx.moveTo(dk, dd / 2); ctx.lineTo(dk + dd, -dd / 2); ctx.stroke(); } ctx.restore();
       ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.strokeRect(-dw / 2, -dd / 2, dw, dd);
+    } else if (o.t === 'plate') {
+      var pcol = o.look === 'brown' ? '196,160,122' : o.look === 'halo' ? '90,200,240' : o.look === 'none' ? '140,140,140' : '175,177,172';
+      var pls = function () { ctx.beginPath(); if (o.shape === 'circle') ctx.arc(0, 0, Math.max(3, o.r * z), 0, 7); else { var pw = Math.max(3, o.w * z), pd = Math.max(3, o.d * z); ctx.rect(-pw / 2, -pd / 2, pw, pd); } };
+      if (o.look === 'gray' || o.look === 'brown') { ctx.fillStyle = 'rgba(' + pcol + ',.9)'; pls(); ctx.fill(); }
+      if (o.look === 'halo') { ctx.shadowColor = 'rgb(' + pcol + ')'; ctx.shadowBlur = 8; }
+      ctx.strokeStyle = 'rgb(' + pcol + ')'; ctx.lineWidth = o.look === 'halo' ? 2.5 : 1.5; if (o.look === 'none') ctx.setLineDash([3, 3]); pls(); ctx.stroke(); ctx.setLineDash([]); ctx.shadowBlur = 0;
+      ctx.fillStyle = ink; ctx.font = 'bold 9px ' + css('--font-d'); ctx.textAlign = 'center'; ctx.fillText('PLATE', 0, 3); ctx.textAlign = 'start';
+    } else if (o.t === 'target') {
+      var tw = Math.max(8, o.size * z), tt = Math.max(3, 1.2 * z);
+      if (o.sd) { ctx.strokeStyle = 'rgba(210,35,42,.6)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(-tw / 2 - o.sd * z / 2, 0); ctx.lineTo(tw / 2 + o.sd * z / 2, 0); ctx.stroke(); ctx.setLineDash([]); }
+      ctx.fillStyle = '#c89a64'; ctx.fillRect(-tw / 2, -tt / 2, tw, tt); ctx.fillStyle = '#d2232a'; ctx.fillRect(-tw * 0.36, -tt / 2, tw * 0.1, tt); ctx.fillRect(tw * 0.26, -tt / 2, tw * 0.1, tt); ctx.fillRect(-tw * 0.12, -tt / 2, tw * 0.24, tt);
+      ctx.strokeStyle = ink; ctx.lineWidth = 1; ctx.strokeRect(-tw / 2, -tt / 2, tw, tt);
+      if (o.post) { ctx.fillStyle = css('--trunk'); ctx.fillRect(-1.5, tt / 2, 3, 3); }
     } else if (o.t === 'ramp') {
       var rw = Math.max(4, o.w * z), rl = Math.max(6, o.len * z), g = ctx.createLinearGradient(0, rl / 2, 0, -rl / 2); g.addColorStop(0, css('--road')); g.addColorStop(1, css('--road-edge'));
       ctx.fillStyle = g; ctx.fillRect(-rw / 2, -rl / 2, rw, rl); ctx.strokeStyle = ink; ctx.lineWidth = 1; ctx.strokeRect(-rw / 2, -rl / 2, rw, rl);
@@ -1256,6 +1277,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (o.t === 'goal') { ctx.fillStyle = o.kind === 'bonus' ? '#8a4fd1' : '#2f9e55'; ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText(o.kind === 'bonus' ? 'BONUS GOAL' : 'GOAL', q[0] + 10, q[1] - 10); }
     if (o.t === 'door') { ctx.fillStyle = css('--ink'); ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText('DOOR  ' + (o.mode === 'open' ? 'always open' : o.mode === 'closed' ? 'always closed' : o.open + 's open / ' + o.shut + 's shut') + (o.links && o.links.length ? '  (linked)' : '') + (o.links && o.links.length ? ' → ' + (o.modeA === 'closed' ? 'always closed' : o.modeA === 'cycle' ? 'cycle' : 'always open') : '') + ((o.sTx || o.sTz || o.oTx || o.oTz) ? '  tilts' : '') + (doorSlide(o) === 'edge' ? '  slides along its lean' : doorSlide(o) === 'none' ? '  swings' : ''), q[0] + 12, q[1] - 12); }
     if (o.t === 'start') { ctx.fillStyle = css('--ink'); ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText('PLAYER START', q[0] + 14, q[1] - 12); }
+    if (o.t === 'target' && z > 0.15) { ctx.fillStyle = '#d2232a'; ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText('TARGET', q[0] + 8, q[1] - 8); }
     if (o.t === 'checkpoint' && z > 0.15) { ctx.fillStyle = '#c9222a'; ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText('CP ' + cpNumber(o), q[0] + 8, q[1] - 8); }
   }
 
@@ -1331,7 +1353,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   function stripFoot(o) { var raw = o.t === 'mud' ? mudW(o) / 2 : o.t === 'ledge' ? Math.max(o.w / 2, 1.3) : o.w / 2, m = o.t === 'mud' ? 1 : 1.5; return { half: raw + m, m: m }; }   // what the game really covers: the piece's own half-width plus its margin (gap and ledge 1.5, mud 1) on every side, ends included
   function toxF(o) { return '<label class="f">Surface<select data-ok="tox"><option value="0"' + (o.tox ? '' : ' selected') + '>Normal</option><option value="1"' + (o.tox ? ' selected' : '') + '>Toxic (a heart a second to stand on, like a toxic patch)</option></select></label>'; }
   // ---- true Y: one flat height for the whole world, 0 where her feet are at the start of the path. A stamp sits on the ground until a Y is typed ----
-  var YWHAT = { tree: 'its foot', sign: 'its foot', goal: 'its foot', checkpoint: 'its foot', toxic: 'its surface', ramp: 'its low end', tip: 'the base of its range', cave: 'its mouth floor', seg: 'its middle', segchain: 'the middle of its first Seg', ledge: 'its top where it starts', platform: 'its top where it starts', door: 'its foot', minion: 'its feet (it stands on the floor at that height)', bigminion: 'its feet (it stands on the floor at that height)', start: 'her feet', spawner: 'where its minions appear', hill: 'the height it is built up from', crag: 'the height its rocks rise from', lake: 'the water\'s surface', patch: 'its ground', mud: 'the ground under it', gap: 'its rim (a gap stays bottomless: this changes nothing)' };
+  var YWHAT = { plate: 'its surface', target: 'its foot (the bottom of its post, or the point under it)', tree: 'its foot', sign: 'its foot', goal: 'its foot', checkpoint: 'its foot', toxic: 'its surface', ramp: 'its low end', tip: 'the base of its range', cave: 'its mouth floor', seg: 'its middle', segchain: 'the middle of its first Seg', ledge: 'its top where it starts', platform: 'its top where it starts', door: 'its foot', minion: 'its feet (it stands on the floor at that height)', bigminion: 'its feet (it stands on the floor at that height)', start: 'her feet', spawner: 'where its minions appear', hill: 'the height it is built up from', crag: 'the height its rocks rise from', lake: 'the water\'s surface', patch: 'its ground', mud: 'the ground under it', gap: 'its rim (a gap stays bottomless: this changes nothing)' };
   var yShown = {}, yKey = '';
   function yRow(o) {                                              // the Y field: the true Y if one is set, else where it is now (from the game, when the editor runs inside it)
     var fixed = o.ya !== undefined, v = fixed ? o.ya : yShown[o.id], ro = o.t === 'gap';
@@ -1358,7 +1380,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (!ghost) h += layerSelect(lyrOf(o).id, 'data-ok="layer"', 'Layer', false);
     if (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag') h += '<label class="f">Height with others<select data-ok="hm"><option value="add"' + (o.hm === 'ind' ? '' : ' selected') + '>Additive: stacks on what it crosses</option><option value="ind"' + (o.hm === 'ind' ? ' selected' : '') + '>Independent: its own height, merges in</option></select></label>';
     if (joinedCave) h += '<label class="f">Starts from<select data-ok="after"><option value="">Its own mouth</option>' + S.objs.filter(function (q) { return q !== o && q.t === 'cave'; }).map(function (q) { return '<option value="' + q.id + '"' + (o.after === q.id ? ' selected' : '') + '>End of Cave #' + (S.objs.indexOf(q) + 1) + '</option>'; }).join('') + '</select></label>';
-    if (!STRIPS[o.t] && !joinedCave) h += '<label class="f">Snap to the path<select data-ok="noat"><option value="0"' + (o.noat ? '' : ' selected') + '>Snaps: follows the path when it changes</option><option value="1"' + (o.noat ? ' selected' : '') + '>Free: stays where it is</option></select></label>';
+    var isFree = o.noat || (!ghost && o.s === undefined);
+    if (!STRIPS[o.t] && !joinedCave) h += '<label class="f">Snap to the path<select data-ok="noat"><option value="0"' + (isFree ? '' : ' selected') + '>Snaps: follows the path when it changes</option><option value="1"' + (isFree ? ' selected' : '') + '>Free: stays where it is</option></select></label>';
     if (!ghost && !joinedCave && (!STRIPS[o.t] || o.follow === false)) h += num('X', 'X', -99999, 99999, 1, Math.round(p.x * 10) / 10) + num('Z', 'Z', -99999, 99999, 1, Math.round(p.z * 10) / 10) + (STRIPS[o.t] ? '' : num('rot', 'Rotation °', -360, 360, 5, o.rot || 0));
     if (o.t === 'tree') h += '<label class="f">Size<select data-ok="exs"><option value="rand"' + (o.ex ? '' : ' selected') + '>Random, like the level\'s own trees</option><option value="exact"' + (o.ex ? ' selected' : '') + '>Exactly these sizes</option></select></label>' + (o.ex ? num('tH', 'Trunk height', 1, 80, 0.5, o.tH) + num('tW', 'Trunk width', 0.2, 12, 0.1, o.tW) + num('cH', 'Canopy height', 1, 80, 0.5, o.cH) + num('cW', 'Canopy width', 1, 40, 0.5, o.cW) : '');
     if (!ghost && !joinedCave) h += yRow(o);
@@ -1422,16 +1445,29 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       h += num('w', 'Width', 2, 100, 1, o.w) + num('hgt', 'Height', 1, 60, 0.5, o.hgt);
       if (!ghost) {
         h += '<div class="stats" style="grid-column:1/-1"><b>Linked to</b> ' + (dl.length ? dl.map(function (id) { var q = S.objs.filter(function (z) { return z.id === id; })[0]; return '<button class="small" data-oact="unlink" data-lid="' + id + '" title="Unlink">' + NAMES[q.t] + ' #' + id + ' ✕</button>'; }).join(' ') : 'nothing') + '</div>';
-        var cand = S.objs.filter(function (q) { return (q.t === 'minion' || q.t === 'bigminion') && dl.indexOf(q.id) < 0; });
+        var cand = S.objs.filter(function (q) { return (q.t === 'minion' || q.t === 'bigminion' || q.t === 'plate' || q.t === 'target') && dl.indexOf(q.id) < 0; });
         if (cand.length) h += '<label class="f">Link to…<select data-ok="addlink"><option value="">Choose…</option>' + cand.map(function (q) { var p2 = pos(q); return '<option value="' + q.id + '">' + NAMES[q.t] + ' #' + q.id + ' (X ' + Math.round(p2.x) + ', Z ' + Math.round(p2.z) + ')</option>'; }).join('') + '</select></label>';
       }
       var linked = dl.length > 0, modeA = o.modeA || 'open';   // linked: only the mode changes once everything it is linked to is beaten; how it opens and shuts stays the same
-      h += dsl('mode', linked ? 'Before interaction' : 'Behaviour', o.mode, MODES) + (linked ? dsl('modeA', 'After interaction (once everything linked is beaten)', modeA, MODES) : '');
+      h += dsl('mode', linked ? 'Before interaction' : 'Behaviour', o.mode, MODES) + (linked ? dsl('modeA', 'After interaction (once every minion linked is beaten, plate pressed and target broken)', modeA, MODES) : '');
       if (o.mode === 'cycle' || (linked && modeA === 'cycle')) h += num('open', 'Open for (seconds)', 0.1, 600, 0.1, o.open) + num('shut', 'Closed for (seconds)', 0.1, 600, 0.1, o.shut) + num('phase', 'Start offset (seconds)', 0, 600, 0.1, o.phase);
       h += num('speed', 'Time to open or shut (seconds)', 0.05, 60, 0.05, o.speed)
         + dsl('slide', 'Opens by', doorSlide(o), [['down', 'Sliding straight down into the floor'], ['edge', 'Sliding toward its bottom edge (along its own lean)'], ['none', 'Swinging only (to its open tilt)']])
         + num('sTx', 'Tilt when shut: forward / back °', -180, 180, 1, o.sTx) + num('sTz', 'Tilt when shut: sideways °', -180, 180, 1, o.sTz) + num('oTx', 'Tilt when open: forward / back °', -180, 180, 1, o.oTx) + num('oTz', 'Tilt when open: sideways °', -180, 180, 1, o.oTz);
       h += '<div class="stats" style="grid-column:1/-1">Tilts pivot at the door\'s base: forward / back leans its top along the way ahead, sideways leans it to the right. Sliding toward its bottom edge moves it its own height along its lean, so its top edge ends where its bottom edge was. If it shuts on someone in the doorway, they are pushed out the side they came from.</div>';
+    }
+    var isel = function (k, l, v, opts) { return '<label class="f">' + l + '<select data-ok="' + k + '">' + opts.map(function (m) { return '<option value="' + m[0] + '"' + (String(v) === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>'; };
+    if (o.t === 'plate') {
+      h += isel('look', 'Look', o.look, [['gray', 'Light gray'], ['brown', 'Light brown'], ['halo', 'A faint glowing halo round its edge'], ['none', 'Invisible']]) + isel('shape', 'Shape', o.shape, [['rect', 'Rectangle'], ['circle', 'Circle']]);
+      h += o.shape === 'circle' ? num('r', 'Radius', 0.5, 2000, 0.5, o.r) : num('w', 'Width (across)', 0.5, 4000, 0.5, o.w) + num('d', 'Length (along)', 0.5, 4000, 0.5, o.d);
+      h += isel('whl', 'Stays pressed', o.whl ? '1' : '0', [['0', 'Once she steps on it, for the rest of the run'], ['1', 'Only while she stands on it']]);
+      h += '<div class="stats" style="grid-column:1/-1">Pressed when Molly stands on it. A door linked to it counts it as done while it is pressed. It lies on the ground (or at its Y) and does not change the ground\'s height.</div>';
+    }
+    if (o.t === 'target') {
+      h += num('size', 'Size (diameter)', 0.5, 200, 0.5, o.size) + isel('post', 'Stands on', o.post ? '1' : '0', [['1', 'A sign post'], ['0', 'Nothing (it hangs in the air)']]) + num('h', 'Height of its middle above its Y', -50, 500, 0.5, o.h)
+        + num('tilt', 'Tilt ° (+ leans its top back)', -180, 180, 1, o.tilt) + num('spin', 'Spin ° (turns it round its middle)', -360, 360, 1, o.spin) + num('hb', 'Hitbox size (× its own size)', 0.1, 5, 0.05, o.hb) + num('k', 'Barrier speed that breaks it (Zips; 0 = never)', 0, 200, 0.5, o.k)
+        + num('sd', 'Side-to-side travel (0 = still)', 0, 1000, 0.5, o.sd) + (o.sd ? num('sp', 'Side to side: seconds per full cycle', 0.5, 120, 0.5, o.sp) : '') + num('vd', 'Up-and-down travel (0 = still)', 0, 1000, 0.5, o.vd) + (o.vd ? num('vp', 'Up and down: seconds per full cycle', 0.5, 120, 0.5, o.vp) : '') + (o.sd || o.vd ? num('phase', 'Phase (seconds into the cycle)', 0, 120, 0.1, o.phase) : '');
+      h += '<div class="stats" style="grid-column:1/-1">One heart. The Barrier breaks it when it hits it at that speed or faster; otherwise it is solid. When it breaks it splits in two and falls apart. A door linked to it counts it as done once it is broken. It moves on the level clock, like platforms.</div>';
     }
     if (o.t === 'ramp') h += num('len', 'Length', 5, 300, 1, o.len) + num('w', 'Width', 2, 100, 1, o.w) + num('ang', 'Slope °', 0, 60, 1, o.ang) + num('boost', 'Style Boost (last units)', 0, 100, 1, o.boost);
     if (o.t === 'checkpoint') h += num('w', 'Gate width', 4, 200, 1, o.w);
@@ -1481,6 +1517,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     else if (k === 'big') { o.big = t.value === '1'; DEF[o.t].big = o.big; }
     else if (k === 'text' || k === 'shape' || k === 'move' || k === 'kind' || k === 'style' || k === 'rock' || k === 'ground' || k === 'edge' || k === 'ends') { o[k] = t.value; DEF[o.t][k] = t.value; }
     else if (k === 'tox') { o.tox = t.value === '1'; DEF[o.t].tox = o.tox; }
+    else if (k === 'whl' || k === 'post') { o[k] = t.value === '1'; DEF[o.t][k] = o[k]; }
+    else if (k === 'look') { o.look = t.value; DEF[o.t].look = t.value; }
     else if (k === 'ya') { if (t.value === '' || !isFinite(parseFloat(t.value))) delete o.ya; else { o.ya = parseFloat(t.value); delete o.y; } }   // a typed Y fixes it at that height; an empty box puts it back on the ground
     else { o[k] = parseFloat(t.value) || 0; if (DEF[o.t] && DEF[o.t][k] !== undefined && !isOneCrag(o)) DEF[o.t][k] = o[k]; }   // what you set is what the next one starts with
     if (o.t === 'platform' && o.group) {
@@ -1523,6 +1561,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       }
       if (o.t === 'ramp') { r.length = o.len; r.width = o.w; r.slope = o.ang; r.boost = o.boost; }
       if (o.t === 'checkpoint') { r.width = o.w; r.number = cpNumber(o); }
+      if (o.t === 'plate') { r.shape = o.shape; if (o.shape === 'circle') r.radius = o.r; else { r.width = o.w; r.length = o.d; } r.look = o.look; if (o.whl) r.onlyWhileStanding = true; }
+      if (o.t === 'target') { r.size = o.size; if (!o.post) r.post = false; r.height = o.h; if (o.tilt) r.tilt = o.tilt; if (o.spin) r.spin = o.spin; if (o.hb !== 1) r.hitbox = o.hb; r.breakSpeed = o.k; if (o.sd) { r.sideTravel = o.sd; r.sidePeriod = o.sp; } if (o.vd) { r.upTravel = o.vd; r.upPeriod = o.vp; } if ((o.sd || o.vd) && o.phase) r.phase = o.phase; }
       if (STRIPS[o.t] && o.t !== 'segchain') { r.length = o.len; if (o.follow === false) { r.heading = R(o.th); r.bend = R(o.bend); } }
       if (o.t === 'ledge') { r.thickness = o.w; r.height = o.hgt; }
       if (o.t === 'platform') { r.width = o.w; r.height = o.hgt; r.thick = o.thick === undefined ? 2 : o.thick; r.move = o.move; if (o.move !== 'none') { r.travel = o.dist; r.period = o.period; r.phase = o.phase || 0; if (o.group) r.group = o.group; } }
@@ -1706,6 +1746,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         }
         if (r.type === 'ramp') { o.len = r.length || 45; o.w = r.width || 9; o.ang = r.slope === undefined ? 30 : r.slope; o.boost = r.boost || 0; }
         if (r.type === 'checkpoint') o.w = r.width || 16;
+        if (r.type === 'plate') { o.shape = r.shape === 'circle' ? 'circle' : 'rect'; o.r = r.radius || 4; o.w = r.width || 8; o.d = r.length || 8; o.look = r.look === 'none' || r.look === 'brown' || r.look === 'halo' ? r.look : 'gray'; o.whl = !!r.onlyWhileStanding; }
+        if (r.type === 'target') { o.size = r.size || 6; o.post = r.post !== false; o.h = r.height === undefined ? 7 : r.height; o.tilt = r.tilt || 0; o.spin = r.spin || 0; o.hb = r.hitbox > 0 ? r.hitbox : 1; o.k = r.breakSpeed === undefined ? 20 : r.breakSpeed; o.sd = r.sideTravel || 0; o.sp = r.sidePeriod || 4; o.vd = r.upTravel || 0; o.vp = r.upPeriod || 4; o.phase = r.phase || 0; }
         if (r.type === 'sign') o.text = r.text || '';
         if (r.type === 'ledge') { o.w = r.thickness || 4; o.hgt = r.height === undefined ? 5 : r.height; }
         if (r.type === 'platform') { o.w = r.width || 16; o.thick = r.thick === undefined ? 2 : r.thick; o.hgt = r.height === undefined ? 10 : r.height; o.move = r.move || 'none'; o.dist = r.travel || 40; o.period = r.period || 4; o.phase = r.phase || 0; o.group = r.group || 0; }
@@ -5256,7 +5298,7 @@ requestAnimationFrame(tick);
   }
   function sbBuild(j) {
     j = j || {};
-    var B = { discs: [], width: j.width || 9, terrain: j.terrain || '', samples: [], total: 0, objs: [], trees: [], minions: [], toxic: [], segs: [], tips: [], goals: [], spawners: [], strips: [], meshes: [], tipDone: {}, ramps: [], hills: [], lakes: [], bigs: [], pits: [], caves: [], shafts: [], patches: [], timeLimit: Math.max(0, +j.timeLimit || 0), ranks: null, noCave: false, caveOpen: null, caveCov: null, caveR: 8, cps: [], signs: [], movers: [], T: 0, signDone: {}, waterY: null };
+    var B = { discs: [], width: j.width || 9, terrain: j.terrain || '', samples: [], total: 0, objs: [], trees: [], minions: [], toxic: [], segs: [], tips: [], goals: [], spawners: [], strips: [], meshes: [], tipDone: {}, ramps: [], hills: [], lakes: [], bigs: [], pits: [], caves: [], shafts: [], patches: [], timeLimit: Math.max(0, +j.timeLimit || 0), ranks: null, noCave: false, caveOpen: null, caveCov: null, caveR: 8, cps: [], signs: [], movers: [], plates: [], targets: [], trig: {}, tgBits: [], T: 0, signDone: {}, waterY: null };
     var sm = B.samples, x = 0, z = 0, th = 0, s = 0, y0b = (j.terrain === 'level2' ? L2_Y : 0), y = y0b, STEP = 4;      // Oceana Crags' path runs at 40
     var PATHS = [{ x: 0, z: 0, th: 0, y: 0, pieces: j.pieces || [] }].concat((j.extraPaths || []).map(function (e) { return { x: e.x || 0, z: e.z || 0, th: (e.heading || 0) * Math.PI / 180, y: e.rise || 0, pieces: e.pieces || [] }; }));
     B.pathStart = []; B.pathEnd = [];
@@ -5367,6 +5409,8 @@ requestAnimationFrame(tick);
       }
       if (r.type === 'platform') { o.dist = r.travel || 40; o.period = r.period || 4; o.phase = r.phase || 0; o.thick = r.thick === undefined ? 2 : r.thick; }
       if (r.type === 'tip') { o.shape = r.shape || 'circle'; o.r = r.radius || 40; o.w = r.width || 80; o.d = r.length || 60; o.text = r.text || ''; o.up = r.above || 0; o.dn = r.below || 0; }
+      if (r.type === 'plate') { o.shape = r.shape === 'circle' ? 'circle' : 'rect'; o.r = Math.max(0.5, r.radius || 4); o.w = Math.max(0.5, r.width || 8); o.d = Math.max(0.5, r.length || 8); o.look = r.look === 'none' || r.look === 'brown' || r.look === 'halo' ? r.look : 'gray'; o.whl = !!r.onlyWhileStanding; }   // a pressure plate: pressed when she stands on it
+      if (r.type === 'target') { o.size = Math.max(0.5, r.size || 6); o.post = r.post !== false; o.h = r.height === undefined ? 7 : r.height; o.tilt = r.tilt || 0; o.spin = r.spin || 0; o.hb = r.hitbox > 0 ? r.hitbox : 1; o.k = r.breakSpeed === undefined ? 20 : Math.max(0, r.breakSpeed); o.sd = r.sideTravel || 0; o.sp = Math.max(0.1, r.sidePeriod || 4); o.vd = r.upTravel || 0; o.vp = Math.max(0.1, r.upPeriod || 4); o.phase = r.phase || 0; }   // a target: a wooden disc with one heart, broken by the Barrier at speed
       if (o.id !== undefined) byId[o.id] = o;
       B.objs.push(o);
     });
@@ -5402,6 +5446,8 @@ requestAnimationFrame(tick);
       else if (o.t === 'start') B.startPt = { x: p.x, z: p.z, th: p.th, T: T };
       else if (o.t === 'checkpoint') B.cps.push({ T: T, y: o.y, x: p.x, z: p.z, th: p.th, hw: o.w / 2, num: o.num || 0, ord: oi });
       else if (o.t === 'sign') B.signs.push({ T: T, y: o.y, x: p.x, z: p.z, th: p.th, text: o.text });
+      else if (o.t === 'plate') { var plc = o.shape === 'circle'; B.plates.push({ id: o.id, T: T, y: o.y, x: p.x, z: p.z, th: p.th, circ: plc, r: o.r, hw: o.w / 2, hd: o.d / 2, rr: plc ? o.r : Math.hypot(o.w, o.d) / 2, look: o.look, whl: o.whl, on: false, now: false }); if (o.id !== undefined) B.trig[o.id] = B.plates[B.plates.length - 1]; }
+      else if (o.t === 'target') { B.targets.push({ id: o.id, T: T, y: o.y, x: p.x, z: p.z, th: p.th, size: o.size, post: o.post, h: o.h, tilt: o.tilt * Math.PI / 180, spin: o.spin * Math.PI / 180, hb: o.hb, k: o.k, sd: o.sd, sp: o.sp, vd: o.vd, vp: o.vp, phase: o.phase, on: false }); if (o.id !== undefined) B.trig[o.id] = B.targets[B.targets.length - 1]; }
       else if (o.t === 'ledge' || o.t === 'platform' || o.t === 'gap' || o.t === 'mud') {
         var half = o.t === 'mud' ? (o.follow === false ? o.w / 2 : B.hw) + 1 : o.t === 'ledge' ? Math.max(o.w / 2, 1.3) : o.w / 2, tgt = o.t === 'gap' ? gapH : o.t === 'mud' ? mudH : ledgeH;
         var mg = o.t === 'mud' ? 0 : 1.5, mgEnd = o.t === 'mud' ? 1 : 1.5;   // rounded: a disc of (half + mg) every 3 units. squared: boxes 1 unit apart (1.5 long, so they overlap on a bend), plus a cap of mgEnd past each end
@@ -5749,6 +5795,7 @@ requestAnimationFrame(tick);
   function sbDoorLinked(m) {                                     // has everything this door is linked to been beaten? (an enemy that is not on the map at all counts as not beaten)
     var ids = m.o.links, i, e, found; if (!ids.length) return false;
     for (i = 0; i < ids.length; i++) {
+      var tr = SB.trig && SB.trig[ids[i]]; if (tr) { if (!tr.on) return false; continue; }   // a pressure plate (pressed) or a target (broken)
       found = false;
       for (var q = 0; q < ENEMIES.length; q++) { e = ENEMIES[q]; if (e.sbp && e.sbId === ids[i]) { found = true; if (!e.dead) return false; } }
       if (!found) return false;
@@ -6017,6 +6064,153 @@ requestAnimationFrame(tick);
     var tt = f0 / (f0 - f1);
     return { lat: ((B.px - g.x) + (ex - B.px) * tt) * rx + ((B.pz - g.z) + (ez - B.pz) * tt) * rz, yy: B.py + (py - B.py) * tt };
   }
+
+  // ---- Pressure plates and targets: interactables a door can be linked to (a door counts a plate as beaten while it is pressed, a target once it is broken) ----
+  var sbPlateTex = {};
+  function sbPlateTexture(kind) {                                // a tiling texture, 8 units across: pale stone for gray, sanded planks for brown
+    if (sbPlateTex[kind]) return sbPlateTex[kind];
+    var cv = document.createElement('canvas'); cv.width = cv.height = 128; var g = cv.getContext('2d'), i, rr = function (k) { var x = Math.sin(k * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+    if (kind === 'brown') {
+      g.fillStyle = '#c4a07a'; g.fillRect(0, 0, 128, 128);
+      for (i = 0; i < 4; i++) { g.fillStyle = i % 2 ? 'rgba(120,80,45,.10)' : 'rgba(255,240,210,.10)'; g.fillRect(0, i * 32, 128, 32); g.fillStyle = 'rgba(95,62,35,.45)'; g.fillRect(0, i * 32, 128, 1.5); }
+      g.strokeStyle = 'rgba(110,72,40,.22)'; g.lineWidth = 1; for (i = 0; i < 14; i++) { var yy = rr(i) * 128; g.beginPath(); g.moveTo(0, yy); g.bezierCurveTo(40, yy - 3, 90, yy + 3, 128, yy); g.stroke(); }
+    } else {
+      g.fillStyle = '#c3c4c0'; g.fillRect(0, 0, 128, 128);
+      for (i = 0; i < 420; i++) { var v = 150 + Math.floor(rr(i) * 70); g.fillStyle = 'rgba(' + v + ',' + v + ',' + (v - 4) + ',.55)'; g.fillRect(rr(i + 900) * 128, rr(i + 1900) * 128, 1 + rr(i + 2900) * 2.5, 1 + rr(i + 3900) * 2.5); }
+      g.strokeStyle = 'rgba(90,92,88,.35)'; g.lineWidth = 1.5; g.strokeRect(0.75, 0.75, 126.5, 126.5);
+    }
+    var t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; sbPlateTex[kind] = t; return t;
+  }
+  function sbPlateY(pl, wx, wz) { return pl.T !== undefined ? pl.T : sbFoot(wx, wz) + pl.y; }
+  function sbTrigMeshes() {
+    var B = SB; if (!B) return;
+    B.plates.forEach(function (pl) {
+      if (pl.look === 'none') return;
+      var cs = Math.cos(pl.th), sn = Math.sin(pl.th), loc = function (lx, lz) { return [pl.x + lx * cs - lz * sn, pl.z + lx * sn + lz * cs]; }, grid = [], uv = [], pos = [], uvs = [], nu, nv, iu, iv, rim = [];
+      if (pl.circ) { nu = Math.max(16, Math.min(96, Math.ceil(pl.r * 2))); nv = Math.max(1, Math.ceil(pl.r / 2.5)); for (iv = 0; iv <= nv; iv++) for (iu = 0; iu <= nu; iu++) { var a = iu / nu * 6.2832, rd = pl.r * iv / nv; grid.push(loc(Math.cos(a) * rd, Math.sin(a) * rd)); uv.push([Math.cos(a) * rd / 8, Math.sin(a) * rd / 8]); } for (iu = 0; iu <= nu; iu++) { var a2 = iu / nu * 6.2832; rim.push(loc(Math.cos(a2) * pl.r, Math.sin(a2) * pl.r)); } }
+      else {
+        nu = Math.max(1, Math.ceil(pl.hw * 2 / 2.5)); nv = Math.max(1, Math.ceil(pl.hd * 2 / 2.5));
+        for (iv = 0; iv <= nv; iv++) for (iu = 0; iu <= nu; iu++) { var lx = -pl.hw + 2 * pl.hw * iu / nu, lz = -pl.hd + 2 * pl.hd * iv / nv; grid.push(loc(lx, lz)); uv.push([lx / 8, lz / 8]); }
+        var per = [[-1, -1], [1, -1], [1, 1], [-1, 1], [-1, -1]], q;
+        for (q = 0; q < 4; q++) { var a0 = per[q], a1 = per[q + 1], L = Math.hypot((a1[0] - a0[0]) * pl.hw, (a1[1] - a0[1]) * pl.hd), ns = Math.max(1, Math.ceil(L / 2)); for (var k = 0; k < ns; k++) { var f = k / ns; rim.push(loc((a0[0] + (a1[0] - a0[0]) * f) * pl.hw, (a0[1] + (a1[1] - a0[1]) * f) * pl.hd)); } }
+        rim.push(rim[0]);
+      }
+      var lift = 0.12, gy = grid.map(function (c) { return sbPlateY(pl, L3_X + c[0], c[1]); });
+      if (pl.look === 'halo') {                                  // a faint glow standing up from its edge, fading upward
+        var cv = document.createElement('canvas'); cv.width = 4; cv.height = 64; var g2 = cv.getContext('2d'), gr = g2.createLinearGradient(0, 64, 0, 0); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.35, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 4, 64);
+        var HH = 1.0;
+        for (k = 0; k + 1 < rim.length; k++) {
+          var c0 = rim[k], c1 = rim[k + 1], y0 = sbPlateY(pl, L3_X + c0[0], c0[1]) + 0.05, y1 = sbPlateY(pl, L3_X + c1[0], c1[1]) + 0.05;
+          pos.push(L3_X + c0[0], y0, c0[1], L3_X + c1[0], y1, c1[1], L3_X + c1[0], y1 + HH, c1[1], L3_X + c0[0], y0, c0[1], L3_X + c1[0], y1 + HH, c1[1], L3_X + c0[0], y0 + HH, c0[1]);
+          uvs.push(0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1);
+        }
+        var hg = new THREE.BufferGeometry(); hg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3)); hg.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2));
+        pl.mat = new THREE.MeshBasicMaterial({ color: 0x6fd6ff, map: new THREE.CanvasTexture(cv), transparent: true, opacity: 0.32, depthWrite: false, side: THREE.DoubleSide });
+        pl.mesh = new THREE.Mesh(hg, pl.mat); pl.mesh.renderOrder = 3; scene.add(pl.mesh); B.meshes.push(pl.mesh); return;
+      }
+      for (iv = 0; iv < nv; iv++) for (iu = 0; iu < nu; iu++) {
+        var ia = iv * (nu + 1) + iu, ib = ia + 1, ic = ia + nu + 2, id = ia + nu + 1;
+        [ia, ib, ic, ia, ic, id].forEach(function (vi) { pos.push(L3_X + grid[vi][0], gy[vi] + lift, grid[vi][1]); uvs.push(uv[vi][0], uv[vi][1]); });
+      }
+      var pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3)); pg.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), 2)); pg.computeVertexNormals();
+      pl.mat = new THREE.MeshLambertMaterial({ map: sbPlateTexture(pl.look), side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -6 });
+      pl.mat.color.setScalar(0.8); pl.mesh = new THREE.Mesh(pg, pl.mat); pl.mesh.receiveShadow = true; scene.add(pl.mesh); B.meshes.push(pl.mesh);
+    });
+    var wood = new THREE.MeshLambertMaterial({ color: 0xc89a64 }), edge = new THREE.MeshLambertMaterial({ color: 0x8a5a33 }), red = new THREE.MeshLambertMaterial({ color: 0xd2232a, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 }), postM = new THREE.MeshLambertMaterial({ color: 0x6b4426 });
+    B.targets.forEach(function (tg) {
+      var wx = L3_X + tg.x, fy = tg.T !== undefined ? tg.T : sbFoot(wx, tg.z) + tg.y, R = tg.size / 2, TK = Math.max(0.35, Math.min(1.2, tg.size * 0.1)), grp = new THREE.Group();
+      grp.position.set(wx, fy, tg.z); grp.rotation.y = -tg.th; tg.fy = fy; tg.TK = TK;
+      if (tg.post && tg.h > 0) { tg.postM = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1, 0.9), postM); tg.postM.castShadow = true; grp.add(tg.postM); }
+      tg.mv = new THREE.Group(); tg.mv.position.y = tg.h; grp.add(tg.mv);
+      var tilt = new THREE.Group(); tilt.rotation.x = tg.tilt; tg.mv.add(tilt);
+      tg.sp0 = new THREE.Group(); tg.sp0.rotation.z = tg.spin; tilt.add(tg.sp0);
+      tg.halves = [];
+      [0, 1].forEach(function (hi) {                             // two halves (split top to bottom), so it can break in two
+        var half = new THREE.Group(), th0 = hi ? Math.PI : 0;
+        var disc = new THREE.Mesh(new THREE.CylinderGeometry(R, R, TK, 28, 1, false, th0, Math.PI), [edge, wood, wood]); disc.rotation.x = Math.PI / 2; disc.castShadow = true; half.add(disc);
+        var cap = new THREE.Mesh(new THREE.PlaneGeometry(TK, 2 * R), edge); cap.rotation.y = Math.PI / 2; half.add(cap);   // the cut face (hidden while whole)
+        [1, -1].forEach(function (sd) {                          // the paint, both faces: a red ring and a red middle
+          var a0 = (hi ? 1 : -1) * sd * Math.PI / 2;            // the back face is turned round, so its half is the other way in its own frame
+          var ring = new THREE.Mesh(new THREE.RingGeometry(R * 0.52, R * 0.72, 20, 1, a0, Math.PI), red), dot = new THREE.Mesh(new THREE.CircleGeometry(R * 0.24, 14, a0, Math.PI), red);
+          [ring, dot].forEach(function (m) { m.position.z = sd * (TK / 2 + 0.01); if (sd < 0) m.rotation.y = Math.PI; half.add(m); });
+        });
+        tg.sp0.add(half); tg.halves.push({ m: half, p: half.position.clone(), r: half.rotation.clone(), dir: hi ? -1 : 1 });
+      });
+      scene.add(grp); B.meshes.push(grp); tg.grp = grp; tg.ex = new THREE.Vector3(); tg.ey = new THREE.Vector3(); tg.ez = new THREE.Vector3(); tg.C = new THREE.Vector3();
+      sbTargetPose(tg, B.T);
+    });
+  }
+  function sbTargetPose(tg, T) {                                 // where a target is now: its own side-to-side and up-and-down on the level clock
+    var ox = tg.sd ? tg.sd / 2 * Math.sin(2 * Math.PI * (T + tg.phase) / tg.sp) : 0, oy = tg.vd ? tg.vd / 2 * Math.sin(2 * Math.PI * (T + tg.phase) / tg.vp) : 0;
+    tg.mv.position.set(ox, tg.h + oy, 0);
+    if (tg.postM) { var ph = Math.max(0.05, tg.h + oy); tg.postM.scale.y = ph; tg.postM.position.set(ox, ph / 2, -(tg.TK / 2 + 0.45)); }   // on a post: the post goes with it, up to its middle, just behind it
+    tg.grp.updateMatrixWorld(true); var e = tg.sp0.matrixWorld.elements;
+    tg.ex.set(e[0], e[1], e[2]).normalize(); tg.ey.set(e[4], e[5], e[6]).normalize(); tg.ez.set(e[8], e[9], e[10]).normalize(); tg.C.set(e[12], e[13], e[14]);
+  }
+  function sbTargetDist(tg, x, y, z) {                            // how far a point is from the target's hitbox (a disc), and which way is out
+    var dx = x - tg.C.x, dy = y - tg.C.y, dz = z - tg.C.z, lx = dx * tg.ex.x + dy * tg.ex.y + dz * tg.ex.z, ly = dx * tg.ey.x + dy * tg.ey.y + dz * tg.ey.z, lz = dx * tg.ez.x + dy * tg.ez.y + dz * tg.ez.z;
+    var Rh = tg.size / 2 * tg.hb, ht = Math.max(0.35, tg.TK / 2 * tg.hb), rr = Math.hypot(lx, ly), k = rr > Rh ? Rh / rr : 1, cx = lx * k, cy = ly * k, cz = Math.max(-ht, Math.min(ht, lz));
+    var ux = lx - cx, uy = ly - cy, uz = lz - cz, d = Math.hypot(ux, uy, uz);
+    if (d < 1e-6) { ux = 0; uy = 0; uz = lz >= 0 ? 1 : -1; d = 0; } else { ux /= d; uy /= d; uz /= d; }
+    return { d: d, nx: ux * tg.ex.x + uy * tg.ey.x + uz * tg.ez.x, ny: ux * tg.ex.y + uy * tg.ey.y + uz * tg.ez.y, nz: ux * tg.ex.z + uy * tg.ey.z + uz * tg.ez.z };
+  }
+  function sbTargetBreak(tg, now) {                              // its one heart gone: it splits in two and the halves fall apart, like a beaten minion
+    tg.on = true; tg.brokeAt = now; shake(0.3);
+    tg.halves.forEach(function (h) {
+      scene.attach(h.m); var sx = tg.ex.x * h.dir, sz = tg.ex.z * h.dir, v = 5 + Math.random() * 5;
+      SB.tgBits.push({ tg: tg, m: h.m, vx: sx * v + speed * Math.sin(-heading) * 0.15, vy: 7 + Math.random() * 7, vz: sz * v - speed * Math.cos(heading) * 0.15, wx: (Math.random() - 0.5) * 10, wz: (Math.random() - 0.5) * 10 });
+    });
+  }
+  function sbTargetHit(now) {                                    // after she has moved this step: is she touching a target? (the Barrier at speed breaks it; otherwise it is solid)
+    var B = SB; if (!B || !B.targets.length || !playing) return;
+    var pp = player.position, i;
+    var asp = Math.abs(speed) / TILE, rad = ballOn ? BALL_R : 0.5, offs = ballOn ? [BALL_R] : [0.5, PLAYER_H / 2, PLAYER_H - 0.5];
+    var tp0 = B.prevOK && B.tgP ? B.tgP : [pp.x, pp.y, pp.z], sx0 = tp0[0], sy0 = tp0[1], sz0 = tp0[2];   // where she was when this last ran (her movement comes after it in the frame)
+    for (i = 0; i < B.targets.length; i++) {
+      var tg = B.targets[i]; if (!tg.mv) continue;
+      if (tg.on) continue;
+      var reach = tg.size / 2 * tg.hb + Math.abs(tg.sd) / 2 + 8; if (Math.abs(pp.x - tg.grp.position.x) > reach + 10 || Math.abs(pp.z - tg.grp.position.z) > reach + 10) continue;
+      var n = Math.min(40, Math.max(1, Math.ceil(Math.hypot(pp.x - sx0, pp.z - sz0, pp.y - sy0) / 0.4))), hitS = -1, s, k, q, best = null;
+      for (s = 1; s <= n && hitS < 0; s++) { var f = s / n, X = sx0 + (pp.x - sx0) * f, Y = sy0 + (pp.y - sy0) * f, Z = sz0 + (pp.z - sz0) * f; for (k = 0; k < offs.length; k++) { q = sbTargetDist(tg, X, Y + offs[k], Z); if (q.d < rad) { hitS = s; break; } } }
+      if (hitS < 0) continue;
+      if (ballOn && tg.k > 0 && asp >= tg.k) { sbTargetBreak(tg, now); continue; }   // the Barrier at speed: its one heart gone
+      if (hitS < n) { var f0 = (hitS - 1) / n; pp.x = sx0 + (pp.x - sx0) * f0; pp.z = sz0 + (pp.z - sz0) * f0; }   // she would have gone through it this frame: she stops where she first touched it
+      for (k = 0; k < offs.length; k++) { q = sbTargetDist(tg, pp.x, pp.y + offs[k], pp.z); if (q.d < rad && (!best || q.d < best.d)) best = q; }
+      if (best && best.d < 1e-6) { var qb = sbTargetDist(tg, sx0, sy0 + offs[0], sz0); best.nx = qb.nx; best.nz = qb.nz; }   // still inside: out the side she came from
+      if (best) { var hx = best.nx, hz = best.nz, hl = Math.hypot(hx, hz); if (hl < 0.2) { hx = sx0 - pp.x; hz = sz0 - pp.z; hl = Math.hypot(hx, hz); if (hl < 1e-6) { hx = Math.sin(heading); hz = -Math.cos(heading); hl = 1; } } pp.x += hx / hl * (rad - best.d + 0.02); pp.z += hz / hl * (rad - best.d + 0.02); }   // solid wood: pushed back out, sideways
+    }
+    B.tgP = [pp.x, pp.y, pp.z];
+  }
+  function sbTrigReset() {                                       // a fresh run: plates up, targets whole again
+    var B = SB; if (!B) return;
+    B.plates.forEach(function (pl) { pl.on = false; pl.now = false; });
+    B.tgBits = []; B.tgP = null;
+    B.targets.forEach(function (tg) { tg.on = false; if (!tg.halves) return; tg.halves.forEach(function (h) { tg.sp0.add(h.m); h.m.position.copy(h.p); h.m.rotation.copy(h.r); h.m.scale.set(1, 1, 1); h.m.visible = true; }); });
+  }
+  function sbTrigTick(dt, now) {                                 // plates: pressed while she stands on one (or for good, unless set to only while she stands); targets: move, are solid, and break at speed
+    var B = SB, pp = player.position, ex = pp.x - L3_X, ez = pp.z, i;
+    if (!B.movers.length) B.T += dt;                             // the level clock (the platforms' block keeps it when there are any)
+    for (i = 0; i < B.plates.length; i++) {
+      var pl = B.plates[i], on = false, dx = ex - pl.x, dz = ez - pl.z;
+      if (Math.abs(dx) <= pl.rr && Math.abs(dz) <= pl.rr && grounded) {
+        var c = Math.cos(-pl.th), sn = Math.sin(-pl.th), lx = dx * c - dz * sn, lz = dx * sn + dz * c;
+        if (pl.circ ? Math.hypot(lx, lz) <= pl.r : Math.abs(lx) <= pl.hw && Math.abs(lz) <= pl.hd) {
+          var sy = pl.T !== undefined ? pl.T : Math.max(l3Top(pp.x, pp.z), sbSlabTop(pp.x, pp.z, pp.y)) + pl.y;
+          on = pp.y < sy + 0.7 && pp.y > sy - 1.5;
+        }
+      }
+      pl.now = on; if (on) pl.on = true; else if (pl.whl) pl.on = false;
+      if (pl.mat) { if (pl.look === 'halo') pl.mat.opacity = pl.on ? 0.7 : 0.32; else pl.mat.color.setScalar(pl.on ? 0.62 : 0.8); }   // pressed: the halo brightens, a plate darkens a little
+    }
+    for (i = 0; i < B.targets.length; i++) { var tq = B.targets[i]; if (tq.mv && !tq.on && (tq.sd || tq.vd)) sbTargetPose(tq, B.T); }
+    for (i = 0; i < B.tgBits.length; i++) {                       // the halves of broken targets: they fall, bounce, settle, and shrink away after three seconds
+      var b = B.tgBits[i], m = b.m, gone = (now - b.tg.brokeAt) / 1000;
+      if (gone >= 3) { m.visible = false; continue; }
+      b.vy -= GRAV * dt; m.position.x += b.vx * dt; m.position.y += b.vy * dt; m.position.z += b.vz * dt; m.rotation.x += b.wx * dt; m.rotation.z += b.wz * dt;
+      var fl = sbFoot(m.position.x, m.position.z) + b.tg.size * 0.2; if (m.position.y < fl) { m.position.y = fl; b.vy = Math.abs(b.vy) > 4 ? -b.vy * 0.3 : 0; b.vx *= 0.8; b.vz *= 0.8; b.wx *= 0.7; b.wz *= 0.7; }
+      var sc = gone > 2.6 ? Math.max(0.01, (3 - gone) / 0.4) : 1; m.scale.set(sc, sc, sc);
+    }
+  }
   function sbMudAt(x, z) {
     if (!SB) return false; var ex = x - L3_X, m = false;
     sbNear(SB.mudH, ex, z, SB.maxM, function (e) { if (!m && sbIn(e, ex, z, 0)) m = true; });
@@ -6178,7 +6372,7 @@ requestAnimationFrame(tick);
       var tmesh = new THREE.Mesh(tg, new THREE.MeshLambertMaterial({ color: 0x34353a, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 }));
       tmesh.receiveShadow = true; scene.add(tmesh); B.meshes.push(tmesh);
     });
-    sbCaveMeshes(); sbSlabMeshes(); sbWallMeshes();
+    sbCaveMeshes(); sbSlabMeshes(); sbWallMeshes(); sbTrigMeshes();
   }
   function sbPlaceEnemies() {
     if (!SB) return; SB.prevOK = false;
@@ -6190,6 +6384,7 @@ requestAnimationFrame(tick);
       if (m.trap) { e.stuck = true; var pit = SB.pits.filter(function (q) { return q.x === m.x && q.z === m.z; })[0]; if (pit && pit.floor !== null) { e.fyF = function () { return pit.floor; }; e.fy = pit.floor; } }
     });
     SB.spawners.forEach(function (s) { s.t = 0; });
+    sbTrigReset();
   }
   function sbTick(dt, now) {
     var B = SB; if (!B || !playing) return;
@@ -6238,6 +6433,7 @@ requestAnimationFrame(tick);
       });
       gcI = 1e9; gcJ = 1e9;
     }
+    sbTrigTick(dt, now); ex = pp.x - L3_X; ez = pp.z;
     if (hp > 0 && !ballOn && now >= toxUntil && !onTox && B.toxLedge) {   // the top of a toxic ledge
       var tlh = sbLedge(pp.x, pp.z);
       if (ledTox && Math.abs(tlh) > 0.4) { var tgl = groundH(pp.x, pp.z); if (pp.y < tgl + 2.2 && pp.y > tgl - 3) onTox = true; }
@@ -9086,9 +9282,15 @@ requestAnimationFrame(tick);
 
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
-  { v: 'v179', d: 'Nov 14, 2026', t: 'Grass Canyon, re-edited', g: [
+  { v: 'v179', d: 'Nov 14, 2026', t: 'Pressure plates, targets and a new Grass Canyon', g: [
     ['Levels', [
       'Grass Canyon, Act 1 is Ricky\'s re-edited layout: a door, a mud pad and two more Seg chains, with the trees thinned (1,411, down from 1,976). Opening it in the Path Editor loads the same layout.'
+    ]],
+    ['Path Editor', [
+      'Pressure plate: a flat plate on the ground (or at its Y) that Molly presses by standing on it. Light gray, light brown, a faint glowing halo round its edge, or invisible; a rectangle or a circle of any size. It stays pressed for the rest of the run, or only while she stands on it.',
+      'Target: an upright wooden disc with a red ring and middle, on a sign post or hanging in the air. Size, height, tilt, spin and heading; it can move side to side and/or up and down on the level clock, like platforms. One heart: the Barrier breaks it when it hits at its break speed (20 Zips unless set), and it splits in two and falls apart like a beaten minion. Otherwise it is solid. Its hitbox matches its size and can be scaled.',
+      'Doors can be linked to plates and targets as well as minions: a linked door changes to its After mode once every minion linked is beaten, every plate pressed and every target broken. Plates and targets reset when she respawns, as minions do.',
+      'Every stamp is now free by default (Snap to the path is still a choice per stamp). A stamp placed near the path still faces along it. Mud and Seg chains stamp on their own curve, and can be set to follow the path afterwards.'
     ]]
   ]},
   { v: 'v178', d: 'Nov 14, 2026', t: 'True heights, layers and a clear view', g: [
@@ -9966,6 +10168,7 @@ function showScreen(name) {                                // the menu shows one
     }
 
     updateEnemies(sdt, now);
+    if (level === 3) sbTargetHit(now);
     updateStreaks(dt);
     updateChunks(player.position.x, player.position.z, 1);
     updateTrees(player.position.x, player.position.z);
