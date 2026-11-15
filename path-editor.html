@@ -717,6 +717,24 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   function mudW(o) { return o.follow === false ? (o.w > 0 ? o.w : 12) : S.width; }   // mud on the path is as wide as the path; mud of its own has a width
   function stripFoot(o) { var raw = o.t === 'mud' ? mudW(o) / 2 : o.t === 'ledge' ? Math.max(o.w / 2, 1.3) : o.w / 2, m = o.t === 'mud' ? 1 : 1.5; return { half: raw + m, m: m }; }   // what the game really covers: the piece's own half-width plus its margin (gap and ledge 1.5, mud 1) on every side, ends included
   function toxF(o) { return '<label class="f">Surface<select data-ok="tox"><option value="0"' + (o.tox ? '' : ' selected') + '>Normal</option><option value="1"' + (o.tox ? ' selected' : '') + '>Toxic (a heart a second to stand on, like a toxic patch)</option></select></label>'; }
+  // ---- true Y: one flat height for the whole world, 0 where her feet are at the start of the path. A stamp sits on the ground until a Y is typed ----
+  var YWHAT = { tree: 'its foot', sign: 'its foot', goal: 'its foot', checkpoint: 'its foot', toxic: 'its surface', ramp: 'its low end', tip: 'the base of its range', cave: 'its mouth floor', seg: 'its middle', segchain: 'the middle of its first Seg', ledge: 'its top where it starts', platform: 'its top where it starts', door: 'its foot', minion: 'its feet (it stands on the floor at that height)', bigminion: 'its feet (it stands on the floor at that height)', start: 'her feet', spawner: 'where its minions appear', hill: 'the height it is built up from', crag: 'the height its rocks rise from', lake: 'the water\'s surface', patch: 'its ground', mud: 'the ground under it', gap: 'its rim (a gap stays bottomless: this changes nothing)' };
+  var yShown = {}, yKey = '';
+  function yRow(o) {                                              // the Y field: the true Y if one is set, else where it is now (from the game, when the editor runs inside it)
+    var fixed = o.ya !== undefined, v = fixed ? o.ya : yShown[o.id], ro = o.t === 'gap';
+    return '<label class="f">Y (true height: ' + (YWHAT[o.t] || 'its base') + ')<input type="number" step="0.5" data-ok="ya" value="' + (v === undefined ? '' : Math.round(v * 100) / 100) + '" placeholder="on the ground"' + (ro ? ' disabled' : '') + '></label>'
+      + '<div class="stats" style="grid-column:1/-1">' + (fixed ? 'Fixed at this height. <button class="small" data-oact="ground">Back on the ground</button>' : ro ? 'Gaps are bottomless.' : 'On the ground' + (v === undefined ? (typeof HOST === 'undefined' ? ' (open the editor from the game to see its height)' : '') : '') + '. Type a Y to fix it at that height.') + '</div>';
+  }
+  function yRefresh() {                                           // ask the game for the selected stamps' heights (after the inspector is drawn, so typing is never held up)
+    if (typeof HOST === 'undefined' || !HOST.__yInfo) return;
+    var sl = selList(); if (!sl.length) return;
+    setTimeout(function () {
+      var j; try { j = JSON.parse($('json').value); } catch (e) { return; }
+      var r = HOST.__yInfo(j, sl.map(function (o) { return o.id; })); if (!r || !r.ys) return;
+      var changed = false; for (var k in r.ys) { if (yShown[k] !== r.ys[k]) { yShown[k] = r.ys[k]; changed = true; } }
+      var inp = $('insp').querySelector('input[data-ok="ya"]'); if (inp && document.activeElement !== inp && sl.length === 1 && sl[0].ya === undefined && yShown[sl[0].id] !== undefined) inp.value = Math.round(yShown[sl[0].id] * 100) / 100;
+    }, 0);
+  }
   function renderInsp() {
     var el = $('insp'), sl0 = selList(), o = S.objs[sel], ghost = ghostMode();
     if (tool === 'forest') { el.hidden = true; return; }
@@ -730,7 +748,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (!STRIPS[o.t] && !joinedCave) h += '<label class="f">Snap to the path<select data-ok="noat"><option value="0"' + (o.noat ? '' : ' selected') + '>Snaps: follows the path when it changes</option><option value="1"' + (o.noat ? ' selected' : '') + '>Free: stays where it is</option></select></label>';
     if (!ghost && !joinedCave && (!STRIPS[o.t] || o.follow === false)) h += num('X', 'X', -99999, 99999, 1, Math.round(p.x * 10) / 10) + num('Z', 'Z', -99999, 99999, 1, Math.round(p.z * 10) / 10) + (STRIPS[o.t] ? '' : num('rot', 'Rotation °', -360, 360, 5, o.rot || 0));
     if (o.t === 'tree') h += '<label class="f">Size<select data-ok="exs"><option value="rand"' + (o.ex ? '' : ' selected') + '>Random, like the level\'s own trees</option><option value="exact"' + (o.ex ? ' selected' : '') + '>Exactly these sizes</option></select></label>' + (o.ex ? num('tH', 'Trunk height', 1, 80, 0.5, o.tH) + num('tW', 'Trunk width', 0.2, 12, 0.1, o.tW) + num('cH', 'Canopy height', 1, 80, 0.5, o.cH) + num('cW', 'Canopy width', 1, 40, 0.5, o.cW) : '');
-    if (o.t === 'tree' || o.t === 'sign' || o.t === 'goal' || o.t === 'checkpoint' || o.t === 'toxic' || o.t === 'ramp' || o.t === 'tip' || (o.t === 'cave' && !joinedCave)) h += num('y', 'Y offset (up from the ground or path)', -500, 500, 0.5, o.y || 0);
+    if (!ghost && !joinedCave) h += yRow(o);
     if (o.t === 'seg' || o.t === 'segchain') h += '<label class="f">Size<select data-ok="big"><option value="0"' + (o.big ? '' : ' selected') + '>Regular</option><option value="1"' + (o.big ? ' selected' : '') + '>Big (5×, worth 10)</option></select></label>';
     if (o.t === 'seg') h += num('h', 'Height above the ground', -1, 500, 0.5, o.h || 0);
     if (o.t === 'segchain') h += num('h', 'Height above the ground (at the start)', -1, 500, 0.5, o.h || 0) + num('rise', 'Rise by the end of the chain', -500, 500, 0.5, o.rise || 0) + num('arc', 'Vertical arc (extra height in the middle)', -500, 500, 0.5, o.arc || 0);
@@ -814,7 +832,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (o.t === 'platform' && o.group && o.move !== 'none') h += '<div class="row"><button class="small" data-oact="space">Space this group evenly</button></div>';
     if (o.t === 'tip') h += '<label class="f">Tip text<textarea data-ok="text" style="height:64px">' + (o.text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</textarea></label>';
     if (!ghost) h += '<div class="stats">' + (o.t === 'segchain' ? (chainPts(o).length + ' segs' + (o.follow === false ? ', on its own curve' : ', following the path')) : o.s !== undefined ? 'attached to the path: ' + Math.round(o.s) + ' along, ' + Math.round(o.u * 10) / 10 + ' across' : 'free on the map') + '</div>';
-    el.innerHTML = h; el.hidden = false;
+    el.innerHTML = h; el.hidden = false; if (!ghost) yRefresh();
   }
   $('insp').addEventListener('change', function (e) {
     var t = e.target, ghost = ghostMode(), o = ghost ? GH : S.objs[sel]; if (!o) return;
@@ -850,6 +868,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     else if (k === 'big') { o.big = t.value === '1'; DEF[o.t].big = o.big; }
     else if (k === 'text' || k === 'shape' || k === 'move' || k === 'kind' || k === 'style' || k === 'rock' || k === 'ground' || k === 'edge' || k === 'ends') { o[k] = t.value; DEF[o.t][k] = t.value; }
     else if (k === 'tox') { o.tox = t.value === '1'; DEF[o.t].tox = o.tox; }
+    else if (k === 'ya') { if (t.value === '' || !isFinite(parseFloat(t.value))) delete o.ya; else { o.ya = parseFloat(t.value); delete o.y; } }   // a typed Y fixes it at that height; an empty box puts it back on the ground
     else { o[k] = parseFloat(t.value) || 0; if (DEF[o.t] && DEF[o.t][k] !== undefined && !isOneCrag(o)) DEF[o.t][k] = o[k]; }   // what you set is what the next one starts with
     if (o.t === 'platform' && o.group) {
       if (k === 'group') { var mate = S.objs.filter(function (q) { return q !== o && q.t === 'platform' && q.group === o.group; })[0]; if (mate) { o.period = mate.period; o.dist = mate.dist; o.move = mate.move; } }
@@ -862,6 +881,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   $('insp').addEventListener('change', function (e) { var t = e.target; if (t.dataset.gk !== 'layer' || t.value === '') return; var sl = selList(); if (sl.length < 2) return; snap(); sl.forEach(function (q) { q.layer = +t.value; }); afterEdit(false); renderInsp(); });
   $('insp').addEventListener('input', function (e) { if (e.target.tagName === 'TEXTAREA') { var o = S.objs[sel]; if (o) { o.text = e.target.value; DEF[o.t].text = o.text; afterEdit(false); } } });
   $('insp').addEventListener('click', function (e) { var b = e.target.closest('button[data-oact]'); if (!b || sel < 0) return; var o = S.objs[sel], a = b.dataset.oact; snap();
+    if (a === 'ground') { delete o.ya; afterEdit(false); renderInsp(); return; }
     if (a === 'unlink') { var ul = parseInt(b.dataset.lid, 10); o.links = (o.links || []).filter(function (id) { return id !== ul; }); if (!o.links.length) delete o.modeA; afterEdit(false); renderInsp(); return; }
     if (a === 'split') { var parts2 = splitCrags(o), at2 = S.objs.indexOf(o); S.objs.splice(at2, 1); parts2.forEach(function (c) { S.objs.push(c); }); setSelList(parts2); afterEdit(false); renderInsp(); return; }
     if (a === 'reroll') { o.seed = 1 + Math.floor(Math.random() * 2000000000); afterEdit(false); renderInsp(); return; }
@@ -879,7 +899,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var R = function (v) { return Math.round(v * 10) / 10; };
     $('json').value = JSON.stringify({ version: 2, width: S.width, terrain: S.terrain || undefined, timeLimit: S.timeLimit || undefined, ranks: S.ranks && Object.keys(DEFR).some(function (k) { return S.ranks[k] !== undefined && S.ranks[k] !== DEFR[k]; }) ? S.ranks : undefined, pieces: S.pieces, extraPaths: S.more && S.more.length ? S.more.map(function (m) { return { x: m.x || 0, z: m.z || 0, heading: m.th || 0, rise: m.y || 0, layer: m.layer !== undefined && m.layer !== S.layers[0].id ? m.layer : undefined, pieces: m.pieces }; }) : undefined, layers: S.layers.length > 1 || S.layers[0].name !== 'Layer 1' || S.layers[0].vis === false || S.layers[0].lock ? S.layers.map(function (l) { return { id: l.id, name: l.name, visible: l.vis !== false, locked: !!l.lock }; }) : undefined, pathLayer: S.pathLayer !== undefined && S.pathLayer !== S.layers[0].id ? S.pathLayer : undefined, motion: { clock: 'the level\'s own clock, never time since a platform loaded', offset: 'travel / 2 * sin(2 * pi * (T + phase) / period)' }, objects: S.objs.map(function (o) {
       var r = { type: o.t, id: o.id }; if (o.hm === 'ind' && (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag')) r.heightMode = 'independent'; if (o.layer !== undefined && o.layer !== S.layers[0].id) r.layer = o.layer; if (o.s !== undefined) { r.s = R(o.s); r.u = R(o.u); } else { r.x = R(o.x); r.z = R(o.z); }
-      if (o.rot) r.rot = o.rot; if (o.y) r.y = o.y; if (o.noat) r.noAttach = true;
+      if (o.rot) r.rot = o.rot; if (o.y) r.y = o.y; if (o.ya !== undefined) r.yAbs = o.ya; if (o.noat) r.noAttach = true;
       if (o.t === 'tree' && o.ex) { r.exact = true; r.trunkHeight = o.tH; r.trunkWidth = o.tW; r.canopyHeight = o.cH; r.canopyWidth = o.cW; }
       if (o.t === 'toxic') { r.width = o.w; r.length = o.d; }
       if (o.t === 'door') {
@@ -1063,7 +1083,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     try {
       var j = JSON.parse($('json').value); if (!j.pieces) throw 0; snap();
       S = { layers: (j.layers || []).map(function (l) { return { id: +l.id, name: String(l.name || 'Layer'), vis: l.visible !== false, lock: !!l.locked }; }), pathLayer: j.pathLayer, more: (j.extraPaths || []).map(function (m) { return { x: m.x || 0, z: m.z || 0, th: m.heading || 0, y: m.rise || 0, layer: m.layer, pieces: m.pieces || [] }; }), width: j.width || 9, pieces: j.pieces, terrain: j.terrain || '', timeLimit: j.timeLimit || 0, ranks: j.ranks || null, objs: (j.objects || []).map(function (r) {
-        var o = { t: r.type, rot: r.rot || 0, y: r.y || 0 }; if (r.noAttach) o.noat = true; if (r.s !== undefined) { o.s = r.s; o.u = r.u; } else { o.x = r.x; o.z = r.z; }
+        var o = { t: r.type, rot: r.rot || 0, y: r.y || 0 }; if (typeof r.yAbs === 'number') o.ya = r.yAbs; if (r.noAttach) o.noat = true; if (r.s !== undefined) { o.s = r.s; o.u = r.u; } else { o.x = r.x; o.z = r.z; }
         if (r.type === 'toxic') { o.w = r.width || r.size || 12; o.d = r.length || r.size || 12; }
         if (r.type === 'door') {
           var dr = function (q, d) { return { mode: q.mode || 'cycle', open: q.open === undefined ? d.open : q.open, shut: q.closed === undefined ? d.shut : q.closed, phase: q.phase === undefined ? d.phase : q.phase, speed: q.speed === undefined ? d.speed : q.speed, slide: q.slide === 'edge' ? 'edge' : q.sink === false ? 'none' : q.sink === undefined && !q.slide ? d.slide : 'down', sTx: q.shutTiltX === undefined ? d.sTx : q.shutTiltX, sTz: q.shutTiltZ === undefined ? d.sTz : q.shutTiltZ, oTx: q.openTiltX === undefined ? d.oTx : q.openTiltX, oTz: q.openTiltZ === undefined ? d.oTz : q.openTiltZ }; };
