@@ -8,7 +8,7 @@ print('molly page: stats',vis('#statBox'),'comet box',vis('#cometBox'),'mobs',vi
 g.typed('stat.top',91,200)
 g.click('#pages button[data-pg="comet"]',1500)
 print('comet page: h1',g.ev(g.q('#rigH1')+'.textContent'),'stats',vis('#statBox'),'comet box',vis('#cometBox'),'mobs',vis('#mobBox'),'barrier button',vis('[data-m=barrier]'))
-print('comet starts as a copy of Molly: top speed',g.ev(R+".querySelector('#s_stat_top').value"))
+print('comet starts with her own defaults (top speed 50):',g.ev(R+".querySelector('#s_stat_top').value"))
 print(g.typed('stat.top',70,200), g.typed('comet.star.range',75,200))
 pg.screenshot(path=SP+'/rig_comet.png')
 g.click('#pages button[data-pg="mobs"]',1200)
