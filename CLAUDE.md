@@ -13,12 +13,12 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (level detai
 - If unsure about a decision, ask. In an unattended session, do not guess: write the question in the report and leave that thing alone.
 - No physics changes to compensate for level problems.
 - Units: TILE 2 (1 Zip = 2 u/s). Show speeds in Zips.
-- Interactive sessions that change the game: bump the version label (`<div class="ver">`) and add a CHANGELOG entry (top of `var CHANGELOG`), keep `audit-notes.md` current.
+- Interactive sessions that change the game: keep a CHANGELOG entry for the coming version at the top of `var CHANGELOG`, and keep `audit-notes.md` current. Bump the version label (`<div class="ver">`) and publish only when Ricky says so.
 
 - The sweep re-cuts the code into 20 slices by itself whenever the code has changed (`tools/reslice.py`), so new code needs no bookkeeping.
 
 ## Branches (so two sessions never edit the same thing)
-- Interactive work with Ricky happens on `main`.
+- Interactive work with Ricky happens on the branch `next` (push it freely). Ricky controls version numbers: ALWAYS ask him before bumping the version label or merging `next` into `main` (a push to `main` publishes a release). He batches changes into versions.
 - The nightly sweep NEVER touches `main`. It works on a branch `nightly/YYYY-MM-DD`, based on the newest unmerged `origin/nightly/*` branch if there is one (so the nights stack and merge as a chain), otherwise on `main`.
 - At the start of each interactive session: `git fetch`, then merge any unmerged `nightly/*` branches into `main` oldest first (after reading their reports), tell Ricky what they fixed and what they left for him, add the fixes to the next CHANGELOG entry, and push `main`.
 - Commit messages end with the attribution lines the session was given.
