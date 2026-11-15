@@ -330,8 +330,11 @@
         <span><span class="key">W</span></span><span>Run forward</span>
         <span><span class="key">S</span></span><span>Brake: slide to a stop</span>
         <span><span class="key">Space</span></span><span>Jump: hold for full height, tap to hop</span>
-        <span><span class="key">Q</span> <span class="key">E</span></span><span>Sidestep left / right (not in the Barrier)</span>
-        <span><span class="key">2</span></span><span>Barrier on / off: an unhurtable red shell</span>
+        <span><span class="key">Q</span> <span class="key">E</span></span><span>Molly: sidestep left / right (not in the Barrier)</span>
+        <span><span class="key">2</span></span><span>Molly: Barrier on / off, an unhurtable red shell</span>
+        <span><span class="key">Q</span> <span class="key">E</span></span><span>Comet: Star Throw where the camera faces (hold to charge, up to 3 s)</span>
+        <span><span class="key">2</span></span><span>Comet: Hover on / off</span>
+        <span><span class="key">Space</span></span><span>Comet, hovering, held in the air: Fly</span>
         <span><span class="key">A</span> <span class="key">D</span></span><span>Drift: at 30 Zips or more, swing 15° that way (1 s cooldown; not in the Barrier)</span>
         <span><span class="key">Hold S</span></span><span>Standing still: Runner's Pose. After 3 s, let go to launch at 50 Zips</span>
         <span><span class="key">Hold S</span></span><span>Standing still in the Barrier: Dodecadash. Let go to launch, +20 Zips per second held (max 120), 4 power a second</span>
@@ -531,6 +534,12 @@ textarea{width:100%;min-height:84px;background:var(--bg);color:var(--fg);border:
   #stage{flex:none;height:44vh;min-height:250px}
   aside{border-left:0;overflow:visible}
 }
+aside[data-page=mobs]>*:not(.pgAll):not(#mobBox){display:none!important}
+aside:not([data-page=mobs]) #mobBox{display:none!important}
+aside:not([data-page=comet]) #cometBox{display:none!important}
+#app[data-page=mobs] #modes,#app[data-page=mobs] #modes2,#app[data-page=mobs] #views{display:none!important}
+#app[data-page=comet] [data-m=barrier]{display:none!important}
+#pages{margin:4px 0 2px}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}</style>
 <div class="rigwrap"><div id="app">
   <div id="stageWrap">
@@ -551,8 +560,9 @@ textarea{width:100%;min-height:84px;background:var(--bg);color:var(--fg);border:
     </div>
   </div>
   <aside>
-    <div class="actions"><button class="btn" id="rigClose">&larr; Back to title screen</button></div>
-    <h1>Runner rig editor</h1>
+    <div class="actions pgAll"><button class="btn" id="rigClose">&larr; Back to title screen</button></div>
+    <div class="seg pgAll" id="pages" role="group" aria-label="Page"><button type="button" data-pg="molly" aria-pressed="true">Molly</button><button type="button" data-pg="comet" aria-pressed="false">Comet</button><button type="button" data-pg="mobs" aria-pressed="false">Mobs</button></div>
+    <h1 class="pgAll" id="rigH1">Molly: rig editor</h1>
     <p class="sub">Pick a part below, or click it on the model. Orbit by dragging, zoom with scroll. Left and right sides match.</p>
     <details id="statBox"><summary>Stats</summary>
       <p class="sub">Molly's stat card. These numbers are the ones the game runs on: change a slider, close the editor, and she plays that way, with the card on the Characters page and pause menu following.</p>
@@ -567,15 +577,24 @@ textarea{width:100%;min-height:84px;background:var(--bg);color:var(--fg);border:
         <div id="moveOut"></div>
       </details>
     </details>
-    <details id="minBox"><summary>Minions</summary>
-      <p class="sub">How Minions and Big Minions look, walk and fight. The preview shows the one picked here, walking at its top speed and chasing; close the editor and every minion in the game follows.</p>
-      <div class="seg" id="minTabs" role="group" aria-label="Which minion"><button type="button" data-mt="min" aria-pressed="true">Minion</button><button type="button" data-mt="big" aria-pressed="false">Big Minion</button></div>
+    <details id="cometBox" open><summary>Comet's moves</summary>
+      <p class="sub">Comet has no Strafe and no Hedron Barrier. Q or E: Star Throw (hold to charge). 2: Hover. Space held in the air while hovering: Fly. Her look, run and stats above are her own copy of Molly's dials.</p>
+      <h3>Hover</h3><div id="cHov"></div>
+      <h3>Fly</h3><div id="cFly"></div>
+      <h3>Star Throw</h3><div id="cStar"></div>
+      <h3>Star colours</h3><div class="colors" id="cCols"></div>
+      <div class="actions"><button class="btn" id="resetComet">Reset Comet's moves</button></div>
+    </details>
+    <section class="editor" id="mobBox" aria-label="Mobs">
+      <h2>Mobs</h2>
+      <p class="sub">How each kind of mob looks, walks and fights. The preview shows the one picked here, walking at its top speed and chasing; close the editor and every one in the game follows.</p>
+      <div class="seg" id="minTabs" role="group" aria-label="Which mob"></div>
       <p class="sub" id="minNote"></p>
       <h3>Look</h3><div id="minLook"></div><div id="minCols" class="mcols"></div>
       <h3>Walk</h3><div id="minWalk"></div>
       <h3>Stats</h3><div id="minStats"></div>
-      <div class="actions"><button class="btn" id="resetMin">Reset this minion</button></div>
-    </details>
+      <div class="actions"><button class="btn" id="resetMin">Reset this one</button></div>
+    </section>
     <section class="editor" id="animSec" aria-label="Animation dials" hidden>
       <h2 id="animTitle"></h2>
       <p class="sub" id="animNote"></p>
@@ -3266,10 +3285,12 @@ Object.keys(MOVES).forEach(function(n){var cur={},k;for(k in KD)cur[k]=KD[k];
 var DEF={},k,q;
 for(k in GLOBAL)DEF[k]=GLOBAL[k];
 Object.keys(MOVEX).forEach(function(n){DEF['m.'+n+'.dur']=MOVEDUR[n];MOVEX[n].forEach(function(e,i){DEF['m.'+n+'.'+i+'.t']=e[0];for(var f in KD)DEF['m.'+n+'.'+i+'.'+f]=e[1][f];});});
+for(k in KD){if(k!=='fl')DEF['dA.'+k]=0;}   /* Drift: changes laid over her fast run while she drifts (all 0: just the run, as the game has done since v170) */
 DEF['stat.top']=80;DEF['stat.accelT']=7;DEF['stat.brake']=3;DEF['stat.jumpH']=7.2;DEF['stat.grav']=20;DEF['stat.gripZ']=20;DEF['stat.fadeSlope']=0;DEF['stat.fadeWall']=1;DEF['stat.fall']=50;DEF['stat.hearts']=3;DEF['stat.colH']=3.6;DEF['stat.colW']=1;DEF['stat.wallGrip']=1;DEF['stat.fric']=11.4;var MNE={scale:[1,5],radius:[1,3],headW:[.9,.9],headH:[.9,.9],headD:[.9,.9],torsoW:[.7,.7],torsoH:[1.35,1.35],torsoD:[.45,.45],armW:[.3,.3],armL:[1.35,1.35],legW:[.33,.33],legD:[.4,.4],legL:[1.35,1.35],cHead:['#45484e','#45484e'],cBody:['#2f3237','#2f3237'],cLimb:['#26282c','#26282c'],cEye:['#ff2a1a','#ff2a1a'],stride:[.9,.9],legSwing:[45.8,45.8],armSwing:[13.8,13.8],armRaise:[83.1,83.1],bob:[0,0],top:[10,10],acc:[5,5],see:[100,100],hearts:[1,3],dmg:[1,2],cool:[1.2,1.2],k1:[20,20],k2:[0,0],k3:[0,0],stomp:[8,17]};for(var mnk in MNE){DEF['mn.min.'+mnk]=MNE[mnk][0];DEF['mn.big.'+mnk]=MNE[mnk][1];}   /* the minions' own dials (the game's MN_DEF) */DEF['stat.slamAcc']=40;DEF['stat.slamMax']=60;DEF['m.drift.lean']=28.6;DEF['m.drift.angle']=15;DEF['m.drift.time']=.15;DEF['m.drift.minZips']=30;DEF['m.drift.cool']=1;DEF['m.drift.rate']=9;DEF['slope.side']=.85;
 var BARRIER_DEF={'barrier.radius':1.76,'barrier.height':1.64,'barrier.spin':1,'barrier.sphereAt':40,'barrier.squeezeAt':75,'barrier.squeezeLen':5,'barrier.squeeze':.2,'barrier.stretch':.12,'barrier.chargeSphere':2,'barrier.chargeSqueeze':3.5,'barrier.glow':.2,'barrier.glowSize':1.14,'barrier.dashLen':.32,'barrier.dashGap':.22,
   'barrier.cBody':'#ff2a1f','barrier.cEmis':'#b3140c','barrier.cEdge':'#ffc7b8','barrier.cDash':'#ff9a88','barrier.cGlow':'#ff3a2a','barrier.preview':0};
 for(k in BARRIER_DEF)DEF[k]=BARRIER_DEF[k];
+if(window.__COMET_DEF)for(k in window.__COMET_DEF)DEF[k]=window.__COMET_DEF[k];   /* Comet's moves (the game keeps their defaults); Molly's settings carry them too, unused */
 DEF['m.set.bob']=.5;DEF['m.set.rock']=1;DEF['m.set.nod']=1;DEF['idle.dur']=3;DEF['idle.breath']=.4;DEF['idle.sway']=1.2;DEF['idle.arm']=2;DEF['idle.pony']=1;
 SEGS.forEach(function(s){for(q in SD[s.id])DEF[s.id+'.'+q]=SD[s.id][q];
   [1,2].forEach(function(n){var b=s.id+'.u'+n;DEF[b+'p']=n===1?.3:.7;DEF[b+'a']=n===1?0:180;DEF[b+'d']=0;DEF[b+'wl']=50;DEF[b+'wr']=50;DEF[b+'ws']=.2;DEF[b+'we']=.2;DEF[b+'kl']=0;DEF[b+'kr']=0;DEF[b+'ks']=0;DEF[b+'ke']=0;});});
@@ -3322,7 +3343,7 @@ var P=JSON.parse(JSON.stringify(DEF));
 var HOLDS=[[/\.len$/,.5,400],[/\.dia$/,.2,400],[/\.depth$/,.02,20],[/\.peak$/,.005,.995],[/\.t[SE]$/,.005,20],[/\.c[SE]$/,.05,50],
  [/\.u[12]w[lr]$/,.5,360],[/\.u[12]w[se]$/,.002,5],[/\.u[12]d$/,-100,100],[/\.u[12]p$/,-1,2],[/\.u[12]k[lrse]$/,-4,4],[/^Foot\.flat$/,0,.98],[/\.band[AL]$|^Shin\.pad$|^Foot\.(heel|sole|ankleH)$/,0,400],
  [/^scale$/,.05,20],[/^sides$/,5,48,1],[/^rings$/,1,8,1],[/^ringGap$/,0,20],[/^fmt$/,2,2],[/^hairVol$/,.05,10],[/^bangL$/,0,10],[/^j[A-Z]/,0,100],[/^(jit|irr|irrC)$/,0,5],
- [/\.dur$/,.05,600],[/^m\.drift\.time$/,.02,10],[/^m\.drift\.rate$/,.1,200],[/^m\.drift\.(cool|minZips)$/,0,1000],
+ [/\.dur$/,.05,600],[/^comet\./,0,1e4],[/^dA\.(hyf|hz)$/,-1,1],[/^dA\./,-180,180],[/^m\.drift\.time$/,.02,10],[/^m\.drift\.rate$/,.1,200],[/^m\.drift\.(cool|minZips)$/,0,1000],
  [/^barrier\.radius$/,.2,20],[/^barrier\.squeezeLen$/,.5,1e4],[/^barrier\.squeeze$/,-2,.95],[/^barrier\.stretch$/,-.95,10],[/^barrier\.glow$/,0,1],[/^barrier\.glowSize$/,.1,10],[/^barrier\.dash(Len|Gap)$/,.005,20],
  [/^stat\.top$/,1,1e4],[/^stat\.accelT$/,.5,1e4],[/^stat\.(brake|jumpH|wallGrip|fric)$/,0,1e4],[/^stat\.gripZ$/,.5,5e5],[/^stat\.grav$/,1,1e4],[/^stat\.fade(Wall|Slope)$/,0,1,1],[/^stat\.fall$/,1,1e4],[/^stat\.slam(Acc|Max)$/,1,1e4],[/^mn\.\w+\.(scale|head[WHD]|torso[WHD]|arm[WL]|leg[WDL])$/,.05,100],[/^mn\.\w+\.hearts$/,1,99,1],[/^mn\.\w+\.dmg$/,0,99,1],[/^mn\.\w+\.(radius|top|acc|see|cool|k[123]|stomp|stride|bob)$/,0,1e4],[/^mn\.\w+\.(legSwing|armSwing|armRaise)$/,-180,180],[/^stat\.hearts$/,1,12,1],[/^stat\.colH$/,1.2,100],[/^stat\.colW$/,.2,100]];
 function hold(key,v){
@@ -4001,12 +4022,25 @@ function toPose(v){
 }
 function mirrorV(v){var o={},k;for(k in v)o[k]=v[k];[['aLp','aRp'],['aLr','aRr'],['aLe','aRe'],['hL','hR'],['kL','kR'],['dL','dR']].forEach(function(p){o[p[0]]=v[p[1]];o[p[1]]=v[p[0]];});return o;}
 function modeDur(m){
+  if(m==='drift')return P['runF.dur'];   /* a drift is her fast run with changes laid over it, stride for stride */
   if(m==='idle')return P['idle.dur'];
   if(m==='runS'||m==='run'||m==='runF')return P['run'+(m==='runS'?'S':m==='runF'?'F':'M')+'.dur'];
   if(MOVEX[m])return P['m.'+m+'.dur'];
   return 3;
 }
+function poseDrift(ph,right){   /* the game's drift: her fast run cycle, with the Drift dials added on top (right: mirrored, for drifting right) */
+  var o=poseRun(ph,'F'),v={},k;for(k in KD)if(k!=='fl')v[k]=P['dA.'+k]||0;if(right)v=mirrorV(v);
+  var H=hipsBase[1],mul=function(n,q){if(!o[n])o[n]={q:new THREE.Quaternion()};if(!o[n].q)o[n].q=new THREE.Quaternion();o[n].q.multiply(q);};
+  var hp=(o.Hips&&o.Hips.pos)||hipsBase;o.Hips=o.Hips||{};o.Hips.pos=[hp[0],hp[1]+H*v.hyf,hp[2]+v.hz];
+  mul('Hips',qx(v.hp*rad));mul('Spine',qx(v.sp*rad));mul('Head',qx(v.hd*rad));
+  [['L',1],['R',-1]].forEach(function(e){var S=e[0],g=e[1];
+    mul('Shoulder'+S,qx(-v['a'+S+'p']*rad).multiply(qz(g*v['a'+S+'r']*rad)));mul('Elbow'+S,qx(-v['a'+S+'e']*rad));
+    mul('Hip'+S,qx(-v['h'+S]*rad));mul('Knee'+S,qx(v['k'+S]*rad));mul('Ankle'+S,qx(-v['d'+S]*rad));});
+  mul('Pony1',qx(v.p1*rad));mul('Pony2',qx(v.p2*rad));mul('Pony3',qx(v.p3*rad));
+  return o;
+}
 function poseFor(mode,ph){
+  if(mode==='drift')return poseDrift(ph,false);
   if(mode==='run')return poseRun(ph,'M');if(mode==='runS')return poseRun(ph,'S');if(mode==='runF')return poseRun(ph,'F');
   if(mode==='idle')return poseIdle(ph);
   if(mode==='set'){var v=moveAt('set',ph/(2*Math.PI)),b=Math.sin(ph),rk=P['m.set.rock'];
@@ -4065,7 +4099,7 @@ function fmt(v,u,step){
   if(u==='n')return String(Math.round(v));
   return v.toFixed(step>=.1?1:2);
 }
-function statCardRefresh(){var h=SR.querySelector('#statLive');if(h&&window.__statCardHTML)h.innerHTML=window.__statCardHTML(P,false);moveRefresh();}
+function statCardRefresh(){var h=SR.querySelector('#statLive');if(h&&window.__statCardHTML){var c={},k;for(k in P)c[k]=P[k];c.__who=CHAR;h.innerHTML=window.__statCardHTML(c,false);}moveRefresh();}
 /* Movement details: the tables follow the stat sliders; the situation below them has three dials of its own (not saved: they are only a calculator) */
 var MSC={slope:20,dir:90,speed:80,mode:'run'};
 function moveRefresh(scenOnly){var b=SR.querySelector('#moveBox');if(!b||!b.open)return;var a=SR.querySelector('#moveLive'),o=SR.querySelector('#moveOut');
@@ -4186,7 +4220,22 @@ function syncAll(){
   buildGroups();COLORS.forEach(function(c){$('#c_'+c[0]).value=P[c[0]];});renderPart();
   try{renderStats();renderAnim();}catch(e){}barrierDirty=true;   /* the Stats menu, the animation dials and the Barrier preview show the new values too */
 }
-function save(){try{localStorage.setItem('runnerRig2',JSON.stringify(P));}catch(e){}}
+/* Pages: Molly and Comet each have their own copy of every dial (kept in runnerRig2 and cometRig); Mobs are kept with Molly's. Comet starts as a copy of Molly. */
+var PAGE='molly',CHAR='molly',CHARKEY={molly:'runnerRig2',comet:'cometRig'},CHARNAME={molly:'Molly',comet:'Comet'};HOST.__char='molly';
+function save(){try{localStorage.setItem(CHARKEY[CHAR],JSON.stringify(P));}catch(e){}}
+function loadChar(c){CHAR=c;HOST.__char=c;P=JSON.parse(JSON.stringify(DEF));var sv=null;try{sv=localStorage.getItem(CHARKEY[c])||(c==='comet'?localStorage.getItem('runnerRig2'):null);}catch(e){}
+  if(sv){try{takeSettings(JSON.parse(sv));}catch(e){}}}
+function setPage(pg){
+  var c=pg==='comet'?'comet':'molly';
+  if(c!==CHAR){save();loadChar(c);syncAll();dirty=true;}
+  PAGE=pg;$('aside').setAttribute('data-page',pg);$('#app').setAttribute('data-page',pg);
+  SR.querySelectorAll('#pages button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.pg===pg));});
+  $('#rigH1').textContent=pg==='mobs'?'Mobs':CHARNAME[c]+': rig editor';
+  if(pg==='comet'&&ui.mode==='barrier')setMode('run');
+  if(pg==='mobs'){minDirty=true;try{renderMinions();}catch(e){}}
+  try{renderComet();statCardRefresh();}catch(e){}
+}
+SR.querySelectorAll('#pages button').forEach(function(b){b.addEventListener('click',function(){setPage(b.dataset.pg);});});
 function status(t,ms){var s=$('#status');s.textContent=t;clearTimeout(status.t);status.t=setTimeout(function(){s.textContent='';},ms||4500);}
 
 SR.querySelectorAll('#views button').forEach(function(b){b.addEventListener('click',function(){setView(b.dataset.v);});});
@@ -4254,6 +4303,11 @@ function renderAnim(){
       var l=document.createElement('label');l.style.cssText='display:flex;gap:6px;align-items:center;font-size:12px';l.textContent=c[1];
       var i=document.createElement('input');i.type='color';i.value=P[c[0]];i.addEventListener('input',function(){P[c[0]]=i.value;save();barrierDirty=true;});l.appendChild(i);ch.appendChild(l);});
     rows.appendChild(ch);
+  }else if(m==='drift'){
+    $('#animNote').textContent='What she does while drifting left (A held); drifting right is the same, mirrored. In the game she keeps running, stride for stride, and leans into the corner from her feet. The changes below are added on top of her Fast run (all 0: just the run). Save to game to use them.';
+    addRows(rows,[[pre+'lean','Lean into the corner','deg',0,60,.5],[pre+'angle','Momentum shift when it starts','deg',0,45,.5],[pre+'time','Time to make the shift','s',.03,.6,.01],[pre+'minZips','Needs at least','Zips',0,80,1],[pre+'cool','Cooldown after release','s',0,5,.1],[pre+'rate','How fast she settles into it','x',2,20,.5],['slope.side','Tilt to sideways slopes (all running)','x',0,1.2,.05]],{anim:1});
+    KEYGROUPS.forEach(function(g){var h3=document.createElement('h3');h3.textContent=g[0]+' (added to her run)';kh.appendChild(h3);var d=document.createElement('div');kh.appendChild(d);
+      addRows(d,g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['dA.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}),{anim:1});});
   }else{
     $('#animNote').textContent=m==='drift'?'Her pose while drifting left (A held, camera to her left); drifting right is this pose mirrored. Pose is for the Molly model; lean and turn dials below are live in the game.':'A one-shot move that loops here so you can watch it. Pick a stage to jump to it and edit its pose; the moves in between are blended for you.';
     var extra=[[pre+'dur','Total length','s',.5,5,.05]];
@@ -4275,9 +4329,21 @@ function renderAnim(){
 var STAT_ROWS=[['stat.top','Top speed','Zips',20,160,1],['stat.accelT','Time from 0 to top speed','s',1,20,.1],['stat.brake','Braking strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip fades on slopes (× the cosine of the slope)','tog'],['stat.fall','Max fall speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision box height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision box width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier slam: top speed','Zips',10,200,1]];
 function renderStats(){var h=$('#statRows');if(!h)return;h.innerHTML='';addRows(h,STAT_ROWS,{anim:1,stat:1});var sc=document.createElement('div');sc.id='statLive';sc.style.cssText='margin-top:10px;max-width:460px';h.appendChild(sc);statCardRefresh();}   /* the Stats menu at the top of the panel */
 try{renderStats();}catch(e){}
+var COMET_HOV=[['comet.hov.cost','Power to switch it on','n',0,50,1],['comet.hov.drain','Power a second while on','n',0,20,.1],['comet.hov.height','Floats above the ground by','units',0,3,.05],
+ ['comet.hov.top','Top speed','Zips',10,200,1],['comet.hov.accelT','Time from 0 to top speed','s',.5,20,.1],['comet.hov.brake','Braking strength (x coasting)','x',0,8,.1],['comet.hov.fric','Friction (coasting)','Zips/s²',0,40,.1],['comet.hov.gripZ','Sideways grip (turning)','Zips/s²',1,80,.5],['comet.hov.jumpH','Jump height','units',0,30,.1],
+ ['comet.hov.ankle','Ankle stars: size','units',.05,2,.01],['comet.hov.back','Back star: size','units',.1,3,.01],['comet.hov.spinS','Stars: turns a second','x',0,6,.1]];
+var COMET_FLY=[['comet.fly.drain','Extra power a second while flying','n',0,40,.1],['comet.fly.lift','Lift (× gravity: 1 cancels it)','x',0,3,.01],['comet.fly.arms','Arms up: how fast she raises them','x',1,30,.5]];
+var COMET_STAR=[['comet.star.cost','Power per throw (needs more than 0)','n',0,20,1],['comet.star.range','Range','units',5,400,1],['comet.star.dmg','Damage','hearts',0,10,.5],['comet.star.cool','Cooldown','s',0,10,.1],['comet.star.speed','Speed','Zips',5,400,1],['comet.star.size','Size (across)','units',.1,5,.05],['comet.star.spin','Spin (turns a second)','x',0,20,.1],
+ ['comet.star.cMax','Charge: most seconds','s',0,6,1],['comet.star.cCost','Charge: power per second','n',0,20,1],['comet.star.cSize','Charge: size per second (+ × its size)','x',0,3,.05],['comet.star.cDmg','Charge: damage per second','hearts',0,5,.5],['comet.star.cRange','Charge: range per second','units',0,400,1]];
+function renderComet(){if(PAGE!=='comet')return;['#cHov','#cFly','#cStar','#cCols'].forEach(function(q){$(q).innerHTML='';});
+  addRows($('#cHov'),COMET_HOV,{anim:1});addRows($('#cFly'),COMET_FLY,{anim:1});addRows($('#cStar'),COMET_STAR,{anim:1});
+  [['comet.cStar','Star'],['comet.cGlow','Glow']].forEach(function(c){var l=document.createElement('label');l.innerHTML='<input type="color" value="'+P[c[0]]+'"><span>'+c[1]+'</span>';$('#cCols').appendChild(l);l.querySelector('input').addEventListener('input',function(){P[c[0]]=this.value;save();});});}
+$('#resetComet').addEventListener('click',function(){for(var k in DEF)if(k.indexOf('comet.')===0)P[k]=DEF[k];save();renderComet();status("Comet's moves reset.");});
 try{SR.querySelector('#moveBox').addEventListener('toggle',function(){moveScenBuild();moveRefresh();});}catch(e){}
 $('#resetStats').addEventListener('click',function(){STAT_ROWS.forEach(function(c){P[c[0]]=DEF[c[0]];});save();renderStats();status('Stats reset.');});
 /* ================= Minions panel: one kind at a time, with its own preview ================= */
+var MOB_KINDS=[['min','Minions','Minion'],['big','Big Minions','Big Minion']];   /* [key, tab, one of them]: a new kind of mob is one more line here (and its defaults under mn.<key>.) */
+function mobName(t){for(var i=0;i<MOB_KINDS.length;i++)if(MOB_KINDS[i][0]===t)return MOB_KINDS[i][2];return t;}
 var minTab='min',minDirty=true,minGroup=null,minModel=null,minPhase=0;
 var MIN_LOOK=[['scale','Overall size (× the blocks below)','x',.2,8,.05],['radius','Collision radius (how close it gets to her)','units',.2,20,.05],['headW','Head width','units',.1,3,.01],['headH','Head height','units',.1,3,.01],['headD','Head depth','units',.1,3,.01],['torsoW','Body width','units',.1,3,.01],['torsoH','Body height','units',.1,4,.01],['torsoD','Body depth','units',.1,3,.01],['armW','Arm thickness','units',.05,2,.01],['armL','Arm length','units',.1,4,.01],['legW','Leg width','units',.05,2,.01],['legD','Leg depth','units',.05,2,.01],['legL','Leg length','units',.1,4,.01]];
 var MIN_WALK=[['stride','Stride rate (swings per unit it moves)','x',.05,4,.01],['legSwing','Leg swing','°',0,90,.5],['armSwing','Arm swing','°',0,90,.5],['armRaise','Arms raised forward while chasing','°',-30,180,.5],['bob','Bob (lift at each step)','units',0,1.5,.01]];
@@ -4292,12 +4358,12 @@ function renderMinions(){
   SR.querySelectorAll('#minTabs button').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-mt')===minTab));});
   minDirty=true;minNoteSet();
 }
-function minNoteSet(){var c=minCfgP(minTab),h=(c.legL+c.torsoH+c.headH)*c.scale;$('#minNote').textContent=(minTab==='big'?'Big Minion':'Minion')+': '+(Math.round(h*100)/100)+' units tall in the game (Molly is 3.6). The preview is drawn at her height.';}
-SR.querySelectorAll('#minTabs button').forEach(function(b){b.addEventListener('click',function(){minTab=b.getAttribute('data-mt');renderMinions();});});
-$('#resetMin').addEventListener('click',function(){for(var k in MNE)P['mn.'+minTab+'.'+k]=DEF['mn.'+minTab+'.'+k];save();renderMinions();status((minTab==='big'?'Big Minion':'Minion')+' reset.');});
+function minNoteSet(){var c=minCfgP(minTab),h=(c.legL+c.torsoH+c.headH)*c.scale;$('#minNote').textContent=mobName(minTab)+': '+(Math.round(h*100)/100)+' units tall in the game (Molly is 3.6). The preview is drawn at her height.';}
+MOB_KINDS.forEach(function(m){var b=document.createElement('button');b.type='button';b.setAttribute('data-mt',m[0]);b.setAttribute('aria-pressed',String(m[0]===minTab));b.textContent=m[1];b.addEventListener('click',function(){minTab=m[0];minDirty=true;renderMinions();});$('#minTabs').appendChild(b);});
+$('#resetMin').addEventListener('click',function(){for(var k in MNE)P['mn.'+minTab+'.'+k]=DEF['mn.'+minTab+'.'+k];save();minDirty=true;renderMinions();status(mobName(minTab)+' reset.');});
 try{renderMinions();}catch(e){}
 function minPreview(dt){
-  var on=$('#minBox').open&&!!window.__makeMinion;
+  var on=PAGE==='mobs'&&!!window.__makeMinion;
   if(!on){if(minGroup)minGroup.visible=false;return;}
   if(rigRoot)rigRoot.visible=false;if(barrierGroup)barrierGroup.visible=false;
   var c=minCfgP(minTab);
@@ -4312,7 +4378,7 @@ function minPreview(dt){
   window.__poseMinion(minModel,c,minPhase,Math.min(1,spd/12),true);
 }
 $('#resetAnim').addEventListener('click',function(){var pre=animPrefix(ui.mode),key;for(key in DEF){if(key.indexOf(pre)===0)P[key]=DEF[key];}
-  if(ui.mode==='drift')P['slope.side']=DEF['slope.side'];   /* the sideways-slope tilt sits with the drift dials */
+  if(ui.mode==='drift'){P['slope.side']=DEF['slope.side'];for(key in DEF)if(key.indexOf('dA.')===0)P[key]=DEF[key];}   /* the sideways-slope tilt and the changes to her run sit with the drift dials */
   barrierDirty=true;save();renderAnim();statCardRefresh();status('Animation reset.');});
 
 /* ================= export ================= */
@@ -4333,22 +4399,23 @@ $('#exportGlb').addEventListener('click',function(){
   btn.disabled=true;
   if(dirty){try{rebuild();}catch(e){dirty=false;}}
   if(!skMesh){btn.disabled=false;status('These settings cannot be built, so there is nothing to save.',12000);return;}
-  rigRoot.userData={slideHold:P['m.slide.3.t'],fallHold:P['m.fall.6.t'],scale:P.scale};   /* where the slide and the face-plant are held travels inside the model, so the game holds each clip at the place this build gave it. So does her Overall scale: the game stands every model 3.6 units tall, times this */
+  rigRoot.userData={slideHold:P['m.slide.3.t'],fallHold:P['m.fall.6.t'],scale:P.scale,driftRun:1};   /* where the slide and the face-plant are held travels inside the model, so the game holds each clip at the place this build gave it. So does her Overall scale: the game stands every model 3.6 units tall, times this */
   var hid=[wireMesh,hlMesh].map(function(m){var v=m.visible;m.visible=false;return [m,v];});
   var cur=NAMES.map(function(n){return [bones[n].position.clone(),bones[n].quaternion.clone()];});
   NAMES.forEach(function(n){bones[n].quaternion.copy(rest[n]);});bones.Hips.position.set(hipsBase[0],hipsBase[1],hipsBase[2]);
   var clips=[clipFrom('Idle',poseIdle,modeDur('idle'),24),clipFrom('Run_Slow',function(p){return poseRun(p,'S');},modeDur('runS'),20),clipFrom('Run_Mid',function(p){return poseRun(p,'M');},modeDur('run'),16),clipFrom('Run',function(p){return poseRun(p,'M');},modeDur('run'),16),clipFrom('Run_Fast',function(p){return poseRun(p,'F');},modeDur('runF'),12),
-    clipFrom('Jump',function(p){return poseFor('jump',p);},modeDur('jump'),40),clipFrom('Slide',function(p){return poseFor('slide',p);},modeDur('slide'),40),clipFrom('Faceplant',function(p){return poseFor('fall',p);},modeDur('fall'),56),clipFrom('Drift_L',function(p){return poseFor('drift',p);},modeDur('drift'),8),clipFrom('Drift_R',function(p){return toPose(mirrorV(moveAt('drift',p/(2*Math.PI))));},modeDur('drift'),8),clipFrom('RunnersPose',function(p){return poseFor('set',p);},modeDur('set'),24)];
+    clipFrom('Jump',function(p){return poseFor('jump',p);},modeDur('jump'),40),clipFrom('Slide',function(p){return poseFor('slide',p);},modeDur('slide'),40),clipFrom('Faceplant',function(p){return poseFor('fall',p);},modeDur('fall'),56),clipFrom('Drift_L',function(p){return poseDrift(p,false);},modeDur('drift'),16),clipFrom('Drift_R',function(p){return poseDrift(p,true);},modeDur('drift'),16),clipFrom('RunnersPose',function(p){return poseFor('set',p);},modeDur('set'),24)];
   rigRoot.updateMatrixWorld(true);
   var restore=function(){NAMES.forEach(function(n,i){bones[n].position.copy(cur[i][0]);bones[n].quaternion.copy(cur[i][1]);});
     hid.forEach(function(h){h[0].visible=h[1];});btn.disabled=false;};
   try{
     new THREE.GLTFExporter().parse(rigRoot,function(buf){
       restore();
+      var who=CHARNAME[CHAR];
       try{HOST.__save(buf,settingsJson(),function(r){
-        if(r==='ok')status('Saved. Molly is updated in the game.');
-        else if(r==='big')status('Molly is updated for now, but this browser could not keep this build (its storage is full or blocked), so the one saved before it will be back next time. A smaller build (fewer Sides per ring or Rings per side, under Faceting) may fit.',20000);
-        else status('This build could not be loaded into the game, so the game keeps the Molly it had.',12000);});}catch(e){status('Could not save Molly.',12000);}
+        if(r==='ok')status('Saved. '+who+' is updated in the game.');
+        else if(r==='big')status(who+' is updated for now, but this browser could not keep this build (its storage is full or blocked), so the one saved before it will be back next time. A smaller build (fewer Sides per ring or Rings per side, under Faceting) may fit.',20000);
+        else status('This build could not be loaded into the game, so the game keeps the '+who+' it had.',12000);});}catch(e){status('Could not save Molly.',12000);}
     },{binary:true,animations:clips,onlyVisible:true,trs:true});
   }catch(e){restore();status('Export failed.');}
 });
@@ -4383,13 +4450,13 @@ function tick(now){
   if(ui.mode!=='rest'&&ui.mode!=='barrier'&&ui.playing){
     var dur=Math.max(.05,modeDur(ui.mode));ui.phase=(ui.phase+dt/dur)%1;$('#phase').value=ui.phase;}
   applyPose(poseFor(ui.mode,2*Math.PI*ui.phase));
-  if(ui.mode==='drift'&&rigRoot){var hb=bones.Hips;if(hb)hb.quaternion.premultiply(qz(-P['m.drift.lean']*rad));}   /* shows the lean the game adds on top of the pose */
+  if(rigRoot)rigRoot.rotation.z=ui.mode==='drift'?-P['m.drift.lean']*rad:0;   /* the lean the game adds while drifting: the whole of her, tipped from her feet */
   barrierPreview(dt);minPreview(dt);
   controls.update();renderer.render(scene,camera);
 }
 bandReady=true;                                                     /* the part tables exist now: any arm band numbers still in the old meaning are converted, the defaults' and the dials' each against their own other dials */
 try{if(defOld){var keepP=P;P=DEF;try{bandFix();}finally{P=keepP;}}if(bandOld){bandFix();bandOld=false;if(hadSaved)save();}}catch(e){}
-initScene();buildStatic();renderPart();setMode('run');applyTheme();
+initScene();buildStatic();renderPart();setMode('run');applyTheme();$('aside').setAttribute('data-page','molly');$('#app').setAttribute('data-page','molly');
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);}catch(e){}
 
 
@@ -6159,7 +6226,7 @@ requestAnimationFrame(tick);
     return { d: d, nx: ux * tg.ex.x + uy * tg.ey.x + uz * tg.ez.x, ny: ux * tg.ex.y + uy * tg.ey.y + uz * tg.ez.y, nz: ux * tg.ex.z + uy * tg.ey.z + uz * tg.ez.z };
   }
   function sbTargetBreak(tg, now) {                              // its one heart gone: it splits in two and the halves fall apart, like a beaten minion
-    tg.on = true; tg.brokeAt = now; shake(0.3);
+    tg.on = true; tg.hp = 0; tg.brokeAt = now; shake(0.3);
     tg.halves.forEach(function (h) {
       scene.attach(h.m); var sx = tg.ex.x * h.dir, sz = tg.ex.z * h.dir, v = 5 + Math.random() * 5;
       SB.tgBits.push({ tg: tg, m: h.m, vx: sx * v + speed * Math.sin(-heading) * 0.15, vy: 7 + Math.random() * 7, vz: sz * v - speed * Math.cos(heading) * 0.15, wx: (Math.random() - 0.5) * 10, wz: (Math.random() - 0.5) * 10 });
@@ -6189,14 +6256,14 @@ requestAnimationFrame(tick);
     var B = SB; if (!B) return;
     B.plates.forEach(function (pl) { pl.on = false; pl.now = false; });
     B.tgBits = []; B.tgP = null;
-    B.targets.forEach(function (tg) { tg.on = false; if (!tg.halves) return; tg.halves.forEach(function (h) { tg.sp0.add(h.m); h.m.position.copy(h.p); h.m.rotation.copy(h.r); h.m.scale.set(1, 1, 1); h.m.visible = true; }); });
+    B.targets.forEach(function (tg) { tg.on = false; tg.hp = 1; if (!tg.halves) return; tg.halves.forEach(function (h) { tg.sp0.add(h.m); h.m.position.copy(h.p); h.m.rotation.copy(h.r); h.m.scale.set(1, 1, 1); h.m.visible = true; }); });
   }
   function sbTrigTick(dt, now) {                                 // plates: pressed while she stands on one (or for good, unless set to only while she stands); targets: move, are solid, and break at speed
     var B = SB, pp = player.position, ex = pp.x - L3_X, ez = pp.z, i;
     if (!B.movers.length) B.T += dt;                             // the level clock (the platforms' block keeps it when there are any)
     for (i = 0; i < B.plates.length; i++) {
       var pl = B.plates[i], on = false, dx = ex - pl.x, dz = ez - pl.z;
-      if (Math.abs(dx) <= pl.rr && Math.abs(dz) <= pl.rr && grounded) {
+      if (Math.abs(dx) <= pl.rr && Math.abs(dz) <= pl.rr && grounded && !hovOn) {
         var c = Math.cos(-pl.th), sn = Math.sin(-pl.th), lx = dx * c - dz * sn, lz = dx * sn + dz * c;
         if (pl.circ ? Math.hypot(lx, lz) <= pl.r : Math.abs(lx) <= pl.hw && Math.abs(lz) <= pl.hd) {
           var sy = pl.T !== undefined ? pl.T : Math.max(l3Top(pp.x, pp.z), sbSlabTop(pp.x, pp.z, pp.y)) + pl.y;
@@ -6438,12 +6505,12 @@ requestAnimationFrame(tick);
       gcI = 1e9; gcJ = 1e9;
     }
     sbTrigTick(dt, now); ex = pp.x - L3_X; ez = pp.z;
-    if (hp > 0 && !ballOn && now >= toxUntil && !onTox && B.toxLedge) {   // the top of a toxic ledge
+    if (hp > 0 && !ballOn && !hovOn && now >= toxUntil && !onTox && B.toxLedge) {   // the top of a toxic ledge
       var tlh = sbLedge(pp.x, pp.z);
       if (ledTox && Math.abs(tlh) > 0.4) { var tgl = groundH(pp.x, pp.z); if (pp.y < tgl + 2.2 && pp.y > tgl - 3) onTox = true; }
     }
-    if (onTox && hp > 0 && !ballOn && now >= toxUntil) { toxUntil = now + 1000; hp -= 1; drawHearts(); flashHurt(); shake(0.3); }   // standing on a toxic platform or ledge: a heart a second, as on a toxic patch
-    if (hp > 0 && !ballOn && now >= toxUntil) {
+    if (onTox && hp > 0 && !ballOn && !hovOn && now >= toxUntil) { toxUntil = now + 1000; hp -= 1; drawHearts(); flashHurt(); shake(0.3); }   // standing on a toxic platform or ledge: a heart a second, as on a toxic patch
+    if (hp > 0 && !ballOn && !hovOn && now >= toxUntil) {
       for (i = 0; i < B.toxic.length; i++) {
         var t = B.toxic[i]; if (Math.abs(t.x - ex) > t.rr || Math.abs(t.z - ez) > t.rr) continue;
         c = Math.cos(-t.th); sn = Math.sin(-t.th); var dx = ex - t.x, dz = ez - t.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c;
@@ -6454,7 +6521,7 @@ requestAnimationFrame(tick);
         }
       }
     }
-    if ((B.terrain === 'level2' || B.patches.length) && hp > 0 && !ballOn && now >= toxUntil) {      // poisoned ground (the Sink's own, or a toxic terrain patch): a heart a second to stand on it
+    if ((B.terrain === 'level2' || B.patches.length) && hp > 0 && !ballOn && !hovOn && now >= toxUntil) {      // poisoned ground (the Sink's own, or a toxic terrain patch): a heart a second to stand on it
       var tgy = level3H(pp.x, pp.z);
       if (wL2 === 3 && pp.y < tgy + 2.2 && pp.y > tgy - 3 && sbDeckTop(pp.x, pp.z, pp.y) < pp.y - 0.5) { toxUntil = now + 1000; hp -= 1; drawHearts(); flashHurt(); shake(0.3); }   // (not while she is up on a path deck over it)
     }
@@ -6524,7 +6591,7 @@ requestAnimationFrame(tick);
   window.__hd = function () { return [heading, yaw, speed, driftHeld, driftCool, grounded, player.position.x - 60000, player.position.y, player.position.z, slDeg, slA]; };
   window.__keys = function (o) { for (var k in o) keys[k] = o[k]; };
   window.__bub = function () { return sbBub.count; };
-  window.__lean = function () { return [leanZ, sideLean, driftBlend, body.rotation.z, !!(mollyAct && mollyAct.Drift_L)]; };
+  window.__lean = function () { return [leanZ, sideLean, driftBlend, body.rotation.z, !!(mollyAct && mollyAct.Drift_L), mollyDriftRun, mollyW && +((mollyW.Drift_L || 0) + (mollyW.Drift_R || 0)).toFixed(2)]; };
   window.__st = function (o) { if ('vy' in o) vy = o.vy; if ('ballOn' in o) ballOn = o.ballOn; if ('speed' in o) speed = o.speed; if ('heading' in o) heading = o.heading; if ('yaw' in o) yaw = o.yaw; if ('segs' in o) setPower(o.segs); return [vy, speed, hp]; };
   window.__pos = function (x, y, z) { player.position.set(x, y, z); };
   window.__l3 = function (x, z) { return level3H(x, z); };
@@ -7231,18 +7298,37 @@ requestAnimationFrame(tick);
     'stat.top': 80, 'stat.accelT': 7, 'stat.brake': 3, 'stat.jumpH': 7.2, 'stat.grav': 20, 'stat.gripZ': 20, 'stat.fadeSlope': 0, 'stat.fall': 50, 'stat.hearts': 3, 'stat.colH': 3.6, 'stat.colW': 1, 'stat.wallGrip': 1, 'stat.fadeWall': 1, 'stat.fric': 11.4, 'stat.slamAcc': 40, 'stat.slamMax': 60
   };
   var MAXHP = 3;
-  var mollyScale = 1, SLIDE_H = 1;   // mollyScale: the Overall scale the model in use was saved with (the Rig Editor's dial). She stands 3.6 units x this, and her collision box (standing and sliding) is multiplied by it too
+  var mollyScale = 1, SLIDE_H = 1, mollyDriftRun = false;   // mollyScale: the Overall scale the model in use was saved with (the Rig Editor's dial). She stands 3.6 units x this, and her collision box (standing and sliding) is multiplied by it too
   // Minions and Big Minions are set in the Rig Editor's Minions panel: their blocks, colours, walk and stats. [Minion, Big Minion]. Speeds in Zips; swing angles in degrees; a damage speed of 0 means never
   var MN_DEF = { scale: [1, 5], radius: [1, 3], headW: [0.9, 0.9], headH: [0.9, 0.9], headD: [0.9, 0.9], torsoW: [0.7, 0.7], torsoH: [1.35, 1.35], torsoD: [0.45, 0.45], armW: [0.3, 0.3], armL: [1.35, 1.35], legW: [0.33, 0.33], legD: [0.4, 0.4], legL: [1.35, 1.35],
     cHead: ['#45484e', '#45484e'], cBody: ['#2f3237', '#2f3237'], cLimb: ['#26282c', '#26282c'], cEye: ['#ff2a1a', '#ff2a1a'],
     stride: [0.9, 0.9], legSwing: [45.8, 45.8], armSwing: [13.8, 13.8], armRaise: [83.1, 83.1], bob: [0, 0],
     top: [10, 10], acc: [5, 5], see: [100, 100], hearts: [1, 3], dmg: [1, 2], cool: [1.2, 1.2], k1: [20, 20], k2: [0, 0], k3: [0, 0], stomp: [8, 17] };
   for (var mnk in MN_DEF) { RIGCFG['mn.min.' + mnk] = MN_DEF[mnk][0]; RIGCFG['mn.big.' + mnk] = MN_DEF[mnk][1]; }
+  // Comet's moves (the Rig Editor's Comet page). Hover: its own movement stats while it is on. Star Throw: Q or E, held to charge (each second costs power and adds size, damage and range). Speeds in Zips
+  var COMET_DEF = { 'comet.hov.cost': 6, 'comet.hov.drain': 1, 'comet.hov.height': 0.5, 'comet.hov.top': 80, 'comet.hov.accelT': 7, 'comet.hov.brake': 3, 'comet.hov.fric': 11.4, 'comet.hov.gripZ': 20, 'comet.hov.jumpH': 7.2,
+    'comet.hov.ankle': 0.35, 'comet.hov.back': 0.75, 'comet.hov.spinS': 1.5, 'comet.fly.drain': 4, 'comet.fly.lift': 1, 'comet.fly.arms': 8,
+    'comet.star.cost': 1, 'comet.star.range': 50, 'comet.star.dmg': 0.5, 'comet.star.cool': 2, 'comet.star.speed': 100, 'comet.star.size': 1.2, 'comet.star.spin': 4,
+    'comet.star.cMax': 3, 'comet.star.cCost': 2, 'comet.star.cSize': 0.5, 'comet.star.cDmg': 0.5, 'comet.star.cRange': 50, 'comet.cStar': '#4fc3ff', 'comet.cGlow': '#a8e6ff' };
+  for (var ck in COMET_DEF) RIGCFG[ck] = COMET_DEF[ck];
+  window.__COMET_DEF = COMET_DEF;
   var RIGDEF = JSON.parse(JSON.stringify(RIGCFG));
+  // Which runner she plays as: 'molly' or 'comet' (the Characters page). Each keeps her own Rig Editor dials (runnerRig2, cometRig) and her own saved model (mollyGlb, cometGlb); Comet starts as a copy of Molly. Mobs' dials always come from Molly's.
+  var CHAR = 'molly'; try { if (localStorage.getItem('pr_char') === 'comet') CHAR = 'comet'; } catch (e) {}
+  function isComet() { return CHAR === 'comet'; }
+  function rigStored(ch) {
+    var om = null, o = null; try { om = JSON.parse(localStorage.getItem('runnerRig2') || 'null'); o = ch === 'comet' ? (JSON.parse(localStorage.getItem('cometRig') || 'null') || om) : om; } catch (e) {}
+    return [o, om];
+  }
+  function rigCfgFor(ch) {                                       // a runner's dials, read fresh (for the Characters page's cards)
+    var so = rigStored(ch), o = so[0], c = {};
+    for (var k in RIGDEF) { var src = k.indexOf('mn.') === 0 ? so[1] : o; c[k] = src && typeof src[k] === typeof RIGDEF[k] ? src[k] : RIGDEF[k]; }
+    c.scale = o && typeof o.scale === 'number' ? o.scale : 1; c.__who = ch; return c;
+  }
   function rigRead() {
-    var o = null; try { o = JSON.parse(localStorage.getItem('runnerRig2') || 'null'); } catch (e) {}
+    var so = rigStored(CHAR), o = so[0], om = so[1];
     if (o && o['stat.gripZ'] === undefined && typeof o['stat.grip'] === 'number') o['stat.gripZ'] = o['stat.grip'] / 2;   // dials saved by an older build kept her grip in units/s^2 (1 Zip = 2 units)
-    for (var k in RIGDEF) RIGCFG[k] = o && typeof o[k] === typeof RIGDEF[k] && (typeof o[k] !== 'string' || /^#[0-9a-f]{6}$/i.test(o[k])) ? o[k] : RIGDEF[k];
+    for (var k in RIGDEF) { var src = k.indexOf('mn.') === 0 ? om : o; RIGCFG[k] = src && typeof src[k] === typeof RIGDEF[k] && (typeof src[k] !== 'string' || /^#[0-9a-f]{6}$/i.test(src[k])) ? src[k] : RIGDEF[k]; }
     RIGCFG['barrier.radius'] = Math.max(0.2, RIGCFG['barrier.radius']); RIGCFG['m.drift.rate'] = Math.max(0.1, RIGCFG['m.drift.rate']);   // a Barrier with no size or a drift that never settles would break her spin and her lean
     applyStats(); if (typeof enRestyle === 'function') enRestyle();
   }
@@ -7254,6 +7340,10 @@ requestAnimationFrame(tick);
     WALL_FADE = C['stat.fadeWall'] ? 1 : 0; SLOPE_FADE = C['stat.fadeSlope'] ? 1 : 0;
     MAXHP = Math.max(1, Math.min(12, Math.round(C['stat.hearts']))); WALL_GRIP = Math.max(0, C['stat.wallGrip']); FRIC = Math.max(0, C['stat.fric']) * TILE;
     PLAYER_H = Math.max(1.2, C['stat.colH']) * mollyScale; PLAYER_RADIUS = Math.max(0.1, C['stat.colW'] / 2) * mollyScale; SLIDE_H = mollyScale;   // her collision box: how tall standing (a slide squeezes it to 1) and how wide, all times the model's Overall scale
+    if (typeof hovOn !== 'undefined' && hovOn) {                   // Comet's Hover: its own movement stats while it is on
+      RUN_SPEED = Math.max(1, C['comet.hov.top']) * TILE; ACCEL_TIME = Math.max(0.5, C['comet.hov.accelT']); ACCEL = RUN_SPEED / ACCEL_TIME; BRAKE_MULT = Math.max(0, C['comet.hov.brake']);
+      GRIP = Math.max(0.5, C['comet.hov.gripZ']) * TILE; JUMP_H = Math.max(0, C['comet.hov.jumpH']); JUMP_V = Math.sqrt(2 * GRAV * JUMP_H); FRIC = Math.max(0, C['comet.hov.fric']) * TILE;
+    }
     if (typeof heartsEl !== 'undefined' && heartsEl) { if (hp > MAXHP) hp = MAXHP; drawHearts(); }
   }
   window.__statCardHTML = function (c, compact) {                // one card for the Characters page, the pause menu and the Rig Editor (inline styles, so it looks the same in all three)
@@ -7263,20 +7353,34 @@ requestAnimationFrame(tick);
     var scl = Math.max(0.05, Math.min(20, g('scale', 1)));       // her Overall scale: the collision box is the two stats times this
     var tiles = [['Height', f1(Math.max(1.2, g('stat.colH', 3.6)) * scl), 'units'], ['Width', f1(Math.max(0.2, g('stat.colW', 1)) * scl), 'units'], ['Hearts', String(hh), ''], ['Top speed', f1(top), 'Zips'], ['Acceleration', f1(acc), 'Zips/s²'], ['Braking', f1(brk), 'Zips/s²'], ['Jump height', f1(jh), 'units'], ['Gravity', f1(gv), 'Zips/s²'], ['Max fall speed', f1(fl), 'Zips'], ['Sideways grip', f1(gz), 'Zips/s²'], ['Wall grip', '×' + f1(wgp), g('stat.fadeWall', 1) ? 'fades with the bank' : 'at any bank'], ['Friction', f1(fr), 'Zips/s²']];
     var h = '<div style="background:#f6ecdd;color:#3a2616;border-radius:14px;padding:12px 14px;font-family:inherit;text-align:left;box-sizing:border-box">';
-    h += '<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px solid #3a2616;padding-bottom:4px;margin-bottom:8px"><b style="font-size:' + (compact ? 17 : 22) + 'px;letter-spacing:.08em">MOLLY</b><span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.7">Runner</span></div>';
+    h += '<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px solid #3a2616;padding-bottom:4px;margin-bottom:8px"><b style="font-size:' + (compact ? 17 : 22) + 'px;letter-spacing:.08em">' + (c.__who === 'comet' ? 'COMET' : 'MOLLY') + '</b><span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.7">Runner</span></div>';
     h += '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">';
     tiles.forEach(function (t) { h += '<div style="background:#ecdcc3;border-radius:8px;padding:5px 7px;min-width:0"><div style="font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;opacity:.7">' + t[0] + '</div><div style="font:600 ' + (compact ? 15 : 19) + 'px/1.15 monospace">' + t[1] + '</div><div style="font-size:10px;opacity:.7">' + t[2] + '</div></div>'; });
     h += '</div>';
     if (!compact) {
       var rows = [['Time to top speed', f1(aT) + ' s over ' + f1(top * 2 * aT / 2) + ' units'], ['Top speed to a stop (braking)', f1(top / brk) + ' s over ' + f1(top * 2 * (top / brk) / 2) + ' units'], ['Friction', f1(fr) + ' Zips/s² · hills steeper than ' + f1(Math.asin(Math.min(1, fr / gv)) * 57.29578) + '° speed her up'], ['Turn radius at top speed', f1(top * 2 * top / gz) + ' units'], ['Grip on slopes', g('stat.fadeSlope', 0) ? 'fades with the slope (× its cosine)' : 'the same on any slope'], ['Jump', f1(air) + ' s in the air · ' + f1(top * 2 * air) + ' units at top speed'],
         ['Drift', f1(g('m.drift.angle', 15)) + '° shift · needs ' + f1(g('m.drift.minZips', 30)) + ' Zips · ' + f1(g('m.drift.cool', 1)) + ' s cooldown'], ['Hedron Barrier', 'costs 12 Power to start · half acceleration · no strafe or drift']];
+      if (c.__who === 'comet') rows.splice(rows.length - 1, 1, ['Star Throw (Q / E)', f1(g('comet.star.dmg', 0.5)) + ' heart · ' + f1(g('comet.star.range', 50)) + ' units · ' + f1(g('comet.star.cool', 2)) + ' s cooldown · costs ' + f1(g('comet.star.cost', 1)) + ' Power; hold to charge'],
+        ['Hover (2)', 'costs ' + f1(g('comet.hov.cost', 6)) + ' Power to start, ' + f1(g('comet.hov.drain', 1)) + ' a second · top speed ' + f1(g('comet.hov.top', 80)) + ' Zips'], ['Fly (Space, hovering)', f1(g('comet.fly.drain', 4)) + ' more Power a second'], ['No Strafe or Hedron Barrier', '']);
       h += '<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:12px">';
       rows.forEach(function (r) { h += '<tr><td style="padding:3px 4px 3px 0;border-top:1px solid #d9c7a8;opacity:.75">' + r[0] + '</td><td style="padding:3px 0;border-top:1px solid #d9c7a8;text-align:right;font-family:monospace">' + r[1] + '</td></tr>'; });
       h += '</table>';
     }
     return h + '</div>';
   };
-  function refreshStatCards() { var a = document.getElementById('charStats'), b = document.getElementById('pauseStats'), c = {}; for (var k in RIGCFG) c[k] = RIGCFG[k]; c.scale = mollyScale; if (a) a.innerHTML = window.__statCardHTML(c, false); if (b) b.innerHTML = window.__statCardHTML(c, true); }   // (the cards show her collision box as it really is: times the Overall scale of the model in use)
+  function refreshStatCards() {
+    var a = document.getElementById('charStats'), b = document.getElementById('pauseStats'), c = {}; for (var k in RIGCFG) c[k] = RIGCFG[k]; c.scale = mollyScale; c.__who = CHAR;
+    if (b) b.innerHTML = window.__statCardHTML(c, true);
+    if (a) {                                                    // the Characters page: both runners, and which one she plays as
+      var h = '';
+      ['molly', 'comet'].forEach(function (ch) {
+        var cc = ch === CHAR ? c : rigCfgFor(ch), on = ch === CHAR;
+        h += '<div style="margin:0 0 14px">' + window.__statCardHTML(cc, false) + '<button class="go2 pickChar" type="button" data-ch="' + ch + '" aria-pressed="' + on + '" style="margin-top:6px;width:100%' + (on ? ';opacity:.75' : '') + '">' + (on ? 'Playing as ' : 'Play as ') + (ch === 'comet' ? 'Comet' : 'Molly') + '</button></div>';
+      });
+      a.innerHTML = h;
+      a.querySelectorAll('.pickChar').forEach(function (bt) { bt.onclick = function () { setChar(bt.getAttribute('data-ch')); }; });
+    }
+  }  // (the cards show her collision box as it really is: times the Overall scale of the model in use)
   // ---- Movement details (the Rig Editor's Stats menu): the movement model written out as numbers, from whatever the stat sliders say right now. ----
   // Everything shown is in Zips and Zips/s^2 (1 Zip = TILE units a second), and uses the game's own constants, so the tables cannot drift from the rules above.
   function moveVals(c) {
@@ -7811,6 +7915,8 @@ requestAnimationFrame(tick);
           var c = THREE.AnimationClip.findByName(g.animations, n); if (!c) return;
           var a = mollyMix.clipAction(c); a.play(); a.timeScale = 0; a.setEffectiveWeight(0); mollyAct[n] = a; mollyW[n] = 0; mollyT[n] = 0;
         });
+        cometRest = {}; model.traverse(function (o) { if (o.isBone) cometRest[o.name] = o.quaternion.clone(); });   // the bones' rest pose, for Fly's arms
+        mollyDriftRun = false; model.traverse(function (o) { if (o.userData && o.userData.driftRun) mollyDriftRun = true; });   // a model saved from v179's Rig Editor carries drift clips made from her run (older ones carry a held pose, which the game does not use)
         mollyHoldF = {};                                          // a model saved from the Rig Editor carries where its slide and face-plant are held; the built-in one uses the built-in settings
         model.traverse(function (o) { var ud = o.userData; if (ud && typeof ud.slideHold === 'number' && ud.slideHold > 0 && ud.slideHold <= 1) mollyHoldF.Slide = ud.slideHold; if (ud && typeof ud.fallHold === 'number' && ud.fallHold > 0 && ud.fallHold <= 1) mollyHoldF.Faceplant = ud.fallHold; });
         mollyRoot = root; body.add(root); lower.visible = false; upper.visible = false; mollyOn = true; glowMats = null;
@@ -7839,34 +7945,43 @@ requestAnimationFrame(tick);
       localStorage.setItem('mollyGlb', btoa(t)); return true;
     } catch (e) { return false; }
   }
-  function mollyStore(buf, done) {                              // keep a saved model in this browser; done(true) once it is safely there, done(false) if it could not be kept
+  function glbKey(ch) { return (ch || CHAR) === 'comet' ? 'cometGlb' : 'mollyGlb'; }
+  function mollyStore(buf, done, ch) {                              // keep a saved model in this browser; done(true) once it is safely there, done(false) if it could not be kept
     var once = false, fin = function (ok) { if (once) return; once = true; if (ok) mollySavedBytes = buf.byteLength; if (done) done(ok); };
     mollyDbOpen(function (db) {
-      if (!db) { fin(mollyStoreLS(buf)); return; }
+      if (!db) { fin(glbKey(ch) === 'mollyGlb' ? mollyStoreLS(buf) : false); return; }
       try {
-        var tx = db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(buf, 'mollyGlb');
-        tx.oncomplete = function () { try { localStorage.removeItem('mollyGlb'); } catch (e) {} fin(true); };
+        var tx = db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(buf, glbKey(ch));
+        tx.oncomplete = function () { try { if (glbKey(ch) === 'mollyGlb') localStorage.removeItem('mollyGlb'); } catch (e) {} fin(true); };
         tx.onerror = function () { fin(false); }; tx.onabort = function () { fin(false); };
       } catch (e) { fin(false); }
     });
   }
-  function mollyFetch(cb) {                                     // the saved model's bytes, or null
+  function mollyFetch(cb, ch) {                                     // the saved model's bytes, or null
     mollyDbOpen(function (db) {
       if (!db) { cb(null); return; }
-      try { var rq = db.transaction('kv', 'readonly').objectStore('kv').get('mollyGlb'); rq.onsuccess = function () { cb(rq.result && rq.result.byteLength ? rq.result : null); }; rq.onerror = function () { cb(null); }; }
+      try { var rq = db.transaction('kv', 'readonly').objectStore('kv').get(glbKey(ch)); rq.onsuccess = function () { cb(rq.result && rq.result.byteLength ? rq.result : null); }; rq.onerror = function () { cb(null); }; }
       catch (e) { cb(null); }
     });
   }
-  (function () {
+  function loadCharModel() {                                    // the model of whoever she is playing as: her saved one, else the built-in Molly (Comet's too, until one is saved for her)
     var dflt = function () { mollySavedBytes = 0; mollyLoad(b64ToBuf(document.getElementById('molly-glb').textContent)); };
+    if (isComet()) { mollyFetch(function (buf) { if (buf) { mollySavedBytes = buf.byteLength; mollyLoad(buf, dflt); } else dflt(); }, 'comet'); return; }
     var old = null, oldBuf = null; try { old = localStorage.getItem('mollyGlb'); if (old) oldBuf = b64ToBuf(old); } catch (e) { oldBuf = null; }
     if (oldBuf) {                                                // a model saved by a build up to v173 (it can only be newer than anything in the database: the copy here is removed as soon as it has been moved)
       mollySavedBytes = oldBuf.byteLength; mollyLoad(oldBuf, dflt);
       mollyDbOpen(function (db) { if (db) mollyStore(oldBuf); });   // (with no database it simply stays where it is)
       return;
     }
-    mollyFetch(function (buf) { if (buf) { mollySavedBytes = buf.byteLength; mollyLoad(buf, dflt); } else dflt(); });
-  })();
+    mollyFetch(function (buf) { if (buf) { mollySavedBytes = buf.byteLength; mollyLoad(buf, dflt); } else dflt(); }, 'molly');
+  }
+  loadCharModel();
+  function setChar(ch) {                                         // the Characters page's Play as buttons
+    if (ch !== 'comet') ch = 'molly'; if (ch === CHAR) { refreshStatCards(); return; }
+    CHAR = ch; try { localStorage.setItem('pr_char', ch); } catch (e) {}
+    if (ballOn) setBall(false, true); if (typeof setHover === 'function') setHover(false, true);
+    rigRead(); if (typeof barrierBuild === 'function') barrierBuild(); loadCharModel(); refreshStatCards();
+  }
   // ---- The Rig Editor: a full-screen panel (its own shadow tree, so its styles stay out of the game) opened from the title screen. Save to game rebuilds Molly. ----
   var rigHost = null;
   function openRig() {
@@ -7878,7 +7993,9 @@ requestAnimationFrame(tick);
       var sr = rigHost.attachShadow({ mode: 'open' }); sr.appendChild(document.getElementById('rig-tpl').content.cloneNode(true));
       rigHost.__init = document.getElementById('molly-settings').textContent;
       rigHost.__save = function (buf, json, done) {                 // the game takes the new Molly only if she loads cleanly, and reports whether this browser could keep her (its storage can be full, or switched off)
-        mollyLoad(buf, function () { if (done) done('bad'); }, function () { rigRead(); barrierBuild(); mollyStore(buf, function (kept) { if (done) done(kept ? 'ok' : 'big'); }); });
+        var ch = rigHost.__char || 'molly';
+        if (ch !== CHAR) { mollyStore(buf, function (kept) { if (done) done(kept ? 'ok' : 'big'); }, ch); return; }   // the runner she is not playing as: kept for when she is
+        mollyLoad(buf, function () { if (done) done('bad'); }, function () { rigRead(); barrierBuild(); mollyStore(buf, function (kept) { if (done) done(kept ? 'ok' : 'big'); }, ch); });
       };
       rigHost.__close = function () { rigHost.hidden = true; rigHost.__open = false; rigRead(); barrierBuild(); };
       ['keydown', 'keyup', 'keypress'].forEach(function (t) { rigHost.addEventListener(t, function (e) { e.stopPropagation(); }); });
@@ -7988,6 +8105,7 @@ requestAnimationFrame(tick);
     else if (!grounded) want = 'Jump';
     else if (zp < 0.75) want = 'Idle';
     else want = zp <= 15 ? 'Run_Slow' : zp < 45 ? 'Run_Mid' : 'Run_Fast';
+    if (mollyDriftRun && driftBlend > 0.5 && grounded && want.indexOf('Run_') === 0 && mollyAct.Drift_L && mollyAct.Drift_R) want = driftSide > 0 ? 'Drift_L' : 'Drift_R';   // her run with the Drift dials' changes, stride for stride
     if (!grounded && mollyPrevGround) mollyV0 = 0;
     if (!grounded && vy > mollyV0) mollyV0 = vy;                // the launch speed of this jump (a ledge walk-off has none)
     mollyPrevGround = grounded;
@@ -7997,12 +8115,12 @@ requestAnimationFrame(tick);
       if (n === want && mollyW[n] < 0.02 && (n === 'Slide' || n === 'Faceplant' || n === 'RunnersPose' || n === 'Drift_L' || n === 'Drift_R')) mollyT[n] = 0;
       mollyW[n] += ((n === want ? 1 : 0) - mollyW[n]) * f; tot += mollyW[n];
     }
-    var rc = mollyAct.Run_Mid.getClip().duration, ref = want === 'Run_Slow' ? 8 : want === 'Run_Fast' ? 60 : 30;
+    var rc = mollyAct.Run_Mid.getClip().duration, ref = want === 'Run_Slow' ? 8 : want === 'Run_Fast' || want.indexOf('Drift') === 0 ? 60 : 30;
     mollyRunPh = (mollyRunPh + dt * Math.max(0.6, Math.min(1.6, zp / ref)) / rc) % 1;      // one shared stride phase, so a change of gait picks up where the last one left off
     for (i = 0; i < MOLLY_CLIPS.length; i++) {
       n = MOLLY_CLIPS[i]; var a = mollyAct[n]; if (!a) continue;
       var d = a.getClip().duration;
-      if (n.indexOf('Run_') === 0) a.time = mollyRunPh * d;
+      if (n.indexOf('Run_') === 0 || (mollyDriftRun && n.indexOf('Drift_') === 0)) a.time = mollyRunPh * d;
       else if (n === 'Idle') { mollyT.Idle = (mollyT.Idle + dt) % d; a.time = mollyT.Idle; }
       else if (n === 'Jump') {                                // the leap follows her real height: launch (27% of the clip) to apex (50%) while she rises, apex to touchdown (72%) while she falls
         var jf = vy > 0 && mollyV0 > 0 ? 0.27 + 0.23 * Math.max(0, 1 - vy / mollyV0) : 0.5 + 0.22 * Math.min(1, -vy / JUMP_V);
@@ -8049,7 +8167,7 @@ requestAnimationFrame(tick);
     hpEl.classList.add('hurt'); hurtEl.classList.add('on');
   }
   function landFall(h) {
-    if (ballOn) return;                                         // the Hedron Barrier takes the landing                                        // she has just touched down after falling h units from her highest point
+    if (ballOn || hovOn) return;                                // the Hedron Barrier (or Comet's Hover) takes the landing                                        // she has just touched down after falling h units from her highest point
     var dmg = h >= 135 ? 3 : h >= 90 ? 2 : h >= 45 ? 1 : 0;
     if (dmg === 0 || hp <= 0) return;
     hp = Math.max(0, hp - dmg); drawHearts(); flashHurt();
@@ -8353,7 +8471,7 @@ requestAnimationFrame(tick);
     }
     ovBub.count = n; ovBub.instanceMatrix.needsUpdate = true;
     var gh = mountainH(pp.x, pp.z, 1000) + ledgeH(pp.x, pp.z);   // the real ground under her, not the path or slab above it
-    if (ovTox && pp.y < gh + 2.2 && now >= toxUntil && hp > 0 && !ballOn) {
+    if (ovTox && pp.y < gh + 2.2 && now >= toxUntil && hp > 0 && !ballOn && !hovOn) {
       if (!toxTipDone) { toxTipDone = true; showHint('Doctor Rektangulik has poisoned the ground here! The dark patches will hurt you!', 5000, now); }
       toxUntil = now + 1000; hp -= 1; drawHearts(); flashHurt(); shake(0.3);
     }
@@ -8382,7 +8500,7 @@ requestAnimationFrame(tick);
         toxDummy.rotation.set(toxT * 0.7 + r1 * 6, toxT + r2 * 6, 0); toxDummy.scale.set(sz, sz, sz); toxDummy.updateMatrix();
         toxBub.setMatrixAt(n++, toxDummy.matrix);
       }
-      if (onPath && sg >= t.a - 0.3 && sg <= t.b + 0.3 && Math.abs(v - t.v) < 1.25 && pp.y < L2_Y + TOX_H + 1 && now >= toxUntil && hp > 0 && !ballOn) {
+      if (onPath && sg >= t.a - 0.3 && sg <= t.b + 0.3 && Math.abs(v - t.v) < 1.25 && pp.y < L2_Y + TOX_H + 1 && now >= toxUntil && hp > 0 && !ballOn && !hovOn) {
         toxUntil = now + 1000; hp -= 1; drawHearts(); flashHurt(); shake(0.3);
       }
     }
@@ -9286,7 +9404,7 @@ requestAnimationFrame(tick);
 
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
-  { v: 'v179', d: 'Nov 14, 2026', t: 'Pressure plates, targets and a new Grass Canyon', g: [
+  { v: 'v179', d: 'Nov 14, 2026', t: 'Comet, pressure plates, targets and a new Grass Canyon', g: [
     ['Levels', [
       'Grass Canyon, Act 1 is Ricky\'s re-edited layout: a door, a mud pad and two more Seg chains, with the trees thinned (1,411, down from 1,976). Opening it in the Path Editor loads the same layout.'
     ]],
@@ -9295,6 +9413,16 @@ var CHANGELOG = [
       'Target: an upright wooden disc with a red ring and middle, on a sign post or hanging in the air. Size, height, tilt, spin and heading; it can move side to side and/or up and down on the level clock, like platforms. One heart: the Barrier breaks it when it hits at its break speed (20 Zips unless set), and it splits in two and falls apart like a beaten minion. Otherwise it is solid. Its hitbox matches its size and can be scaled.',
       'Doors can be linked to plates and targets as well as minions: a linked door changes to its After mode once every minion linked is beaten, every plate pressed and every target broken. Plates and targets reset when she respawns, as minions do.',
       'Every stamp is now free by default (Snap to the path is still a choice per stamp). A stamp placed near the path still faces along it. Mud and Seg chains stamp on their own curve, and can be set to follow the path afterwards.'
+    ]],
+    ['Comet', [
+      'A second runner. Pick her on the Characters page (Play as Comet). She starts as a copy of Molly, and has her own Rig Editor page with every one of Molly\'s dials, kept apart from Molly\'s, and her own saved model.',
+      'No Strafe and no Hedron Barrier. Instead, Q or E is Star Throw: a small, flat, spinning star of blue energy that flies straight where the camera faces, 50 units, for half a heart. It needs Power above 0 and costs 1, with a 2 s cooldown. Hold the key to charge it on the speedometer\'s charge bar: each second, up to 3, costs 2 Power and adds 50% size, half a heart and 50 units. It goes by itself at 3 s, or when she cannot pay for the next second. It hurts minions and breaks targets.',
+      '2 is Hover: 6 Power to start, then 1 a second. She floats half a unit over whatever she would stand on, with none of what standing does (no mud, no toxic ground, no pressure plates, no hard landings), on Hover\'s own movement stats. Two small spinning stars ride at her ankles and a bigger one behind her back.',
+      'While hovering, Space held in the air is Fly: lift that cancels gravity (adjustable), for 4 more Power a second. She raises her arms over her head and the star from her back goes up to her hands.'
+    ]],
+    ['Rig Editor', [
+      'Pages across the top: Molly, Comet and Mobs. Mobs has the Minions and Big Minions tabs (the same dials as before); a new kind of mob is one more tab.',
+      'The Drift animation now shows what she does in the game: her Fast run, leaning into the corner from her feet. Its dials are now changes laid over her run while she drifts (all 0 to start, so nothing changes until you move one); Save to game puts them in the game.'
     ]]
   ]},
   { v: 'v178.1', d: 'Nov 15, 2026', t: 'Nightly fixes', g: [
@@ -9779,6 +9907,118 @@ function showScreen(name) {                                // the menu shows one
   document.addEventListener('pointerlockchange', function () {
     if (!document.pointerLockElement && playing && mouseMode !== 'drag') pause();
   });
+
+  // ---- Comet's moves (the Rig Editor's Comet page sets every number). She has no Strafe and no Hedron Barrier. ----
+  // Star Throw: Q or E. Needs more than 0 Power and costs 1; a small flat spinning five-pointed star of blue energy flies straight where the camera points, 50 units, for half a heart.
+  // Held, it charges (the speedometer's charge bar): each whole second, up to 3, costs 2 Power and adds 50% size, half a heart and 50 units. Out of Power or at 3 seconds it goes by itself. 2 s cooldown.
+  // Hover: 2. Costs 6 Power, then 1 a second; she floats half a unit over whatever she would stand on (no mud, toxic ground, pressure plates or hard landings) on Hover's own movement stats.
+  // Fly: Space held in the air while hovering: lift against gravity (1 = cancels it) for 4 more Power a second. Arms up, and the star on her back goes up to her hands.
+  window.__comet = function () { return { char: CHAR, hov: hovOn, fly: flyOn, power: +segCount.toFixed(2), charging: starCharging, lvl: starLvl, stars: STARS.filter(function (q) { return !q.hitAt; }).map(function (q) { return [+q.r.toFixed(2), +q.dmg.toFixed(2), +q.left.toFixed(1)]; }), cool: starCoolUntil, vy: +vy.toFixed(2), y: +player.position.y.toFixed(2), bodyY: +body.position.y.toFixed(2), grounded: grounded, top: RUN_SPEED / TILE }; };
+  window.__hovFx = function () { var p = player.position; return hovFx ? { flyBlend: +flyBlend.toFixed(2), B: [+(hovFx.B.position.x - p.x).toFixed(2), +(hovFx.B.position.y - p.y).toFixed(2), +(hovFx.B.position.z - p.z).toFixed(2)], L: +(hovFx.L.position.y - p.y).toFixed(2), vis: hovFx.B.visible, rest: !!cometRest && Object.keys(cometRest).length, bone: !!(mollyRoot && mollyRoot.getObjectByName('WristL')) } : null; };
+  window.__setChar = function (c) { setChar(c); }; window.__setPower = function (v) { setPower(v); };
+  var starCharging = false, starKey = null, starT = 0, starLvl = 0, starCoolUntil = 0, STARS = [];
+  var hovOn = false, flyOn = false, hovBlend = 0, flyBlend = 0, hovFx = null, cometRest = null;
+  function powerDeny() { seglineEl.classList.remove('deny'); void seglineEl.offsetWidth; seglineEl.classList.add('deny'); }
+  function cometC(k) { return RIGCFG['comet.' + k]; }
+  function starGeo(R) {                                          // a flat five-pointed star, R from its middle to a point
+    var sh = new THREE.Shape(), i; for (i = 0; i < 10; i++) { var a = Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? R * 0.42 : R; if (i) sh.lineTo(Math.cos(a) * r, Math.sin(a) * r); else sh.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+    var g = new THREE.ExtrudeGeometry(sh, { depth: R * 0.14, bevelEnabled: false }); g.translate(0, 0, -R * 0.07); return g;
+  }
+  var starGlowTex = null;
+  function starMesh(size) {                                      // the star and a soft glow round it; .spin is the part that turns
+    if (!starGlowTex) { var cv = document.createElement('canvas'); cv.width = cv.height = 64; var g2 = cv.getContext('2d'), gr = g2.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.35, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, 64, 64); starGlowTex = new THREE.CanvasTexture(cv); }
+    var grp = new THREE.Group(), spin = new THREE.Group(); grp.add(spin);
+    var m = new THREE.Mesh(starGeo(size / 2), new THREE.MeshBasicMaterial({ color: new THREE.Color(cometC('cStar')) })); spin.add(m);
+    var gl = new THREE.Sprite(new THREE.SpriteMaterial({ map: starGlowTex, color: new THREE.Color(cometC('cGlow')), transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false })); gl.scale.setScalar(size * 2.2); grp.add(gl);
+    grp.spin = spin; grp.glow = gl; return grp;
+  }
+  function starPress(code) {
+    if (!playing || starCharging || fpOn) return;
+    if (starCoolUntil > 0) return;                                 // still cooling down (game time: it waits while paused)
+    if (segCount <= 0) { powerDeny(); return; }                  // it needs some Power
+    setPower(segCount - cometC('star.cost')); starCharging = true; starKey = code; starT = 0; starLvl = 0;
+  }
+  function starRelease() {
+    if (!starCharging) return; starCharging = false; starKey = null;
+    var lvl = starLvl, size = cometC('star.size') * (1 + cometC('star.cSize') * lvl), dmg = cometC('star.dmg') + cometC('star.cDmg') * lvl, range = cometC('star.range') + cometC('star.cRange') * lvl;
+    var ev = Math.max(-1.4, Math.min(1.4, 0.35 - pitch)), d = new THREE.Vector3(-Math.sin(yaw) * Math.cos(ev), Math.sin(ev), -Math.cos(yaw) * Math.cos(ev));   // where the camera faces; level at the camera's resting tilt (it looks down at her), up or down as the camera tilts from there
+    var up = new THREE.Vector3(0, 1, 0), nrm = up.clone().sub(d.clone().multiplyScalar(d.y)); if (nrm.lengthSq() < 1e-4) nrm.set(1, 0, 0); nrm.normalize();   // it flies flat: its face turned up, square to the way it goes
+    var g = starMesh(size), pp = player.position; g.position.set(pp.x + d.x * 1.2, pp.y + PLAYER_H * 0.62 + d.y * 1.2, pp.z + d.z * 1.2);
+    g.spin.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), nrm); scene.add(g);
+    STARS.push({ g: g, d: d, left: range, dmg: dmg, r: size / 2, a: 0, nrm: nrm, hitAt: 0 });
+    starCoolUntil = cometC('star.cool');
+  }
+  function starHitTarget(tg, dmg, now) { if (tg.on) return false; tg.hp = (tg.hp === undefined ? 1 : tg.hp) - dmg; if (tg.hp <= 1e-6) sbTargetBreak(tg, now); return true; }
+  function setHover(on, quiet) {
+    if (on === hovOn) return;
+    if (on) { if (!isComet() || ballOn) return; var c = cometC('hov.cost'); if (segCount < c || segCount <= 0) { powerDeny(); return; } setPower(segCount - c); }
+    hovOn = on; if (!on) flyOn = false; applyStats();
+  }
+  function cometInput(dt) {                                      // per step: the charge, the Power that Hover and Fly use, and whether she is flying
+    if (!isComet()) { if (hovOn) setHover(false, true); starCharging = false; return; }
+    if (playing) starCoolUntil = Math.max(0, starCoolUntil - dt);
+    if (starCharging) {
+      if (!playing) { starCharging = false; }
+      else {
+        starT += dt;
+        var mx = Math.max(0, Math.round(cometC('star.cMax')));
+        if (starLvl < mx && starT >= starLvl + 1) { if (segCount >= cometC('star.cCost') && segCount > 0) { setPower(segCount - cometC('star.cCost')); starLvl++; } else starRelease(); }   // can't pay for the next second: it goes
+        if (starCharging && starT >= Math.max(mx, 0.0001) && starLvl >= mx) starRelease();
+      }
+    }
+    flyOn = hovOn && playing && !grounded && spaceDown;
+    if (hovOn && playing) { setPower(segCount - (cometC('hov.drain') + (flyOn ? cometC('fly.drain') : 0)) * dt); if (segCount <= 0) setHover(false); }
+  }
+  function cometStars(dt, now) {                                 // thrown stars: fly, spin, and hit a mob, a target or the ground
+    for (var i = STARS.length - 1; i >= 0; i--) {
+      var st = STARS[i], g = st.g;
+      if (st.hitAt) { var f = (now - st.hitAt) / 220; g.glow.scale.setScalar(st.r * 4.4 * (1 + f * 1.5)); g.glow.material.opacity = 0.8 * (1 - f); g.spin.visible = false; if (f >= 1) { scene.remove(g); STARS.splice(i, 1); } continue; }
+      st.a += cometC('star.spin') * 2 * Math.PI * dt; g.spin.children[0].rotation.z = st.a;
+      var step = Math.min(st.left, cometC('star.speed') * TILE * dt), n = Math.max(1, Math.ceil(step / 0.5)), hit = false;
+      for (var k = 1; k <= n && !hit; k++) {
+        var x = g.position.x + st.d.x * step * k / n, y = g.position.y + st.d.y * step * k / n, z = g.position.z + st.d.z * step * k / n;
+        for (var j = 0; j < ENEMIES.length && !hit; j++) {
+          var e = ENEMIES[j]; if (e.dead || (e.sbp ? level !== 3 : e.l2 ? level !== 2 : level !== 1) || ((e.ov || e.sbp) && !e.act)) continue;   // the same mobs the game is running
+          if (Math.hypot(x - e.x, z - e.z) < e.R + st.r && y > e.fy - st.r && y < e.fy + e.H + st.r) {
+            hit = true; e.hearts -= st.dmg; e.pulse = now; e.flashUntil = now + 1000; if (e.hearts <= 1e-6) killEnemy(e, now);
+          }
+        }
+        if (!hit && level === 3 && SB && SB.targets) for (j = 0; j < SB.targets.length && !hit; j++) { var tg = SB.targets[j]; if (!tg.on && tg.mv && sbTargetDist(tg, x, y, z).d < st.r) hit = starHitTarget(tg, st.dmg, now); }
+        if (!hit && y < groundH(x, z)) hit = true;              // into the ground
+        if (hit) g.position.set(x, y, z);
+      }
+      if (hit) { st.hitAt = now; continue; }
+      g.position.addScaledVector(st.d, step); st.left -= step;
+      if (st.left <= 1e-6) { st.hitAt = now; }                   // its range used up: it fades out where it is
+    }
+  }
+  function cometPose(dt) {                                       // the Hover stars and Fly's arms
+    var hv = isComet() && hovOn, fl = hv && flyOn;
+    hovBlend += ((hv ? 1 : 0) - hovBlend) * Math.min(1, dt * 10); flyBlend += ((fl ? 1 : 0) - flyBlend) * Math.min(1, dt * cometC('fly.arms'));
+    if (hovBlend > 0.001) body.position.y += cometC('hov.height') * hovBlend;   // she floats over whatever she would be standing on
+    if (!hovFx) { hovFx = { L: starMesh(1), R: starMesh(1), B: starMesh(1), a: 0 }; [hovFx.L, hovFx.R, hovFx.B].forEach(function (m) { m.visible = false; scene.add(m); }); }
+    var show = hovBlend > 0.02; hovFx.L.visible = hovFx.R.visible = hovFx.B.visible = show; if (!show) return;
+    var sA = cometC('hov.ankle') * hovBlend, sB = cometC('hov.back') * hovBlend; hovFx.L.scale.setScalar(sA); hovFx.R.scale.setScalar(sA); hovFx.B.scale.setScalar(sB);
+    [hovFx.L, hovFx.R, hovFx.B].forEach(function (m) { m.spin.children[0].material.color.set(cometC('cStar')); m.glow.material.color.set(cometC('cGlow')); });
+    hovFx.a += cometC('hov.spinS') * 2 * Math.PI * dt;
+    var rot = player.rotation.y, fx = -Math.sin(rot), fz = -Math.cos(rot), v = new THREE.Vector3(), pp = player.position, bn = mollyOn && mollyRoot ? mollyRoot : null;
+    var bone = function (n) { var b = bn && bn.getObjectByName(n); return b ? b.getWorldPosition(new THREE.Vector3()) : null; };
+    if (fl && bn && cometRest) {                                   // Fly: both arms straight up over her head
+      ['L', 'R'].forEach(function (S, i) { var g = i ? -1 : 1, sh = bn.getObjectByName('Shoulder' + S), el = bn.getObjectByName('Elbow' + S);
+        if (sh && cometRest['Shoulder' + S]) sh.quaternion.slerp(cometRest['Shoulder' + S].clone().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-170 * Math.PI / 180, 0, 0))).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, g * 8 * Math.PI / 180))), flyBlend);
+        if (el && cometRest['Elbow' + S]) el.quaternion.slerp(cometRest['Elbow' + S].clone().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-8 * Math.PI / 180, 0, 0))), flyBlend); });
+    }
+    player.updateMatrixWorld(true);
+    var aL = bone('AnkleL'), aR = bone('AnkleR'), sp = bone('Spine'), wL = bone('WristL'), wR = bone('WristR'), H = PLAYER_H, lift = cometC('hov.height') * hovBlend;
+    if (!aL) aL = new THREE.Vector3(pp.x - Math.cos(rot) * 0.3, pp.y + lift + 0.3, pp.z + Math.sin(rot) * 0.3);
+    if (!aR) aR = new THREE.Vector3(pp.x + Math.cos(rot) * 0.3, pp.y + lift + 0.3, pp.z - Math.sin(rot) * 0.3);
+    if (!sp) sp = new THREE.Vector3(pp.x, pp.y + lift + H * 0.62, pp.z);
+    hovFx.L.position.copy(aL); hovFx.R.position.copy(aR);
+    [hovFx.L, hovFx.R].forEach(function (m, i) { m.spin.rotation.set(-Math.PI / 2, 0, (i ? -1 : 1) * hovFx.a); });   // flat round her ankles, turning
+    var back = new THREE.Vector3(sp.x - fx * 0.55, sp.y + 0.15, sp.z - fz * 0.55), top = wL && wR ? wL.clone().add(wR).multiplyScalar(0.5).add(new THREE.Vector3(0, 0.25, 0)) : new THREE.Vector3(pp.x, pp.y + lift + H + 0.9, pp.z);
+    hovFx.B.position.copy(back.lerp(top, flyBlend));
+    hovFx.B.spin.rotation.set(0, rot, 0); hovFx.B.spin.children[0].rotation.z = hovFx.a * 0.7;   // upright behind her, facing back, turning slowly
+  }
   function setBall(on, quiet) {
     if (on === ballOn) return;
     if (on) {
@@ -9793,19 +10033,20 @@ function showScreen(name) {                                // the menu shows one
     
   }
   document.addEventListener('keydown', function (e) {
-    if (!e.repeat && playing && !fpOn && (e.code === 'Digit2' || e.code === 'Numpad2')) setBall(!ballOn);
+    if (!e.repeat && playing && !fpOn && (e.code === 'Digit2' || e.code === 'Numpad2')) { if (isComet()) setHover(!hovOn); else setBall(!ballOn); }
     if (fpOn && (e.code === 'KeyW' || e.code === 'KeyS' || e.code === 'KeyA' || e.code === 'KeyD' || e.code === 'Space' || e.code === 'KeyQ' || e.code === 'KeyE')) { if (e.code === 'Space') e.preventDefault(); return; }   // flat on her face, she cannot be steered
     if (e.code === 'KeyW') keys.w = true;
     if (e.code === 'KeyS') keys.s = true;
     if (e.code === 'KeyA') keys.a = true;
     if (e.code === 'KeyD') keys.d = true;
-    if (!e.repeat && e.code === 'KeyE') strafe(1);
-    if (!e.repeat && e.code === 'KeyQ') strafe(-1);
+    if (!e.repeat && e.code === 'KeyE') { if (isComet()) starPress('KeyE'); else strafe(1); }
+    if (!e.repeat && e.code === 'KeyQ') { if (isComet()) starPress('KeyQ'); else strafe(-1); }
     if (e.code === 'Space' && playing) { e.preventDefault(); if (!e.repeat) { jumpBuf = 0.15; spaceDown = true; } }
     if (e.code === 'Escape' && playing) pause();
     else if (e.code === 'Escape' && !startEl.hidden) { if (screenNow === 'controls') showScreen(controlsBack); else if (screenNow === 'levels') showScreen('main'); else if (screenNow === 'settings') showScreen(settingsBack); else if (screenNow === 'cps' || screenNow === 'map' || screenNow === 'dev') showScreen('pause'); else if (screenNow === 'lvmap') showScreen('levels'); }
   });
   document.addEventListener('keyup', function (e) {
+    if (starCharging && e.code === starKey) starRelease();
     if (e.code === 'KeyW') keys.w = false;
     if (e.code === 'KeyS') keys.s = false;
     if (e.code === 'KeyA') keys.a = false;
@@ -9933,7 +10174,9 @@ function showScreen(name) {                                // the menu shows one
       if (dashHold >= 0.25 && playing && ballOn && grounded && !keys.w && !keys.s) speed = Math.min(DASH_MAX, DASH_RATE * dashHold) * TILE;
       dashHold = 0;
     }
-    setCharge(dashNow ? dashHold * DASH_RATE / DASH_MAX : 0, ballOn && playing);
+    cometInput(sdt);
+    if (isComet()) setCharge(starCharging ? starT / Math.max(0.01, Math.round(cometC('star.cMax')) || 0.01) : 0, starCharging && playing);
+    else setCharge(dashNow ? dashHold * DASH_RATE / DASH_MAX : 0, ballOn && playing);
     if (ballOn && playing) { setPower(segCount - (dashNow ? BARRIER_DRAIN * 4 : BARRIER_DRAIN) * sdt); if (segCount <= 0) setBall(false); }   // the Barrier eats 1% of the Power Line each second and drops when it runs dry
     // Runner's Pose: hold S while standing still and she crouches, for as long as she likes. After 3 seconds she flashes a soft red
     // to say she is ready; the moment S is let go she takes off at 50 Zips. Letting go before the flash does nothing.
@@ -9946,7 +10189,7 @@ function showScreen(name) {                                // the menu shows one
     var glow = rpReady && rpFlash < RP_FLASH_T ? 0.55 * Math.max(0, Math.sin(rpFlash / RP_FLASH_T * Math.PI * 4)) : 0;   // two soft pulses
     if (glow !== rpGlowNow) { rpGlowNow = glow; setGlow(glow); }
     // The mud ramp: slower than 30 Zips on it and she cannot grip. She is dragged to a stop, turned round and slid back down.
-    var mudStall = playing && grounded && slA > 0 && slDeg > 8 && speed < MIN_UP - 0.5 && sl < 0.5 && mudAt(player.position.x, player.position.z);
+    var mudStall = playing && grounded && !hovOn && slA > 0 && slDeg > 8 && speed < MIN_UP - 0.5 && sl < 0.5 && mudAt(player.position.x, player.position.z);
     if (mudStall) sliding = true;
     mudWas = mudStall;
     // Speed along her heading: her drive + gravity along the surface - friction. Her drive only works up to her top speed; whenever she is not driving
@@ -10033,7 +10276,7 @@ function showScreen(name) {                                // the menu shows one
     for (var si = 0; si < steps; si++) {
       var bumpedStep = false;
       if (grounded || ballOn) fallTop = pp.y; else if (pp.y > fallTop) fallTop = pp.y;
-      if (!grounded) { var nvy = (ballOn && playing && keys.s) ? Math.max(-SLAM_MAX, vy - SLAM_ACC * hdt) : Math.max(-FALL_MAX, vy - GRAV * hdt); pp.y += (vy + nvy) * 0.5 * hdt; vy = nvy; }
+      if (!grounded) { var nvy = (ballOn && playing && keys.s) ? Math.max(-SLAM_MAX, vy - SLAM_ACC * hdt) : Math.max(-FALL_MAX, Math.min(FALL_MAX, vy - GRAV * (flyOn ? 1 - cometC('fly.lift') : 1) * hdt)); pp.y += (vy + nvy) * 0.5 * hdt; vy = nvy; }
       if (!blocked) {
         var ox = pp.x, oz = pp.z;
         pp.x += fx * stepLen;
@@ -10178,6 +10421,7 @@ function showScreen(name) {                                // the menu shows one
 
     updateEnemies(sdt, now);
     if (level === 3) sbTargetHit(now);
+    cometStars(sdt, now);
     updateStreaks(dt);
     updateChunks(player.position.x, player.position.z, 1);
     updateTrees(player.position.x, player.position.z);
@@ -10290,7 +10534,8 @@ function showScreen(name) {                                // the menu shows one
       body.position.y += (-0.32 - body.position.y) * db * 0.6;
       upper.rotation.y *= 1 - db;
     }
-    if (mollyOn && !ballOn) { body.rotation.x = 0; body.position.y = 0; updateMolly(sdt, Math.abs(speed) / TILE); }   // the clips pose her; only the lean into turns and the slope pitch below still apply
+    if (mollyOn && !ballOn) { body.rotation.x = 0; body.position.y = 0; updateMolly(sdt, Math.abs(speed) / TILE); }
+    cometPose(sdt);   // the clips pose her; only the lean into turns and the slope pitch below still apply
     // Pitch with her travel up and down (not over the special poses, which set their own body angle)
     var pk = pitchLean * (1 - Math.max(slideBlend, rpBlend, fpBlend));
     body.rotation.x += pk;

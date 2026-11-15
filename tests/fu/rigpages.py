@@ -1,0 +1,26 @@
+# Rig Editor pages: Molly / Comet / Mobs. Comet's dials are her own (cometRig), start as Molly's, and her Save to game keeps her model apart; Mobs has the minion tabs
+import sys; sys.path.insert(0,'/home/claude/poly-runner/tests')
+from righ import *
+SP=sys.argv[1] if len(sys.argv)>1 else '/tmp'
+g=Rig(w=1100,h=760); g.open(); pg=g.pg
+vis=lambda sel: g.ev("s=>{var e=document.getElementById('rigHost').shadowRoot.querySelector(s);return !!e&&getComputedStyle(e).display!=='none'}",sel)
+print('molly page: stats',vis('#statBox'),'comet box',vis('#cometBox'),'mobs',vis('#mobBox'),'barrier button',vis('[data-m=barrier]'))
+g.typed('stat.top',91,200)
+g.click('#pages button[data-pg="comet"]',1500)
+print('comet page: h1',g.ev(g.q('#rigH1')+'.textContent'),'stats',vis('#statBox'),'comet box',vis('#cometBox'),'mobs',vis('#mobBox'),'barrier button',vis('[data-m=barrier]'))
+print('comet starts as a copy of Molly: top speed',g.ev(R+".querySelector('#s_stat_top').value"))
+print(g.typed('stat.top',70,200), g.typed('comet.star.range',75,200))
+pg.screenshot(path=SP+'/rig_comet.png')
+g.click('#pages button[data-pg="mobs"]',1200)
+print('mobs page: tabs',g.ev("[...document.getElementById('rigHost').shadowRoot.querySelectorAll('#minTabs button')].map(b=>b.textContent)"),'stats',vis('#statBox'),'parts chips',vis('#chips'),'mobs',vis('#mobBox'),'pose buttons',vis('#modes'))
+g.click('#minTabs button[data-mt="big"]',800); print('note:',g.ev(g.q('#minNote')+'.textContent'))
+pg.screenshot(path=SP+'/rig_mobs.png')
+g.click('#pages button[data-pg="molly"]',1500); print('back to Molly: top speed',g.ev(R+".querySelector('#s_stat_top').value"))
+st=pg.evaluate("[JSON.parse(localStorage.getItem('runnerRig2'))['stat.top'],JSON.parse(localStorage.getItem('cometRig'))['stat.top'],JSON.parse(localStorage.getItem('cometRig'))['comet.star.range']]")
+print('stored: molly top, comet top, comet star range',st)
+g.click('#pages button[data-pg="comet"]',1500); g.click('#exportGlb',200); pg.wait_for_timeout(9000); print('comet save:',g.ev(g.q('#status')+'.textContent'))
+g.click('#rigClose',300)
+print('game playing as',pg.evaluate("__comet().char"),'its top speed',pg.evaluate("__comet().top"))
+pg.evaluate("__setChar('comet')"); pg.wait_for_timeout(2500); print('as comet: top',pg.evaluate("__comet().top"),'star range',pg.evaluate("(function(){return 0})()"))
+print('cards:',pg.evaluate("document.getElementById('charStats').textContent.replace(/\\s+/g,' ').slice(0,80)"))
+print('errors',[e for e in g.errs if 'flatShading' not in e and 'ERR_FAILED' not in e and 'GPU stall' not in e and 'normalized normal' not in e][:5]); g.close()
