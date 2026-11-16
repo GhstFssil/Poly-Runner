@@ -28,7 +28,7 @@
 
   #start {
     position: absolute; inset: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: safe center;   /* a screen taller than the window starts at its top and scrolls, instead of being cut off above */
     padding: 12px max(16px, env(safe-area-inset-right, 0px)) 14px max(16px, env(safe-area-inset-left, 0px));
     overflow-y: auto;
     background: rgba(43, 29, 20, 0.45);
@@ -1005,7 +1005,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (t === 'gap' && !U('w')) o.w = S.width + 6; if (t === 'goal' && !U('w')) o.w = Math.max(16, S.width + 7);
     if (STRIPS[t]) {
       var nn = nearest(x, z);
-      o.follow = false; o.x = x; o.z = z; o.th = nn.d < 200 ? at(nn.s).th * 180 / Math.PI : 0; o.bend = 0; return o;
+      o.follow = false; o.x = x; o.z = z; o.th = nn.d < 200 ? at(nn.s).th * 180 / Math.PI : 0; if (o.bend === undefined) o.bend = 0; return o;     // a Bend set in the next-stamp panel (DEF) carries onto the stamp
     }
     place(o, x, z); return o;
   }
@@ -1404,13 +1404,14 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (!STRIPS[o.t] && !joinedCave) h += '<label class="f">Snap to the path<select data-ok="noat"><option value="0"' + (isFree ? '' : ' selected') + '>Snaps: follows the path when it changes</option><option value="1"' + (isFree ? ' selected' : '') + '>Free: stays where it is</option></select></label>';
     if (!ghost && !joinedCave && (!STRIPS[o.t] || o.follow === false)) h += num('X', 'X', -99999, 99999, 1, Math.round(p.x * 10) / 10) + num('Z', 'Z', -99999, 99999, 1, Math.round(p.z * 10) / 10) + (STRIPS[o.t] ? '' : num('rot', 'Rotation °', -360, 360, 5, o.rot || 0));
     if (o.t === 'tree') h += '<label class="f">Size<select data-ok="exs"><option value="rand"' + (o.ex ? '' : ' selected') + '>Random, like the level\'s own trees</option><option value="exact"' + (o.ex ? ' selected' : '') + '>Exactly these sizes</option></select></label>' + (o.ex ? num('tH', 'Trunk height', 1, 80, 0.5, o.tH) + num('tW', 'Trunk width', 0.2, 12, 0.1, o.tW) + num('cH', 'Canopy height', 1, 80, 0.5, o.cH) + num('cW', 'Canopy width', 1, 40, 0.5, o.cW) : '');
+    if (ghost && !STRIPS[o.t]) h += num('rot', 'Rotation °', -360, 360, 5, o.rot || 0);      // the next stamp can be turned before it is placed, like a placed one
     if (!ghost && !joinedCave) h += yRow(o);
     if (o.t === 'seg' || o.t === 'segchain') h += '<label class="f">Size<select data-ok="big"><option value="0"' + (o.big ? '' : ' selected') + '>Regular</option><option value="1"' + (o.big ? ' selected' : '') + '>Big (5×, worth 10)</option></select></label>';
     if (o.t === 'seg') h += num('h', 'Height above the ground', -1, 500, 0.5, o.h || 0);
     if (o.t === 'segchain') h += num('h', 'Height above the ground (at the start)', -1, 500, 0.5, o.h || 0) + num('rise', 'Rise by the end of the chain', -500, 500, 0.5, o.rise || 0) + num('arc', 'Vertical arc (extra height in the middle)', -500, 500, 0.5, o.arc || 0);
     if (o.t === 'mud') {
       if (!ghost) h += '<label class="f">Shape<select data-ok="follow"><option value="1"' + (o.follow === false ? '' : ' selected') + '>On the path (as wide as the path)</option><option value="0"' + (o.follow === false ? ' selected' : '') + '>Anywhere, on its own curve</option></select></label>';
-      if (o.follow === false) h += num('th', 'Heading ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10) + num('w', 'Width', 1, 300, 1, mudW(o));
+      if (o.follow === false) h += (ghost ? '' : num('th', 'Heading ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10)) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10) + num('w', 'Width', 1, 300, 1, mudW(o));   // the next mud takes its heading from where it is placed, so no Heading box
       else h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10);
       h += num('len', 'Length', 1, 5000, 1, o.len) + num('slow', 'Slowdown %', 0, 95, 1, o.slow) + endsF(o);
     }
@@ -1450,7 +1451,6 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       h += '<p class="note" style="margin:6px 0 0;font-size:12px;opacity:.75">Rotation turns the whole cave. From 80° up it is a shaft: a pit with this outline. Below that it is a tunnel; it cuts open to the sky where it is shallower than its own height, and goes under a roof of ground past that.</p>';
     }
     if (MOBS.indexOf(o.t) >= 0) h += '<label class="f">Behavior<select data-ok="idle"><option value="0"' + (o.idle ? '' : ' selected') + '>Chases Molly</option><option value="1"' + (o.idle ? ' selected' : '') + '>Idle (stands still, turns to face her)</option></select></label>';
-    if (o.t === 'bigminion') h += '<label class="f">Placement<select data-ok="trap"><option value="0"' + (o.trap ? '' : ' selected') + '>Free-roaming</option><option value="1"' + (o.trap ? ' selected' : '') + '>Trapped in a pit (top of head showing)</option></select></label>';
     if (o.t === 'hill') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('h', 'Height', 1, 500, 0.5, o.h) + '<label class="f">Surface<select data-ok="rock"><option value="rock"' + (o.rock === 'rock' ? ' selected' : '') + '>Bare rock</option><option value="grass"' + (o.rock === 'grass' ? ' selected' : '') + '>Grass</option></select></label>';
     if (o.t === 'lake') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('depth', 'Depth', 1, 200, 0.5, o.depth) + num('wl', 'Water level adjust (+ raises it)', -500, 500, 0.5, o.wl || 0);
     if (o.t === 'spawner') h += num('r', 'Radius', 2, 1000, 1, o.r) + num('every', 'Every (seconds)', 0.2, 120, 0.2, o.every) + num('max', 'Most alive at once', 1, 100, 1, o.max);
@@ -1533,7 +1533,6 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (pn && free && o.s !== undefined) { delete o.s; delete o.u; o.x = pn.x; o.z = pn.z; o.rot = Math.round(pn.th * 180 / Math.PI * 10) / 10; }     // let go: it stays exactly where it is, facing the same way
       else if (pn && !free && o.s === undefined && samples.length) { var na = nearest(o.x, o.z); if (na.d < 120) { var pa2 = at(na.s); o.rot = Math.round((o.rot || 0) - pa2.th * 180 / Math.PI); o.s = na.s; o.u = na.u; delete o.x; delete o.z; } }     // snap back: onto the path at the nearest spot
     }
-    else if (k === 'trap') { o.trap = t.value === '1'; DEF[o.t].trap = o.trap; }
     else if (k === 'idle') { o.idle = t.value === '1'; DEF[o.t] = DEF[o.t] || {}; DEF[o.t].idle = o.idle; }
     else if (k === 'big') { o.big = t.value === '1'; DEF[o.t].big = o.big; }
     else if (k === 'text' || k === 'shape' || k === 'move' || k === 'kind' || k === 'style' || k === 'rock' || k === 'ground' || k === 'edge' || k === 'ends') { o[k] = t.value; DEF[o.t][k] = t.value; }
@@ -4540,7 +4539,7 @@ var DEF={},k,q;
 for(k in GLOBAL)DEF[k]=GLOBAL[k];
 Object.keys(MOVEX).forEach(function(n){DEF['m.'+n+'.dur']=MOVEDUR[n];MOVEX[n].forEach(function(e,i){DEF['m.'+n+'.'+i+'.t']=e[0];for(var f in KD)DEF['m.'+n+'.'+i+'.'+f]=e[1][f];});});
 for(k in KD){if(k!=='fl')DEF['dA.'+k]=0;}   /* Drift: changes laid over her fast run while she drifts (all 0: just the run, as the game has done since v170) */
-DEF['stat.top']=80;DEF['stat.accelT']=7;DEF['stat.brake']=3;DEF['stat.jumpH']=7.2;DEF['stat.grav']=20;DEF['stat.gripZ']=20;DEF['stat.fadeSlope']=0;DEF['stat.fadeWall']=1;DEF['stat.fall']=50;DEF['stat.hearts']=3;DEF['stat.colH']=3.6;DEF['stat.colW']=1;DEF['stat.wallGrip']=1;DEF['stat.fric']=11.4;var MNE={scale:[1,5],radius:[1,3],headW:[.9,.9],headH:[.9,.9],headD:[.9,.9],torsoW:[.7,.7],torsoH:[1.35,1.35],torsoD:[.45,.45],armW:[.3,.3],armL:[1.35,1.35],legW:[.33,.33],legD:[.4,.4],legL:[1.35,1.35],cHead:['#45484e','#45484e'],cBody:['#2f3237','#2f3237'],cLimb:['#26282c','#26282c'],cEye:['#ff2a1a','#ff2a1a'],stride:[.9,.9],legSwing:[45.8,45.8],armSwing:[13.8,13.8],armRaise:[83.1,83.1],bob:[0,0],top:[10,10],acc:[5,5],see:[100,100],hearts:[1,3],dmg:[1,2],cool:[1.2,1.2],k1:[20,20],k2:[0,0],k3:[0,0],stomp:[8,17]};for(var mnk in MNE){DEF['mn.min.'+mnk]=MNE[mnk][0];DEF['mn.big.'+mnk]=MNE[mnk][1];}   /* the minions' own dials (the game's MN_DEF) */DEF['stat.slamAcc']=40;DEF['stat.slamMax']=60;DEF['m.drift.lean']=28.6;DEF['m.drift.angle']=15;DEF['m.drift.time']=.15;DEF['m.drift.minZips']=30;DEF['m.drift.cool']=1;DEF['m.drift.rate']=9;DEF['slope.side']=.85;
+DEF['stat.top']=80;DEF['stat.accelT']=7;DEF['stat.brake']=3;DEF['stat.jumpH']=7.2;DEF['stat.grav']=20;DEF['stat.gripZ']=20;DEF['stat.fadeSlope']=0;DEF['stat.fadeWall']=1;DEF['stat.fall']=50;DEF['stat.hearts']=3;DEF['stat.colH']=3.6;DEF['stat.colW']=1;DEF['stat.wallGrip']=1;DEF['stat.fric']=11.4;var MNE={scale:[1,5],radius:[1,3],headW:[.9,.9],headH:[.9,.9],headD:[.9,.9],torsoW:[.7,.7],torsoH:[1.35,1.35],torsoD:[.45,.45],armW:[.3,.3],armL:[1.35,1.35],legW:[.33,.33],legD:[.4,.4],legL:[1.35,1.35],cHead:['#45484e','#45484e'],cBody:['#2f3237','#2f3237'],cLimb:['#26282c','#26282c'],cEye:['#ff2a1a','#ff2a1a'],stride:[.9,.9],legSwing:[45.8,45.8],armSwing:[13.8,13.8],armRaise:[83.1,83.1],bob:[0,0],top:[10,10],acc:[5,5],see:[100,100],hearts:[1,3],dmg:[1,2],cool:[1.2,1.2],k1:[20,20],k2:[0,0],k3:[0,0],stomp:[8,17]};for(var mnk in MNE){DEF['mn.min.'+mnk]=MNE[mnk][0];DEF['mn.big.'+mnk]=MNE[mnk][1];}   /* the minions' own dials (the game's MN_DEF) */DEF['stat.slamAcc']=40;DEF['stat.slamMax']=60;DEF['stat.strafe']=2;DEF['m.drift.lean']=28.6;DEF['m.drift.angle']=15;DEF['m.drift.time']=.15;DEF['m.drift.minZips']=30;DEF['m.drift.cool']=1;DEF['m.drift.rate']=9;DEF['slope.side']=.85;
 var BARRIER_DEF={'barrier.radius':1.76,'barrier.height':1.64,'barrier.spin':1,'barrier.sphereAt':40,'barrier.squeezeAt':75,'barrier.squeezeLen':5,'barrier.squeeze':.2,'barrier.stretch':.12,'barrier.chargeSphere':2,'barrier.chargeSqueeze':3.5,'barrier.glow':.2,'barrier.glowSize':1.14,'barrier.dashLen':.32,'barrier.dashGap':.22,
   'barrier.cBody':'#ff2a1f','barrier.cEmis':'#b3140c','barrier.cEdge':'#ffc7b8','barrier.cDash':'#ff9a88','barrier.cGlow':'#ff3a2a','barrier.preview':0};
 for(k in BARRIER_DEF)DEF[k]=BARRIER_DEF[k];
@@ -5634,7 +5633,7 @@ function renderAnim(){
       addRows(d,g[1].map(function(r){return [kp+r[0]].concat(r.slice(1));}),{anim:1});});
   }
 }
-var STAT_ROWS=[['stat.top','Top speed','Zips',20,160,1],['stat.accelT','Time from 0 to top speed','s',1,20,.1],['stat.brake','Braking strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip fades on slopes (× the cosine of the slope)','tog'],['stat.fall','Max fall speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision box height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision box width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier slam: top speed','Zips',10,200,1]];
+var STAT_ROWS=[['stat.top','Top speed','Zips',20,160,1],['stat.accelT','Time from 0 to top speed','s',1,20,.1],['stat.brake','Braking strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip fades on slopes (× the cosine of the slope)','tog'],['stat.fall','Max fall speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision box height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision box width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier slam: top speed','Zips',10,200,1],['stat.strafe','Strafe distance (Q/E sidestep; 2 = one square)','units',0.5,12,.1]];
 function renderStats(){var h=$('#statRows');if(!h)return;h.innerHTML='';addRows(h,STAT_ROWS,{anim:1,stat:1});var sc=document.createElement('div');sc.id='statLive';sc.style.cssText='margin-top:10px;max-width:460px';h.appendChild(sc);statCardRefresh();}   /* the Stats menu at the top of the panel */
 try{renderStats();}catch(e){}
 var COMET_HOV=[['comet.hov.cost','Power to switch it on','n',0,50,1],['comet.hov.drain','Power a second while on','n',0,20,.1],['comet.hov.height','Floats above the ground by','units',0,3,.05],
@@ -5834,7 +5833,7 @@ requestAnimationFrame(tick);
   var STEP_UP = 1;          // a ledge this small or smaller she just steps up, with no loss of speed
   var CLIMB_SLOPE = 1.05;   // ground steeper than this (rise per unit run, a little over 45 degrees) stops her like a wall
   var DROP_SLOPE = 0.35;   // ground that falls away faster than this leaves her in the air
-  var BOUNCE_KEEP = 0.5, BOUNCE_MIN = 8, SLAM_ACC = 40 * TILE, SLAM_MAX = 60 * TILE;   // the Hedron Barrier: it bounces back up at half the speed it landed at, and S in the air drives it straight down (40 Zips/s^2, 60 Zips at most)
+  var BOUNCE_KEEP = 0.5, BOUNCE_MIN = 8, SLAM_ACC = 40 * TILE, SLAM_MAX = 60 * TILE, STRAFE_DIST = TILE;   // the Hedron Barrier: it bounces back up at half the speed it landed at, and S in the air drives it straight down (40 Zips/s^2, 60 Zips at most)
   var FALL_MAX = 100;      // free-fall speed limit: 50 Zips (units/s)
   var MIN_UP = 60;         // running uphill, the slope bleeds her speed down to 30 Zips and no further
   var FRIC = 160 / 7;       // friction (units/s^2): her slowdown whenever she is not driving herself (coasting, braking, or past her own top speed). Set by the Friction stat
@@ -8631,7 +8630,7 @@ requestAnimationFrame(tick);
     'barrier.chargeSphere': 2, 'barrier.chargeSqueeze': 3.5, 'barrier.glow': 0.2, 'barrier.glowSize': 1.14, 'barrier.dashLen': 0.32, 'barrier.dashGap': 0.22,
     'barrier.cBody': '#ff2a1f', 'barrier.cEmis': '#b3140c', 'barrier.cEdge': '#ffc7b8', 'barrier.cDash': '#ff9a88', 'barrier.cGlow': '#ff3a2a',
     'm.drift.lean': 28.6, 'm.drift.angle': 15, 'm.drift.time': 0.15, 'm.drift.minZips': 30, 'm.drift.cool': 1, 'm.drift.rate': 9, 'slope.side': 0.85,
-    'stat.top': 80, 'stat.accelT': 7, 'stat.brake': 3, 'stat.jumpH': 7.2, 'stat.grav': 20, 'stat.gripZ': 20, 'stat.fadeSlope': 0, 'stat.fall': 50, 'stat.hearts': 3, 'stat.colH': 3.6, 'stat.colW': 1, 'stat.wallGrip': 1, 'stat.fadeWall': 1, 'stat.fric': 11.4, 'stat.slamAcc': 40, 'stat.slamMax': 60
+    'stat.top': 80, 'stat.accelT': 7, 'stat.brake': 3, 'stat.jumpH': 7.2, 'stat.grav': 20, 'stat.gripZ': 20, 'stat.fadeSlope': 0, 'stat.fall': 50, 'stat.hearts': 3, 'stat.colH': 3.6, 'stat.colW': 1, 'stat.wallGrip': 1, 'stat.fadeWall': 1, 'stat.fric': 11.4, 'stat.slamAcc': 40, 'stat.slamMax': 60, 'stat.strafe': 2
   };
   var MAXHP = 3;
   var mollyScale = 1, SLIDE_H = 1, mollyDriftRun = false;   // mollyScale: the Overall scale the model in use was saved with (the Rig Editor's dial). She stands 3.6 units x this, and her collision box (standing and sliding) is multiplied by it too
@@ -8705,7 +8704,7 @@ requestAnimationFrame(tick);
     var C = RIGCFG;
     // any number can be typed into a stat, so the ones that would break the game (a negative jump, no grip at all, a top speed below nothing) are held to the nearest value that still works
     RUN_SPEED = Math.max(1, C['stat.top']) * TILE; ACCEL_TIME = Math.max(0.5, C['stat.accelT']); ACCEL = RUN_SPEED / ACCEL_TIME; BRAKE_MULT = Math.max(0, C['stat.brake']);
-    GRAV = Math.max(1, C['stat.grav']) * TILE; GRIP = Math.max(0.5, C['stat.gripZ']) * TILE; JUMP_H = Math.max(0, C['stat.jumpH']); JUMP_V = Math.sqrt(2 * GRAV * JUMP_H); FALL_MAX = Math.max(1, C['stat.fall']) * TILE; SLAM_ACC = Math.max(1, C['stat.slamAcc']) * TILE; SLAM_MAX = Math.max(1, C['stat.slamMax']) * TILE;   // (Grass Canyon's big curve keeps the radius it was built with, TURN_R: it is part of the level, not of her stats)
+    GRAV = Math.max(1, C['stat.grav']) * TILE; GRIP = Math.max(0.5, C['stat.gripZ']) * TILE; JUMP_H = Math.max(0, C['stat.jumpH']); JUMP_V = Math.sqrt(2 * GRAV * JUMP_H); FALL_MAX = Math.max(1, C['stat.fall']) * TILE; SLAM_ACC = Math.max(1, C['stat.slamAcc']) * TILE; SLAM_MAX = Math.max(1, C['stat.slamMax']) * TILE; STRAFE_DIST = Math.max(0.25, C['stat.strafe']);   // (Grass Canyon's big curve keeps the radius it was built with, TURN_R: it is part of the level, not of her stats)
     WALL_FADE = C['stat.fadeWall'] ? 1 : 0; SLOPE_FADE = C['stat.fadeSlope'] ? 1 : 0;
     MAXHP = Math.max(1, Math.min(12, Math.round(C['stat.hearts']))); WALL_GRIP = Math.max(0, C['stat.wallGrip']); FRIC = Math.max(0, C['stat.fric']) * TILE;
     PLAYER_H = Math.max(1.2, C['stat.colH']) * mollyScale; PLAYER_RADIUS = Math.max(0.1, C['stat.colW'] / 2) * mollyScale; SLIDE_H = mollyScale;   // her collision box: how tall standing (a slide squeezes it to 1) and how wide, all times the model's Overall scale
@@ -9549,7 +9548,6 @@ requestAnimationFrame(tick);
   // ---- Strafe: an instant sidestep of one square, to her right (+1) or left (-1) of the way she is heading ----
   // Her direction and speed are untouched. She only slides as far as the way is clear: a trunk, a wall or a ledge face
   // too steep to walk up stops the slide short, and a drop at the far end leaves her in the air.
-  var STRAFE_DIST = TILE;
   function strafe(dir) {
     if (!playing || !grounded || ballOn) return;                 // no sidestep inside the Hedron Barrier
     var rx = Math.cos(heading) * dir, rz = -Math.sin(heading) * dir;
@@ -10774,6 +10772,19 @@ requestAnimationFrame(tick);
 
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v182', d: 'Nov 16, 2026', t: 'Next-stamp fixes, a Strafe stat', g: [
+    ['Path Editor', [
+      'The Bend you set in the next-stamp panel now carries onto the ledge, gap, platform, mud or seg chain you place. Before, it was reset to 0.',
+      'The next-stamp panel has a Rotation box for trees, hills and the other stamps that can be turned, matching a placed stamp. The next mud no longer shows a Heading box (it takes its heading from where you place it, so the box did nothing).',
+      'Big Minions no longer have a Placement option (Trapped in a pit). Layouts that already have a trapped one keep it.',
+    ]],
+    ['Rig Editor', [
+      'Stats has a Strafe distance row (Q/E sidestep). The default, 2 units, is the one square it always was.',
+    ]],
+    ['Menus', [
+      'The Characters page is no longer cut off at the top when it is taller than the window: it starts at the top and scrolls.',
+    ]]
+  ]},
   { v: 'v181.1', d: 'Nov 16, 2026', t: 'Hidden layers stay faint', g: [
     ['Path Editor', [
       'Stamps on a hidden layer now show as faint shadows for every kind (crags, spawners, tips, ledges, gaps, mud, platforms), including the placing preview. Before, their outlines and moving-range marks were drawn at full strength.',

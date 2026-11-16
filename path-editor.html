@@ -372,7 +372,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (t === 'gap' && !U('w')) o.w = S.width + 6; if (t === 'goal' && !U('w')) o.w = Math.max(16, S.width + 7);
     if (STRIPS[t]) {
       var nn = nearest(x, z);
-      o.follow = false; o.x = x; o.z = z; o.th = nn.d < 200 ? at(nn.s).th * 180 / Math.PI : 0; o.bend = 0; return o;
+      o.follow = false; o.x = x; o.z = z; o.th = nn.d < 200 ? at(nn.s).th * 180 / Math.PI : 0; if (o.bend === undefined) o.bend = 0; return o;     // a Bend set in the next-stamp panel (DEF) carries onto the stamp
     }
     place(o, x, z); return o;
   }
@@ -771,13 +771,14 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (!STRIPS[o.t] && !joinedCave) h += '<label class="f">Snap to the path<select data-ok="noat"><option value="0"' + (isFree ? '' : ' selected') + '>Snaps: follows the path when it changes</option><option value="1"' + (isFree ? ' selected' : '') + '>Free: stays where it is</option></select></label>';
     if (!ghost && !joinedCave && (!STRIPS[o.t] || o.follow === false)) h += num('X', 'X', -99999, 99999, 1, Math.round(p.x * 10) / 10) + num('Z', 'Z', -99999, 99999, 1, Math.round(p.z * 10) / 10) + (STRIPS[o.t] ? '' : num('rot', 'Rotation °', -360, 360, 5, o.rot || 0));
     if (o.t === 'tree') h += '<label class="f">Size<select data-ok="exs"><option value="rand"' + (o.ex ? '' : ' selected') + '>Random, like the level\'s own trees</option><option value="exact"' + (o.ex ? ' selected' : '') + '>Exactly these sizes</option></select></label>' + (o.ex ? num('tH', 'Trunk height', 1, 80, 0.5, o.tH) + num('tW', 'Trunk width', 0.2, 12, 0.1, o.tW) + num('cH', 'Canopy height', 1, 80, 0.5, o.cH) + num('cW', 'Canopy width', 1, 40, 0.5, o.cW) : '');
+    if (ghost && !STRIPS[o.t]) h += num('rot', 'Rotation °', -360, 360, 5, o.rot || 0);      // the next stamp can be turned before it is placed, like a placed one
     if (!ghost && !joinedCave) h += yRow(o);
     if (o.t === 'seg' || o.t === 'segchain') h += '<label class="f">Size<select data-ok="big"><option value="0"' + (o.big ? '' : ' selected') + '>Regular</option><option value="1"' + (o.big ? ' selected' : '') + '>Big (5×, worth 10)</option></select></label>';
     if (o.t === 'seg') h += num('h', 'Height above the ground', -1, 500, 0.5, o.h || 0);
     if (o.t === 'segchain') h += num('h', 'Height above the ground (at the start)', -1, 500, 0.5, o.h || 0) + num('rise', 'Rise by the end of the chain', -500, 500, 0.5, o.rise || 0) + num('arc', 'Vertical arc (extra height in the middle)', -500, 500, 0.5, o.arc || 0);
     if (o.t === 'mud') {
       if (!ghost) h += '<label class="f">Shape<select data-ok="follow"><option value="1"' + (o.follow === false ? '' : ' selected') + '>On the path (as wide as the path)</option><option value="0"' + (o.follow === false ? ' selected' : '') + '>Anywhere, on its own curve</option></select></label>';
-      if (o.follow === false) h += num('th', 'Heading ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10) + num('w', 'Width', 1, 300, 1, mudW(o));
+      if (o.follow === false) h += (ghost ? '' : num('th', 'Heading ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10)) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10) + num('w', 'Width', 1, 300, 1, mudW(o));   // the next mud takes its heading from where it is placed, so no Heading box
       else h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10);
       h += num('len', 'Length', 1, 5000, 1, o.len) + num('slow', 'Slowdown %', 0, 95, 1, o.slow) + endsF(o);
     }
@@ -817,7 +818,6 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       h += '<p class="note" style="margin:6px 0 0;font-size:12px;opacity:.75">Rotation turns the whole cave. From 80° up it is a shaft: a pit with this outline. Below that it is a tunnel; it cuts open to the sky where it is shallower than its own height, and goes under a roof of ground past that.</p>';
     }
     if (MOBS.indexOf(o.t) >= 0) h += '<label class="f">Behavior<select data-ok="idle"><option value="0"' + (o.idle ? '' : ' selected') + '>Chases Molly</option><option value="1"' + (o.idle ? ' selected' : '') + '>Idle (stands still, turns to face her)</option></select></label>';
-    if (o.t === 'bigminion') h += '<label class="f">Placement<select data-ok="trap"><option value="0"' + (o.trap ? '' : ' selected') + '>Free-roaming</option><option value="1"' + (o.trap ? ' selected' : '') + '>Trapped in a pit (top of head showing)</option></select></label>';
     if (o.t === 'hill') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('h', 'Height', 1, 500, 0.5, o.h) + '<label class="f">Surface<select data-ok="rock"><option value="rock"' + (o.rock === 'rock' ? ' selected' : '') + '>Bare rock</option><option value="grass"' + (o.rock === 'grass' ? ' selected' : '') + '>Grass</option></select></label>';
     if (o.t === 'lake') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('depth', 'Depth', 1, 200, 0.5, o.depth) + num('wl', 'Water level adjust (+ raises it)', -500, 500, 0.5, o.wl || 0);
     if (o.t === 'spawner') h += num('r', 'Radius', 2, 1000, 1, o.r) + num('every', 'Every (seconds)', 0.2, 120, 0.2, o.every) + num('max', 'Most alive at once', 1, 100, 1, o.max);
@@ -900,7 +900,6 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (pn && free && o.s !== undefined) { delete o.s; delete o.u; o.x = pn.x; o.z = pn.z; o.rot = Math.round(pn.th * 180 / Math.PI * 10) / 10; }     // let go: it stays exactly where it is, facing the same way
       else if (pn && !free && o.s === undefined && samples.length) { var na = nearest(o.x, o.z); if (na.d < 120) { var pa2 = at(na.s); o.rot = Math.round((o.rot || 0) - pa2.th * 180 / Math.PI); o.s = na.s; o.u = na.u; delete o.x; delete o.z; } }     // snap back: onto the path at the nearest spot
     }
-    else if (k === 'trap') { o.trap = t.value === '1'; DEF[o.t].trap = o.trap; }
     else if (k === 'idle') { o.idle = t.value === '1'; DEF[o.t] = DEF[o.t] || {}; DEF[o.t].idle = o.idle; }
     else if (k === 'big') { o.big = t.value === '1'; DEF[o.t].big = o.big; }
     else if (k === 'text' || k === 'shape' || k === 'move' || k === 'kind' || k === 'style' || k === 'rock' || k === 'ground' || k === 'edge' || k === 'ends') { o[k] = t.value; DEF[o.t][k] = t.value; }

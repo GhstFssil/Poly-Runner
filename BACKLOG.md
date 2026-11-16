@@ -11,15 +11,10 @@ Open work only. Ricky decides priority and version numbers (see CLAUDE.md). Move
 - [ ] Ledges, hills and trapped-minion pits placed on a path that is a deck over low ground on Oceana do not show.
 
 ## Bugs
-- [ ] Path Editor: editing the "next ledge" field (the next-stamp settings) does not change the ledge before it is placed, so ledges have to be edited after placing.
-- [ ] Characters: the top of the card is cut off on the screen.
-- [ ] Editor: Big Minions: Remove the "trapped in a pit" placement option, and placement options in general.
-- [ ] Gameplay: Being stopped by a wall doesn't always stop forward momentum, sometimes causing the runner to become stuck and then launch off of it.
+- [ ] Gameplay: Being stopped by a wall doesn't always stop forward momentum, sometimes causing the runner to become stuck and then launch off of it. (Nov 16: could not reproduce running head-on into a ledge face on flat ground: she stops. Needs the scenario: which wall (ledge, trunk, banked path wall), jumping or running, speed.)
 
 ## Ideas
-- [ ] Path Editor: make the next-stamp fields always match what is editable when the placed stamp is selected (same fields, same order, for every stamp kind).
-- [ ] Rig Editor: Add strafe distance to editable stats.
-- [ ] Rig Editor: add heading to caves.
+- [ ] Path Editor: add heading to caves. (Unclear: unjoined caves already have Rotation; joined caves have no Turn at the joint like ledges do. Which one?)
 
 ## Nightly sweep suggestions
 Suggestions the sweep may not act on (features, physics, tuning, looks, design) are written in `sweep-reports/` and can be promoted here when Ricky approves them.
