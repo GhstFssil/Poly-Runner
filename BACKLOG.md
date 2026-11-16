@@ -7,6 +7,7 @@ Open work only. Ricky decides priority and version numbers (see CLAUDE.md). Move
 
 ## Bugs
 - [ ] Path Editor: editing the "next ledge" field (the next-stamp settings) does not change the ledge before it is placed, so ledges have to be edited after placing.
+- [ ] Characters: the top of the card is cut off on the screen.
 
 ## Ideas
 - [ ] Path Editor: make the next-stamp fields always match what is editable when the placed stamp is selected (same fields, same order, for every stamp kind).
