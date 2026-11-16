@@ -3,7 +3,7 @@
 Open work only. Ricky decides priority and version numbers (see CLAUDE.md). Move finished items into the CHANGELOG and `audit-notes.md`, then delete them here.
 
 ## Needs a decision from Ricky
-- [ ] Does the runner ever look flat red and stippled near the camera in the real game? It does in headless renders, and in pre-v179 builds too. Suspect: the see-through shader. (From HANDOFF.md)
+(none)
 
 ## Bugs
 - [ ] Path Editor: editing the "next ledge" field (the next-stamp settings) does not change the ledge before it is placed, so ledges have to be edited after placing.

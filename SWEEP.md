@@ -8,7 +8,7 @@ Night counter: 1
 Last checked commit: 0347d07c1f6ae1cec07defe1345ceb65a918d8e3
 
 ## What a nightly session does
-1. `git fetch`; choose the base (see CLAUDE.md: newest unmerged `origin/nightly/*`, else `main`); create `nightly/YYYY-MM-DD` from it; run `sh tests/setup.sh`.
+1. `git fetch`; choose the base (see ARCHITECTURE.md, Branches: newest unmerged `origin/nightly/*`, else `main`); create `nightly/YYYY-MM-DD` from it; run `sh tests/setup.sh`.
 2. **Re-slice if the code changed.** Run `git diff --stat <Last checked commit> HEAD -- checker-run.html path-editor.html`. If anything changed (any edit by anyone since that commit, including earlier nights' fixes that were merged), run `python3 tools/reslice.py`. It cuts the code into 20 slices of about 5 percent each, at section and function boundaries, and rewrites the table below. Do not move "Next slice": tonight simply takes the slice with that number in the new table (so new code lands in whichever slice it falls in and is reached in its turn; nothing is put at the front of the line). If nothing changed, keep the table as it is.
 3. **Take the slice** numbered "Next slice". Read all of its code. A slice is a starting point, not a fence: if something in it leans on code elsewhere (a helper, a shared value), read that too.
 4. **Pick the lens** for tonight: cycle[Night counter mod 7] where the cycle is Bugs, Bugs, Visual, Bugs, Bugs, Performance, Bugs. (Seven nights, so over time every slice meets every lens.) If the lens makes no sense for the slice (Visual for code with nothing to see, such as import/export, menus and input; Performance for code with no hot path), use Bugs instead; never skip a slice.
