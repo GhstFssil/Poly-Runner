@@ -33,6 +33,9 @@ button.small{padding:3px 8px;font-size:12px}
 .piece .head{display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:700}
 .piece .head .num{font-family:var(--font-m);color:var(--mute);font-weight:400}
 .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:6px}
+.fields.std{grid-template-columns:repeat(2,minmax(0,1fr))}
+.fields.std select,.fields.std input{min-width:0;max-width:100%;text-overflow:ellipsis}
+.head .tip{cursor:help;opacity:.6;margin-left:4px}
 label.f{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--mute);min-width:0}
 input[type=number],input[type=text],textarea{font:13px var(--font-m);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:4px 6px;width:100%;min-width:0}
 input[type=range]{width:100%;accent-color:var(--accent)}
@@ -372,7 +375,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (t === 'gap' && !U('w')) o.w = S.width + 6; if (t === 'goal' && !U('w')) o.w = Math.max(16, S.width + 7);
     if (STRIPS[t]) {
       var nn = nearest(x, z);
-      o.follow = false; o.x = x; o.z = z; o.th = nn.d < 200 ? at(nn.s).th * 180 / Math.PI : 0; o.bend = 0; return o;
+      o.follow = false; o.x = x; o.z = z; o.th = nn.d < 200 ? at(nn.s).th * 180 / Math.PI : 0; if (o.bend === undefined) o.bend = 0; return o;     // a Bend set in the next-stamp panel (DEF) carries onto the stamp
     }
     place(o, x, z); return o;
   }
@@ -757,12 +760,50 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       var inp = $('insp').querySelector('input[data-ok="ya"]'); if (inp && document.activeElement !== inp && sl.length === 1 && sl[0].ya === undefined && yShown[sl[0].id] !== undefined) inp.value = Math.round(yShown[sl[0].id] * 100) / 100;
     }, 0);
   }
+  // ---- the inspector's look: every box has a fixed slot in a two-column grid, labels are one or two words, and the longer wording lives in tooltips ----
+  var SLOT = { noat: [1, 1], after: [1, 1], layer: [1, 2], X: [2, 1], s: [2, 1], Z: [2, 2], u: [2, 2], rot: [3, 1], th: [3, 1], turn: [3, 1], ya: [3, 2], len: [4, 1], d: [4, 1], r: [4, 1], w: [4, 2], hgt: [5, 1], h: [5, 1], bend: [5, 2] };
+  var SHORTL = { noat: 'Snap', hm: 'Stacking', layer: 'Layer', after: 'From', follow: 'Shape', exs: 'Size', X: 'X', Z: 'Z', rot: 'Rotation', th: 'Heading', turn: 'Turn', s: 'Start', u: 'Across', ya: 'Y', len: 'Length', d: 'Length', w: 'Width', h: 'Height', hgt: 'Height', thick: 'Thickness', bend: 'Bend', r: 'Radius', ends: 'Ends', tox: 'Surface', rock: 'Surface', shape: 'Shape',
+    tH: 'Trunk height', tW: 'Trunk width', cH: 'Canopy height', cW: 'Canopy width', big: 'Size', rise: 'Rise', arc: 'Arc', gap: 'Spacing', gapV: 'Spacing ±', count: 'Count', base: 'Base', baseV: 'Base ±', hgtV: 'Peak ±', roll: 'Roll', ang: 'Angle', angSet: 'Angle from', slope: 'Slope', carve: 'Carve',
+    move: 'Movement', dist: 'Travel', period: 'Cycle', group: 'Group', phase: 'Phase', slow: 'Slowdown', idle: 'Behavior', depth: 'Depth', wl: 'Water level', every: 'Every', max: 'Max', kind: 'Type', style: 'Look', look: 'Look', whl: 'Pressed', ground: 'Terrain', edge: 'Edge', soft: 'Softness', boost: 'Boost', up: 'Reach up', dn: 'Reach down',
+    size: 'Size', post: 'Stands on', tilt: 'Tilt', spin: 'Spin', hb: 'Hitbox', k: 'Break speed', sd: 'Side travel', sp: 'Side cycle', vd: 'Up travel', vp: 'Up cycle', mode: 'Mode', modeA: 'After', open: 'Open for', shut: 'Shut for', speed: 'Move time', slide: 'Opens by', sTx: 'Shut tilt', sTz: 'Shut side', oTx: 'Open tilt', oTz: 'Open side', addlink: 'Link', text: 'Text' };
+  var SHORTT = { 'ledge.w': 'Thickness', 'checkpoint.w': 'Gate width', 'cave.len': 'Depth', 'cave.bend': 'Curve', 'ramp.ang': 'Slope', 'crag.hgt': 'Peak', 'crag.r': 'Radius', 'hill.h': 'Height', 'cave.shape': 'Shape' };
+  var OPTS = { 'Once she steps on it, for the rest of the run': 'Latches', 'Only while she stands on it': 'While on', 'Sliding straight down into the floor': 'Down', 'Sliding toward its bottom edge (along its own lean)': 'Edge', 'Swinging only (to its open tilt)': 'Swing', 'Opens and shuts on a cycle': 'Cycle', 'Always open': 'Open', 'Always closed': 'Closed',
+    'A sign post': 'Post', 'Nothing (it hangs in the air)': 'Nothing', 'A faint glowing halo round its edge': 'Halo', 'Carries on at the angle the last cave ended on': 'Carried', 'Its own angle (set below)': 'Own', 'Its own mouth': 'Own mouth', 'Its own start': 'Own start', 'Follows the path': 'Path', 'Its own curve': 'Own curve', 'On the path (as wide as the path)': 'On path', 'Anywhere, on its own curve': 'Free',
+    'Random, like the level\'s own trees': 'Random', 'Exactly these sizes': 'Exact', 'Big (5×, worth 10)': 'Big', 'Chases Molly': 'Chases', 'Toxic ground (hurts, like the Sink)': 'Toxic ground' };
+  var BTNS = { next: 'Next piece', reroll: 'Re-roll', split: 'Split crags', space: 'Space evenly' };
+  function tidyInsp(el, o, ghost) {
+    var f = el.querySelector('.fields'); if (!f) return;
+    var notes = [], extra = [], kids = Array.prototype.slice.call(f.children);
+    kids.forEach(function (c) {
+      if (c.tagName === 'LABEL') {
+        var ctl = c.querySelector('[data-ok]'), k = ctl ? ctl.dataset.ok : '', tn = c.firstChild, orig = tn && tn.nodeType === 3 ? tn.nodeValue : '';
+        var sh = SHORTT[o.t + '.' + k] || SHORTL[k];
+        if (k === 'mode' && /^Before/.test(orig)) sh = 'Before';
+        if (k === 'phase' && /^Start offset/.test(orig)) sh = 'Offset';
+        if (!sh) sh = orig.replace(/\s*[(:—].*$/, '').split(/\s+/).slice(0, 2).join(' ');
+        if (tn && tn.nodeType === 3) { tn.nodeValue = sh; if (orig && orig !== sh) c.title = orig; }
+        Array.prototype.forEach.call(c.querySelectorAll('option'), function (op) { var full = op.textContent, sg = OPTS[full] || full.replace(/\s*[(:—].*$/, ''); if (sg && sg !== full) { op.title = full; op.textContent = sg; } });
+        var sl = SLOT[k]; if (sl) { c.style.gridRow = String(sl[0]); c.style.gridColumn = String(sl[1]); } else extra.push(c);
+      } else if (c.querySelector('button')) { c.style.gridColumn = '1 / -1'; extra.push(c); }
+      else { notes.push(c.textContent.trim()); c.remove(); }
+    });
+    var late = function (c) { var q = c.tagName === 'LABEL' ? c.querySelector('[data-ok]') : null; return c.tagName !== 'LABEL' || (q && (q.dataset.ok === 'addlink' || q.dataset.ok === 'follow' || q.dataset.ok === 'angSet')) ? 1 : 0; };   // boxes that only exist on a placed stamp (Link, the notes with buttons) go last, so nothing else moves when a stamp is placed
+    extra = extra.map(function (c, i) { return [late(c), i, c]; }).sort(function (x, y) { return x[0] - y[0] || x[1] - y[1]; }).map(function (x) { return x[2]; });
+    var row = 6, col = 1;
+    extra.forEach(function (c) {
+      if (c.tagName !== 'LABEL') { if (col === 2) { row++; col = 1; } c.style.gridRow = String(row); row++; return; }
+      c.style.gridRow = String(row); c.style.gridColumn = String(col); if (col === 1) col = 2; else { col = 1; row++; }
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('button[data-oact]'), function (b) { var t = BTNS[b.dataset.oact]; if (t && b.textContent !== t) { b.title = b.textContent; b.textContent = t; } });
+    var tl = el.querySelector('label.f textarea'); if (tl && tl.parentNode.firstChild.nodeType === 3 && tl.parentNode.firstChild.nodeValue === 'Tip text') tl.parentNode.firstChild.nodeValue = 'Text';
+    var hd = el.querySelector('.head span'); if (hd && (notes.length || ghost)) { var tp = document.createElement('span'); tp.className = 'tip'; tp.textContent = 'ⓘ'; tp.title = (ghost ? 'Set before placing. ' : '') + notes.join(' '); hd.appendChild(tp); }
+  }
   function renderInsp() {
     var el = $('insp'), sl0 = selList(), o = S.objs[sel], ghost = ghostMode();
     if (tool === 'forest') { el.hidden = true; return; }
     if (ghost) { if (!GH || GH.t !== tool) GH = mk0(tool, 0, 0); o = GH; delete o.s; delete o.u; delete o.x; delete o.z; }   // a stamp tool is chosen: this panel sets up the NEXT stamp
     else { if (sl0.length > 1) { renderGroup(sl0); return; } if (!o) { el.hidden = true; return; } }
-    var p = ghost ? { x: 0, z: 0, th: 0 } : pos(o), h = '<div class="head"><span>' + (ghost ? 'Next ' + NAMES[o.t].toLowerCase() + ' (set before placing)' : NAMES[o.t]) + '</span>' + (ghost ? '' : '<span class="row" style="gap:4px"><button class="small" data-oact="del">Delete</button></span>') + '</div><div class="fields">';
+    var p = ghost ? { x: 0, z: 0, th: 0 } : pos(o), h = '<div class="head"><span>' + (ghost ? 'Next ' + NAMES[o.t].toLowerCase() : NAMES[o.t]) + '</span>' + (ghost ? '' : '<span class="row" style="gap:4px"><button class="small" data-oact="del">Delete</button></span>') + '</div><div class="fields std">';
     var joinedCave = !ghost && o.t === 'cave' && o.after !== undefined;
     if (!ghost) h += layerSelect(lyrOf(o).id, 'data-ok="layer"', 'Layer', false);
     if (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag') h += '<label class="f">Height with others<select data-ok="hm"><option value="add"' + (o.hm === 'ind' ? '' : ' selected') + '>Additive: stacks on what it crosses</option><option value="ind"' + (o.hm === 'ind' ? ' selected' : '') + '>Independent: its own height, merges in</option></select></label>';
@@ -771,13 +812,14 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (!STRIPS[o.t] && !joinedCave) h += '<label class="f">Snap to the path<select data-ok="noat"><option value="0"' + (isFree ? '' : ' selected') + '>Snaps: follows the path when it changes</option><option value="1"' + (isFree ? ' selected' : '') + '>Free: stays where it is</option></select></label>';
     if (!ghost && !joinedCave && (!STRIPS[o.t] || o.follow === false)) h += num('X', 'X', -99999, 99999, 1, Math.round(p.x * 10) / 10) + num('Z', 'Z', -99999, 99999, 1, Math.round(p.z * 10) / 10) + (STRIPS[o.t] ? '' : num('rot', 'Rotation °', -360, 360, 5, o.rot || 0));
     if (o.t === 'tree') h += '<label class="f">Size<select data-ok="exs"><option value="rand"' + (o.ex ? '' : ' selected') + '>Random, like the level\'s own trees</option><option value="exact"' + (o.ex ? ' selected' : '') + '>Exactly these sizes</option></select></label>' + (o.ex ? num('tH', 'Trunk height', 1, 80, 0.5, o.tH) + num('tW', 'Trunk width', 0.2, 12, 0.1, o.tW) + num('cH', 'Canopy height', 1, 80, 0.5, o.cH) + num('cW', 'Canopy width', 1, 40, 0.5, o.cW) : '');
+    if (ghost && !STRIPS[o.t]) h += num('rot', 'Rotation °', -360, 360, 5, o.rot || 0);      // the next stamp can be turned before it is placed, like a placed one
     if (!ghost && !joinedCave) h += yRow(o);
     if (o.t === 'seg' || o.t === 'segchain') h += '<label class="f">Size<select data-ok="big"><option value="0"' + (o.big ? '' : ' selected') + '>Regular</option><option value="1"' + (o.big ? ' selected' : '') + '>Big (5×, worth 10)</option></select></label>';
     if (o.t === 'seg') h += num('h', 'Height above the ground', -1, 500, 0.5, o.h || 0);
     if (o.t === 'segchain') h += num('h', 'Height above the ground (at the start)', -1, 500, 0.5, o.h || 0) + num('rise', 'Rise by the end of the chain', -500, 500, 0.5, o.rise || 0) + num('arc', 'Vertical arc (extra height in the middle)', -500, 500, 0.5, o.arc || 0);
     if (o.t === 'mud') {
       if (!ghost) h += '<label class="f">Shape<select data-ok="follow"><option value="1"' + (o.follow === false ? '' : ' selected') + '>On the path (as wide as the path)</option><option value="0"' + (o.follow === false ? ' selected' : '') + '>Anywhere, on its own curve</option></select></label>';
-      if (o.follow === false) h += num('th', 'Heading ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10) + num('w', 'Width', 1, 300, 1, mudW(o));
+      if (o.follow === false) h += (ghost ? '' : num('th', 'Heading ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10)) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10) + num('w', 'Width', 1, 300, 1, mudW(o));   // the next mud takes its heading from where it is placed, so no Heading box
       else h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10);
       h += num('len', 'Length', 1, 5000, 1, o.len) + num('slow', 'Slowdown %', 0, 95, 1, o.slow) + endsF(o);
     }
@@ -817,7 +859,6 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       h += '<p class="note" style="margin:6px 0 0;font-size:12px;opacity:.75">Rotation turns the whole cave. From 80° up it is a shaft: a pit with this outline. Below that it is a tunnel; it cuts open to the sky where it is shallower than its own height, and goes under a roof of ground past that.</p>';
     }
     if (MOBS.indexOf(o.t) >= 0) h += '<label class="f">Behavior<select data-ok="idle"><option value="0"' + (o.idle ? '' : ' selected') + '>Chases Molly</option><option value="1"' + (o.idle ? ' selected' : '') + '>Idle (stands still, turns to face her)</option></select></label>';
-    if (o.t === 'bigminion') h += '<label class="f">Placement<select data-ok="trap"><option value="0"' + (o.trap ? '' : ' selected') + '>Free-roaming</option><option value="1"' + (o.trap ? ' selected' : '') + '>Trapped in a pit (top of head showing)</option></select></label>';
     if (o.t === 'hill') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('h', 'Height', 1, 500, 0.5, o.h) + '<label class="f">Surface<select data-ok="rock"><option value="rock"' + (o.rock === 'rock' ? ' selected' : '') + '>Bare rock</option><option value="grass"' + (o.rock === 'grass' ? ' selected' : '') + '>Grass</option></select></label>';
     if (o.t === 'lake') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('depth', 'Depth', 1, 200, 0.5, o.depth) + num('wl', 'Water level adjust (+ raises it)', -500, 500, 0.5, o.wl || 0);
     if (o.t === 'spawner') h += num('r', 'Radius', 2, 1000, 1, o.r) + num('every', 'Every (seconds)', 0.2, 120, 0.2, o.every) + num('max', 'Most alive at once', 1, 100, 1, o.max);
@@ -869,7 +910,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (o.t === 'platform' && o.group && o.move !== 'none') h += '<div class="row"><button class="small" data-oact="space">Space this group evenly</button></div>';
     if (o.t === 'tip') h += '<label class="f">Tip text<textarea data-ok="text" style="height:64px">' + (o.text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</textarea></label>';
     if (!ghost) h += '<div class="stats">' + (o.t === 'segchain' ? (chainPts(o).length + ' segs' + (o.follow === false ? ', on its own curve' : ', following the path')) : o.s !== undefined ? 'attached to the path: ' + Math.round(o.s) + ' along, ' + Math.round(o.u * 10) / 10 + ' across' : 'free on the map') + '</div>';
-    el.innerHTML = h; el.hidden = false; if (!ghost) yRefresh();
+    el.innerHTML = h; el.hidden = false; tidyInsp(el, o, ghost); if (!ghost) yRefresh();
   }
   $('insp').addEventListener('change', function (e) {
     var t = e.target, ghost = ghostMode(), o = ghost ? GH : S.objs[sel]; if (!o) return;
@@ -900,7 +941,6 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (pn && free && o.s !== undefined) { delete o.s; delete o.u; o.x = pn.x; o.z = pn.z; o.rot = Math.round(pn.th * 180 / Math.PI * 10) / 10; }     // let go: it stays exactly where it is, facing the same way
       else if (pn && !free && o.s === undefined && samples.length) { var na = nearest(o.x, o.z); if (na.d < 120) { var pa2 = at(na.s); o.rot = Math.round((o.rot || 0) - pa2.th * 180 / Math.PI); o.s = na.s; o.u = na.u; delete o.x; delete o.z; } }     // snap back: onto the path at the nearest spot
     }
-    else if (k === 'trap') { o.trap = t.value === '1'; DEF[o.t].trap = o.trap; }
     else if (k === 'idle') { o.idle = t.value === '1'; DEF[o.t] = DEF[o.t] || {}; DEF[o.t].idle = o.idle; }
     else if (k === 'big') { o.big = t.value === '1'; DEF[o.t].big = o.big; }
     else if (k === 'text' || k === 'shape' || k === 'move' || k === 'kind' || k === 'style' || k === 'rock' || k === 'ground' || k === 'edge' || k === 'ends') { o[k] = t.value; DEF[o.t][k] = t.value; }

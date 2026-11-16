@@ -25,11 +25,7 @@ Causes found with scans on his oc4.json (pieces 1-17 changed to ov / roll / fl):
    STILL TO VERIFY: in motion (run.py), screenshots (shot.py), ramps/gaps/ends/pits/enemies on decks, regression (t/reg.py), wall tests (tear/wg.py).
 
 ## Findings not fixed (questions for Ricky, ask at the end)
-- Grip stat is in units/s^2 (40) while everything else is in Zips; card shows it /2. Convert the slider to Zips/s^2?
-- Grip does not fade with slope on ordinary ground but does on walls (jump at 80 degrees). Fade everywhere (grip x cos slope)?
-- Gap/ledge/platform ends: round in game, square in editor. Make the game square (his tuned jumps get ~29 units shorter)?
-- Gravity as an editable stat?
-- Ledges / hills / trapped-minion pits placed on a path that is a deck over low ground on Oceana do not show.
+Moved to BACKLOG.md ("Needs a decision from Ricky") on Nov 16 2026.
 
 ## Rig Editor edge cases (Nov 13 evening) - FIXES WRITTEN, SYNTAX CLEAN, NOT YET TESTED
 Backup before these edits: /tmp/cr-pre-rigfix.html. Test harness: /tmp/aud/righ.py (Rig class), rx1-rx7.py. Test copy needs `python3 /tmp/aud/mk_test.py` after any edit.
@@ -136,3 +132,6 @@ RESUMED Nov 13 11:50 PM after a usage-limit stop; nothing of the follow-ups was 
 
 - Nov 15 2026: Path Editor: toxic patches now have editable Width (across) and Length (along) fields in the inspector (the model, export and game already carried them; only the fields were missing). Edited path-editor.html, embed regenerated.
 - Nov 15 2026 (v181): version label bumped to v181 at Ricky's request, CHANGELOG entry added for the toxic patch Width/Length fields. BACKLOG: logged the "next ledge" edit bug and the next-stamp fields matching the placed-stamp fields.
+- Nov 16 2026 (v182, next, unreleased): Path Editor: mk0 reset Bend to 0 for strip stamps, so the next-stamp Bend never carried (fixed, tests/penext.py); next-stamp panel gets Rotation for non-strip stamps and loses the dead Heading box on mud; Big Minion Placement select removed (trapped layouts still load, export and play; tests/penext_bm.py). Game: #start now justify-content: safe center, so a menu screen taller than the window starts at its top (the Characters card was cut off; measured at 4 window sizes). New stat stat.strafe (STRAFE_DIST, default 2 units = TILE, floor 0.25; tests/fu/strafe1.py). Wall-stop bug not reproduced (head-on ledge face stops her); left in BACKLOG with questions.
+- Nov 16 2026 (v182): Game: stuck-after-glancing-hit fixed. In the step loop, a ledge or crag face (`ledgeHit`) rejects the step and restores her position; with `bdn >= 0` (moving along the face, or its widely sampled normal pointing away, e.g. at ledge corners) neither the penalty nor the slide branch ran, so she stood pinned with speed still on. Now `else if (ledgeHit) { speed = 0; stepLen = 0; blocked = true; }`. Test tests/fu/wall4.py: 33 glancing approaches, 2 stuck before (one at 147 u/s), 0 after; reg2, fu/ends1, fu/fu1b clean. Ricky's report: usually ledges or crags at an angle, speed cut once then only friction and inputs.
+- Nov 16 2026 (v182): Path Editor inspector tidy-up (path-editor.html: SLOT / SHORTL / SHORTT / OPTS / tidyInsp, run on the HTML renderInsp builds; no field names or saved data changed). Two-column grid (`.fields.std`); fixed slots: noat|layer, X(s)|Z(u), rot(th, turn)|ya, len(d, r)|w, hgt(h)|bend; other boxes follow in order, with placed-only boxes (Link, Shape, Angle from, notes with buttons) last so the next-stamp panel and a placed stamp agree. Labels one or two words; the original text is the tooltip; option text shortened (OPTS or text before ( : —, full text in title); plain-text notes became the title's ⓘ tooltip. Test tests/peinsp.py (three random kinds, seed printable): label length, slots, next vs placed, overflow, typed value; passes on 8 seeds.

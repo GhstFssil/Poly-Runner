@@ -2,8 +2,7 @@
 
 Standing rules: CLAUDE.md. Stable facts, branches and test commands: ARCHITECTURE.md. History: the CHANGELOG in `checker-run.html` and `audit-notes.md`. Open work: BACKLOG.md.
 
-Last updated 2026-11-16, after v181. In progress: nothing.
-Unmerged: `nightly/2026-11-16` (hidden-layer stamp shading fix, `tests/pegho.py`). Merge to `main` as v181.1 once Ricky approves.
+Last updated 2026-11-16, after v182. In progress: nothing. Unmerged nightly branches: none (`nightly/2026-11-16` went out as v181.1).
 
 ## Key decisions (Ricky's unless marked)
 - Star aim (Claude's call; reported to Ricky): follows the camera's yaw and is level at the camera's resting pitch of 0.35, because a literal camera ray would hit the ground about 6 u ahead.
