@@ -527,7 +527,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   function segDot(x, y, big, z) { var r = Math.max(3, (big ? 5 : 2.2) * z * 1.6); ctx.fillStyle = '#f2c230'; ctx.strokeStyle = css('--ink'); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.stroke(); if (big) { ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 7); ctx.stroke(); } }
   function strokePts(pts) { ctx.beginPath(); pts.forEach(function (c, i) { var q = w2s(c[0], c[1]); if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }); ctx.stroke(); }
   function drawStrip(o, selected) {
-    var z = view.zoom, pts = stripPts(o, Math.max(3, 5 / z)), pts0 = pts, W = Math.max(2, (o.t === 'mud' ? mudW(o) : o.w) * z), acc = css('--accent');
+    var ga = ctx.globalAlpha, z = view.zoom, pts = stripPts(o, Math.max(3, 5 / z)), pts0 = pts, W = Math.max(2, (o.t === 'mud' ? mudW(o) : o.w) * z), acc = css('--accent');
     ctx.lineJoin = 'round'; ctx.lineCap = 'butt';
     if (o.t === 'gap' || o.t === 'ledge' || o.t === 'mud') {   // the true footprint, under the piece: its margin all round, and the end shape
       var fp = stripFoot(o), fpts = pts, sq = endsOf(o) === 'square';
@@ -538,14 +538,14 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (o.t === 'platform' && (o.move === 'side' || o.move === 'forward')) {
       var th0 = pts[0][2], v = o.move === 'side' ? [Math.cos(th0), Math.sin(th0)] : [Math.sin(th0), -Math.cos(th0)], hd = o.dist / 2;
       if (clock !== null) { var mv = Math.sin(2 * Math.PI * (clock + (o.phase || 0)) / Math.max(0.1, o.period)); pts = pts.map(function (c) { return [c[0] + v[0] * hd * mv, c[1] + v[1] * hd * mv, c[2]]; }); }
-      ctx.strokeStyle = '#7fa6bf'; ctx.globalAlpha = 0.3; ctx.lineWidth = W;
+      ctx.strokeStyle = '#7fa6bf'; ctx.globalAlpha = ga * 0.3; ctx.lineWidth = W;
       var pb = pts0; [-1, 1].forEach(function (sg) { strokePts(pb.map(function (c) { return [c[0] + v[0] * hd * sg, c[1] + v[1] * hd * sg]; })); });
-      ctx.globalAlpha = 0.8; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.strokeStyle = acc; var a = w2s(pts0[0][0] - v[0] * hd, pts0[0][1] - v[1] * hd), b = w2s(pts0[0][0] + v[0] * hd, pts0[0][1] + v[1] * hd); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+      ctx.globalAlpha = ga * 0.8; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.strokeStyle = acc; var a = w2s(pts0[0][0] - v[0] * hd, pts0[0][1] - v[1] * hd), b = w2s(pts0[0][0] + v[0] * hd, pts0[0][1] + v[1] * hd); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = ga;
     }
     if (o.t === 'gap') { ctx.strokeStyle = '#c9222a'; ctx.lineWidth = W + 4; strokePts(pts); }
     ctx.strokeStyle = o.tox ? '#3c4f3a' : o.t === 'ledge' ? '#7a6a58' : o.t === 'platform' ? '#7fa6bf' : o.t === 'gap' ? '#241c1c' : '#6b4a2b';
-    if (o.t === 'platform' && o.move === 'vertical' && clock !== null) ctx.globalAlpha = 0.55 + 0.45 * Math.sin(2 * Math.PI * (clock + (o.phase || 0)) / Math.max(0.1, o.period));
-    ctx.lineWidth = W; strokePts(pts); ctx.globalAlpha = 1;
+    if (o.t === 'platform' && o.move === 'vertical' && clock !== null) ctx.globalAlpha = ga * (0.55 + 0.45 * Math.sin(2 * Math.PI * (clock + (o.phase || 0)) / Math.max(0.1, o.period)));
+    ctx.lineWidth = W; strokePts(pts); ctx.globalAlpha = ga;
     if (o.t === 'ledge') { ctx.strokeStyle = '#4a3f33'; ctx.lineWidth = 1.5; strokePts(pts.map(function (c) { return [c[0], c[1]]; })); }
     var m = pts[Math.floor(pts.length / 2)], q = w2s(m[0], m[1]);
     ctx.fillStyle = css('--ink'); ctx.font = 'bold 11px ' + css('--font-d');
@@ -566,7 +566,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   function drawObj(o, selected) {
     if (STRIPS[o.t] && o.t !== 'segchain') { drawStrip(o, selected); return; }
     if (o.t === 'segchain') { var cp = chainPts(o); if (selected) { ctx.strokeStyle = css('--accent'); ctx.lineWidth = 2; ctx.beginPath(); cp.forEach(function (c, i) { var q2 = w2s(c[0], c[1]); if (i) ctx.lineTo(q2[0], q2[1]); else ctx.moveTo(q2[0], q2[1]); }); ctx.stroke(); } cp.forEach(function (c) { var q2 = w2s(c[0], c[1]); segDot(q2[0], q2[1], o.big, view.zoom); }); return; }
-    var p = pos(o), q = w2s(p.x, p.z), z = view.zoom, h = halves(o), ink = css('--ink'), acc = css('--accent');
+    var ga = ctx.globalAlpha, p = pos(o), q = w2s(p.x, p.z), z = view.zoom, h = halves(o), ink = css('--ink'), acc = css('--accent');
     ctx.save(); ctx.translate(q[0], q[1]); ctx.rotate(p.th);
     var idleTag = function (sz) { ctx.save(); ctx.rotate(-p.th); ctx.fillStyle = css('--eye'); ctx.font = 'bold 9px ' + css('--font-d'); ctx.textAlign = 'center'; ctx.fillText('IDLE', 0, sz / 2 + 11); ctx.restore(); };   // an idle mob: stands still and only turns to face her
     if (o.t === 'tree') {
@@ -592,7 +592,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     } else if (o.t === 'seg') {
       segDot(0, 0, o.big, z);
     } else if (o.t === 'crag') {
-      ctx.fillStyle = '#8a8478'; ctx.globalAlpha *= 0.14; ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+      ctx.fillStyle = '#8a8478'; ctx.globalAlpha *= 0.14; ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.fill(); ctx.globalAlpha = ga;
       ctx.strokeStyle = '#8a8478'; ctx.lineWidth = 1; ctx.setLineDash([3, 4]); ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.stroke(); ctx.setLineDash([]);
       ctx.fillStyle = '#6f695e'; cragCells(o).forEach(function (c) { var cs = Math.max(2.5, c.rad * z), cx0 = c.x * z, cy0 = c.z * z; ctx.beginPath(); ctx.moveTo(cx0, cy0 - cs); ctx.lineTo(cx0 + cs * 0.9, cy0 + cs * 0.6); ctx.lineTo(cx0 - cs * 0.9, cy0 + cs * 0.6); ctx.closePath(); ctx.fill(); });
     } else if (o.t === 'patch') {
@@ -610,7 +610,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       var lr = Math.max(4, o.r * z); ctx.fillStyle = 'rgba(70,130,200,.45)'; ctx.beginPath(); ctx.arc(0, 0, lr, 0, 7); ctx.fill(); ctx.strokeStyle = '#4682c8'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(0, 0, lr, 0, 7); ctx.stroke();
       ctx.fillStyle = ink; ctx.font = 'bold 11px ' + css('--font-d'); ctx.textAlign = 'center'; ctx.fillText('LAKE −' + o.depth, 0, 4); ctx.textAlign = 'start';
     } else if (o.t === 'spawner') {
-      ctx.fillStyle = '#c9222a'; ctx.globalAlpha *= 0.12; ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+      ctx.fillStyle = '#c9222a'; ctx.globalAlpha *= 0.12; ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.fill(); ctx.globalAlpha = ga;
       ctx.strokeStyle = '#c9222a'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 3]); ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.stroke(); ctx.setLineDash([]);
       var sm = Math.max(7, 8 * z); ctx.fillStyle = css('--minion'); ctx.fillRect(-sm / 2, -sm / 2, sm, sm); ctx.strokeStyle = '#c9222a'; ctx.lineWidth = 2; ctx.strokeRect(-sm / 2 - 2, -sm / 2 - 2, sm + 4, sm + 4);
     } else if (o.t === 'goal') {
@@ -655,7 +655,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     } else if (o.t === 'tip') {
       ctx.fillStyle = acc; ctx.globalAlpha *= 0.16; ctx.strokeStyle = acc;
       if (o.shape === 'circle') { ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.fill(); } else { ctx.fillRect(-o.w * z / 2, -o.d * z / 2, o.w * z, o.d * z); }
-      ctx.globalAlpha = 1; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
+      ctx.globalAlpha = ga; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
       if (o.shape === 'circle') { ctx.beginPath(); ctx.arc(0, 0, Math.max(4, o.r * z), 0, 7); ctx.stroke(); } else ctx.strokeRect(-o.w * z / 2, -o.d * z / 2, o.w * z, o.d * z); ctx.setLineDash([]);
       ctx.fillStyle = acc; ctx.font = 'bold 11px ' + css('--font-d'); ctx.textAlign = 'center'; ctx.fillText('TIP', 0, 4); ctx.textAlign = 'start';
     }
