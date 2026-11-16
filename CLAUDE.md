@@ -23,3 +23,19 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (level detai
 - At the start of each interactive session: `git fetch`, read any unmerged `nightly/*` reports and tell Ricky what they fixed and what they left for him. Merging nightly fixes into `main` publishes them, so it follows the version rule below.
 - Version numbering for nightly fixes (Ricky's rule): fixes pushed to `main` from a nightly sweep add the next decimal to the current version (v178 -> v178.1 -> v178.2; after v179, v179.1). Each such push gets its own CHANGELOG entry and version label. Then merge `main` into `next`. Ricky's own versions (v179, v180, ...) stay his call: always ask before those.
 - Commit messages end with the attribution lines the session was given.
+
+## Session economy
+- Search before reading. Never read a large file in full; read only the relevant range.
+- Don't re-read files already read this session unless they changed.
+- Before a big read or wide change, tell me which files and sections you plan to touch.
+- For multi-step work, propose a short plan first and wait for my go-ahead before large edits.
+- Prefer small, targeted edits over rewriting whole files.
+- Filter long command output: show failures and the last ~30 lines, not full logs.
+- After two failed attempts at the same fix, stop, summarize what was tried, and recommend reverting or starting fresh.
+- Keep stable project facts in ARCHITECTURE.md, not in conversation.
+- Keep replies short: lead with the outcome, skip recaps, don't paste back code I can see in the file.
+- Ask one focused question when requirements are ambiguous.
+- When a task is done, say so and suggest whether to continue here or start fresh.
+
+## Rules maintenance
+After each release (or when I ask), review these instructions and suggest changes in one short list: rules to add based on friction seen this session, rules to trim because they're redundant, outdated, or something you'd do anyway, and any wording to tighten. Don't edit this file without my approval. Keep the total under ~25 lines.
