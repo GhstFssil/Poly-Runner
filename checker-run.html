@@ -1477,6 +1477,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       h += '<div class="stats" style="grid-column:1/-1">Tilts pivot at the door\'s base: forward / back leans its top along the way ahead, sideways leans it to the right. Sliding toward its bottom edge moves it its own height along its lean, so its top edge ends where its bottom edge was. If it shuts on someone in the doorway, they are pushed out the side they came from.</div>';
     }
     var isel = function (k, l, v, opts) { return '<label class="f">' + l + '<select data-ok="' + k + '">' + opts.map(function (m) { return '<option value="' + m[0] + '"' + (String(v) === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>'; };
+    if (o.t === 'toxic') h += num('w', 'Width (across)', 1, 4000, 0.5, o.w) + num('d', 'Length (along)', 1, 4000, 0.5, o.d);
     if (o.t === 'plate') {
       h += isel('look', 'Look', o.look, [['gray', 'Light gray'], ['brown', 'Light brown'], ['halo', 'A faint glowing halo round its edge'], ['none', 'Invisible']]) + isel('shape', 'Shape', o.shape, [['rect', 'Rectangle'], ['circle', 'Circle']]);
       h += o.shape === 'circle' ? num('r', 'Radius', 0.5, 2000, 0.5, o.r) : num('w', 'Width (across)', 0.5, 4000, 0.5, o.w) + num('d', 'Length (along)', 0.5, 4000, 0.5, o.d);
