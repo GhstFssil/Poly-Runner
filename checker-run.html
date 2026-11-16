@@ -667,6 +667,9 @@ button.small{padding:3px 8px;font-size:12px}
 .piece .head{display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:700}
 .piece .head .num{font-family:var(--font-m);color:var(--mute);font-weight:400}
 .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:6px}
+.fields.std{grid-template-columns:repeat(2,minmax(0,1fr))}
+.fields.std select,.fields.std input{min-width:0;max-width:100%;text-overflow:ellipsis}
+.head .tip{cursor:help;opacity:.6;margin-left:4px}
 label.f{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--mute);min-width:0}
 input[type=number],input[type=text],textarea{font:13px var(--font-m);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:4px 6px;width:100%;min-width:0}
 input[type=range]{width:100%;accent-color:var(--accent)}
@@ -1390,12 +1393,50 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       var inp = $('insp').querySelector('input[data-ok="ya"]'); if (inp && SR.activeElement !== inp && sl.length === 1 && sl[0].ya === undefined && yShown[sl[0].id] !== undefined) inp.value = Math.round(yShown[sl[0].id] * 100) / 100;
     }, 0);
   }
+  // ---- the inspector's look: every box has a fixed slot in a two-column grid, labels are one or two words, and the longer wording lives in tooltips ----
+  var SLOT = { noat: [1, 1], after: [1, 1], layer: [1, 2], X: [2, 1], s: [2, 1], Z: [2, 2], u: [2, 2], rot: [3, 1], th: [3, 1], turn: [3, 1], ya: [3, 2], len: [4, 1], d: [4, 1], r: [4, 1], w: [4, 2], hgt: [5, 1], h: [5, 1], bend: [5, 2] };
+  var SHORTL = { noat: 'Snap', hm: 'Stacking', layer: 'Layer', after: 'From', follow: 'Shape', exs: 'Size', X: 'X', Z: 'Z', rot: 'Rotation', th: 'Heading', turn: 'Turn', s: 'Start', u: 'Across', ya: 'Y', len: 'Length', d: 'Length', w: 'Width', h: 'Height', hgt: 'Height', thick: 'Thickness', bend: 'Bend', r: 'Radius', ends: 'Ends', tox: 'Surface', rock: 'Surface', shape: 'Shape',
+    tH: 'Trunk height', tW: 'Trunk width', cH: 'Canopy height', cW: 'Canopy width', big: 'Size', rise: 'Rise', arc: 'Arc', gap: 'Spacing', gapV: 'Spacing ±', count: 'Count', base: 'Base', baseV: 'Base ±', hgtV: 'Peak ±', roll: 'Roll', ang: 'Angle', angSet: 'Angle from', slope: 'Slope', carve: 'Carve',
+    move: 'Movement', dist: 'Travel', period: 'Cycle', group: 'Group', phase: 'Phase', slow: 'Slowdown', idle: 'Behavior', depth: 'Depth', wl: 'Water level', every: 'Every', max: 'Max', kind: 'Type', style: 'Look', look: 'Look', whl: 'Pressed', ground: 'Terrain', edge: 'Edge', soft: 'Softness', boost: 'Boost', up: 'Reach up', dn: 'Reach down',
+    size: 'Size', post: 'Stands on', tilt: 'Tilt', spin: 'Spin', hb: 'Hitbox', k: 'Break speed', sd: 'Side travel', sp: 'Side cycle', vd: 'Up travel', vp: 'Up cycle', mode: 'Mode', modeA: 'After', open: 'Open for', shut: 'Shut for', speed: 'Move time', slide: 'Opens by', sTx: 'Shut tilt', sTz: 'Shut side', oTx: 'Open tilt', oTz: 'Open side', addlink: 'Link', text: 'Text' };
+  var SHORTT = { 'ledge.w': 'Thickness', 'checkpoint.w': 'Gate width', 'cave.len': 'Depth', 'cave.bend': 'Curve', 'ramp.ang': 'Slope', 'crag.hgt': 'Peak', 'crag.r': 'Radius', 'hill.h': 'Height', 'cave.shape': 'Shape' };
+  var OPTS = { 'Once she steps on it, for the rest of the run': 'Latches', 'Only while she stands on it': 'While on', 'Sliding straight down into the floor': 'Down', 'Sliding toward its bottom edge (along its own lean)': 'Edge', 'Swinging only (to its open tilt)': 'Swing', 'Opens and shuts on a cycle': 'Cycle', 'Always open': 'Open', 'Always closed': 'Closed',
+    'A sign post': 'Post', 'Nothing (it hangs in the air)': 'Nothing', 'A faint glowing halo round its edge': 'Halo', 'Carries on at the angle the last cave ended on': 'Carried', 'Its own angle (set below)': 'Own', 'Its own mouth': 'Own mouth', 'Its own start': 'Own start', 'Follows the path': 'Path', 'Its own curve': 'Own curve', 'On the path (as wide as the path)': 'On path', 'Anywhere, on its own curve': 'Free',
+    'Random, like the level\'s own trees': 'Random', 'Exactly these sizes': 'Exact', 'Big (5×, worth 10)': 'Big', 'Chases Molly': 'Chases', 'Toxic ground (hurts, like the Sink)': 'Toxic ground' };
+  var BTNS = { next: 'Next piece', reroll: 'Re-roll', split: 'Split crags', space: 'Space evenly' };
+  function tidyInsp(el, o, ghost) {
+    var f = el.querySelector('.fields'); if (!f) return;
+    var notes = [], extra = [], kids = Array.prototype.slice.call(f.children);
+    kids.forEach(function (c) {
+      if (c.tagName === 'LABEL') {
+        var ctl = c.querySelector('[data-ok]'), k = ctl ? ctl.dataset.ok : '', tn = c.firstChild, orig = tn && tn.nodeType === 3 ? tn.nodeValue : '';
+        var sh = SHORTT[o.t + '.' + k] || SHORTL[k];
+        if (k === 'mode' && /^Before/.test(orig)) sh = 'Before';
+        if (k === 'phase' && /^Start offset/.test(orig)) sh = 'Offset';
+        if (!sh) sh = orig.replace(/\s*[(:—].*$/, '').split(/\s+/).slice(0, 2).join(' ');
+        if (tn && tn.nodeType === 3) { tn.nodeValue = sh; if (orig && orig !== sh) c.title = orig; }
+        Array.prototype.forEach.call(c.querySelectorAll('option'), function (op) { var full = op.textContent, sg = OPTS[full] || full.replace(/\s*[(:—].*$/, ''); if (sg && sg !== full) { op.title = full; op.textContent = sg; } });
+        var sl = SLOT[k]; if (sl) { c.style.gridRow = String(sl[0]); c.style.gridColumn = String(sl[1]); } else extra.push(c);
+      } else if (c.querySelector('button')) { c.style.gridColumn = '1 / -1'; extra.push(c); }
+      else { notes.push(c.textContent.trim()); c.remove(); }
+    });
+    var late = function (c) { var q = c.tagName === 'LABEL' ? c.querySelector('[data-ok]') : null; return c.tagName !== 'LABEL' || (q && (q.dataset.ok === 'addlink' || q.dataset.ok === 'follow' || q.dataset.ok === 'angSet')) ? 1 : 0; };   // boxes that only exist on a placed stamp (Link, the notes with buttons) go last, so nothing else moves when a stamp is placed
+    extra = extra.map(function (c, i) { return [late(c), i, c]; }).sort(function (x, y) { return x[0] - y[0] || x[1] - y[1]; }).map(function (x) { return x[2]; });
+    var row = 6, col = 1;
+    extra.forEach(function (c) {
+      if (c.tagName !== 'LABEL') { if (col === 2) { row++; col = 1; } c.style.gridRow = String(row); row++; return; }
+      c.style.gridRow = String(row); c.style.gridColumn = String(col); if (col === 1) col = 2; else { col = 1; row++; }
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('button[data-oact]'), function (b) { var t = BTNS[b.dataset.oact]; if (t && b.textContent !== t) { b.title = b.textContent; b.textContent = t; } });
+    var tl = el.querySelector('label.f textarea'); if (tl && tl.parentNode.firstChild.nodeType === 3 && tl.parentNode.firstChild.nodeValue === 'Tip text') tl.parentNode.firstChild.nodeValue = 'Text';
+    var hd = el.querySelector('.head span'); if (hd && (notes.length || ghost)) { var tp = document.createElement('span'); tp.className = 'tip'; tp.textContent = 'ⓘ'; tp.title = (ghost ? 'Set before placing. ' : '') + notes.join(' '); hd.appendChild(tp); }
+  }
   function renderInsp() {
     var el = $('insp'), sl0 = selList(), o = S.objs[sel], ghost = ghostMode();
     if (tool === 'forest') { el.hidden = true; return; }
     if (ghost) { if (!GH || GH.t !== tool) GH = mk0(tool, 0, 0); o = GH; delete o.s; delete o.u; delete o.x; delete o.z; }   // a stamp tool is chosen: this panel sets up the NEXT stamp
     else { if (sl0.length > 1) { renderGroup(sl0); return; } if (!o) { el.hidden = true; return; } }
-    var p = ghost ? { x: 0, z: 0, th: 0 } : pos(o), h = '<div class="head"><span>' + (ghost ? 'Next ' + NAMES[o.t].toLowerCase() + ' (set before placing)' : NAMES[o.t]) + '</span>' + (ghost ? '' : '<span class="row" style="gap:4px"><button class="small" data-oact="del">Delete</button></span>') + '</div><div class="fields">';
+    var p = ghost ? { x: 0, z: 0, th: 0 } : pos(o), h = '<div class="head"><span>' + (ghost ? 'Next ' + NAMES[o.t].toLowerCase() : NAMES[o.t]) + '</span>' + (ghost ? '' : '<span class="row" style="gap:4px"><button class="small" data-oact="del">Delete</button></span>') + '</div><div class="fields std">';
     var joinedCave = !ghost && o.t === 'cave' && o.after !== undefined;
     if (!ghost) h += layerSelect(lyrOf(o).id, 'data-ok="layer"', 'Layer', false);
     if (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag') h += '<label class="f">Height with others<select data-ok="hm"><option value="add"' + (o.hm === 'ind' ? '' : ' selected') + '>Additive: stacks on what it crosses</option><option value="ind"' + (o.hm === 'ind' ? ' selected' : '') + '>Independent: its own height, merges in</option></select></label>';
@@ -1502,7 +1543,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (o.t === 'platform' && o.group && o.move !== 'none') h += '<div class="row"><button class="small" data-oact="space">Space this group evenly</button></div>';
     if (o.t === 'tip') h += '<label class="f">Tip text<textarea data-ok="text" style="height:64px">' + (o.text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</textarea></label>';
     if (!ghost) h += '<div class="stats">' + (o.t === 'segchain' ? (chainPts(o).length + ' segs' + (o.follow === false ? ', on its own curve' : ', following the path')) : o.s !== undefined ? 'attached to the path: ' + Math.round(o.s) + ' along, ' + Math.round(o.u * 10) / 10 + ' across' : 'free on the map') + '</div>';
-    el.innerHTML = h; el.hidden = false; if (!ghost) yRefresh();
+    el.innerHTML = h; el.hidden = false; tidyInsp(el, o, ghost); if (!ghost) yRefresh();
   }
   $('insp').addEventListener('change', function (e) {
     var t = e.target, ghost = ghostMode(), o = ghost ? GH : S.objs[sel]; if (!o) return;
@@ -10776,6 +10817,7 @@ var CHANGELOG = [
     ['Path Editor', [
       'The Bend you set in the next-stamp panel now carries onto the ledge, gap, platform, mud or seg chain you place. Before, it was reset to 0.',
       'The next-stamp panel has a Rotation box for trees, hills and the other stamps that can be turned, matching a placed stamp. The next mud no longer shows a Heading box (it takes its heading from where you place it, so the box did nothing).',
+      'The inspector and the next-stamp panel are tidied: every box sits in a fixed spot in a two-column grid (Snap and Layer, X and Z, Rotation and Y, then Length and Width, Height and Bend, then the stamp\'s own boxes), labels are one or two words, and the longer wording shows when you hover a label or option (or the ⓘ by the title). The next-stamp panel uses the same spots as a placed stamp.',
       'Big Minions no longer have a Placement option (Trapped in a pit). Layouts that already have a trapped one keep it.',
     ]],
     ['Rig Editor', [

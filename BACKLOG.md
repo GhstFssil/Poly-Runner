@@ -14,7 +14,7 @@ Open work only. Ricky decides priority and version numbers (see CLAUDE.md). Move
 (none open)
 
 ## Ideas
-- [ ] Path Editor: tidy the inspector and next-stamp panel: labels of one or two words, every box in a fixed, standardized slot. (Requested by Ricky Nov 16; plan awaiting his go-ahead.)
+(none open)
 
 ## Nightly sweep suggestions
 Suggestions the sweep may not act on (features, physics, tuning, looks, design) are written in `sweep-reports/` and can be promoted here when Ricky approves them.
