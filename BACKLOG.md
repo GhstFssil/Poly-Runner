@@ -11,10 +11,10 @@ Open work only. Ricky decides priority and version numbers (see CLAUDE.md). Move
 - [ ] Ledges, hills and trapped-minion pits placed on a path that is a deck over low ground on Oceana do not show.
 
 ## Bugs
-- [ ] Gameplay: Being stopped by a wall doesn't always stop forward momentum, sometimes causing the runner to become stuck and then launch off of it. (Nov 16: could not reproduce running head-on into a ledge face on flat ground: she stops. Needs the scenario: which wall (ledge, trunk, banked path wall), jumping or running, speed.)
+(none open)
 
 ## Ideas
-- [ ] Path Editor: add heading to caves. (Unclear: unjoined caves already have Rotation; joined caves have no Turn at the joint like ledges do. Which one?)
+- [ ] Path Editor: tidy the inspector and next-stamp panel: labels of one or two words, every box in a fixed, standardized slot. (Requested by Ricky Nov 16; plan awaiting his go-ahead.)
 
 ## Nightly sweep suggestions
 Suggestions the sweep may not act on (features, physics, tuning, looks, design) are written in `sweep-reports/` and can be promoted here when Ricky approves them.

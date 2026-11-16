@@ -10781,6 +10781,9 @@ var CHANGELOG = [
     ['Rig Editor', [
       'Stats has a Strafe distance row (Q/E sidestep). The default, 2 units, is the one square it always was.',
     ]],
+    ['Gameplay', [
+      'Fixed getting stuck against a ledge or crag after a glancing hit: her speed stayed on and answered W and S while she stood pinned. When a ledge face blocks her and she is not running into it (along it, or at a corner), she now stops, so her speed reads zero until she steers clear.',
+    ]],
     ['Menus', [
       'The Characters page is no longer cut off at the top when it is taller than the window: it starts at the top and scrolls.',
     ]]
@@ -11776,6 +11779,8 @@ function showScreen(name) {                                // the menu shows one
             if (speed <= 0.01) blocked = true;
           } else if (ledgeHit && bdn < 0 && btl > 1e-6) {    // a ledge face again within the second: no penalty, she just slides along it (a straight face cannot spin her round)
             fx = btx / btl; fz = btz / btl; heading = Math.atan2(-fx, -fz); stepLen = speed * cfac * hdt;
+          } else if (ledgeHit) {                              // a ledge face that stopped the step but is not being run into (along it, or its sampled face points away): she cannot move, so her speed goes too, instead of staying on while she stands pinned
+            speed = 0; stepLen = 0; blocked = true;
           }
         }
       }
