@@ -25,11 +25,7 @@ Causes found with scans on his oc4.json (pieces 1-17 changed to ov / roll / fl):
    STILL TO VERIFY: in motion (run.py), screenshots (shot.py), ramps/gaps/ends/pits/enemies on decks, regression (t/reg.py), wall tests (tear/wg.py).
 
 ## Findings not fixed (questions for Ricky, ask at the end)
-- Grip stat is in units/s^2 (40) while everything else is in Zips; card shows it /2. Convert the slider to Zips/s^2?
-- Grip does not fade with slope on ordinary ground but does on walls (jump at 80 degrees). Fade everywhere (grip x cos slope)?
-- Gap/ledge/platform ends: round in game, square in editor. Make the game square (his tuned jumps get ~29 units shorter)?
-- Gravity as an editable stat?
-- Ledges / hills / trapped-minion pits placed on a path that is a deck over low ground on Oceana do not show.
+Moved to BACKLOG.md ("Needs a decision from Ricky") on Nov 16 2026.
 
 ## Rig Editor edge cases (Nov 13 evening) - FIXES WRITTEN, SYNTAX CLEAN, NOT YET TESTED
 Backup before these edits: /tmp/cr-pre-rigfix.html. Test harness: /tmp/aud/righ.py (Rig class), rx1-rx7.py. Test copy needs `python3 /tmp/aud/mk_test.py` after any edit.
