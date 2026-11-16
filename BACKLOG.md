@@ -14,7 +14,9 @@ Open work only. Ricky decides priority and version numbers (see CLAUDE.md). Move
 (none open)
 
 ## Ideas
-(none open)
+- [ ] Performance: big toxic patches mesh at up to 300x300 cells (`max(2.5, size/300)` in `sbMakeMeshes`), each vertex calling `sbFoot`. Cap at about 32-64 cells a side (looks the same on flat ground).
+- [ ] Performance: fewer bubbles for toxic patches farther from Molly, or a lower overall cap than 800 in `sbToxBubbles`.
+- [ ] Performance: toxic terrain-patch and toxic-ledge bubbles still call `groundH` for every bubble every frame; cache their base heights the way toxic patches now do (`t.bub`).
 
 ## Nightly sweep suggestions
 Suggestions the sweep may not act on (features, physics, tuning, looks, design) are written in `sweep-reports/` and can be promoted here when Ricky approves them.
