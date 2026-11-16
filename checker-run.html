@@ -265,7 +265,7 @@
 <div id="stage">
   <canvas id="view" aria-label="3D view of a girl in a red jumpsuit with a ponytail running through a long grass valley with stone walls"></canvas>
   <div id="start" class="splash">
-    <div class="ver">v180</div>
+    <div class="ver">v181</div>
     <button id="bClog" class="clogBtn" type="button" title="What changed in each version">Changes</button>
     <section class="scr on" id="scr-main" aria-label="Main menu">
       <h1 class="logo"><span>POLY</span><span>RUNNER</span></h1>
@@ -10774,6 +10774,11 @@ requestAnimationFrame(tick);
 
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v181', d: 'Nov 15, 2026', t: 'Toxic patches you can size', g: [
+    ['Path Editor', [
+      'Toxic patches have Width (across) and Length (along) boxes in the inspector, so you can size one by typing instead of being stuck with 12 by 12.',
+    ]]
+  ]},
   { v: 'v180', d: 'Nov 15, 2026', t: 'Comet\'s moves, made to order', g: [
     ['Comet', [
       'Star Throw has a throw: holding Q or E she leans in with a star in her hand behind her, growing as she charges; letting go, her arm swings through and the star leaves her hand part way. Her legs keep running. E throws right-handed, Q left-handed.',
