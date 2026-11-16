@@ -34,6 +34,17 @@
 - True Y: `yAbs` in JSON is measured from the first path sample (`B.y0`); in the game `o.T = ya + y0`.
 - Interactables: pressure plates (`B.plates`) and targets (`B.targets`), registered in `B.trig` by id; a door switches to its After mode once every linked minion is beaten, plate pressed and target broken (`sbDoorLinked`).
 
-## Branches
-- `next`: interactive work. `main`: releases (a push publishes when it touches the game, `desktop/` or the release tooling). `nightly/YYYY-MM-DD`: the 03:00 Central sweep.
-- Versions are Ricky's to call; nightly fixes are numbered vN.1, vN.2 and so on.
+## Branches and versions
+- `next`: interactive work (push freely). `main`: releases; a push publishes when it touches the game, `desktop/` or the release tooling, under the `<div class="ver">` label. `nightly/YYYY-MM-DD`: the 03:00 Central sweep, never `main`.
+- A nightly branch is based on the newest unmerged `origin/nightly/*` (so nights stack as a chain), otherwise on `main`.
+- Whole-number versions (v181, v182...) are Ricky's call: always ask before bumping the label or merging `next` into `main`.
+- Nightly fixes merged to `main` take the next decimal (v181 -> v181.1 -> v181.2), each with its own CHANGELOG entry and label; then merge `main` into `next`.
+- Find nightly branches with `git ls-remote origin 'refs/heads/nightly/*'` (`git fetch` leaves no remote-tracking refs). GitHub refuses branch deletion, so merged nightly branches stay.
+- Publish (only when Ricky says): bump the label on `next`, merge `--no-ff` into `main`, push, `gh run list -b main -L 1`, fast-forward `next`.
+
+## Run and test
+- Once per fresh session: `sh tests/setup.sh`.
+- After every edit: `python3 tests/chk.py && python3 tests/mk_test.py`. Then run only the tests for the area touched (map in SWEEP.md), from inside `tests/`.
+- Tests under `tests/fu/` are per-feature; run one only when touching that feature.
+- Old build for comparison: `python3 tests/mk_test.py OLD.html /tmp/polyrun-work/t/aud_main.html`, then pass `html='aud_main.html'` to `Rig()`.
+- Keep scratch backups in `/tmp`, never in the repo.
