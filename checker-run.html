@@ -6686,6 +6686,8 @@ requestAnimationFrame(tick);
   var L3_X = 60000, L3_MIN = 50000;
   var SB = null, sbNoRamps = false;                              // sbNoRamps: while each ramp's foot is measured, ramps are left out of the ground
   function sbHash(c) { return { c: c, m: {} }; }
+  var TOX_C = 32;
+  function sbToxAt(B, ex, z) { return B.toxH ? B.toxH.m[(Math.floor(ex / TOX_C) + 4096) * 8192 + Math.floor(z / TOX_C) + 4096] : null; }   // the toxic patches whose reach covers this point's cell (or null)
   function sbIn(e, x, z, g) {                                  // is (x, z) inside this footprint entry, grown by g? Rounded pieces are discs along the line; squared pieces are short oriented boxes (e.hl along the line, e.half across)
     if (!e.sq) return Math.hypot(e.x - x, e.z - z) <= e.half + g;
     var dx = x - e.x, dz = z - e.z, c = Math.cos(e.th), s = Math.sin(e.th);
@@ -6922,6 +6924,11 @@ requestAnimationFrame(tick);
     B.wallH = nWl ? wallH : null;                                  // wall pieces: found by sbWallFind
     B.slabH = nSl ? slabH : null;                                  // floating pieces: their own slabs, found here
     B.ledgeH = ledgeH; B.gapH = gapH; B.mudH = mudH; B.coneH = coneH; B.pathH = pathH; B.maxL = maxL; B.maxG = maxG; B.maxM = maxM;
+    var toxH = sbHash(TOX_C); B.toxic.forEach(function (t) {     // toxic patches: each is filed in every cell its square reach covers, so a point looks in its own cell only (sbToxAt)
+      t.cn = Math.cos(-t.th); t.sn = Math.sin(-t.th);
+      for (var ta = Math.floor((t.x - t.rr) / TOX_C); ta <= Math.floor((t.x + t.rr) / TOX_C); ta++) for (var tb = Math.floor((t.z - t.rr) / TOX_C); tb <= Math.floor((t.z + t.rr) / TOX_C); tb++) sbAdd(toxH, (ta + 0.5) * TOX_C, (tb + 0.5) * TOX_C, t);
+    });
+    B.toxH = toxH;
     B.hillsT = B.hills.filter(function (h) { return h.T !== undefined; });
     var lT = B.objs.filter(function (o) { return o.t === 'ledge' && o.T !== undefined; });
     if (lT.length) { var keepSB = SB; SB = B; try { lT.forEach(function (o) { var q0 = shapeAt(o, 0); o.hgt = o.T - level3H(L3_X + q0.x, q0.z); }); } finally { SB = keepSB; } }   // a ledge with a true Y: its top is at it where the ledge starts (and keeps the ground's shape along it)
@@ -7184,7 +7191,8 @@ requestAnimationFrame(tick);
       var dx = ex - rp.x, dz = z - rp.z, lf = dx * Math.sin(rp.th) - dz * Math.cos(rp.th), lx = dx * Math.cos(rp.th) + dz * Math.sin(rp.th);
       if (Math.abs(lx) <= rp.hw && lf >= -rp.hl && lf <= rp.hl) { y = (rp.base === undefined ? y : rp.base) + rp.tn * (lf + rp.hl) + rp.y; wL2 = 1; }   // a flat plane rising from the height she stands on at its foot (the path, a slab of path, or the ground there), the same for the ground mesh and for her feet
     }
-    for (i = 0; i < B.toxic.length; i++) { var t = B.toxic[i]; if (Math.abs(t.x - ex) > t.rr || Math.abs(t.z - z) > t.rr) continue; var c = Math.cos(-t.th), sn = Math.sin(-t.th), tdx = ex - t.x, tdz = z - t.z, lx2 = tdx * c - tdz * sn, lz2 = tdx * sn + tdz * c; if (Math.abs(lx2) <= t.hw && Math.abs(lz2) <= t.hd) { tox = true; break; } }
+    var tca = sbToxAt(B, ex, z);
+    if (tca) for (i = 0; i < tca.length; i++) { var t = tca[i]; if (Math.abs(t.x - ex) > t.rr || Math.abs(t.z - z) > t.rr) continue; var tdx = ex - t.x, tdz = z - t.z, lx2 = tdx * t.cn - tdz * t.sn, lz2 = tdx * t.sn + tdz * t.cn; if (Math.abs(lx2) <= t.hw && Math.abs(lz2) <= t.hd) { tox = true; break; } }
     { var mud = false, mudT; sbNear(B.mudH, ex, z, B.maxM, function (e) { if (!mud && sbIn(e, ex, z, 0)) { mud = true; mudT = e.o.T; } }); if (mud) { if (mudT !== undefined) y = mudT; wMud = 1; wL2 = 0; } }   // mud with a true Y: the ground under it is at that height
     return y;
   }
@@ -7805,20 +7813,23 @@ requestAnimationFrame(tick);
         }
       })();
     }
+    var toxPos = [];                                                // every toxic patch goes into this one mesh (one draw, not one per patch)
     B.toxic.forEach(function (t) {                               // toxic patches: a flat dark rectangle laid just above the ground, exactly the size that hurts
-      var nu = Math.max(1, Math.ceil(t.hw * 2 / Math.max(2.5, t.hw * 2 / 300))), nv = Math.max(1, Math.ceil(t.hd * 2 / Math.max(2.5, t.hd * 2 / 300))), pos = [], cs = Math.cos(t.th), sn = Math.sin(t.th), iu, iv, grid = [];
+      var nu = Math.max(1, Math.ceil(t.hw * 2 / Math.max(2.5, t.hw * 2 / 300))), nv = Math.max(1, Math.ceil(t.hd * 2 / Math.max(2.5, t.hd * 2 / 300))), cs = Math.cos(t.th), sn = Math.sin(t.th), iu, iv, grid = [];
       for (iv = 0; iv <= nv; iv++) for (iu = 0; iu <= nu; iu++) {
         var lx = -t.hw + 2 * t.hw * iu / nu, lz = -t.hd + 2 * t.hd * iv / nv, wx = t.x + lx * cs - lz * sn, wz = t.z + lx * sn + lz * cs;
         grid.push([L3_X + wx, (t.T !== undefined ? t.T : sbFoot(L3_X + wx, wz) + t.y) + 0.12, wz]);
       }
       for (iv = 0; iv < nv; iv++) for (iu = 0; iu < nu; iu++) {
         var a = grid[iv * (nu + 1) + iu], b = grid[iv * (nu + 1) + iu + 1], c = grid[(iv + 1) * (nu + 1) + iu + 1], d = grid[(iv + 1) * (nu + 1) + iu];
-        [a, b, c, a, c, d].forEach(function (q) { pos.push(q[0], q[1], q[2]); });
+        [a, b, c, a, c, d].forEach(function (q) { toxPos.push(q[0], q[1], q[2]); });
       }
-      var tg = new THREE.BufferGeometry(); tg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3)); tg.computeVertexNormals();
+    });
+    if (toxPos.length) {
+      var tg = new THREE.BufferGeometry(); tg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(toxPos), 3)); tg.computeVertexNormals();
       var tmesh = new THREE.Mesh(tg, new THREE.MeshLambertMaterial({ color: 0x34353a, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 }));
       tmesh.receiveShadow = true; scene.add(tmesh); B.meshes.push(tmesh);
-    });
+    }
     sbCaveMeshes(); sbSlabMeshes(); sbWallMeshes(); sbTrigMeshes();
   }
   function sbPlaceEnemies() {
@@ -7887,9 +7898,10 @@ requestAnimationFrame(tick);
     }
     if (onTox && hp > 0 && !ballOn && !hovOn && now >= toxUntil) { toxUntil = now + 1000; hp -= 1; drawHearts(); flashHurt(); shake(0.3); }   // standing on a toxic platform or ledge: a heart a second, as on a toxic patch
     if (hp > 0 && !ballOn && !hovOn && now >= toxUntil) {
-      for (i = 0; i < B.toxic.length; i++) {
-        var t = B.toxic[i]; if (Math.abs(t.x - ex) > t.rr || Math.abs(t.z - ez) > t.rr) continue;
-        c = Math.cos(-t.th); sn = Math.sin(-t.th); var dx = ex - t.x, dz = ez - t.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c;
+      var tcd = sbToxAt(B, ex, ez) || [];
+      for (i = 0; i < tcd.length; i++) {
+        var t = tcd[i]; if (Math.abs(t.x - ex) > t.rr || Math.abs(t.z - ez) > t.rr) continue;
+        c = t.cn; sn = t.sn; var dx = ex - t.x, dz = ez - t.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c;
         var tsf = Math.max(l3Top(pp.x, pp.z), sbSlabTop(pp.x, pp.z, pp.y));      // the surface the patch lies on (not a cave floor or a slab beneath it)
         var tsy = t.T !== undefined ? t.T : tsf + t.y;
         if (Math.abs(lx) <= t.hw && Math.abs(lz) <= t.hd && pp.y < tsy + 2.2 && pp.y > tsy - 3) {
@@ -9829,11 +9841,17 @@ requestAnimationFrame(tick);
     function put(wx, wy, wz, sz, r1, r2) { toxDummy.position.set(wx, wy, wz); toxDummy.rotation.set(toxT * 0.7 + r1 * 6, toxT + r2 * 6, 0); toxDummy.scale.set(sz, sz, sz); toxDummy.updateMatrix(); sbBub.setMatrixAt(n++, toxDummy.matrix); }
     for (i = 0; i < B.toxic.length && n < 800; i++) {
       var t = B.toxic[i]; if (Math.abs(t.x - ex) > t.rr + 150 || Math.abs(t.z - pp.z) > t.rr + 150) continue;
-      var cnt = Math.max(6, Math.min(90, Math.round(t.hw * t.hd * 4 * 0.12)));
-      for (k = 0; k < cnt; k++) {
-        var r1 = rand01(i, k, 161), r2 = rand01(i, k, 162), r3 = rand01(i, k, 163), life = (toxT * (0.35 + 0.3 * r3) + r2) % 1, lx = (r1 * 2 - 1) * t.hw, lz = (rand01(i, k, 164) * 2 - 1) * t.hd;
-        var bx = t.x + lx * Math.cos(t.th) - lz * Math.sin(t.th), bz = t.z + lx * Math.sin(t.th) + lz * Math.cos(t.th);
-        put(L3_X + bx, (t.T !== undefined ? t.T : sbFoot(L3_X + bx, bz) + t.y) + 0.4 + life * TOX_H, bz, (0.3 + 0.55 * rand01(i, k, 165)) * Math.sin(Math.PI * life), r1, r2);
+      if (!t.bub) {                                            // where its bubbles sit never changes: worked out once (ground height included), 7 numbers a bubble
+        var cnt = Math.max(6, Math.min(90, Math.round(t.hw * t.hd * 4 * 0.12))); t.bub = [];
+        for (k = 0; k < cnt; k++) {
+          var r1 = rand01(i, k, 161), r2 = rand01(i, k, 162), r3 = rand01(i, k, 163), lx = (r1 * 2 - 1) * t.hw, lz = (rand01(i, k, 164) * 2 - 1) * t.hd;
+          var bx = t.x + lx * Math.cos(t.th) - lz * Math.sin(t.th), bz = t.z + lx * Math.sin(t.th) + lz * Math.cos(t.th);
+          t.bub.push(L3_X + bx, (t.T !== undefined ? t.T : sbFoot(L3_X + bx, bz) + t.y) + 0.4, bz, 0.35 + 0.3 * r3, r2, 0.3 + 0.55 * rand01(i, k, 165), r1);
+        }
+      }
+      for (k = 0; k < t.bub.length; k += 7) {
+        var tb = t.bub, life = (toxT * tb[k + 3] + tb[k + 4]) % 1;
+        put(tb[k], tb[k + 1] + life * TOX_H, tb[k + 2], tb[k + 5] * Math.sin(Math.PI * life), tb[k + 6], tb[k + 4]);
       }
     }
     for (i = 0; i < B.toxLedgePts.length && n < 800; i++) {      // toxic ledge tops: a few bubbles along each one near her
