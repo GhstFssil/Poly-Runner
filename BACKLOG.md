@@ -11,9 +11,27 @@ Open work only. Ricky decides priority and version numbers (see CLAUDE.md). Move
 - [ ] Ledges, hills and trapped-minion pits placed on a path that is a deck over low ground on Oceana do not show.
 
 ## Bugs
-(none open)
+- [ ] Gameplay: Molly gets stuck falling/sliding forever when falling into a cone-shaped hole.
+- [ ] Changing the rotation of a shaft changes the angle of the caves chained to it on the editor screen, but not in the game.
+- [ ] Big minions should push you away when they hit you, and they should have a longer cooldown to hit you after they've been damaged themselves. Also, their heads shouldn't hurt to touch.
+- [ ] The buttons on the path editor screen squish the level name so it can barely be read. They should be much narrower.
+- [ ] Molly gets stuck on the threshold between joined caves of different angles. Needs to be smoothed out.
+- [ ] Molly's Y value using show coordinates doesn't match Oceana Crags' true Y.
+- [ ] On a path, curve angle and curve radius should only affect each other, not the length.
+- [ ] Door collision. See Oceana Crags update.
+- [ ] Minions can push Molly straight up a wall.
+- [ ] When the level is a lot to load, the cursor doesn't always lock.
+- [ ] Toxic terrain doesn't produce visible bubbles at all
 
 ## Ideas
+- [ ] Being underwater should make everything look blue.
+- [ ] Dev mode should include an "invulnerable mode" option where Molly can't be hurt or pushed by enemies.
+- [ ] Screens like dev mode and characters should show the checkerboard background of the main menu.
+- [ ] For paths, supersede terrain should be the default because I use it far more often.
+- [ ] Reduce the number of bubbles toxic patches produce to 25% of what they are now.
+- [ ] Grip during drift should be an editable stat
+- [ ] Hedron barrier should lean on slopes like Molly's body does
+- [ ] Big Minions should toss Molly back, not up.
 - [ ] Performance: big toxic patches mesh at up to 300x300 cells (`max(2.5, size/300)` in `sbMakeMeshes`), each vertex calling `sbFoot`. Cap at about 32-64 cells a side (looks the same on flat ground).
 - [ ] Performance: fewer bubbles for toxic patches farther from Molly, or a lower overall cap than 800 in `sbToxBubbles`.
 - [ ] Performance: toxic terrain-patch and toxic-ledge bubbles still call `groundH` for every bubble every frame; cache their base heights the way toxic patches now do (`t.bub`).
