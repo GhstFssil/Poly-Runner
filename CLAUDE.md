@@ -7,7 +7,8 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (levels) and
 
 ## Standing rules from Ricky
 - Do not send a zip or publish an artifact unless asked.
-- Interactive work goes on `next`. Always ask before bumping the version label (`<div class="ver">`), merging `next` into `main`, or any push to `main` (it publishes a release).
+- Interactive work goes on `next`. Always ask before bumping the version label (`<div class="ver">`), merging `next` into `main`, or any other push to `main` (game or desktop changes publish a release).
+- Exception: doc-only changes (`.md` files only, not sweep reports) go straight to `main` by default, then merge `main` into `next`. They don't publish a release.
 - The nightly sweep works only on `nightly/YYYY-MM-DD`, never `main`. It never changes features, physics, tuning, looks or design: those suggestions go in the report (SWEEP.md).
 - If unsure, ask one focused question. Unattended: write the question in the report and leave that thing alone.
 - No physics changes to compensate for level problems. Units: TILE 2, 1 Zip = 2 u/s; show speeds in Zips.
