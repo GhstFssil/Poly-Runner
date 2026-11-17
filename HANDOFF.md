@@ -2,7 +2,7 @@
 
 Standing rules: CLAUDE.md. Stable facts, branches and test commands: ARCHITECTURE.md. History: the CHANGELOG in `checker-run.html` and `audit-notes.md`. Open work: BACKLOG.md.
 
-Last updated 2026-11-16, after v182. In progress: nothing. Unmerged nightly branches: none (`nightly/2026-11-16` went out as v181.1).
+Last updated 2026-11-17. `next` holds unreleased work (toxic bubbles + all of group 1: doors, coordinates Y, shaft headings, cave joints, cone holes, deck ledges/hills, pits removed); no version bump yet. In progress: nothing. Unmerged nightly branches: none.
 
 ## Key decisions (Ricky's unless marked)
 - Star aim (Claude's call; reported to Ricky): follows the camera's yaw and is level at the camera's resting pitch of 0.35, because a literal camera ray would hit the ground about 6 u ahead.
@@ -10,6 +10,7 @@ Last updated 2026-11-16, after v182. In progress: nothing. Unmerged nightly bran
 - Mob dials live only in Molly's store. Comet's store never holds `mn.*` (`noMobs`).
 
 ## Gotchas and failed approaches
+- Timing-based tests: a 4 s wait is not always enough for her to finish a slide or a run headless (steep2 gave different answers run to run); rerun with a longer wait or poll before calling something a regression. Runs with `draw=True` are far slower.
 - After changing the shipped settings, run `python3 tools/bake_models.py`, or the built-in models won't match them.
 - When rewriting a tag with regex, recompute match positions after each edit. A stale `m.end()` once nested `comet-settings` inside Molly's JSON.
 - Headless fps swings from 2 to 26 and dt is capped, so timing-based results vary. Poll state instead of using fixed waits. `fu/steep1.py` is noisy.
