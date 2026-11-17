@@ -1101,7 +1101,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       S.objs.forEach(function (o) { if (o.s !== undefined && Math.floor((o.s + 0.5) / STRIDE) > pk) o.s -= STRIDE; });
       S.more.splice(pk - 1, 1); setSel(-1); openPaths = { 0: true };
     }
-    else return;
+    else { hist.pop(); return; }                                   // nothing to do (up on the first piece, down on the last): no empty undo step
     afterEdit(true); renderInsp();
   });
   $('addPath').onclick = function () { snap(); var e = samples[samples.length - 1] || { x: 0, z: 0 }; S.more.push({ x: Math.round(e.x / 10) * 10 + 200, z: Math.round(e.z / 10) * 10, th: 0, y: 0, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }] }); openPaths[S.more.length] = true; afterEdit(true); };
