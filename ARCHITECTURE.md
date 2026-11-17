@@ -13,7 +13,7 @@
   - `reslice.py` (the sweep's 20 slices).
 - `tests/`: the Playwright + swiftshader harness (`righ.py` has the `Rig` class).
 - `.github/workflows/release.yml`: publishes under the `<div class="ver">` label when a push to `main` touches the game, `desktop/` or the release tooling.
-- `SWEEP.md`: the nightly sweep's state; reports go in `sweep-reports/`.
+- `SWEEP-BUGS.md`, `SWEEP-EDGES.md`, `SWEEP-PERF.md`: the three nightly sweeps; their state files and reports go in `sweep-reports/`.
 - `audit-notes.md`: the long log. The `var CHANGELOG` in the game is the player-facing log.
 
 ## Runners
@@ -35,8 +35,8 @@
 - Interactables: pressure plates (`B.plates`) and targets (`B.targets`), registered in `B.trig` by id; a door switches to its After mode once every linked minion is beaten, plate pressed and target broken (`sbDoorLinked`).
 
 ## Branches and versions
-- `next`: interactive work (push freely). `main`: releases; a push publishes when it touches the game, `desktop/` or the release tooling, under the `<div class="ver">` label. `nightly/YYYY-MM-DD`: the 03:00 Central sweep, never `main` except appending to `.md` docs (see SWEEP.md).
-- A nightly branch is based on the newest unmerged `origin/nightly/*` (so nights stack as a chain), otherwise on `main`.
+- `next`: interactive work (push freely). `main`: releases; a push publishes when it touches the game, `desktop/` or the release tooling, under the `<div class="ver">` label. `nightly/YYYY-MM-DD-<bugs|edges|perf>`: the three nightly sweeps (staggered times), never `main` except appending to `.md` docs (see SWEEP-*.md).
+- A nightly branch is based on the newest unmerged branch of its own sweep (so nights stack as a chain), otherwise on `main`.
 - Whole-number versions (v181, v182...) are Ricky's call: always ask before bumping the label or merging `next` into `main`.
 - Nightly fixes merged to `main` take the next decimal (v181 -> v181.1 -> v181.2), each with its own CHANGELOG entry and label; then merge `main` into `next`.
 - Find nightly branches with `git ls-remote origin 'refs/heads/nightly/*'` (`git fetch` leaves no remote-tracking refs). GitHub refuses branch deletion, so merged nightly branches stay.
@@ -44,7 +44,7 @@
 
 ## Run and test
 - Once per fresh session: `sh tests/setup.sh`.
-- After every edit: `python3 tests/chk.py && python3 tests/mk_test.py`. Then run only the tests for the area touched (map in SWEEP.md), from inside `tests/`.
+- After every edit: `python3 tests/chk.py && python3 tests/mk_test.py`. Then run only the tests for the area touched (map in any SWEEP-*.md), from inside `tests/`.
 - Tests under `tests/fu/` are per-feature; run one only when touching that feature.
 - Old build for comparison: `python3 tests/mk_test.py OLD.html /tmp/polyrun-work/t/aud_main.html`, then pass `html='aud_main.html'` to `Rig()`.
 - Keep scratch backups in `/tmp`, never in the repo.
