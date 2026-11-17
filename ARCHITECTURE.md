@@ -30,7 +30,7 @@
 ## World
 - Units: TILE 2 (1 Zip = 2 u/s). Speeds are shown in Zips.
 - Levels 1 and 2 are built in. The sandbox (level 3) is built from Path Editor JSON by `sbBuild` (spatial hashes `sbHash` / `sbNear`); the world sits at x offset `L3_X` (60000).
-- Grass Canyon is the sandbox layout `OFFICIAL_L1`.
+- Grass Canyon is the sandbox layout `OFFICIAL_L1`; Oceana Crags is `OFFICIAL_L2` (the old built-in level 2 still supplies its terrain).
 - True Y: `yAbs` in JSON is measured from the first path sample (`B.y0`); in the game `o.T = ya + y0`.
 - Interactables: pressure plates (`B.plates`) and targets (`B.targets`), registered in `B.trig` by id; a door switches to its After mode once every linked minion is beaten, plate pressed and target broken (`sbDoorLinked`).
 
