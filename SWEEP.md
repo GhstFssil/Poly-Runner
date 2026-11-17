@@ -2,63 +2,74 @@
 
 Purpose: every night, one slice of the code (about 5% of it, 20 slices in all) is looked at through one lens (bugs, visual seams and edges, or running lighter and smoother), tested, and fixed only where the fix is proven and safe. A slice is small enough that a night's run stays cheap.
 
-## State (updated by each night, on its branch)
-Next slice: 3
-Night counter: 2
-Last checked commit: 5cd081b66b5f20015ba0888dd990ccd97f57e1e9
+This file is the whole job for the unattended nightly run. Read it as cloned from `main`, before switching branches; the base branch may carry an older SWEEP.md, which you ignore.
+
+## Unattended rules
+- Nobody is watching: never ask. Decide, or leave the thing alone and write the question for Ricky (see "For Ricky").
+- From CLAUDE.md, these do not apply tonight: the session-start summary, naming files before a big read, proposing a plan and waiting for a go-ahead, and the closing reply style. Everything else in CLAUDE.md does. It loads by itself when the repo is registered: don't read it again.
+- Git identity: `git config user.email noreply@anthropic.com` and `git config user.name "Poly Run nightly sweep"`. Never use or write Ricky's email anywhere. Commit messages end with the attribution lines this session was given; if none were given, end with `Co-Authored-By: Claude <noreply@anthropic.com>`.
+- Never: change features, physics, tuning numbers, level content, looks or design; reformat or refactor; bump the version label; add a CHANGELOG entry or edit `audit-notes.md` (those come when Ricky merges, see ARCHITECTURE.md); send a zip or publish anything.
+- On `main`, the run only appends to `.md` docs (never rewrites them, never sweep reports or STATE.md), mainly the "For Ricky" lines in BACKLOG.md, then merges `main` into `next` (below). Everything else goes on tonight's nightly branch.
+
+## State
+The night's state lives in `sweep-reports/STATE.md` on the nightly branches, not here, so this file can be edited on `main` without clashing with the chain of nightly branches:
+
+```
+Next slice: 4
+Night counter: 3
+
+## Tests added by nights
+- (area): tests/name.py, what it checks (nightly/YYYY-MM-DD)
+```
+
+Read it from the base branch. If the base has none yet (the first night after this change), take the two numbers from the "## State" block of the base's own SWEEP.md, and the tests from its old reports; if that block is missing too, start at Next slice 4, Night counter 3.
 
 ## What a nightly session does
-1. `git fetch`; choose the base (see ARCHITECTURE.md, Branches: newest unmerged `origin/nightly/*`, else `main`); create `nightly/YYYY-MM-DD` from it; run `sh tests/setup.sh`.
-2. **Re-slice if the code changed.** Run `git diff --stat <Last checked commit> HEAD -- checker-run.html path-editor.html`. If anything changed (any edit by anyone since that commit, including earlier nights' fixes that were merged), run `python3 tools/reslice.py`. It cuts the code into 20 slices of about 5 percent each, at section and function boundaries, and rewrites the table below. Do not move "Next slice": tonight simply takes the slice with that number in the new table (so new code lands in whichever slice it falls in and is reached in its turn; nothing is put at the front of the line). If nothing changed, keep the table as it is.
-3. **Take the slice** numbered "Next slice". Read all of its code. A slice is a starting point, not a fence: if something in it leans on code elsewhere (a helper, a shared value), read that too.
-4. **Pick the lens** for tonight: cycle[Night counter mod 7] where the cycle is Bugs, Bugs, Visual, Bugs, Bugs, Performance, Bugs. (Seven nights, so over time every slice meets every lens.) If the lens makes no sense for the slice (Visual for code with nothing to see, such as import/export, menus and input; Performance for code with no hot path), use Bugs instead; never skip a slice.
-5. **Do the work** under that lens (below), with the tests that fit the area (below).
-6. **Close the night**: set "Next slice" to the next number (after 20 comes 1), add 1 to "Night counter", set "Last checked commit" to the commit your branch is on once your code changes (if any) are committed (code commits only; the bookkeeping commit that records it does not matter, since the diff looks only at the two code files), write the report to `sweep-reports/YYYY-MM-DD.md` (what you looked at, found and fixed with its test, numbers for performance work, screenshots beside it for visual work, what is left for Ricky, any limit you hit), commit and push the branch. If a usage limit stops you, write down the slice and step you reached in the report and push what is safe, and still do the state update so the next night continues from the right place.
-7. Never: change features, physics, tuning numbers, level content, looks or design; reformat or refactor; bump the version label; send a zip or publish anything. If something might be a bug but might be intended, or needs a decision, do not change it: write it under "For Ricky".
+1. **Choose the base.** Run `git ls-remote origin 'refs/heads/nightly/*'` and take the newest name (sort the names; `2026-11-17-2` comes after `2026-11-17`). It is merged if `main` has its report: `git cat-file -e origin/main:sweep-reports/<name>.md`, where `<name>` is the branch name without `nightly/`. If it is merged, or there are no nightly branches, the base is `origin/main`. Otherwise fetch it with `git fetch --depth=1 origin nightly/<name>:refs/remotes/origin/nightly/<name>` and use that.
+2. **Create tonight's branch** `nightly/YYYY-MM-DD` (today in America/Chicago). If that name is already in the list from step 1, add `-2` (or `-3`, and so on). `git switch -c <branch> <base>`, then `sh tests/setup.sh`.
+3. **Get the slices.** Run `python3 tools/reslice.py --check` (always with `--check`: it prints the table and writes nothing). Unchanged code gives the same table, so no other check is needed. Take the row numbered "Next slice". Also look at the slices for the next three nights (Next slice + 1, + 2, + 3; after 20 comes 1): any that is over 7% of the code goes in tonight's message. Slice 5 is about 12.5% (one long section the tool can't cut); leave it as it is.
+4. **Read the slice.** Read all of its code. A slice is a starting point, not a fence: if something in it leans on code elsewhere (a helper, a shared value), read that too.
+5. **Pick the lens**: cycle[Night counter mod 7], counted from 0: 0 Bugs, 1 Bugs, 2 Visual, 3 Bugs, 4 Bugs, 5 Performance, 6 Bugs. (20 slices and a 7-night cycle, so over time every slice meets every lens.) If the lens makes no sense for the slice (Visual for code with nothing to see, such as import/export, menus and input; Performance for code with no hot path), use Bugs instead; never skip a slice.
+6. **Do the work** under that lens (below), with the tests that fit the area (below).
+7. **Close the night.** In `sweep-reports/STATE.md`: "Next slice" + 1 (after 20 comes 1), "Night counter" + 1, and add any test you wrote to "Tests added by nights". Write the report to `sweep-reports/<name>.md` (named after tonight's branch, without `nightly/`). Commit, then push: `git -c push.negotiate=true push -u origin <branch>`. Write the "For Ricky" items to BACKLOG.md (below). Then send the message (below).
+8. **If a usage limit stops you**, write the slice and step you reached in the report, still update STATE.md so the next night continues from the right place, and push whatever is safe.
+
+## Testing rules
+- After every edit: if you touched `path-editor.html`, run `python3 tools/mk_pe_embed.py` first. Then `python3 tests/chk.py && python3 tests/mk_test.py` (this rebuilds the test copy; without it the tests run on the old game). Then, from inside `tests/`, the tests for the area and `python3 reg2.py`.
+- Commit only when all of those pass. If a fix makes anything worse, undo it. After two failed attempts at the same fix, undo it and write it up in the report.
 
 ## Lenses
-**Bugs.** Read for wrong math or units, off-by-one, null or NaN paths, state that is not reset, swallowed errors, mismatches between the editor and the game, event handlers that leak, values that can leave their range, code that disagrees with its own comment. For each suspect, prove it: write a small test (headless, from `tests/`) that fails, or show the exact input that goes wrong. Fix only a proven bug, with the smallest change, and keep the test. If a fix makes anything worse, undo it.
+**Bugs.** Read for wrong math or units, off-by-one, null or NaN paths, state that is not reset, swallowed errors, mismatches between the editor and the game, event handlers that leak, values that can leave their range, code that disagrees with its own comment. For each suspect, prove it: write a small test (headless, in `tests/`) that fails, or show the exact input that goes wrong. Fix only a proven bug, with the smallest change, and keep the test.
 
-**Visual (seams and edges).** Render the slice's content headless from several close-up angles (the harness has screenshot helpers: `tests/rv*.py`, `tests/shot*`-style scripts, `fu/modes.py`) and look for: cracks or gaps between meshes, holes, z-fighting or flicker, stretched or flipped faces, T-junctions, lighting seams, wrong normals, pop-in, objects floating or sunk, colour breaks at joins, jagged silhouettes where it should be smooth. Fix only a clear artifact with one obvious cause, locally. Save before and after screenshots to `sweep-reports/YYYY-MM-DD/`. If a fix would change how something is designed (a shape, a colour, a size), do not change it: put the screenshot and your suggestion under "For Ricky".
+**Visual (seams and edges).** Render the slice's content headless from several close-up angles (screenshot helpers: `tests/rv*.py`, `tests/shot.py`, `tests/fu/modes.py`) and look for: cracks or gaps between meshes, holes, z-fighting or flicker, stretched or flipped faces, T-junctions, lighting seams, wrong normals, pop-in, objects floating or sunk, colour breaks at joins, jagged silhouettes where it should be smooth. Fix only a clear artifact with one obvious cause, locally. Save before and after screenshots to `sweep-reports/<name>/`. If a fix would change how something is designed (a shape, a colour, a size), do not change it: it goes to "For Ricky" with the screenshot's path.
 
-**Performance (lighter and smoother, same behaviour).** Headless software rendering says nothing about real GPU speed, so measure only what it can: JavaScript time per frame and per build (`performance.now()` around terrain chunks, sandbox builds, rig rebuilds, the main update), allocations inside per-frame code (new objects, arrays, strings, closures made every frame), repeated work that could be cached, draw calls, triangle and material counts, texture and geometry sizes, anything that scales badly. Make a change only if (a) it saves a measurable amount, (b) the output is provably the same (identical positions, heights, sample values or screenshots before and after, plus the related tests) and (c) it is small and local. Record before and after numbers in the report. A bigger idea (a restructure, or anything that changes how something looks or feels) goes under "For Ricky" with the estimated gain and the risk, never into the code. Never trade away behaviour, accuracy or looks for speed.
+**Performance (lighter and smoother, same behaviour).** Headless software rendering says nothing about real GPU speed, so measure only what it can: JavaScript time per frame and per build (`performance.now()` around terrain chunks, sandbox builds, rig rebuilds, the main update), allocations inside per-frame code (new objects, arrays, strings, closures made every frame), repeated work that could be cached, draw calls, triangle and material counts, texture and geometry sizes, anything that scales badly. Make a change only if (a) it saves a measurable amount, (b) the output is provably the same (identical positions, heights, sample values or screenshots before and after, plus the related tests) and (c) it is small and local. Record before and after numbers in the report. A bigger idea (a restructure, or anything that changes how something looks or feels) goes to "For Ricky" with the estimated gain and the risk, never into the code. Never trade away behaviour, accuracy or looks for speed.
 
-## Tests by area (always run `python3 tests/chk.py` and `tests/reg2.py` before committing)
-- Path Editor (`path-editor.html`, and after any change run `python3 tools/mk_pe_embed.py`): `peobj.py`, `pefuzz.py` (takes several minutes), `pesave.py`.
+## Tests by area (run from inside `tests/`)
+- Path Editor (`path-editor.html`): `peobj.py`, `pesave.py`, `pecycle.py`, `pegho.py`, `pefuzz.py` (several minutes: run it last).
 - Sandbox and levels (`sbBuild`, footprints, caves, walls): `fu/ends1.py` plus a test of your own for what you touched.
 - Stats and movement details: `fu/fu1.py`, `fu/fu1b.py`.
 - Rig Editor dials, loading and settings: `rx8.py`, `fu/fu2.py`, `fu/fu4.py`; model build, welds and weights: `rw4.py`, `rm1.py`, `fu/fu3.py`; saved model storage: `fu/fu6.py`.
-- Run tests from inside `tests/`. After every edit to the game, rerun `python3 mk_test.py` first.
+- Plus every test in STATE.md's "Tests added by nights" for the area.
 
-## The slices
-Generated by `python3 tools/reslice.py` (counts every line of both files except the generated Path Editor embed, Molly's saved model and settings, and the change log's text). Do not edit by hand.
-<!--SLICES-BEGIN-->
-| # | Where | Size | Sections inside |
-|---|-------|------|-----------------|
-| 1 | path-editor.html 1-449 | 449 lines (4.3%) | the path: points every 4 units, heading 0 = north (-Z), a right turn s; shapes (in the stamp's own frame: x across, y toward the back; up on t; Layer-Split Overlap ---- |
-| 2 | path-editor.html 450-918 | 469 lines (4.4%) | drawing ----; the piece list ----; the inspector for the selected stamp ----; true Y: one flat height for the whole world, 0 where her feet are at t |
-| 3 | path-editor.html 919-1374 | 456 lines (4.3%) | events ----; copy, paste, delete, duplicate for one stamp or a whole selection ----; presets: a saved group of stamps you can drop anywhere, on any level -; layers (editor only: the game never sees them) ---- … |
-| 4 | path-editor.html 1375-1455; checker-run.html 1-450 | 531 lines (5.0%) | live preview: when the editor is hosted by the game with Live preview  |
-| 5 | checker-run.html 451-643, 3306-4442 | 1330 lines (12.6%) | (code inside one section) |
-| 6 | checker-run.html 4443-4857 | 415 lines (3.9%) | keyframed moves. Angles in degrees. Missing values carry over from the |
-| 7 | checker-run.html 4858-5278 | 421 lines (4.0%) | implicit field of each part, used to blend side joints and to weight v |
-| 8 | checker-run.html 5279-5703 | 425 lines (4.0%) | (code inside one section) |
-| 9 | checker-run.html 5704-5800, 5802-6134 | 430 lines (4.1%) | Speedometer ----; Renderer / scene ----; Valley: rolling grass between two cliff walls and a back wall, running |
-| 10 | checker-run.html 6135-6575 | 441 lines (4.2%) | The cave ----; The doorway, the mud ramp and the field ----; Level 2, Oceana Crags: a flat, light brown stone runway 20 wide runnin; The Crags: a 500-wide range of brown rock spikes. Its centre line star … |
-| 11 | checker-run.html 6576-7048 | 473 lines (4.5%) | Level 3, the Sandbox: flat patchy grass at x = 60000 and up, shaped by; Caves: a tunnel (or, from 80 degrees up, a shaft) bored into the groun |
-| 12 | checker-run.html 7049-7549 | 501 lines (4.7%) | Walls: a path banked past 80 degrees is a tilted plane, not part of th; Pressure plates and targets: interactables a door can be linked to (a  |
-| 13 | checker-run.html 7550-8018 | 469 lines (4.4%) | (code inside one section) |
-| 14 | checker-run.html 8019-8517 | 499 lines (4.7%) | Trees: one per jittered grid cell, in rows running down the valley, so |
-| 15 | checker-run.html 8518-8984 | 467 lines (4.4%) | Character: girl in a red jumpsuit ----; Movement details (the Rig Editor's Stats menu): the movement model wri |
-| 16 | checker-run.html 8985-9458 | 474 lines (4.5%) | Head: a shaped skull with a narrowing jaw, smooth skin, then faceted h; Arms: shoulder, upper arm with a white band on the outside, forearm, b; Legs: thigh, calf with a back bulge, black knee diamond and ankle cuff; State ---- … |
-| 17 | checker-run.html 9459-9989 | 531 lines (5.0%) | Health: three hearts. A hard landing costs hearts (30+ units: one, 60+; Strafe: an instant sidestep of one square, to her right (+1) or left (; Warning sign: a wooden post and board in the middle of the platform at; Toxic patches: dark gray strips of ground, 2 wide and 100 long, along  … |
-| 18 | checker-run.html 9990-10585 | 596 lines (5.6%) | Strafe streaks: thin light lines left in the air along the path of a s; Checkpoint gate at the end of the valley ----; Stone edges: a low row of rough blocks along the plateau's cliff edges; Where she starts: the start meadow or the checkpoint ---- … |
-| 19 | checker-run.html 10586-10775, 11019-11330 | 502 lines (4.8%) | World map on the title / pause card ----; Input ----; the change log on the main menu. Newest first. Add an entry (and bump ; Comet's moves (the Rig Editor's Comet page sets every number). She has |
-| 20 | checker-run.html 11331-12008 | 678 lines (6.4%) | Sizing ----; Clock: five minutes, then the level starts over ----; Loop ---- |
-<!--SLICES-END-->
+## For Ricky
+Anything that might be a bug but might be intended, or needs a decision (including design, tuning and bigger performance ideas), is not changed. Write each one in tonight's report, and also append it to BACKLOG.md on `main`, under "## Nightly sweep suggestions", as one line: `- (nightly/<name>) the question, in plain words; where in the code`. Don't repeat an item that is already there. If another doc on `main` needs a note (for example a test map line here), append it the same way, in the same commit. Then merge `main` into `next`. Do all of it in a separate worktree so tonight's branch is untouched:
+```
+git fetch --depth=200 origin main next
+git worktree add --detach /tmp/pr-main origin/main
+(append to /tmp/pr-main/BACKLOG.md, that section only, and any other .md note)
+git -C /tmp/pr-main commit -am "Nightly <name>: notes for Ricky"      (message ends with the attribution lines)
+git -C /tmp/pr-main -c push.negotiate=true push origin HEAD:main
+M=$(git -C /tmp/pr-main rev-parse HEAD)
+git -C /tmp/pr-main checkout --detach origin/next
+git -C /tmp/pr-main merge --no-ff -m "Merge main into next (nightly <name>)" $M      (message ends with the attribution lines)
+git -C /tmp/pr-main -c push.negotiate=true push origin HEAD:next
+```
+If the push to `main` is refused because `main` moved, fetch again, redo the append on the new `main` and retry once; if it still fails, say so in the message (the items are in the report either way). If the merge into `next` conflicts or fails for any reason, run `git -C /tmp/pr-main merge --abort`, leave `next` alone and say so in the message; never resolve a conflict on `next`.
+
+## The report and the message
+- The report file (`sweep-reports/<name>.md`): the slice and what it covers, the lens, what you looked at, what you found and fixed with its test, numbers for performance work, screenshots for visual work, what you left for Ricky, any limit you hit, and any setup oddity (for example, a clone that was already there).
+- The message: your final message, and a SendUserMessage call with the same text. Plain language for Ricky, no code or jargon, about 15 lines at most: the date and branch, the lens and slice (and what part of the game it covers), what you found, what you fixed (one line each), what you left for him and why (and that it is in BACKLOG), anything you could not finish, and any slice over 7% coming in the next three nights. If you found nothing, say so plainly.
 
 ## Known leftovers (not bugs to chase)
 Ponytail blend at max opens a slit at the hair tie; Contour shift at max falls back to the old arm joint with a few holes; a soft fold at the top of the trailing thigh in deep strides.
-
-## For Ricky (questions the sweeps could not decide)
-(none yet)

@@ -35,7 +35,7 @@
 - Interactables: pressure plates (`B.plates`) and targets (`B.targets`), registered in `B.trig` by id; a door switches to its After mode once every linked minion is beaten, plate pressed and target broken (`sbDoorLinked`).
 
 ## Branches and versions
-- `next`: interactive work (push freely). `main`: releases; a push publishes when it touches the game, `desktop/` or the release tooling, under the `<div class="ver">` label. `nightly/YYYY-MM-DD`: the 03:00 Central sweep, never `main`.
+- `next`: interactive work (push freely). `main`: releases; a push publishes when it touches the game, `desktop/` or the release tooling, under the `<div class="ver">` label. `nightly/YYYY-MM-DD`: the 03:00 Central sweep, never `main` except appending to `.md` docs (see SWEEP.md).
 - A nightly branch is based on the newest unmerged `origin/nightly/*` (so nights stack as a chain), otherwise on `main`.
 - Whole-number versions (v181, v182...) are Ricky's call: always ask before bumping the label or merging `next` into `main`.
 - Nightly fixes merged to `main` take the next decimal (v181 -> v181.1 -> v181.2), each with its own CHANGELOG entry and label; then merge `main` into `next`.
