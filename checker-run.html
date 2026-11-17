@@ -7814,8 +7814,8 @@ requestAnimationFrame(tick);
       })();
     }
     var toxPos = [];                                                // every toxic patch goes into this one mesh (one draw, not one per patch)
-    B.toxic.forEach(function (t) {                               // toxic patches: a flat dark rectangle laid just above the ground, exactly the size that hurts
-      var nu = Math.max(1, Math.ceil(t.hw * 2 / Math.max(2.5, t.hw * 2 / 300))), nv = Math.max(1, Math.ceil(t.hd * 2 / Math.max(2.5, t.hd * 2 / 300))), cs = Math.cos(t.th), sn = Math.sin(t.th), iu, iv, grid = [];
+    B.toxic.forEach(function (t) {                               // toxic patches: a flat dark rectangle laid just above the ground, exactly the size that hurts; at most 64 cells a side, each 2.5 units or more
+      var nu = Math.max(1, Math.ceil(t.hw * 2 / Math.max(2.5, t.hw * 2 / 64))), nv = Math.max(1, Math.ceil(t.hd * 2 / Math.max(2.5, t.hd * 2 / 64))), cs = Math.cos(t.th), sn = Math.sin(t.th), iu, iv, grid = [];
       for (iv = 0; iv <= nv; iv++) for (iu = 0; iu <= nu; iu++) {
         var lx = -t.hw + 2 * t.hw * iu / nu, lz = -t.hd + 2 * t.hd * iv / nv, wx = t.x + lx * cs - lz * sn, wz = t.z + lx * sn + lz * cs;
         grid.push([L3_X + wx, (t.T !== undefined ? t.T : sbFoot(L3_X + wx, wz) + t.y) + 0.12, wz]);
@@ -9835,50 +9835,72 @@ requestAnimationFrame(tick);
   ovBub.frustumCulled = false; ovBub.count = 0; scene.add(ovBub);
   var sbBub = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0x8f9a8f, transparent: true, opacity: 0.55, depthWrite: false }), 900);
   sbBub.frustumCulled = false; sbBub.count = 0; scene.add(sbBub);
+  var SB_BUB_CAP = 500;                                       // most Sandbox bubbles drawn in one frame (was 800)
+  function sbBubKeep(d) { return d <= 60 ? 1 : d >= 150 ? 0.25 : 1 - 0.75 * (d - 60) / 90; }   // farther from her, fewer bubbles: all of them within 60 units, a quarter past 150
   function sbToxBubbles(pp) {                                // the Sandbox: square bubbles rise off toxic patches and toxic terrain patches, as they do off the poisoned strips of the real level
-    var B = SB, n = 0, ex = pp.x - L3_X, i, k, a, b;
+    var B = SB, n = 0, ex = pp.x - L3_X, i, k, a, b, CAP = SB_BUB_CAP;
     if (!B || level !== 3 || !playing) { sbBub.count = 0; return; }
     function put(wx, wy, wz, sz, r1, r2) { toxDummy.position.set(wx, wy, wz); toxDummy.rotation.set(toxT * 0.7 + r1 * 6, toxT + r2 * 6, 0); toxDummy.scale.set(sz, sz, sz); toxDummy.updateMatrix(); sbBub.setMatrixAt(n++, toxDummy.matrix); }
-    for (i = 0; i < B.toxic.length && n < 800; i++) {
+    function far(bx, bz, r) { return r > sbBubKeep(Math.hypot(bx - ex, bz - pp.z)); }   // r: the bubble's own fixed random number, so the same ones stay hidden
+    for (i = 0; i < B.toxic.length && n < CAP; i++) {
       var t = B.toxic[i]; if (Math.abs(t.x - ex) > t.rr + 150 || Math.abs(t.z - pp.z) > t.rr + 150) continue;
-      if (!t.bub) {                                            // where its bubbles sit never changes: worked out once (ground height included), 7 numbers a bubble
-        var cnt = Math.max(6, Math.min(90, Math.round(t.hw * t.hd * 4 * 0.12))); t.bub = [];
+      if (!t.bub) {                                            // where its bubbles sit never changes: worked out once (ground height included), 8 numbers a bubble
+        var cnt = Math.max(2, Math.min(23, Math.round(t.hw * t.hd * 4 * 0.03))); t.bub = [];   // a quarter of the old count (0.12 a square unit, 6 to 90)
         for (k = 0; k < cnt; k++) {
           var r1 = rand01(i, k, 161), r2 = rand01(i, k, 162), r3 = rand01(i, k, 163), lx = (r1 * 2 - 1) * t.hw, lz = (rand01(i, k, 164) * 2 - 1) * t.hd;
           var bx = t.x + lx * Math.cos(t.th) - lz * Math.sin(t.th), bz = t.z + lx * Math.sin(t.th) + lz * Math.cos(t.th);
-          t.bub.push(L3_X + bx, (t.T !== undefined ? t.T : sbFoot(L3_X + bx, bz) + t.y) + 0.4, bz, 0.35 + 0.3 * r3, r2, 0.3 + 0.55 * rand01(i, k, 165), r1);
+          t.bub.push(L3_X + bx, (t.T !== undefined ? t.T : sbFoot(L3_X + bx, bz) + t.y) + 0.4, bz, 0.35 + 0.3 * r3, r2, 0.3 + 0.55 * rand01(i, k, 165), r1, rand01(i, k, 166));
         }
       }
-      for (k = 0; k < t.bub.length; k += 7) {
-        var tb = t.bub, life = (toxT * tb[k + 3] + tb[k + 4]) % 1;
+      for (k = 0; k < t.bub.length && n < CAP; k += 8) {
+        var tb = t.bub; if (far(tb[k] - L3_X, tb[k + 2], tb[k + 7])) continue;
+        var life = (toxT * tb[k + 3] + tb[k + 4]) % 1;
         put(tb[k], tb[k + 1] + life * TOX_H, tb[k + 2], tb[k + 5] * Math.sin(Math.PI * life), tb[k + 6], tb[k + 4]);
       }
     }
-    for (i = 0; i < B.toxLedgePts.length && n < 800; i++) {      // toxic ledge tops: a few bubbles along each one near her
+    for (i = 0; i < B.toxLedgePts.length && n < CAP; i++) {      // toxic ledge tops: a few bubbles along each one near her
       var tq = B.toxLedgePts[i]; if (Math.abs(tq.x - ex) > 150 || Math.abs(tq.z - pp.z) > 150) continue;
-      for (k = 0; k < 3; k++) {
-        var tr1 = rand01(i, k, 181), tlife = (toxT * (0.35 + 0.3 * rand01(i, k, 182)) + rand01(i, k, 183)) % 1, tl = (tr1 * 2 - 1) * tq.half * 0.8, ta = (rand01(i, k, 184) * 2 - 1) * 2;
-        var tbx = tq.x + Math.cos(tq.th) * tl + Math.sin(tq.th) * ta, tbz = tq.z + Math.sin(tq.th) * tl - Math.cos(tq.th) * ta;
-        put(L3_X + tbx, groundH(L3_X + tbx, tbz) + 0.4 + tlife * TOX_H, tbz, (0.3 + 0.55 * rand01(i, k, 185)) * Math.sin(Math.PI * tlife), tr1, rand01(i, k, 186));
+      if (!tq.bub) {                                           // worked out once, ground height included: 8 numbers a bubble
+        tq.bub = [];
+        for (k = 0; k < 3; k++) {
+          var tr1 = rand01(i, k, 181), tl = (tr1 * 2 - 1) * tq.half * 0.8, ta = (rand01(i, k, 184) * 2 - 1) * 2;
+          var tbx = tq.x + Math.cos(tq.th) * tl + Math.sin(tq.th) * ta, tbz = tq.z + Math.sin(tq.th) * tl - Math.cos(tq.th) * ta;
+          tq.bub.push(tbx, groundH(L3_X + tbx, tbz) + 0.4, tbz, 0.35 + 0.3 * rand01(i, k, 182), rand01(i, k, 183), 0.3 + 0.55 * rand01(i, k, 185), tr1, rand01(i, k, 186));
+        }
+      }
+      for (k = 0; k < 24; k += 8) {
+        var qb = tq.bub, tlife = (toxT * qb[k + 3] + qb[k + 4]) % 1;
+        put(L3_X + qb[k], qb[k + 1] + tlife * TOX_H, qb[k + 2], qb[k + 5] * Math.sin(Math.PI * tlife), qb[k + 6], qb[k + 7]);
       }
     }
-    for (i = 0; i < B.movers.length && n < 800; i++) {          // toxic platforms: bubbles off the top, moving with it
+    for (i = 0; i < B.movers.length && n < CAP; i++) {          // toxic platforms: bubbles off the top, moving with it
       var tm = B.movers[i]; if (tm.door || !tm.o || !tm.o.tox || ex < tm.minx - 150 || ex > tm.maxx + 150 || pp.z < tm.minz - 150 || pp.z > tm.maxz + 150) continue;
       var tcnt = Math.min(60, Math.max(4, Math.round(tm.pts.length * 1.5)));
-      for (k = 0; k < tcnt; k++) {
+      for (k = 0; k < tcnt && n < CAP; k++) {
         var tpq = tm.pts[Math.floor(rand01(i, k, 191) * tm.pts.length)], tside = (rand01(i, k, 192) * 2 - 1) * tm.half * 0.85, tlf = (toxT * (0.35 + 0.3 * rand01(i, k, 193)) + rand01(i, k, 194)) % 1;
         put(L3_X + tpq[0] + Math.cos(tpq[2]) * tside + tm.off[0], tm.base + tm.hgt + tm.dy + 0.4 + tlf * TOX_H, tpq[1] + Math.sin(tpq[2]) * tside + tm.off[1], (0.3 + 0.55 * rand01(i, k, 195)) * Math.sin(Math.PI * tlf), rand01(i, k, 196), rand01(i, k, 197));
       }
     }
-    for (i = 0; i < B.patches.length && n < 800; i++) {
-      var pa = B.patches[i]; if (pa.ground !== 'toxic' || Math.abs(pa.x - ex) > pa.rr + 100 || Math.abs(pa.z - pp.z) > pa.rr + 100) continue;
-      var CS = 7, ca = Math.floor(ex / CS), cb = Math.floor(pp.z / CS);
-      for (a = ca - 10; a <= ca + 10 && n < 800; a++) for (b = cb - 10; b <= cb + 10 && n < 800; b++) {
-        if (rand01(a, b, 171 + i) > 0.5) continue;
-        var wx = (a + rand01(a, b, 172)) * CS, wz = (b + rand01(a, b, 173)) * CS, pc = Math.cos(-pa.th), ps = Math.sin(-pa.th), pdx = wx - pa.x, pdz = wz - pa.z, plx = pdx * pc - pdz * ps, plz = pdx * ps + pdz * pc, inside;
-        inside = pa.shape === 'rect' ? Math.abs(plx) < pa.hw && Math.abs(plz) < pa.hd : Math.hypot(plx / pa.hw, plz / pa.hd) < 1; if (!inside) continue;
+    var nearTox = B.terrain === 'level2';                     // poisoned ground: Oceana's own low ground, and toxic terrain patches
+    for (i = 0; i < B.patches.length && !nearTox; i++) { var pa = B.patches[i]; if (pa.ground === 'toxic' && Math.abs(pa.x - ex) <= pa.rr + 100 && Math.abs(pa.z - pp.z) <= pa.rr + 100) nearTox = true; }
+    if (nearTox && n < CAP) {                                  // poisoned ground near her, up to 84 units off, in 6-unit squares: a bubble in every square of a toxic terrain patch (about as thick as a toxic patch's), and in 1 of 5 on Oceana's own ground (about as thick as the Sink's were)
+      var CS = 6, ca = Math.floor(ex / CS), cb = Math.floor(pp.z / CS);
+      if (!B.toxCells) B.toxCells = new Map();                 // each square's bubble: worked out once (ground height included); null if the ground there is not poisoned
+      for (a = ca - 14; a <= ca + 14 && n < CAP; a++) for (b = cb - 14; b <= cb + 14 && n < CAP; b++) {
+        var key = a * 1000003 + b, cq = B.toxCells.get(key);
+        if (cq === undefined) {
+          var wx = (a + rand01(a, b, 172)) * CS, wz = (b + rand01(a, b, 173)) * CS, gy = level3H(L3_X + wx, wz);   // level3H marks poisoned ground as kind 3, the same test that hurts her
+          cq = null;
+          if (wL2 === 3 && sbDeckTop(L3_X + wx, wz, null) < gy - 1) {   // (none under a path deck)
+            var inPa = false;
+            for (var pi = 0; pi < B.patches.length && !inPa; pi++) { var pq = B.patches[pi]; if (pq.ground !== 'toxic') continue; var qc = Math.cos(-pq.th), qs = Math.sin(-pq.th), qx = (wx - pq.x) * qc - (wz - pq.z) * qs, qz = (wx - pq.x) * qs + (wz - pq.z) * qc; inPa = pq.shape === 'rect' ? Math.abs(qx) < pq.hw && Math.abs(qz) < pq.hd : Math.hypot(qx / pq.hw, qz / pq.hd) < 1; }
+            if (inPa || rand01(a, b, 171) < 0.2) cq = [wx, gy + 0.4, wz];
+          }
+          B.toxCells.set(key, cq);
+        }
+        if (!cq || far(cq[0], cq[2], rand01(a, b, 179))) continue;
         var lf = (toxT * (0.35 + 0.3 * rand01(a, b, 174)) + rand01(a, b, 175)) % 1;
-        put(L3_X + wx, groundH(L3_X + wx, wz) + 0.4 + lf * TOX_H, wz, (0.3 + 0.55 * rand01(a, b, 176)) * Math.sin(Math.PI * lf), rand01(a, b, 177), rand01(a, b, 178));
+        put(L3_X + cq[0], cq[1] + lf * TOX_H, cq[2], (0.3 + 0.55 * rand01(a, b, 176)) * Math.sin(Math.PI * lf), rand01(a, b, 177), rand01(a, b, 178));
       }
     }
     sbBub.count = n; sbBub.instanceMatrix.needsUpdate = true;
@@ -10831,6 +10853,18 @@ requestAnimationFrame(tick);
 
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'Next', d: 'Nov 17, 2026', t: 'Toxic bubbles, unreleased', g: [
+    ['Fixes', [
+      'Toxic ground now bubbles: toxic terrain patches and Oceana Crags\' poisoned low ground show square bubbles wherever they hurt (patches barely showed any, and Oceana\'s ground had none).',
+      'Path Editor: pressing up on the first piece (or down on the last) no longer saves an empty undo step, so the next Ctrl+Z works the first time.',
+    ]],
+    ['Looks', [
+      'Toxic patches make a quarter as many bubbles as before, and bubbles thin out to a quarter of their number between 60 and 150 units from Molly.',
+    ]],
+    ['Performance', [
+      'Big toxic patches are drawn with at most 64 squares a side instead of 300; bubbles on toxic ground and toxic ledges work out their height once instead of every frame; at most 500 Sandbox bubbles are drawn at once (was 800).',
+    ]]
+  ]},
   { v: 'v183', d: 'Nov 16, 2026', t: 'Oceana Crags, rebuilt', g: [
     ['Levels', [
       'Oceana Crags, Act 1 is now the layout built in the Path Editor, played the same way as Grass Canyon. Import Oceana Crags in the Path Editor and the Levels map load this layout too.',

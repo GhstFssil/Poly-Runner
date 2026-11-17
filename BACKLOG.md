@@ -2,14 +2,7 @@
 
 Open work only, in focused groups. Ricky decides priority and version numbers (see CLAUDE.md). Move finished items into the CHANGELOG and `audit-notes.md`, then delete them here. Items marked **Decision** need Ricky's answer first.
 
-## 1. Toxic patches: performance and bubbles
-- [ ] Bug: toxic terrain doesn't produce visible bubbles at all.
-- [ ] Performance: big toxic patches mesh at up to 300x300 cells (`max(2.5, size/300)` in `sbMakeMeshes`), each vertex calling `sbFoot`. Cap at about 32-64 cells a side (looks the same on flat ground).
-- [ ] Performance: toxic terrain-patch and toxic-ledge bubbles still call `groundH` for every bubble every frame; cache their base heights the way toxic patches now do (`t.bub`).
-- [ ] Performance: fewer bubbles for toxic patches farther from Molly, or a lower overall cap than 800 in `sbToxBubbles`.
-- [ ] Reduce the number of bubbles toxic patches produce to 25% of what they are now.
-
-## 2. Level geometry and collision
+## 1. Level geometry and collision
 - [ ] Molly gets stuck falling/sliding forever when falling into a cone-shaped hole.
 - [ ] Molly gets stuck on the threshold between joined caves of different angles. Needs to be smoothed out.
 - [ ] Door collision. See Oceana Crags update.
@@ -18,7 +11,7 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 - [ ] Molly's Y value using show coordinates doesn't match Oceana Crags' true Y.
 - [ ] **Decision:** gap/ledge/platform ends are round in the game and square in the editor. Make the game square? (His tuned jumps get about 29 units shorter.)
 
-## 3. Molly's stats and enemies
+## 2. Molly's stats and enemies
 - [ ] **Decision:** grip stat is in units/s^2 (40) while everything else is in Zips; the card shows it /2. Convert the slider to Zips/s^2?
 - [ ] **Decision:** grip does not fade with slope on ordinary ground but does on walls (jump at 80 degrees). Fade everywhere (grip x cos slope)?
 - [ ] **Decision:** gravity as an editable stat?
@@ -28,7 +21,7 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 - [ ] Dev mode: an "invulnerable mode" option where Molly can't be hurt or pushed by enemies.
 - [ ] Hedron barrier should lean on slopes like Molly's body does.
 
-## 4. Editor and UI polish
+## 3. Editor and UI polish
 - [ ] Path editor: the buttons squish the level name so it can barely be read. They should be much narrower.
 - [ ] Path editor: curve angle and curve radius should only affect each other, not the length.
 - [ ] Paths: supersede terrain should be the default (Ricky uses it far more often).
@@ -37,7 +30,7 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 - [ ] Being underwater should make everything look blue.
 
 ## Separate track: split the game into source files and rename to Poly Runner
-(Discussed 2026-11-16; Ricky backs up saves first. Best done after groups 1-3 so those fixes aren't mixed into the move.)
+(Discussed 2026-11-16; Ricky backs up saves first. Best done after groups 1-2 so those fixes aren't mixed into the move.)
 - [ ] Check whether the old hand-built character code (Character / Head / Arms / Legs sections, about 750 lines) is still used now that the runners are .glb models; drop it before splitting if not.
 - [ ] Split `checker-run.html` into `src/` files plus `tools/build.py`, which joins them back into one shipped HTML file (same idea as `mk_pe_embed.py`). Suggested layout: `src/index.html`, `style.css`; `src/game/` cut at the existing `// ----` headers (core, level1-valley, level2-crags, sandbox, runner-molly, runner-comet, enemies, hud); `src/rig-editor/`; `src/path-editor/`; `data/` with real `molly.glb` / `comet.glb`, the two settings JSONs, `grass-canyon.json` (`OFFICIAL_L1`) and `changelog.json`. Do it in steps on `next`, tests after each: models and data, then editors, then the main script.
   - Risk: none to saves (they are not in the game file). Watch for: the main script is one closure with shared variables, so the pieces must be joined in order without code changes; separate script/module files won't load from `file://`. Tests, `bake_models.py`, `mk_pe_embed.py`, `reslice.py`, `build_release.py` and SWEEP.md's line-range map all assume the single file and need updating.
