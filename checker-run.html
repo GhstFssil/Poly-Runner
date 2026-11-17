@@ -6922,9 +6922,22 @@ requestAnimationFrame(tick);
       for (var ta = Math.floor((t.x - t.rr) / TOX_C); ta <= Math.floor((t.x + t.rr) / TOX_C); ta++) for (var tb = Math.floor((t.z - t.rr) / TOX_C); tb <= Math.floor((t.z + t.rr) / TOX_C); tb++) sbAdd(toxH, (ta + 0.5) * TOX_C, (tb + 0.5) * TOX_C, t);
     });
     B.toxH = toxH;
-    B.hillsT = B.hills.filter(function (h) { return h.T !== undefined; });
+    B.hillsT = B.hills.filter(function (h) { return h.T !== undefined; }); B.dLedgeH = null; B.dHills = [];
+    if (B.terrain === 'level2') {                                  // Oceana: a ledge that starts on a path deck, or a hill centred on one, stands on the deck (raising its top, see sbDeckTop) instead of on the ground hidden under it
+      var keepSB1 = SB, keepLH = B.ledgeH, keepHl = B.hills, keepHT = B.hillsT; SB = B;
+      try {
+        B.ledgeH = sbHash(ledgeH.c); B.hills = []; B.hillsT = [];
+        var onDk = function (x, z) { var dk = sbDeckTop(L3_X + x, z, null); return dk > -1e8 && dk > level3H(L3_X + x, z) + 0.5; };
+        B.objs.forEach(function (o) { if (o.t === 'ledge') { var q0 = shapeAt(o, 0); o.dk = onDk(q0.x, q0.z); } });
+        keepHl.forEach(function (h) { h.dk = onDk(h.x, h.z); });
+      } finally { B.ledgeH = keepLH; B.hills = keepHl; B.hillsT = keepHT; SB = keepSB1; }
+      var dLH = sbHash(ledgeH.c), anyDL = false;
+      for (var lhk in ledgeH.m) ledgeH.m[lhk] = ledgeH.m[lhk].filter(function (e) { if (!e.o.dk) return true; (dLH.m[lhk] || (dLH.m[lhk] = [])).push(e); anyDL = true; return false; });
+      B.dLedgeH = anyDL ? dLH : null; B.dHills = B.hills.filter(function (h) { return h.dk; }); B.hills = B.hills.filter(function (h) { return !h.dk; }); B.hillsT = B.hills.filter(function (h) { return h.T !== undefined; });
+      B.dHillR = 0; B.dHills.forEach(function (h) { B.dHillR = Math.max(B.dHillR, h.r); });
+    }
     var lT = B.objs.filter(function (o) { return o.t === 'ledge' && o.T !== undefined; });
-    if (lT.length) { var keepSB = SB; SB = B; try { lT.forEach(function (o) { var q0 = shapeAt(o, 0); o.hgt = o.T - level3H(L3_X + q0.x, q0.z); }); } finally { SB = keepSB; } }   // a ledge with a true Y: its top is at it where the ledge starts (and keeps the ground's shape along it)
+    if (lT.length) { var keepSB = SB; SB = B; try { lT.forEach(function (o) { var q0 = shapeAt(o, 0); if (o.dk) { sbNoBump = true; try { o.hgt = o.T - sbDeckTop(L3_X + q0.x, q0.z, null); } finally { sbNoBump = false; } } else o.hgt = o.T - level3H(L3_X + q0.x, q0.z); }); } finally { SB = keepSB; } }   // a ledge with a true Y: its top is at it where the ledge starts (and keeps the ground's shape along it)
     return B;
   }
   function sbDispose() { if (SB) { SB.meshes.forEach(function (m) { scene.remove(m); }); } SB = null; }
@@ -7266,6 +7279,19 @@ requestAnimationFrame(tick);
     }
     return true;
   }
+  var sbNoBump = false;
+  function sbDeckLedge(ex, z) {                                    // Oceana: how far the ledges standing on a path deck raise its top at (ex, z) (the taller of the stacked and the independent ones, as on the ground; a dip goes no deeper than the deck)
+    var B = SB, best = 0, bi = 0; if (!B.dLedgeH) return 0;
+    sbNear(B.dLedgeH, ex, z, B.maxL, function (e) { if (sbIn(e, ex, z, 0)) { if (e.o.ind) { if (Math.abs(e.o.hgt) > Math.abs(bi)) bi = e.o.hgt; } else if (Math.abs(e.o.hgt) > Math.abs(best)) best = e.o.hgt; } });
+    return Math.max(-(DECK_TH - 0.2), Math.abs(bi) > Math.abs(best) ? bi : best);
+  }
+  function sbDeckHill(ex, z, y) {                                  // Oceana: the deck's top at (ex, z) with the hills standing on it (y: the deck's own top there). A hill with a true Y is built up from that height, as on the ground
+    var B = SB, i, h, d, add = 0;
+    for (i = 0; i < B.dHills.length; i++) { h = B.dHills[i]; if (h.T !== undefined) continue; d = Math.hypot(ex - h.x, z - h.z); if (d < h.r) add += h.h * (1 - smooth01(d / h.r)); }
+    y += Math.max(-(DECK_TH - 0.2), add);
+    for (i = 0; i < B.dHills.length; i++) { h = B.dHills[i]; if (h.T === undefined) continue; d = Math.hypot(ex - h.x, z - h.z); if (d < h.r) y += (h.T + h.h * (1 - smooth01(d / h.r)) - y) * (1 - smooth01((d / h.r - 0.85) / 0.15)); }
+    return y;
+  }
   function sbDeckTop(x, z, py) {                                 // Oceana: the top of whichever path deck is under (x, z) that she is on or above (py = her feet; null: any), or a very low number. A deck is the path itself: as wide as its segment, tilted to its bank, ending square where the path ends, and missing wherever a gap cuts it
     var B = SB; if (!B || B.terrain !== 'level2') return -1e9;
     var ex = x - L3_X, top = -1e9, sm0 = B.samples, ing = false, ri, sq = -1e9, cE = 1e9, cY = -1e9;
@@ -7287,7 +7313,8 @@ requestAnimationFrame(tick);
       if (ext < 1e-6) { if (yy > sq) sq = yy; }                    // the height comes from the stretch she is alongside. (Taking the highest of every stretch whose rounded end reached her lifted her off a climbing path by its slope times its half width)
       else if (ext < cE - 1e-6) { cE = ext; cY = yy; } else if (ext < cE + 1e-6 && yy > cY) cY = yy;   // alongside none (the outside of a corner): the nearest stretch's end fills it
     });
-    if (sq < -1e8) sq = cY; if (sq > top) top = sq;
+    if (sq < -1e8) sq = cY; if (sq > -1e8 && !sbNoBump && (B.dLedgeH || B.dHills.length)) sq = sbDeckHill(ex, z, sq) + sbDeckLedge(ex, z);   // ledges and hills standing on the deck
+    if (sq > top) top = sq;
     for (var di2 = 0; di2 < B.discs.length; di2++) {                // a circular deck
       var Dq = B.discs[di2]; if (Math.hypot(ex - Dq.cx, z - Dq.cz) > Dq.R) continue;
       var dyq = sbDiscY(Dq, ex, z); if (py !== null && py < dyq - (Dq.dk || DECK_TH) - 0.25) continue; if (dyq > top) top = dyq;
@@ -7753,6 +7780,11 @@ requestAnimationFrame(tick);
       (function () {
         var sm2 = B.samples, D2R = Math.PI / 180, Pp = [], Cc = [], col2 = new THREE.Color(), tc2 = 0, segs = [], i2, k2, c2;
         function gapAt(x, z, grow) { var g = false; sbNear(B.gapH, x, z, B.maxG + grow, function (e) { if (!g && sbIn(e, x, z, grow)) g = true; }); return g; }
+        function bumpNear(x, z, grow) {                           // is a ledge or hill standing on the deck within reach of (x, z)?
+          var f = false; if (B.dLedgeH) sbNear(B.dLedgeH, x, z, B.maxL + grow, function (e) { if (!f && sbIn(e, x, z, grow)) f = true; });
+          for (var hi = 0; !f && hi < B.dHills.length; hi++) if (Math.hypot(x - B.dHills[hi].x, z - B.dHills[hi].z) < B.dHills[hi].r + grow) f = true;
+          return f;
+        }
         function mudOn(x, z) { var m = false; sbNear(B.mudH, x, z, B.maxM, function (e) { if (!m && sbIn(e, x, z, 0)) m = true; }); return m; }
         function sect(a, b, t) { return { x: a.x + (b.x - a.x) * t, z: a.z + (b.z - a.z) * t, th: a.th + wrapA(b.th - a.th) * t, y: a.y + (b.y - a.y) * t, rl: (a.rl !== undefined ? a.rl : a.roll || 0) + ((b.rl !== undefined ? b.rl : b.roll || 0) - (a.rl !== undefined ? a.rl : a.roll || 0)) * t, hw: (a.hw !== undefined ? a.hw : (a.w || B.width) / 2) + ((b.hw !== undefined ? b.hw : (b.w || B.width) / 2) - (a.hw !== undefined ? a.hw : (a.w || B.width) / 2)) * t, s: a.s + (b.s - a.s) * t }; }   // one cross-section between two (samples, or cross-sections already made)
         function pt(o, u, dy) { var l = o.hw * u, c = Math.cos(o.rl * D2R); return [L3_X + o.x + Math.cos(o.th) * l * c, o.y - l * Math.sin(o.rl * D2R) - dy, o.z + Math.sin(o.th) * l * c]; }   // a point of it: u from -1 (left edge) to 1 (right edge), dy below the top. A banked deck keeps its width along the slope: the right side lower for a positive bank
@@ -7764,13 +7796,14 @@ requestAnimationFrame(tick);
           var ch = Math.hypot(b.x - a.x, b.z - a.z), dth = b.dk || DECK_TH;
           if (ch < 1e-4) { segs[i2] = { joint: true, a: a, b: b, th: dth }; continue; }   // two samples at one spot (a start set by hand): no deck of its own, only the corner filled in below
           var hwm = Math.max(a.w || B.width, b.w || B.width) / 2, fine = !!B.gapH && gapAt((a.x + b.x) / 2, (a.z + b.z) / 2, ch / 2 + hwm + 1);
+          var bmp = bumpNear((a.x + b.x) / 2, (a.z + b.z) / 2, ch / 2 + hwm + 1); if (bmp) fine = true;   // a ledge or hill stands on this stretch: cut it fine too, so its edges and slopes show
           var ns = fine ? Math.max(1, Math.ceil(ch / 0.5)) : 1, nc = fine ? 16 : 8, pres = new Uint8Array(ns * nc), any = 0, S = [];
           for (k2 = 0; k2 <= ns; k2++) S.push(sect(a, b, k2 / ns));
           for (k2 = 0; k2 < ns; k2++) for (c2 = 0; c2 < nc; c2++) {
             if (fine) { var cp = pt(sect(S[k2], S[k2 + 1], 0.5), (c2 + 0.5) / nc * 2 - 1, 0); if (gapAt(cp[0] - L3_X, cp[2], 0)) continue; }
             pres[k2 * nc + c2] = 1; any = 1;
           }
-          segs[i2] = { a: a, b: b, ns: ns, nc: nc, pres: pres, S: S, th: dth, tx: b.tx || 0, any: any };
+          segs[i2] = { a: a, b: b, ns: ns, nc: nc, pres: pres, S: S, th: dth, tx: b.tx || 0, any: any, bmp: bmp };
         }
         function along(si, u, d) {                                // is there deck just past this end of stretch si (d = -1 before it, 1 after it), at u across?
           var j2 = si + d; while (segs[j2] && segs[j2].joint) j2 += d;
@@ -7794,6 +7827,13 @@ requestAnimationFrame(tick);
             var A = g.S[k], Bq = g.S[k + 1], u0 = c / nc * 2 - 1, u1 = (c + 1) / nc * 2 - 1, um = (u0 + u1) / 2;
             var p00 = pt(A, u0, 0), p01 = pt(A, u1, 0), p10 = pt(Bq, u0, 0), p11 = pt(Bq, u1, 0), q00 = pt(A, u0, TH), q01 = pt(A, u1, TH), q10 = pt(Bq, u0, TH), q11 = pt(Bq, u1, TH);
             var mxc = (p00[0] + p11[0]) / 2, mzc = (p00[2] + p11[2]) / 2;
+            if (g.bmp) {                                          // ledges and hills on the deck: each corner rises with the hills, the whole cell with the ledge at its middle (so a ledge is cut square, with upright sides)
+              var Lc = sbDeckLedge(mxc - L3_X, mzc); [p00, p01, p10, p11].forEach(function (v) { v[1] = sbDeckHill(v[0] - L3_X, v[2], v[1]) + Lc; });
+              [[p00, p10], [p11, p01], [p01, p00], [p10, p11]].forEach(function (ed) {   // an upright face down to each lower neighbour
+                var ea = ed[0], eb = ed[1], emx = (ea[0] + eb[0]) / 2, emz = (ea[2] + eb[2]) / 2, odx = emx - mxc, odz = emz - mzc, odl = Math.hypot(odx, odz) || 1, nL = sbDeckLedge(emx - L3_X + odx / odl * 0.05, emz + odz / odl * 0.05);
+                if (nL < Lc - 0.01) { var dd = Lc - nL, ea2 = [ea[0], ea[1] - dd, ea[2]], eb2 = [eb[0], eb[1] - dd, eb[2]]; stone(0.8); tri(ea, eb, eb2); stone(0.8); tri(ea, eb2, ea2); }
+              });
+            }
             if (B.mudH && mudOn(mxc - L3_X, mzc)) { var jm = rand01(tc2++, 17, 91); col2.setHSL(0.075 + (jm - 0.5) * 0.02, 0.42, 0.2 + (jm - 0.5) * 0.07 + (0.5 + 0.5 * Math.sin(mzc * 0.9 + mxc * 0.3)) * 0.03); tri(p00, p01, p11); tri(p00, p11, p10); }   // a mud strip lying on the deck
             else if (g.tx) { pathTexCol(col2, g.tx, (A.s + Bq.s) / 2, um * (A.hw + Bq.hw) / 2, rand01(tc2++, 17, 91), rand01(tc2, 5, 92)); tri(p00, p01, p11); tri(p00, p11, p10); }   // the segment's own surface
             else if ((si + k + c) & 1) { stone(1); tri(p00, p01, p11); stone(1); tri(p00, p11, p10); }
