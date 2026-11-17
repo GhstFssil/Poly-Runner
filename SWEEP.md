@@ -25,7 +25,7 @@ Night counter: 3
 Read it from the base branch. If the base has none yet (the first night after this change), take the two numbers from the "## State" block of the base's own SWEEP.md, and the tests from its old reports; if that block is missing too, start at Next slice 4, Night counter 3.
 
 ## What a nightly session does
-1. **Choose the base.** Run `git ls-remote origin 'refs/heads/nightly/*'` and take the newest name (sort the names; `2026-11-17-2` comes after `2026-11-17`). It is merged if `main` has its report: `git cat-file -e origin/main:sweep-reports/<name>.md`, where `<name>` is the branch name without `nightly/`. If it is merged, or there are no nightly branches, the base is `origin/main`. Otherwise fetch it with `git fetch --depth=1 origin nightly/<name>:refs/remotes/origin/nightly/<name>` and use that.
+1. **Choose the base.** Run `git ls-remote origin 'refs/heads/nightly/*'` and take the newest name (sort the names; `2026-11-17-2` comes after `2026-11-17`). It is merged if `main` has its report: `git cat-file -e origin/main:sweep-reports/<name>.md`, where `<name>` is the branch name without `nightly/`. If it is merged, or there are no nightly branches, the base is `origin/main`. Otherwise fetch it with (the clone is single-branch, so always name the remote ref like this) `git fetch --depth=1 origin nightly/<name>:refs/remotes/origin/nightly/<name>` and use that.
 2. **Create tonight's branch** `nightly/YYYY-MM-DD` (today in America/Chicago). If that name is already in the list from step 1, add `-2` (or `-3`, and so on). `git switch -c <branch> <base>`, then `sh tests/setup.sh`.
 3. **Get the slices.** Run `python3 tools/reslice.py --check` (always with `--check`: it prints the table and writes nothing). Unchanged code gives the same table, so no other check is needed. Take the row numbered "Next slice". Also look at the slices for the next three nights (Next slice + 1, + 2, + 3; after 20 comes 1): any that is over 7% of the code goes in tonight's message. Slice 5 is about 12.5% (one long section the tool can't cut); leave it as it is.
 4. **Read the slice.** Read all of its code. A slice is a starting point, not a fence: if something in it leans on code elsewhere (a helper, a shared value), read that too.
@@ -55,7 +55,7 @@ Read it from the base branch. If the base has none yet (the first night after th
 ## For Ricky
 Anything that might be a bug but might be intended, or needs a decision (including design, tuning and bigger performance ideas), is not changed. Write each one in tonight's report, and also append it to BACKLOG.md on `main`, under "## Nightly sweep suggestions", as one line: `- (nightly/<name>) the question, in plain words; where in the code`. Don't repeat an item that is already there. If another doc on `main` needs a note (for example a test map line here), append it the same way, in the same commit. Then merge `main` into `next`. Do all of it in a separate worktree so tonight's branch is untouched:
 ```
-git fetch --depth=200 origin main next
+git fetch --depth=200 origin main:refs/remotes/origin/main next:refs/remotes/origin/next
 git worktree add --detach /tmp/pr-main origin/main
 (append to /tmp/pr-main/BACKLOG.md, that section only, and any other .md note)
 git -C /tmp/pr-main commit -am "Nightly <name>: notes for Ricky"      (message ends with the attribution lines)
