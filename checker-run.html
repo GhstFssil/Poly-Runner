@@ -7003,7 +7003,12 @@ requestAnimationFrame(tick);
         if (k < N) A = { x: A.x + f.Tx * ds, y: A.y + f.Ty * ds, z: A.z + f.Tz * ds };
       }
       if (fromShaft) fromShaft.sh.holes.push({ S0: S[0], pts: pts, hw: hwMax, dx: fromShaft.dx, dz: fromShaft.dz, th: fromShaft.th });
-      c.end = { x: A.x, y: A.y, z: A.z, hd: th + bend, pr: frame(L).pr };
+      c.end = { x: A.x, y: A.y, z: A.z, hd: th + bend, pr: frame(L).pr }; c.S = S;
+      if (joined && pv0.S) {                                      // the joint between two tunnels: sbCaveQ eases the floor and roof from one to the other across it, over the samples within CAVE_JW of it on either side
+        var pS = pv0.S, jn = { P: pS[pS.length - 1], Q: S[0] }, jk;
+        for (jk = pS.length - 1; jk >= 0 && Math.hypot(pS[jk].x - jn.P.x, pS[jk].z - jn.P.z) < CAVE_JW + pS[jk].dh; jk--) pS[jk].jn = jn;
+        for (jk = 0; jk < S.length && Math.hypot(S[jk].x - jn.Q.x, S[jk].z - jn.Q.z) < CAVE_JW + S[jk].dh; jk++) S[jk].jn = jn;
+      }
       S.forEach(function (f) { if (f.cov) sbAdd(B.caveCov, f.x, f.z, f); else if (f.fy < f.surf - 0.2) sbAdd(B.caveOpen, f.x, f.z, f); });
       var zin = {}; for (k = 0; k < S.length; k++) if (S[k].cov) { for (var zk = Math.max(0, k - 3); zk <= k; zk++) if (!S[zk].cov || zk === k) zin[zk] = 1; zin[k] = 1; if (k + 1 < S.length && !S[k + 1].cov) for (var zk2 = k + 1; zk2 <= Math.min(S.length - 1, k + 3); zk2++) if (!S[zk2].cov) zin[zk2] = 1; } for (var zz in zin) sbAdd(B.caveZone, S[zz].x, S[zz].z, S[zz]);   // the mouth: where the tunnel goes under the surface
       B.caveR = Math.max(B.caveR, hwMax + 6);
@@ -7014,6 +7019,11 @@ requestAnimationFrame(tick);
     B.noCave = false;
   }
   function sbCaveQuery(x, z) { return sbCaveQ(SB && SB.caveCov, x, z); }
+  var CAVE_JW = 3;                                                 // how far either side of the joint between two tunnels the floor and roof ease from one to the other
+  function sbCaveFR(f, ex, z) {                                   // the floor and roof of a tunnel sample's own stretch at (ex, z), carried on straight past it
+    var dx = ex - f.x, dz = z - f.z, al = dx * f.Thx + dz * f.Thz, rg = polyRange(f.pts, Math.max(-f.hw, Math.min(f.hw, dx * f.Lx + dz * f.Lz))); if (!rg) return null;
+    return [f.y + f.cp * rg[0] - f.tn * al, f.y + f.cp * rg[1] - f.tn * al];
+  }
   function sbCaveQ(hash, x, z, slack) {                          // the tunnel floor and roof under (x, z), where a stretch of tunnel is (hash: the covered samples, or the mouth zone)
     var B = SB; if (!B || !hash) return null; var ex = x - L3_X, best = null, bd = 1e9; slack = slack || 0;
     sbNear(hash, ex, z, B.caveR, function (e) {
@@ -7023,6 +7033,13 @@ requestAnimationFrame(tick);
     });
     if (!best) return null; var e2 = best.e, rg = polyRange(e2.pts, Math.max(-e2.hw, Math.min(e2.hw, best.lat))); if (!rg) return null;
     best.fl = e2.y + e2.cp * rg[0] - e2.tn * best.al; best.rf = e2.y + e2.cp * rg[1] - e2.tn * best.al; best.rg = rg;
+    if (e2.jn) {                                                  // near the joint between two tunnels of different angles (or shapes) each one's own floor and roof would stop at a step: ease from one to the other over CAVE_JW either side, so she can run across it
+      var eP = e2.jn.P, eQ = e2.jn.Q, jx = eP.Thx + eQ.Thx, jz = eP.Thz + eQ.Thz, jl = Math.hypot(jx, jz) || 1, ja = ((ex - eP.x) * jx + (z - eP.z) * jz) / jl;
+      if (ja > -CAVE_JW && ja < CAVE_JW) {
+        var jt = smooth01((ja + CAVE_JW) / (2 * CAVE_JW)), fP = sbCaveFR(eP, ex, z), fQ = sbCaveFR(eQ, ex, z);
+        if (fP && fQ) { best.fl = fP[0] + (fQ[0] - fP[0]) * jt; best.rf = fP[1] + (fQ[1] - fP[1]) * jt; }
+      }
+    }
     return best;
   }
   function sbShaftIn(x, z, slack) {                                // the shaft whose outline (grown by slack) holds the world point (x, z), or null
