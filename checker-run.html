@@ -11327,11 +11327,11 @@ function showScreen(name) {                                // the menu shows one
   on('dv2', function () { if (level === 2) devStart(2, L2CP2_X, L2CP2_Z, -Math.PI / 2); else devStart(2, CP2_X, CP2_Z, Math.PI / 2); });
   on('dv3', function () { devStart(3, CP4_X, CP4_Z, 0); });
   on('dvpower', function () { setPower(POWER_MAX); var b = document.getElementById('dvpower'); b.textContent = 'Power Line full!'; setTimeout(function () { b.textContent = 'Fill Power Line'; }, 1200); });
-  // Dev Mode: Molly's position (Oceana Crags counts x from its own start), under the speedometer and on the Dev Mode card while paused
+  // Dev Mode: Molly's position (Oceana Crags counts x from its own start; on a built level Y is the editor's true Y, from where her feet are at the path's start), under the speedometer and on the Dev Mode card while paused
   var showCoords = false, coordsEl = document.getElementById('coords'), dvCoordsEl = document.getElementById('dvcoords');
   function updateCoords() {
     if (!showCoords) return;
-    var p = player.position, t = 'X ' + (p.x - (level === 3 ? L3_X : level === 2 ? L2_X : 0)).toFixed(1) + '   Y ' + p.y.toFixed(1) + '   Z ' + p.z.toFixed(1);
+    var p = player.position, t = 'X ' + (p.x - (level === 3 ? L3_X : level === 2 ? L2_X : 0)).toFixed(1) + '   Y ' + (p.y - (level === 3 && SB && SB.y0 ? SB.y0 : 0)).toFixed(1) + '   Z ' + p.z.toFixed(1);
     coordsEl.textContent = t; dvCoordsEl.textContent = t;
   }
   on('dvcoordsBtn', function () {
