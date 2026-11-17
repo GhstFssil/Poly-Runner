@@ -43,7 +43,7 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
   - Zero-risk alternative (recommended): keep these names as they are; players never see them.
 
 ## Nightly sweep suggestions
-Suggestions the sweep may not act on (features, physics, tuning, looks, design) are written in `sweep-reports/` and can be promoted here when Ricky approves them.
+Questions and suggestions the sweep may not act on (possible bugs that might be intended, features, physics, tuning, looks, design) are appended below by the sweep itself, one line each, tagged with the night's branch; details are in that night's report in `sweep-reports/`. Ricky promotes or deletes them.
 
 ## Done recently
 See the CHANGELOG at the top of `var CHANGELOG` in `checker-run.html`.
