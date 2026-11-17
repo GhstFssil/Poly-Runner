@@ -265,7 +265,7 @@
 <div id="stage">
   <canvas id="view" aria-label="3D view of a girl in a red jumpsuit with a ponytail running through a long grass valley with stone walls"></canvas>
   <div id="start" class="splash">
-    <div class="ver">v182</div>
+    <div class="ver">v183</div>
     <button id="bClog" class="clogBtn" type="button" title="What changed in each version">Changes</button>
     <section class="scr on" id="scr-main" aria-label="Main menu">
       <h1 class="logo"><span>POLY</span><span>RUNNER</span></h1>
@@ -10831,6 +10831,14 @@ requestAnimationFrame(tick);
 
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v183', d: 'Nov 16, 2026', t: 'Oceana Crags, rebuilt', g: [
+    ['Levels', [
+      'Oceana Crags, Act 1 is now the layout built in the Path Editor, played the same way as Grass Canyon. Import Oceana Crags in the Path Editor and the Levels map load this layout too.',
+    ]],
+    ['Performance', [
+      'Toxic patches cost less: the game finds the nearby ones instead of checking every patch, works out each bubble\'s spot once, and draws all the patches together. They look and hurt the same as before.',
+    ]]
+  ]},
   { v: 'v182', d: 'Nov 16, 2026', t: 'Next-stamp fixes, a Strafe stat', g: [
     ['Path Editor', [
       'The Bend you set in the next-stamp panel now carries onto the ledge, gap, platform, mud or seg chain you place. Before, it was reset to 0.',
