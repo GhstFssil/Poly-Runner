@@ -789,7 +789,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   var $ = function (id) { return SR.getElementById(id); };
   var cv = $('cv'), ctx = cv.getContext('2d');
   var KEY = 'polyrun-path-editor-v2';
-  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: { trap: false }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, slide: 'down', sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {}, plate: { shape: 'rect', w: 8, d: 8, r: 4, look: 'gray', whl: false }, target: { size: 6, post: true, h: 7, tilt: 0, spin: 0, hb: 1, k: 20, sd: 0, sp: 4, vd: 0, vp: 4, phase: 0 } };
+  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: {}, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, slide: 'down', sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {}, plate: { shape: 'rect', w: 8, d: 8, r: 4, look: 'gray', whl: false }, target: { size: 6, post: true, h: 7, tilt: 0, spin: 0, hb: 1, k: 20, sd: 0, sp: 4, vd: 0, vp: 4, phase: 0 } };
   var S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }, { len: 1005.3, ang: 90, r: 640, dy: 0 }, { len: 400, ang: 0, r: 640, dy: 20 }, { len: 502.65, ang: -45, r: 640, dy: 0 }, { len: 300, ang: 0, r: 640, dy: 0 }], objs: [] };
   var GH = null, DEFUSER = {};                                  // GH: the not-yet-placed stamp whose settings the panel shows while a stamp tool is chosen
   function ghostMode() { return tool !== 'select' && tool !== 'erase' && tool !== 'preset' && tool !== 'forest'; }
@@ -1220,7 +1220,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       ctx.fillStyle = ink; ctx.font = 'bold 10px ' + css('--font-d'); ctx.textAlign = 'center'; ctx.fillText(cAng(o) >= 80 ? 'SHAFT ' + o.len : 'CAVE ' + Math.round(cAng(o)) + '°', 0, cr + 12); ctx.textAlign = 'start';
     } else if (o.t === 'bigminion') {
       var bm = Math.max(14, 11 * z); ctx.fillStyle = css('--minion'); ctx.fillRect(-bm / 2, -bm / 2, bm, bm); ctx.fillStyle = css('--eye'); ctx.fillRect(-bm * 0.3, -bm * 0.35, bm * 0.25, bm * 0.25); ctx.fillRect(bm * 0.05, -bm * 0.35, bm * 0.25, bm * 0.25);
-      ctx.strokeStyle = o.trap ? '#c9222a' : css('--eye'); ctx.lineWidth = 2; ctx.strokeRect(-bm / 2 - 3, -bm / 2 - 3, bm + 6, bm + 6); if (o.trap) { ctx.beginPath(); ctx.arc(0, 0, bm * 0.9, 0, 6.2832); ctx.stroke(); }
+      ctx.strokeStyle = css('--eye'); ctx.lineWidth = 2; ctx.strokeRect(-bm / 2 - 3, -bm / 2 - 3, bm + 6, bm + 6);
       if (o.idle) idleTag(bm + 6);
     } else if (o.t === 'minion') {
       var m = Math.max(6, 7 * z); ctx.fillStyle = css('--minion'); ctx.fillRect(-m / 2, -m / 2, m, m); ctx.fillStyle = css('--eye'); ctx.fillRect(-m * 0.3, -m * 0.35, m * 0.25, m * 0.25); ctx.fillRect(m * 0.05, -m * 0.35, m * 0.25, m * 0.25);
@@ -1634,7 +1634,6 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (o.t === 'crag') { r.radius = o.r; r.count = o.count; r.baseRadius = o.base; r.baseRadiusVar = o.baseV; r.height = o.hgt; r.heightVar = o.hgtV; r.spacing = o.gap; r.spacingVar = o.gapV; r.seed = o.seed; }
       if (o.t === 'patch') { r.shape = o.shape; r.width = o.w; r.length = o.d; r.ground = o.ground; r.edge = o.edge; if (o.edge !== 'hard') r.soften = o.soft; }
       if (o.t === 'spawner') { r.radius = o.r; r.every = o.every; r.max = o.max; }
-      if (o.t === 'bigminion') r.trapped = !!o.trap;
       if (MOBS.indexOf(o.t) >= 0 && o.idle) r.idle = true;
       if (o.t === 'cave') { r.shape = o.shape; r.width = o.w; r.height = o.h; r.roll = o.roll; r.angle = o.ang; r.depth = o.len; r.curvature = o.bend; r.slope = o.slope; if (o.carve) r.carve = o.carve; if (o.angSet && o.after !== undefined) r.angleSet = true; }
       if (o.t === 'hill') { r.radius = o.r; r.height = o.h; r.surface = o.rock; }
@@ -1822,7 +1821,6 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         if (r.type === 'tree' && r.exact) { o.ex = true; o.tH = r.trunkHeight || 15.5; o.tW = r.trunkWidth || 1.6; o.cH = r.canopyHeight || 14.9; o.cW = r.canopyWidth || 7.4; }
         if (r.type === 'crag') { o.r = r.radius || 60; o.count = r.count || 25; o.seed = r.seed || (1 + Math.floor(Math.random() * 2000000000)); if (r.heightVar !== undefined) { o.base = r.baseRadius || 5.5; o.baseV = r.baseRadiusVar || 0; o.hgt = r.height || 4; o.hgtV = r.heightVar || 0; o.gap = r.spacing || 0; o.gapV = r.spacingVar || 0; } else { o.base = 5.5; o.baseV = 2; o.hgt = Math.round(0.675 * (r.height || 6) * 10) / 10; o.hgtV = Math.round(0.325 * (r.height || 6) * 10) / 10; o.gap = 0; o.gapV = 0; } }
         if (r.type === 'patch') { o.shape = r.shape || 'ellipse'; o.w = r.width || 200; o.d = r.length || 150; o.ground = r.ground || 'grass'; o.edge = r.edge === 'hard' ? 'hard' : 'soft'; o.soft = r.soften === undefined ? 30 : r.soften; }
-        if (r.type === 'bigminion') o.trap = !!r.trapped;
         if (MOBS.indexOf(r.type) >= 0 && r.idle) o.idle = true;
         if (r.type === 'cave') { o.shape = r.shape || 'rect'; o.w = r.width || 8; o.h = r.height || 8; o.roll = r.roll || 0; o.ang = r.angle === undefined ? 20 : r.angle; o.len = r.depth || 60; o.bend = r.curvature || 0; o.slope = r.slope || 0; o.carve = r.carve || 0; o.angSet = !!r.angleSet; }
         if (r.type === 'hill') { o.r = r.radius || 80; o.h = r.height || 20; o.rock = r.surface || 'rock'; }
@@ -6560,15 +6558,6 @@ requestAnimationFrame(tick);
   // distance from the centre at 48 angles, as a fraction of the ovoid's own outline) to run through the gaps between the crags that are already there. The ground is rolling
   // hills with small crags scattered over it, each with ground all round it; everything outside the crags is toxic. ----
   var OV_CX = L2_X + 1672, OV_CZ = -1000, OV_A = 175, OV_B = 500, OV_N = 3.2, OV_Y = 50, OV_SC = [1.008, 0.991, 1.018, 1.024, 0.996, 0.975, 0.975, 0.985, 0.985, 0.974, 0.964, 0.953, 0.939, 0.926, 0.912, 0.915, 0.958, 1.014, 1.028, 1.000, 0.990, 1.009, 1.015, 1.015, 1.035, 1.044, 1.018, 1.003, 1.034, 1.066, 1.055, 1.016, 0.984, 0.980, 1.002, 1.022, 1.031, 1.046, 1.064, 1.078, 1.084, 1.049, 0.988, 0.959, 0.955, 0.964, 1.005, 1.034], ovTox = 0, ovCrag = 0, ovK = 0;
-  var L2_PIT = { x: Math.round((OV_CX + 24) / 2.5) * 2.5, z: Math.round(-1360 / 2.5) * 2.5, depth: 15.75, base: null };   // where the Big Minion is buried: the middle of a maze cell near the Sink's far end
-  var l2PitOff = false;                                      // the Sandbox's copy of Oceana carves its own pit, so the real one is switched off while it reads the ground
-  function l2PitFloor() { if (L2_PIT.base === null) { l2PitOff = true; L2_PIT.base = level2H(L2_PIT.x, L2_PIT.z); l2PitOff = false; } return L2_PIT.base - L2_PIT.depth; }
-  function l2PitH(x, z, y) {
-    if (!OV_FEATURES) return y;
-    var dx = x - L2_PIT.x, dz = z - L2_PIT.z; if (dx > 6 || dx < -6 || dz > 6 || dz < -6) return y;
-    var k = 1 - smooth01((Math.hypot(dx, dz) - 3) / 2.5); if (k <= 0) return y;
-    var fl = l2PitFloor(); return y + (fl - y) * k;
-  }
   function ovKAt(x, z) {                                    // 1 well inside the ovoid, 0 outside it, a blend across the rim
     var kc = 0, cxr = x - L2_X, zc = Math.abs(z + 500.7);    // the mouth: a short, wide cut through the crags from the path's end into the ovoid
     if (cxr > 1436 && cxr < 1680 && zc < 100) kc = smooth01((cxr - 1436) / 14) * (1 - smooth01((cxr - 1600) / 70)) * (1 - smooth01((zc - 30 - (cxr - 1436) * 0.12) / 40));
@@ -6727,7 +6716,7 @@ requestAnimationFrame(tick);
     return o;
   }
   function sbTerrBase(kind, ex, z, top) {                        // top: the surface a path rides on, which over water is the water's surface rather than the ground far below it                             // the level's own ground at a point, before any path is laid over it (a path that follows the ground, or a slab being compared with it, starts from this)
-    if (kind === 'level2') { var k0 = l2PitOff, h2; l2PitOff = true; try { h2 = worldH0(L2_X + ex, z + L2_SBZ); } finally { l2PitOff = k0; } return top ? Math.max(h2, WATER_Y) : h2; }
+    if (kind === 'level2') { var h2 = worldH0(L2_X + ex, z + L2_SBZ); return top ? Math.max(h2, WATER_Y) : h2; }
     if (kind === 'level1') return worldH0(ex, z);
     if (kind === 'grass') return terrainFlat(ex, z);
     if (kind === 'crags') return Math.min(300, mtSpikes(ex, z));
@@ -6752,7 +6741,7 @@ requestAnimationFrame(tick);
   }
   function sbBuild(j) {
     j = j || {};
-    var B = { discs: [], width: j.width || 9, terrain: j.terrain || '', samples: [], total: 0, objs: [], trees: [], minions: [], toxic: [], segs: [], tips: [], goals: [], spawners: [], strips: [], meshes: [], tipDone: {}, ramps: [], hills: [], lakes: [], bigs: [], pits: [], caves: [], shafts: [], patches: [], timeLimit: Math.max(0, +j.timeLimit || 0), ranks: null, noCave: false, caveOpen: null, caveCov: null, caveR: 8, cps: [], signs: [], movers: [], plates: [], targets: [], trig: {}, tgBits: [], T: 0, signDone: {}, waterY: null };
+    var B = { discs: [], width: j.width || 9, terrain: j.terrain || '', samples: [], total: 0, objs: [], trees: [], minions: [], toxic: [], segs: [], tips: [], goals: [], spawners: [], strips: [], meshes: [], tipDone: {}, ramps: [], hills: [], lakes: [], bigs: [], caves: [], shafts: [], patches: [], timeLimit: Math.max(0, +j.timeLimit || 0), ranks: null, noCave: false, caveOpen: null, caveCov: null, caveR: 8, cps: [], signs: [], movers: [], plates: [], targets: [], trig: {}, tgBits: [], T: 0, signDone: {}, waterY: null };
     var sm = B.samples, x = 0, z = 0, th = 0, s = 0, y0b = (j.terrain === 'level2' ? L2_Y : 0), y = y0b, STEP = 4;      // Oceana Crags' path runs at 40
     var PATHS = [{ x: 0, z: 0, th: 0, y: 0, pieces: j.pieces || [] }].concat((j.extraPaths || []).map(function (e) { return { x: e.x || 0, z: e.z || 0, th: (e.heading || 0) * Math.PI / 180, y: e.rise || 0, pieces: e.pieces || [] }; }));
     B.pathStart = []; B.pathEnd = [];
@@ -6851,7 +6840,6 @@ requestAnimationFrame(tick);
       if (r.type === 'ramp') { o.len = r.length || 45; o.w = r.width || 9; o.ang = r.slope === undefined ? 30 : r.slope; o.boost = r.boost === undefined ? 15 : r.boost; }
       if (r.type === 'checkpoint') { o.w = r.width || 16; o.num = r.number || 0; }
       if (r.type === 'sign') o.text = r.text || '';
-      if (r.type === 'bigminion') o.trap = !!r.trapped;
       if ((r.type === 'minion' || r.type === 'bigminion') && r.idle) o.idle = true;
       if (r.type === 'cave') { o.shape = r.shape || 'rect'; o.w = r.width || 8; o.h = r.height || 8; o.roll = r.roll || 0; o.ang = r.angle === undefined ? 20 : r.angle; o.len = r.depth || 60; o.bend = r.curvature || 0; o.slope = r.slope || 0; o.carve = r.carve || 0; o.angSet = !!r.angleSet; }
       if (r.type === 'door') {
@@ -6878,7 +6866,7 @@ requestAnimationFrame(tick);
       if (o.t === 'tree') B.trees.push([p.x, p.z, o.y, o.ex ? { tH: o.tH, tW: o.tW, cH: o.cH, cW: o.cW } : null, T, o.yc]);
       else if (o.t === 'minion') B.minions.push([p.x, p.z, o.id, !!o.idle, T]);
       else if (o.t === 'cave') B.caves.push({ o: o, p: p });
-      else if (o.t === 'bigminion') { var bgx = o.trap ? Math.round(p.x / 2.5) * 2.5 : p.x, bgz = o.trap ? Math.round(p.z / 2.5) * 2.5 : p.z; B.bigs.push({ x: bgx, z: bgz, trap: !!o.trap, id: o.id, idle: !!o.idle }); if (o.trap) B.pits.push({ x: bgx, z: bgz, floor: null }); }
+      else if (o.t === 'bigminion') { B.bigs.push({ x: p.x, z: p.z, id: o.id, idle: !!o.idle }); }   // (an old layout's "trapped" is ignored: pits are gone; an idle Big Minion in a shaft does that job)
       else if (o.t === 'toxic') B.toxic.push({ T: T, y: o.y, x: p.x, z: p.z, th: p.th, hw: o.w / 2, hd: o.d / 2, rr: Math.hypot(o.w, o.d) / 2 });
       else if (o.t === 'seg') B.segs.push({ x: p.x, z: p.z, big: o.big, h: o.h || 0, T: T });
       else if (o.t === 'segchain') { n = Math.max(1, Math.floor(o.len / Math.max(1, o.gap)) + 1); for (k = o.after !== undefined ? 1 : 0; k < n; k++) { q = shapeAt(o, Math.min(o.len, k * o.gap)); var ct = n > 1 ? k / (n - 1) : 0; B.segs.push({ x: q.x, z: q.z, big: o.big, h: (o.h || 0) + (o.rise || 0) * ct + (o.arc || 0) * 4 * ct * (1 - ct), T: T === undefined ? undefined : T + (o.rise || 0) * ct + (o.arc || 0) * 4 * ct * (1 - ct) }); } }
@@ -7174,7 +7162,7 @@ requestAnimationFrame(tick);
       y = L2_VOID; if (best < HW + 2) { y = L2_VOID + (py - L2_VOID) * (1 - smooth01((best - HW) / 2)); if (best <= HW) wL2 = 1; }
     }
     else if (B.terrain === 'level2') {                                // Oceana Crags' own generated ground (it sets the colour flags too). The path here is a deck of its own, not part of the ground
-      l2PitOff = true; y = worldH0(L2_X + ex, z + L2_SBZ); l2PitOff = false;
+      y = worldH0(L2_X + ex, z + L2_SBZ);
       if (bp && best < 1e8) {
         if (pov && y > py - DECK_CUT) { var pkc = 1 - smooth01((best - HW - DECK_EDGE) / 14); if (pkc > 0) { y += (py - DECK_CUT - y) * pkc; wL2 = 0; wSt = 1; wPl = 0; wMud = 0; } }   // this piece supersedes the terrain: rock standing higher than the deck is cut down to just under it, a little wider than the deck, easing back up to the terrain over 14 units. Lower ground is never touched
       }
@@ -7207,7 +7195,6 @@ requestAnimationFrame(tick);
     for (i = 0; i < B.lakes.length; i++) { var lk = B.lakes[i]; d = Math.hypot(ex - lk.x, z - lk.z); if (d < lk.r) { y -= lk.depth * (1 - smooth01((d - lk.r * 0.7) / (lk.r * 0.3))); if (d < lk.r * 0.9) { wSt = 1; wL2 = 0; } } }
     if (B.slabH) { var scut = sbSlabCut(ex, z, y); if (scut < y) { y = scut; wSt = 1; wL2 = 0; wPl = 0; wMud = 0; } }   // a floating slab spans a drop: any higher ground in its way is cut down to just under it
     if (!B.noCave && B.caves.length) { var Lp = sbLedge(x, z), cy0 = sbCaveCarve(ex, z, y + Lp) - Lp; if (cy0 < y) { y = cy0; wSt = 1; wL2 = 0; wPl = 0; wMud = 0; } }
-    for (i = 0; i < B.pits.length; i++) { var pt = B.pits[i]; if (pt.floor === null) continue; var pdx = ex - pt.x, pdz = z - pt.z; if (pdx > 6 || pdx < -6 || pdz > 6 || pdz < -6) continue; var pk = 1 - smooth01((Math.hypot(pdx, pdz) - 3) / 2.5); if (pk > 0) { y += (pt.floor - y) * pk; wSt = 1; wL2 = 0; } }
     for (i = 0; i < (sbNoRamps || B.terrain === 'level2' ? 0 : B.ramps.length); i++) {   // (on Oceana a ramp is a wedge of its own on the path's deck: see sbDeckTop)
       var rp = B.ramps[i]; if (Math.abs(rp.x - ex) > rp.rr || Math.abs(rp.z - z) > rp.rr) continue;
       var dx = ex - rp.x, dz = z - rp.z, lf = dx * Math.sin(rp.th) - dz * Math.cos(rp.th), lx = dx * Math.cos(rp.th) + dz * Math.sin(rp.th);
@@ -7861,7 +7848,6 @@ requestAnimationFrame(tick);
     SB.minions.forEach(function (m) { if (n < pool.length) { reviveEnemy(pool[n], L3_X + m[0], m[1]); atY(pool[n], m[4]); pool[n].sbOwner = null; pool[n].sbId = m[2]; pool[n].idle = !!m[3]; n++; } });
     SB.bigs.forEach(function (m) {
       if (bn >= bpool.length) return; var e = bpool[bn++]; reviveEnemy(e, L3_X + m.x, m.z); atY(e, m.T); e.sbOwner = null; e.sbId = m.id; e.idle = !!m.idle;
-      if (m.trap) { e.stuck = true; var pit = SB.pits.filter(function (q) { return q.x === m.x && q.z === m.z; })[0]; if (pit && pit.floor !== null) { e.fyF = function () { return pit.floor; }; e.fy = pit.floor; } }
     });
     SB.spawners.forEach(function (s) { s.t = 0; });
     sbTrigReset();
@@ -8019,24 +8005,21 @@ requestAnimationFrame(tick);
   window.__gg = function (x, z) { groundGrad(x, z); return [ggx, ggz]; };
   window.__br = function () { return [breath, breathT]; };
   window.__sbTick = function (dt) { sbTick(dt, performance.now()); };
-  function sbPitInit() {                                        // each pit's floor: 15.75 below whatever the ground there would be without it
-    SB.pits.forEach(function (pt) { pt.floor = null; var g0 = level3H(L3_X + pt.x, pt.z); if (sbDeckTop(L3_X + pt.x, pt.z, null) > g0 + 0.5) return; pt.floor = g0 - 15.75; });   // (on Oceana, no pit where the spot is on the path's deck with nothing under it to dig into: the big minion just stands its ground on the deck)
-  }
   function terrainProbe(kind, x0, z0, nx, nz, cell) {            // the level's own ground at a grid of points (the editor paints it under the layout): height and what it is made of
-    var h = new Float32Array(nx * nz), k = new Uint8Array(nx * nz), i, j, ex, ez, y, kk, lg, keepOff = l2PitOff;
-    try {
+    var h = new Float32Array(nx * nz), k = new Uint8Array(nx * nz), i, j, ex, ez, y, kk, lg;
+    {
       for (j = 0; j < nz; j++) for (i = 0; i < nx; i++) {
         ex = x0 + (i + 0.5) * cell; ez = z0 + (j + 0.5) * cell;
-        if (kind === 'level2') { l2PitOff = true; y = worldH0(L2_X + ex, ez + L2_SBZ); kk = wL2 === 3 ? 6 : wL2 === 2 ? 5 : wL2 ? 4 : 0; lg = ledgeH(L2_X + ex, ez + L2_SBZ); if (y < WATER_Y) kk |= 32; }
+        if (kind === 'level2') { y = worldH0(L2_X + ex, ez + L2_SBZ); kk = wL2 === 3 ? 6 : wL2 === 2 ? 5 : wL2 ? 4 : 0; lg = ledgeH(L2_X + ex, ez + L2_SBZ); if (y < WATER_Y) kk |= 32; }
         else { y = worldH0(ex, ez); kk = wL2 === 3 ? 6 : wSt ? 1 : wPl ? 2 : wMud ? 3 : 0; lg = ledgeH(ex, ez); }
         if (lg > 0.4 || lg < -0.4) kk |= 16;
         h[j * nx + i] = y + lg; k[j * nx + i] = kk;
       }
-    } finally { l2PitOff = keepOff; }
+    }
     return { h: h, k: k };
   }
   function startSandbox(j) {
-    sbDispose(); SB = sbBuild(j); sbPitInit(); sbCaveInit(); sbMoverInit(); gcI = 1e9; gcJ = 1e9;
+    sbDispose(); SB = sbBuild(j); sbCaveInit(); sbMoverInit(); gcI = 1e9; gcJ = 1e9;
     for (var key in chunks) { scene.remove(chunks[key]); delete chunks[key]; }       // the ground is rebuilt for the new layout
     level = 3; newRun(); TIME_LIMIT = SB.timeLimit > 0 ? SB.timeLimit : 300; timeLeft = TIME_LIMIT; sbMakeMeshes(); sbRampInit(); sbBoostZones();   /* after the meshes: Oceana's slab of path is marked out while they are made, and a ramp's foot can stand on it */
     document.getElementById('bMap').hidden = true;
@@ -8051,7 +8034,7 @@ requestAnimationFrame(tick);
   // the cliff at the plateau's edges.
   function worldH0(x, z) {
     if (x > L3_MIN) return level3H(x, z);
-    if (x > L2_MIN) { wSt = 0; wPl = 0; wMud = 0; wF = 0; var yl2 = level2H(x, z); wL2 = l2Kind === 2 && ovTox ? 3 : l2Kind; if (!l2PitOff) { var yp = l2PitH(x, z, yl2); if (yp !== yl2) { wL2 = 2; return yp; } } return yl2; }
+    if (x > L2_MIN) { wSt = 0; wPl = 0; wMud = 0; wF = 0; var yl2 = level2H(x, z); wL2 = l2Kind === 2 && ovTox ? 3 : l2Kind; return yl2; }
     wL2 = 0;
     var y = terrainFlat(x, z);
     wallField(x, z);
@@ -9498,7 +9481,7 @@ requestAnimationFrame(tick);
     if (!SB || level !== 3) { startSandbox(j); return; }
     var pp = player.position, k = { x: pp.x, y: pp.y, z: pp.z, h: heading, yw: yaw, sp: speed, sx: spawn.x, sz: spawn.z, sc: spawn.cp, sy: spawn.yaw, tl: timeLeft, hp: hp, pw: segCount, st: segTotal, ball: ballOn }, keepSB = SB, nb;
     try { SB = null; nb = sbBuild(j); SB = keepSB; } catch (er) { SB = keepSB; peHost.__liveMsg('Not rebuilt: the layout is mid-edit (' + (er && er.message || er) + ')'); return; }   // half-finished edits leave the running level as it was
-    sbDispose(); SB = nb; sbPitInit(); sbCaveInit(); sbMoverInit(); gcI = 1e9; gcJ = 1e9;
+    sbDispose(); SB = nb; sbCaveInit(); sbMoverInit(); gcI = 1e9; gcJ = 1e9;
     for (var key in chunks) { scene.remove(chunks[key]); delete chunks[key]; }
     TIME_LIMIT = SB.timeLimit > 0 ? SB.timeLimit : 300; sbMakeMeshes(); sbRampInit(); sbBoostZones();
     spawnAt(k.x, k.z, 0, '', k.yw); endSpawnFx();
@@ -10459,7 +10442,7 @@ requestAnimationFrame(tick);
   (function () {
     function make(x, z, fy, l2, sc) {
       var g = new THREE.Group(); scene.add(g);
-      var e = { mats: [], flashUntil: 0, flashK: 0, sc: 1, H: EN_H, R: EN_R, big: (sc || 1) > 1, hearts: 1, dmg: 1, stuck: false, fyF: null, invUntil: 0, pulse: 0, g: g, parts: [], hx: x, hz: z, x: x, z: z, vx: 0, vz: 0, face: 0, phase: 0, dead: false, deadAt: 0, bits: [], fy: fy === undefined ? CH_FLOOR : fy, l2: !!l2 };
+      var e = { mats: [], flashUntil: 0, flashK: 0, sc: 1, H: EN_H, R: EN_R, big: (sc || 1) > 1, hearts: 1, dmg: 1, invUntil: 0, pulse: 0, g: g, parts: [], hx: x, hz: z, x: x, z: z, vx: 0, vz: 0, face: 0, phase: 0, dead: false, deadAt: 0, bits: [], fy: fy === undefined ? CH_FLOOR : fy, l2: !!l2 };
       enBuild(e); e.hearts = e.c.hearts; return e;
     }
     var homes = [[-45, -25], [45, -25], [0, -62]];
@@ -10482,13 +10465,12 @@ requestAnimationFrame(tick);
     for (var oi = 0; oi < 26; oi++) { var oe = make(1e7, 1e7, L2_Y, true); oe.ov = true; oe.act = false; ENEMIES.push(oe); }
     for (var si = 0; si < 60; si++) { var se = make(1e7, 1e7, 0, true); se.sbp = true; se.act = false; ENEMIES.push(se); }   // the Sandbox's minions and spawner pool   // the Sink's minions: a pool, woken one a second (at most 20 alive)
     for (var bi = 0; bi < 8; bi++) { var be = make(1e7, 1e7, 0, true, 5); be.sbp = true; be.act = false; ENEMIES.push(be); }   // the Sandbox's Big Minions
-    var P2 = L2_PIT, bg = make(P2.x, P2.z, 0, true, 5); bg.fyF = l2PitFloor; bg.stuck = true; bg.pit2 = true; ENEMIES.push(bg);                  // the one trapped at the end of the Sink
     enemiesReady = true;
   })();
   var ovSpawnT = 0;
   function reviveEnemy(e, x, z) {
     e.bits.forEach(function (b) { scene.remove(b.m); }); e.bits = [];
-    e.dead = false; e.act = true; e.hx = x; e.hz = z; e.x = x; e.z = z; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.fy = SB && level === 3 ? sbFoot(x, z) : groundH(x, z); e.hearts = e.c.hearts; e.stuck = false; e.idle = false; e.fyF = null; e.invUntil = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc);
+    e.dead = false; e.act = true; e.hx = x; e.hz = z; e.x = x; e.z = z; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.fy = SB && level === 3 ? sbFoot(x, z) : groundH(x, z); e.hearts = e.c.hearts; e.idle = false; e.invUntil = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc);
     e.g.position.set(x, e.fy, z); e.g.rotation.y = 0; e.g.visible = true;
     e.parts.forEach(function (p) { if (p.parent !== e.model.body) e.model.body.add(p); });
     e.parts.forEach(function (p) { p.position.copy(p.userData.rest); }); e.model.body.position.y = 0;
@@ -10514,7 +10496,7 @@ requestAnimationFrame(tick);
     if (!enemiesReady) return;
     ENEMIES.forEach(function (e) {
       e.bits.forEach(function (b) { scene.remove(b.m); });
-      e.bits = []; e.dead = false; e.x = e.hx; e.z = e.hz; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.hearts = e.c.hearts; e.invUntil = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc); if (e.fyF) e.fy = e.fyF();
+      e.bits = []; e.dead = false; e.x = e.hx; e.z = e.hz; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.hearts = e.c.hearts; e.invUntil = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc);
       e.g.position.set(e.x, e.fy, e.z); e.g.rotation.y = 0; e.g.visible = e.sbp ? false : e.l2 ? level === 2 : level === 1;
       e.parts.forEach(function (p) { if (p.parent !== e.model.body) e.model.body.add(p); });
       e.parts.forEach(function (p) { p.position.copy(p.userData.rest); }); e.model.body.position.y = 0;
@@ -10563,7 +10545,7 @@ requestAnimationFrame(tick);
       var e = ENEMIES[i];
       if (e.sbp ? level !== 3 : e.l2 ? level !== 2 : level !== 1) continue;
       if ((e.ov || e.sbp) && !e.act) continue;
-      if (e.fyF) e.fy = e.fyF(); else if (e.l2) { if (SB && level === 3) sbPyOv = e.fy + 0.5; e.fy = groundH(e.x, e.z); sbPyOv = undefined; }
+      if (e.l2) { if (SB && level === 3) sbPyOv = e.fy + 0.5; e.fy = groundH(e.x, e.z); sbPyOv = undefined; }
       if (e.big) enFlash(e, e.dead ? 0 : now < e.flashUntil ? 0.55 + 0.45 * Math.sin(now * 0.025) : 0);
       if (e.dead) {
         var gone = (now - e.deadAt) / 1000;
@@ -10581,7 +10563,7 @@ requestAnimationFrame(tick);
       // chase
       var dx = pp.x - e.x, dz = pp.z - e.z, d = Math.hypot(dx, dz), chase = d < e.c.see && Math.abs(pp.y - e.fy) < 40, EACC = e.c.acc * TILE, EMAX = e.c.top * TILE;
       var spd = Math.hypot(e.vx, e.vz);
-      if (e.stuck || e.idle) { if (chase && d > 0.001) e.face = Math.atan2(-dx, -dz); e.vx = e.vz = 0; }   // trapped or idle: it stands its ground and only turns to face her
+      if (e.idle) { if (chase && d > 0.001) e.face = Math.atan2(-dx, -dz); e.vx = e.vz = 0; }   // idle: it stands its ground and only turns to face her
       else if (chase && d > 0.001) {
         var ux = dx / d, uz = dz / d, sp0 = Math.hypot(e.vx, e.vz);
         if (sp0 > 0.5) {                                     // steering: sideways drift bleeds off, and if it is heading well away from her (more than about 35 degrees) it eases off the speed until it has turned
@@ -10599,13 +10581,13 @@ requestAnimationFrame(tick);
       var ex0 = e.x, ez0 = e.z;
       e.x += e.vx * dt; e.z += e.vz * dt;
       if (e.l2 && !e.ov && !e.sbp && l2Dist(e.x, e.z) > L2_HW - 1.2) { e.x = ex0; e.z = ez0; e.vx = e.vz = 0; }
-      if (e.l2 && !e.stuck && (e.vx || e.vz)) { var gnn = groundH(e.x, e.z), mvd = Math.hypot(e.x - ex0, e.z - ez0); if (gnn - e.fy > 0.3 + mvd * 0.9) { e.x = ex0; e.z = ez0; e.vx = e.vz = 0; } }   // they cannot climb a wall or a ledge: ground rising faster than about 42 degrees stops them   // the runway's edge: they never leave it
+      if (e.l2 && (e.vx || e.vz)) { var gnn = groundH(e.x, e.z), mvd = Math.hypot(e.x - ex0, e.z - ez0); if (gnn - e.fy > 0.3 + mvd * 0.9) { e.x = ex0; e.z = ez0; e.vx = e.vz = 0; } }   // they cannot climb a wall or a ledge: ground rising faster than about 42 degrees stops them   // the runway's edge: they never leave it
       // keep each other apart
       for (var j = 0; j < ENEMIES.length; j++) {
         if (j === i || ENEMIES[j].dead || (ENEMIES[j].ov || ENEMIES[j].sbp) && !ENEMIES[j].act) continue;
         var ox = e.x - ENEMIES[j].x, oz = e.z - ENEMIES[j].z, od = Math.hypot(ox, oz);
         var mr = e.R + ENEMIES[j].R + 0.3;
-        if (!e.stuck && !e.idle && od < mr && od > 0.0001) { var pu = (mr - od) / 2; e.x += ox / od * pu; e.z += oz / od * pu; }
+        if (!e.idle && od < mr && od > 0.0001) { var pu = (mr - od) / 2; e.x += ox / od * pu; e.z += oz / od * pu; }
       }
       // they stay inside the chamber
       var cx = e.x - CH_X, cz = e.z - CH_Z, cd = Math.hypot(cx, cz);
@@ -11223,7 +11205,7 @@ function showScreen(name) {                                // the menu shows one
       var last = L2_PIECES[L2_PIECES.length - 1], send = last.s0 + last.len;
       add({ type: 'segchain', s: R(send - 406 - B0), u: 0, length: 400, spacing: 100, big: true });
       [[220, 0], [650, 4], [650, -4], [900, -3], [1100, 0], [1375, 4], [1650, 3.5], [1925, -4], [2200, -3.5]].forEach(function (m) { add({ type: 'minion', s: m[0] - B0, u: m[1] }); });
-      add({ type: 'bigminion', x: R(L2_PIT.x - L2_X), z: R(L2_PIT.z - L2_SBZ), trapped: false });
+      add({ type: 'bigminion', x: R(Math.round((OV_CX + 24) / 2.5) * 2.5 - L2_X), z: R(Math.round(-1360 / 2.5) * 2.5 - L2_SBZ) });   // the middle of a maze cell near the Sink's far end
       TOX.forEach(function (t) { add({ type: 'toxic', s: R((t.a + t.b) / 2 - B0), u: R(t.v), width: 2.5, length: R(t.b - t.a) }); });
       // (the Sink needs no object: its ground is the real level's own, poisonous and textured, in this terrain)
     } else {

@@ -1,4 +1,4 @@
-# Big Minion: no Placement box in the next-stamp panel or on a placed one; an old layout with trapped:true still loads and exports
+# Big Minion: no Placement box; an old layout with trapped:true still loads, and exports without it (pits were removed Nov 17)
 import json
 from playwright.sync_api import sync_playwright
 with sync_playwright() as p:
