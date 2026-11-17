@@ -9,7 +9,6 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 - [ ] Changing the rotation of a shaft changes the angle of the caves chained to it on the editor screen, but not in the game.
 - [ ] Ledges, hills and trapped-minion pits placed on a path that is a deck over low ground on Oceana do not show.
 - [ ] Molly's Y value using show coordinates doesn't match Oceana Crags' true Y.
-- [ ] **Decision:** gap/ledge/platform ends are round in the game and square in the editor. Make the game square? (His tuned jumps get about 29 units shorter.)
 
 ## 2. Molly's stats and enemies
 - [ ] **Decision:** grip stat is in units/s^2 (40) while everything else is in Zips; the card shows it /2. Convert the slider to Zips/s^2?
