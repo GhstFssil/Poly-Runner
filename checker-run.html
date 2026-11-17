@@ -6970,7 +6970,7 @@ requestAnimationFrame(tick);
       if (c.done) return; c.done = true;
       var pv0 = c.o.after !== undefined && byIdC[c.o.after] !== c ? byIdC[c.o.after] : null; if (pv0) doCave(pv0);
       var joined = pv0 && pv0.end ? pv0.end : null, fromShaft = null;                // joined to the end of another tunnel: it carries on from there, the way that one was heading
-      var o = c.o, p = c.p || { x: 0, z: 0, th: 0 }, wx0 = L3_X + p.x, E = joined ? joined.y : o.T !== undefined ? o.T : level3H(wx0, p.z) + (o.y || 0), th = joined ? joined.hd : p.th, L = Math.max(4, o.len), pts, i, k;
+      var o = c.o, p = c.p || { x: 0, z: 0, th: 0 }, wx0 = L3_X + p.x, E = joined ? joined.y : o.T !== undefined ? o.T : level3H(wx0, p.z) + (o.y || 0), th = joined ? joined.hd + (o.turn || 0) * Math.PI / 180 : pv0 && pv0.shaft ? pv0.shaft.th + (o.turn || 0) * Math.PI / 180 : p.th, L = Math.max(4, o.len), pts, i, k;   // joined: it heads on the way the tunnel ended or the way its shaft faces (plus any turn at the joint), as the editor draws it; its own rotation is not used
       if (!joined && pv0 && pv0.shaft) {                         // joined to a shaft: the tunnel starts where its centre line meets the shaft's wall, with its floor level with the shaft's floor
         var psh = pv0.shaft, sDx = Math.sin(th), sDz = -Math.cos(th), t0 = 0, t1 = psh.rad * 3, tm, qi;
         for (qi = 0; qi < 30; qi++) { tm = (t0 + t1) / 2; if (polySd(psh.pts, sDx * tm * psh.Lx + sDz * tm * psh.Lz, sDx * tm * psh.Fx + sDz * tm * psh.Fz) <= 0) t0 = tm; else t1 = tm; }
