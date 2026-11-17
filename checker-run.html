@@ -10906,10 +10906,19 @@ requestAnimationFrame(tick);
 
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
-  { v: 'Next', d: 'Nov 17, 2026', t: 'Toxic bubbles, unreleased', g: [
+  { v: 'Next', d: 'Nov 17, 2026', t: 'Toxic bubbles and level fixes, unreleased', g: [
     ['Fixes', [
+      'Doors stop Molly at any speed. A closed door is only 2 thick, and from about 20 Zips she could pass straight through it.',
+      'Show Coordinates: Y now reads as the Path Editor\'s true Y. On Oceana Crags it read 40 too high.',
+      'A cave joined to a shaft now heads the way the shaft faces in the game, as the editor shows it, so turning the shaft turns the caves chained to it.',
+      'Joined caves of different angles: the floor and roof ease from one cave to the next across the joint, so Molly no longer gets stuck on the step between them.',
+      'Cone-shaped holes: Molly lands at the bottom instead of falling and sliding between the faces for ever.',
       'Toxic ground now bubbles: toxic terrain patches and Oceana Crags\' poisoned low ground show square bubbles wherever they hurt (patches barely showed any, and Oceana\'s ground had none).',
       'Path Editor: pressing up on the first piece (or down on the last) no longer saves an empty undo step, so the next Ctrl+Z works the first time.',
+    ]],
+    ['Levels', [
+      'Oceana Crags: ledges and hills placed on a path deck now stand on the deck (before, they were built on the low ground hidden under it). A ledge is a raised block with upright sides; a hill is a bump in the deck.',
+      'Trapped-minion pits are gone. An old layout with a trapped Big Minion still loads; the minion stands on the ground. (An idle Big Minion in a shaft does the same job.)',
     ]],
     ['Looks', [
       'Toxic patches make a quarter as many bubbles as before, and bubbles thin out to a quarter of their number between 60 and 150 units from Molly.',
