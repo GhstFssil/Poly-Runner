@@ -7857,7 +7857,7 @@ requestAnimationFrame(tick);
         if (riding && o.tox) onTox = true;
         var ox = m.off[0], oz = m.off[1], oy = m.dy, w, half;
         if (m.door) {
-          var sdx = ex - m.cx - m.sx, sdz = ez - m.cz - m.sz, sal = sdx * Math.sin(m.th0) - sdz * Math.cos(m.th0), sla = sdx * Math.cos(m.th0) + sdz * Math.sin(m.th0);
+          var sdx = (B.prevOK ? B.px : ex) - m.cx - m.sx, sdz = (B.prevOK ? B.pz : ez) - m.cz - m.sz, sal = sdx * Math.sin(m.th0) - sdz * Math.cos(m.th0), sla = sdx * Math.cos(m.th0) + sdz * Math.sin(m.th0);
           if (Math.abs(sla) <= m.half + 1 && Math.abs(sal) > m.depth / 2 + 0.4 && Math.abs(sal) < 14) m.side = sal > 0 ? 1 : -1;      // which side she came from, in case it shuts on her
           var dc = o.cfgB, md = o.modeA && sbDoorLinked(m) ? o.modeA : dc.mode;   // one way of opening and shutting; being linked only changes which mode it is in
           var cyc = dc.open + dc.shut, ph = (((B.T + dc.phase) % cyc) + cyc) % cyc, want = md === 'open' ? 1 : md === 'closed' ? 0 : ph < dc.open ? 1 : 0;
@@ -7881,7 +7881,16 @@ requestAnimationFrame(tick);
         }
       });
       B.movers.forEach(function (m) {                            // the slab is solid: she can go under it if she fits, can't go up through it, and is pushed out if she meets its side
-        var hit = sbMovInside(m, ex, ez); if (!hit) return;
+        var hit = sbMovInside(m, ex, ez);
+        if (!hit && m.door && B.prevOK) {                         // a door is only 2 thick: at speed she can be on one side last frame and the other side now without ever being inside it, so check the line between
+          var dnx = Math.sin(m.th0), dnz = -Math.cos(m.th0), dcx = m.cx + m.sx, dcz = m.cz + m.sz, a0 = (B.px - dcx) * dnx + (B.pz - dcz) * dnz, a1 = (ex - dcx) * dnx + (ez - dcz) * dnz;
+          if (a0 * a1 < 0) {
+            var dtt = a0 / (a0 - a1), dsp = sbDoorSpan(m, B.px + (ex - B.px) * dtt, B.pz + (ez - B.pz) * dtt), dqy = B.py + (pp.y - B.py) * dtt;
+            if (dsp && dqy + PLAYER_H > dsp.lo && dqy < dsp.hi - 1.2) { var dbk = (a0 > 0 ? 1 : -1) * (m.depth / 2 + 0.6) - a1; pp.x += dnx * dbk; pp.z += dnz * dbk; ex = pp.x - L3_X; ez = pp.z; }   // back out the way she came
+          }
+          return;
+        }
+        if (!hit) return;
         var top = m.door ? hit.hi : m.base + m.hgt + m.dy, bot = m.door ? hit.lo : top - m.thick;
         if (pp.y + PLAYER_H > bot && pp.y < top - 1.2) {
           if (B.prevOK && B.py + PLAYER_H <= bot + 0.1) { pp.y = bot - PLAYER_H; if (vy > 0) vy = 0; }
