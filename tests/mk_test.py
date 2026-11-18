@@ -34,6 +34,7 @@ hooks=r"""
   window.__pushOutOf = function (x, z, d) { pushOutOf(x, z, d); }; window.__bounce = function (i) { var e = ENEMIES[i]; bounceOffBig(e, e.R + 0.5); };
   window.__ballLean = function () { return [ballGroup.rotation.z, sideLean, ballOn, grounded, wallOn]; };
   window.__setHp = function (v) { hp = v; drawHearts(); };
+  window.__solid = function (x, y, z) { return laserSolid(x, y, z, null); };
   window.__state = function () { return { grounded: grounded, vy: vy, speed: speed, heading: heading, yaw: yaw, wallOn: wallOn, fpOn: fpOn, hp: hp, x: player.position.x, y: player.position.y, z: player.position.z, plOn: plOn, slDeg: slDeg }; };
 """
 s=s.replace(a,hooks+a)

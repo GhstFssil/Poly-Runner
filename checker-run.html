@@ -10534,12 +10534,35 @@ requestAnimationFrame(tick);
   function enRestyle() { if (!enemiesReady) return; ENEMIES.forEach(function (e) { var dead = e.dead; enBuild(e); if (dead) e.g.visible = false; }); }   // the Rig Editor changed them
   var GZB = [], GZ_GEO = null, GZ_MAT = null;                      // Roost Gazer lasers in flight
   function gzClear() { for (var i = 0; i < GZB.length; i++) scene.remove(GZB[i].m); GZB.length = 0; }
+  function laserSolid(x, y, z, shooter) {                        // is the point (x, y, z) inside anything with collision? The ground (ledges, slabs, decks, tunnel floors and roofs, shafts), moving platforms and doors, tilted walls, and every other mob. Sandbox only
+    var B = SB, ex = x - L3_X, i;
+    if (!B) return y < groundH0(x, z);
+    var h = groundH0(x, z);
+    if (B.slabH) { var st = sbSlabTop(x, z, y); if (st > h) h = st; }
+    if (B.terrain === 'level2') { var dk = sbDeckTop(x, z, y); if (dk > h) h = dk; }
+    if (B.caveZone) { var cq = sbCaveQ(B.caveZone, x, z); if (cq && y >= cq.fl - 0.2 && y <= cq.rf + 0.2) h = cq.fl; }   // inside a tunnel the air between its floor and roof is open
+    if (B.shafts.length) { var shf = sbShaftIn(x, z, 0); if (shf) h = shf.floor; }
+    if (y < h) return true;
+    for (i = 0; i < B.movers.length; i++) {
+      var m = B.movers[i], ds = sbMovInside(m, ex, z); if (!ds) continue;
+      if (m.door) { if (y >= ds.lo && y <= ds.hi) return true; } else if (y >= m.base + m.dy && y <= m.base + m.hgt + m.dy) return true;
+    }
+    if (B.wallH) { var w = sbWallFind(ex, z, y); if (w && w.d < 0 && w.d > -1 && Math.abs(w.a) <= w.hw + 0.5) return true; }
+    for (i = 0; i < ENEMIES.length; i++) { var q = ENEMIES[i]; if (q === shooter || q.dead || !q.act || !q.sbp) continue; if (y >= q.fy && y <= q.fy + q.H && Math.hypot(x - q.x, z - q.z) < q.R) return true; }
+    return false;
+  }
+  function gzSight(e) {                                          // a clear line from its eye to her: nothing with collision in between (it holds its fire until there is)
+    var pp = player.position, ox = e.x, oy = e.fy + e.H * 0.55, oz = e.z, tx = pp.x, ty = pp.y + (ballOn ? BALL_R : PLAYER_H * 0.5), tz = pp.z;
+    var dx = tx - ox, dy = ty - oy, dz = tz - oz, dl = Math.hypot(dx, dy, dz), n = Math.ceil((dl - 0.6) / 0.5);
+    for (var k = 1; k <= n; k++) { var f = Math.min(dl - 0.6, k * 0.5) / dl; if (laserSolid(ox + dx * f, oy + dy * f, oz + dz * f, e)) return false; }
+    return true;
+  }
   function gzFire(e) {                                           // a laser bolt from its eye toward where she is now (it flies at the Rig Editor's Laser speed and does its damage if it reaches her)
     var c = e.c, ox = e.x, oy = e.fy + e.H * 0.55, oz = e.z, pp = player.position, tx = pp.x, ty = pp.y + (ballOn ? BALL_R : PLAYER_H * 0.5), tz = pp.z;
     var dx = tx - ox, dy = ty - oy, dz = tz - oz, dl = Math.hypot(dx, dy, dz) || 1;
     if (!GZ_GEO) { GZ_GEO = new THREE.BoxGeometry(0.22, 0.22, 1.6); GZ_MAT = new THREE.MeshBasicMaterial({ color: 0xff3355 }); }
     var m = new THREE.Mesh(GZ_GEO, GZ_MAT); m.position.set(ox, oy, oz); m.lookAt(tx, ty, tz); scene.add(m);
-    GZB.push({ m: m, x: ox, y: oy, z: oz, vx: dx / dl, vy: dy / dl, vz: dz / dl, sp: Math.max(1, c.bolt) * TILE, left: Math.max(5, c.range) * 1.6, dmg: c.bdmg });
+    GZB.push({ m: m, src: e, x: ox, y: oy, z: oz, vx: dx / dl, vy: dy / dl, vz: dz / dl, sp: Math.max(1, c.bolt) * TILE, left: Math.max(5, c.range) * 1.6, dmg: c.bdmg });
   }
   function gzBolts(dt) {
     if (level !== 3) { if (GZB.length) gzClear(); return; }
@@ -10552,7 +10575,7 @@ requestAnimationFrame(tick);
         if (Math.hypot(b.x - pp.x, b.y - cy, b.z - pp.z) < rr) {   // it reaches her: the Barrier takes it, and in Dev Mode's Invulnerable it does nothing
           if (!invulnMode && !ballOn && hp > 0) { hp = Math.max(0, hp - b.dmg); drawHearts(); flashHurt(); shake(0.2); }
           gone = true;
-        } else if (b.left <= 0 || b.y < groundH(b.x, b.z)) gone = true;
+        } else if (b.left <= 0 || laserSolid(b.x, b.y, b.z, b.src)) gone = true;   // anything with collision stops it
       }
       if (gone) { scene.remove(b.m); GZB.splice(i, 1); } else { b.m.position.set(b.x, b.y, b.z); }
     }
@@ -10581,7 +10604,7 @@ requestAnimationFrame(tick);
     var ddy = (pp.y + PLAYER_H * 0.5) - (e.fy + e.H * 0.55);
     if (playing && Math.hypot(pp.x - e.x, ddy, pp.z - e.z) <= c.range) {
       if (!e.nextShot) e.nextShot = now + c.fire * 500;
-      if (now >= e.nextShot) { gzFire(e); e.nextShot = now + Math.max(0.2, c.fire) * 1000; }
+      if (now >= e.nextShot && gzSight(e)) { gzFire(e); e.nextShot = now + Math.max(0.2, c.fire) * 1000; }
     }
   }
   (function () {
@@ -11041,7 +11064,7 @@ var CHANGELOG = [
     ]],
     ['Roost Gazer', [
       'New flying mob: a minion\'s head with tiny legs, wings and one big eye. Place it in the Path Editor (Roost Gazer); Behavior is Chases (buzzes round her head), Idle (hovers still, turns to face her) or Cycle (moves like a platform: side to side, forward and back, or up and down, with Travel, Seconds per cycle and Phase). Hover height is a field too (6 units by default).',
-      'Touching it does no damage. Within 30 units it fires a laser every 2 seconds that does half a heart. The Barrier absorbs lasers. The Barrier at speed and thrown Stars defeat it like a minion.',
+      'Touching it does no damage. Within 30 units it fires a laser every 2 seconds that does half a heart, but only with a clear line to her: the ground, ledges, slabs, tunnel walls, moving platforms, doors, banked walls and other mobs all stop the laser, and it holds its fire until the line is clear. The Barrier absorbs lasers. The Barrier at speed and thrown Stars defeat it like a minion.',
       'The Rig Editor has a Roost Gazers tab on the Mobs page: size, wings, legs, colors, speed, how far it buzzes round her, laser range, seconds between shots, laser speed and laser damage.'
     ]],
     ['Health display', [
