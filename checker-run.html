@@ -10512,7 +10512,7 @@ requestAnimationFrame(tick);
   var ovSpawnT = 0;
   function reviveEnemy(e, x, z) {
     e.bits.forEach(function (b) { scene.remove(b.m); }); e.bits = [];
-    e.dead = false; e.act = true; e.hx = x; e.hz = z; e.x = x; e.z = z; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.fy = SB && level === 3 ? sbFoot(x, z) : groundH(x, z); e.hearts = e.c.hearts; e.idle = false; e.invUntil = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc);
+    e.dead = false; e.act = true; e.hx = x; e.hz = z; e.x = x; e.z = z; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.fy = SB && level === 3 ? sbFoot(x, z) : groundH(x, z); e.hearts = e.c.hearts; e.idle = false; e.invUntil = 0; e.restUntil = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc);
     e.g.position.set(x, e.fy, z); e.g.rotation.y = 0; e.g.visible = true;
     e.parts.forEach(function (p) { if (p.parent !== e.model.body) e.model.body.add(p); });
     e.parts.forEach(function (p) { p.position.copy(p.userData.rest); }); e.model.body.position.y = 0;
@@ -10538,7 +10538,7 @@ requestAnimationFrame(tick);
     if (!enemiesReady) return;
     ENEMIES.forEach(function (e) {
       e.bits.forEach(function (b) { scene.remove(b.m); });
-      e.bits = []; e.dead = false; e.x = e.hx; e.z = e.hz; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.hearts = e.c.hearts; e.invUntil = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc);
+      e.bits = []; e.dead = false; e.x = e.hx; e.z = e.hz; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.hearts = e.c.hearts; e.invUntil = 0; e.restUntil = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc);
       e.g.position.set(e.x, e.fy, e.z); e.g.rotation.y = 0; e.g.visible = e.sbp ? false : e.l2 ? level === 2 : level === 1;
       e.parts.forEach(function (p) { if (p.parent !== e.model.body) e.model.body.add(p); });
       e.parts.forEach(function (p) { p.position.copy(p.userData.rest); }); e.model.body.position.y = 0;
@@ -10572,12 +10572,17 @@ requestAnimationFrame(tick);
   }
   function enFlash(e, k) { if (e.flashK === k) return; e.flashK = k; for (var i = 0; i < e.mats.length; i++) e.mats[i].emissive.setRGB(0.95 * k, 0.05 * k, 0.03 * k); }
   var invulnMode = false;   // Dev Mode > Invulnerable: enemies can neither hurt nor push her (she can still hurt them and bounce off a head)
-  function bounceOffBig(e, rs) {
-    if (invulnMode) return;
-    var pp = player.position, bx = pp.x - e.x, bz = pp.z - e.z, bd = Math.hypot(bx, bz);
+  var BIG_REST = 1500;      // ms after a Big Minion has been damaged before it can hurt her again
+  function pushOutOf(ex, ez, dist) {                      // puts her dist from (ex, ez), flat, away from it. On a wall the part of the move across the wall's face is dropped (it would carry her up or down the wall)
+    var pp = player.position, bx = pp.x - ex, bz = pp.z - ez, bd = Math.hypot(bx, bz);
     if (bd < 0.001) { bx = -Math.sin(heading); bz = Math.cos(heading); bd = 1; }
-    pp.x = e.x + bx / bd * (rs + 0.8); pp.z = e.z + bz / bd * (rs + 0.8);
-    vy = Math.max(vy, 34); grounded = false; speed *= 0.35; shake(0.5);
+    var mx = ex + bx / bd * dist - pp.x, mz = ez + bz / bd * dist - pp.z;
+    if (wallOn && level === 3 && SB) { var w = sbWallFind(pp.x - L3_X, pp.z, pp.y); if (w) { var sa = mx * w.lx + mz * w.lz; mx -= sa * w.lx; mz -= sa * w.lz; } }
+    pp.x += mx; pp.z += mz;
+  }
+  function bounceOffBig(e, rs) {                          // thrown back along the ground, not up
+    if (invulnMode) return;
+    pushOutOf(e.x, e.z, rs + 2); speed *= 0.35; shake(0.5);
   }
   function updateEnemies(dt, now) {
     if (!enemiesReady) return;
@@ -10645,7 +10650,7 @@ requestAnimationFrame(tick);
       var asp = Math.abs(speed) / TILE, hits = (e.c.k3 > 0 && asp >= e.c.k3) ? 3 : (e.c.k2 > 0 && asp >= e.c.k2) ? 2 : (e.c.k1 > 0 && asp >= e.c.k1) ? 1 : 0;   // the Barrier's speed sets the damage: 1, 2 or 3 hearts at its three speeds (0 = never)
       if (ballOn && ((hd < rs && vOver && hits > 0) || onHead)) {
         if (now > e.invUntil) {
-          var dealt = onHead ? 1 : hits; e.invUntil = now + 700; e.hearts -= dealt; e.pulse = now;
+          var dealt = onHead ? 1 : hits; e.invUntil = now + 700; if (e.big) e.restUntil = now + BIG_REST; e.hearts -= dealt; e.pulse = now;
           if (onHead) { vy = Math.max(vy, e.c.stomp * TILE); grounded = false; }   // a stomp: a bounce off its head, even when that kills it
           if (e.hearts <= 0) { killEnemy(e, now); continue; }
           e.flashUntil = now + 1000;
@@ -10658,8 +10663,8 @@ requestAnimationFrame(tick);
       }
       var cd2 = Math.hypot(pp.x - e.x, pp.z - e.z);
       if (!invulnMode && cd2 < rs && vOver) {
-        if (cd2 > 0.0001) { pp.x = e.x + (pp.x - e.x) / cd2 * rs; pp.z = e.z + (pp.z - e.z) / cd2 * rs; } else pp.x = e.x + rs;
-        if (!ballOn && now > enHurtUntil && hp > 0) {
+        pushOutOf(e.x, e.z, rs);
+        if (!ballOn && now > enHurtUntil && hp > 0 && pp.y < e.fy + e.H - e.c.headH * e.sc && now >= (e.restUntil || 0)) {   // its head is harmless to touch, and a Big Minion that has just been damaged gets BIG_REST before it can hit her
           enHurtUntil = now + e.c.cool * 1000; hp = Math.max(0, hp - e.dmg); drawHearts(); flashHurt();
           
         }
@@ -10920,6 +10925,12 @@ var CHANGELOG = [
     ]],
     ['Dev Mode', [
       'New button in the in-game Dev Mode: Invulnerable. While it is On, minions can neither hurt Molly nor push her (she passes through them), and a Big Minion no longer drains her Barrier. She can still damage them and bounce off their heads. It resets when you reload.'
+    ]],
+    ['Minions', [
+      'A Big Minion hit with the Barrier now throws Molly back along the ground instead of launching her up in the air.',
+      'A Big Minion that has just been damaged cannot hurt her for 1.5 seconds.',
+      'Touching a minion\'s head from the side no longer hurts (the stomp bounce is unchanged).',
+      'A minion can no longer shove Molly up or down a wall she is running on.'
     ]]
   ]},
   { v: 'v184', d: 'Nov 17, 2026', t: 'Toxic bubbles and level fixes', g: [
@@ -11582,7 +11593,7 @@ function showScreen(name) {                                // the menu shows one
         for (var j = 0; j < ENEMIES.length && !hit; j++) {
           var e = ENEMIES[j]; if (e.dead || (e.sbp ? level !== 3 : e.l2 ? level !== 2 : level !== 1) || ((e.ov || e.sbp) && !e.act)) continue;   // the same mobs the game is running
           if (Math.hypot(x - e.x, z - e.z) < e.R + st.r && y > e.fy - st.r && y < e.fy + e.H + st.r) {
-            hit = true; e.hearts -= st.dmg; e.pulse = now; e.flashUntil = now + 1000; if (e.hearts <= 1e-6) killEnemy(e, now);
+            hit = true; e.hearts -= st.dmg; if (e.big) e.restUntil = now + BIG_REST; e.pulse = now; e.flashUntil = now + 1000; if (e.hearts <= 1e-6) killEnemy(e, now);
           }
         }
         if (!hit && level === 3 && SB && SB.targets) for (j = 0; j < SB.targets.length && !hit; j++) { var tg = SB.targets[j]; if (!tg.on && tg.mv && sbTargetDist(tg, x, y, z).d < st.r) hit = starHitTarget(tg, st.dmg, now); }
