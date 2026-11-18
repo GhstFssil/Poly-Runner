@@ -12,7 +12,7 @@ hooks=r"""
   window.__mudAt = function (x, z) { return sbMudAt(x, z); };
   window.__put = function (x, y, z) { player.position.set(x, y, z); fallTop = y; vy = 0; grounded = true; speed = 0; };
   window.__gH = function (x, z) { return groundH(x, z); };
-  window.__ens = function () { return ENEMIES.map(function (e, i) { return { i: i, x: e.x, z: e.z, fy: e.fy, H: e.H, R: e.R, sc: e.sc, dead: e.dead, act: e.act, hearts: e.hearts, big: e.big, sbp: !!e.sbp, top: e.c.top, stomp: e.c.stomp, vis: e.g.visible }; }); };
+  window.__ens = function () { return ENEMIES.map(function (e, i) { return { i: i, x: e.x, z: e.z, fy: e.fy, H: e.H, R: e.R, sc: e.sc, dead: e.dead, act: e.act, hearts: e.hearts, big: e.big, sbp: !!e.sbp, top: e.c.top, stomp: e.c.stomp, vis: e.g.visible, gz: !!e.gz, ay: e.ay, gm: e.gm, vx: e.vx, vz: e.vz }; }); };
   window.__vy = function (v) { if (v !== undefined) { vy = v; grounded = false; } return vy; };
   window.__ball = function () { return ballOn; };
   window.__spd = function (v) { if (v !== undefined) speed = v; return speed; };

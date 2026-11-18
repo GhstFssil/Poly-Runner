@@ -89,6 +89,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       <button data-tool="tree">Tree</button>
       <button data-tool="minion">Minion</button>
       <button data-tool="bigminion">Big Minion</button>
+      <button data-tool="gazer">Roost Gazer</button>
       <button data-tool="toxic">Toxic patch</button>
       <button data-tool="sign">Caution sign</button>
       <button data-tool="seg">Seg</button>
@@ -156,14 +157,14 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   var $ = function (id) { return document.getElementById(id); };
   var cv = $('cv'), ctx = cv.getContext('2d');
   var KEY = 'polyrun-path-editor-v2';
-  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: {}, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, slide: 'down', sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {}, plate: { shape: 'rect', w: 8, d: 8, r: 4, look: 'gray', whl: false }, target: { size: 6, post: true, h: 7, tilt: 0, spin: 0, hb: 1, k: 20, sd: 0, sp: 4, vd: 0, vp: 4, phase: 0 } };
+  var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: {}, gazer: { gm: 'chase', hgt: 6, move: 'side', dist: 40, period: 4, phase: 0 }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, slide: 'down', sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {}, plate: { shape: 'rect', w: 8, d: 8, r: 4, look: 'gray', whl: false }, target: { size: 6, post: true, h: 7, tilt: 0, spin: 0, hb: 1, k: 20, sd: 0, sp: 4, vd: 0, vp: 4, phase: 0 } };
   var S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }, { len: 1005.3, ang: 90, r: 640, dy: 0 }, { len: 400, ang: 0, r: 640, dy: 20 }, { len: 502.65, ang: -45, r: 640, dy: 0 }, { len: 300, ang: 0, r: 640, dy: 0 }], objs: [] };
   var GH = null, DEFUSER = {};                                  // GH: the not-yet-placed stamp whose settings the panel shows while a stamp tool is chosen
   function ghostMode() { return tool !== 'select' && tool !== 'erase' && tool !== 'preset' && tool !== 'forest'; }
   var tool = 'select', view = { cx: 300, cz: -300, zoom: 0.5 }, samples = [], total = 0, hist = [], hover = null, sel = -1, dpr = 1;
   var STRIPS = { segchain: 1, ledge: 1, platform: 1, gap: 1, mud: 1 };
   var MOBS = ['minion', 'bigminion'];                         // enemies that can be set Idle (add any new mob type here)
-  var NAMES = { tree: 'Tree', minion: 'Minion', bigminion: 'Big minion', cave: 'Cave', toxic: 'Toxic patch', sign: 'Caution sign', seg: 'Seg', segchain: 'Seg chain', ledge: 'Ledge', platform: 'Platform', gap: 'Gap', mud: 'Mud stretch', crag: 'Crag patch', patch: 'Terrain patch', spawner: 'Spawner', hill: 'Hill', lake: 'Lake', goal: 'Goal', checkpoint: 'Checkpoint', ramp: 'Ramp', tip: 'Tip area', start: 'Player start', door: 'Door', plate: 'Pressure plate', target: 'Target' };
+  var NAMES = { tree: 'Tree', minion: 'Minion', bigminion: 'Big minion', gazer: 'Roost Gazer', cave: 'Cave', toxic: 'Toxic patch', sign: 'Caution sign', seg: 'Seg', segchain: 'Seg chain', ledge: 'Ledge', platform: 'Platform', gap: 'Gap', mud: 'Mud stretch', crag: 'Crag patch', patch: 'Terrain patch', spawner: 'Spawner', hill: 'Hill', lake: 'Lake', goal: 'Goal', checkpoint: 'Checkpoint', ramp: 'Ramp', tip: 'Tip area', start: 'Player start', door: 'Door', plate: 'Pressure plate', target: 'Target' };
 
   var msel = [], clip = null, marq = null, nextLayer = 2;
   function setSel(i) { sel = i; msel = []; }
@@ -435,7 +436,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var p = pos(o); return inR(p.x, p.z);
   }
   // ---- Layer-Split Overlap ----
-  function footR(o) { var h = halves(o); if (h) return null; return o.t === 'tree' ? Math.max(1, (o.cW || 7.4) / 2) : o.t === 'bigminion' ? 3 : o.t === 'sign' ? 1.5 : o.t === 'forest' ? Math.max(o.r || 0, (o.w || 0) / 2) : 2; }   // a round footprint for stamps with no box
+  function footR(o) { var h = halves(o); if (h) return null; return o.t === 'tree' ? Math.max(1, (o.cW || 7.4) / 2) : o.t === 'bigminion' ? 3 : o.t === 'gazer' ? 2 : o.t === 'sign' ? 1.5 : o.t === 'forest' ? Math.max(o.r || 0, (o.w || 0) / 2) : 2; }   // a round footprint for stamps with no box
   function footIn(o, wx, wz) {                                   // is (wx, wz) on this stamp's footprint (its real size, no padding for the mouse)?
     if (STRIPS[o.t]) { var cp = o.t === 'segchain' ? chainPts(o) : stripPts(o, 3), rr = o.t === 'segchain' ? 1.5 : (o.t === 'mud' ? mudW(o) : o.w || 2) / 2; for (var k = 0; k < cp.length; k++) if (Math.hypot(wx - cp[k][0], wz - cp[k][1]) <= rr) return true; return false; }
     var p = pos(o), dx = wx - p.x, dz = wz - p.z; if (circR(o)) return Math.hypot(dx, dz) <= circR(o); var h = halves(o); if (!h) return Math.hypot(dx, dz) <= footR(o);
@@ -589,6 +590,11 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       var bm = Math.max(14, 11 * z); ctx.fillStyle = css('--minion'); ctx.fillRect(-bm / 2, -bm / 2, bm, bm); ctx.fillStyle = css('--eye'); ctx.fillRect(-bm * 0.3, -bm * 0.35, bm * 0.25, bm * 0.25); ctx.fillRect(bm * 0.05, -bm * 0.35, bm * 0.25, bm * 0.25);
       ctx.strokeStyle = css('--eye'); ctx.lineWidth = 2; ctx.strokeRect(-bm / 2 - 3, -bm / 2 - 3, bm + 6, bm + 6);
       if (o.idle) idleTag(bm + 6);
+    } else if (o.t === 'gazer') {
+      var gz = Math.max(8, 8 * z); ctx.fillStyle = css('--minion'); ctx.fillRect(-gz / 2, -gz / 2, gz, gz);
+      ctx.fillStyle = '#f3efe6'; ctx.beginPath(); ctx.arc(0, -gz * 0.05, gz * 0.3, 0, 7); ctx.fill(); ctx.fillStyle = css('--eye'); ctx.beginPath(); ctx.arc(0, -gz * 0.05, gz * 0.16, 0, 7); ctx.fill();
+      ctx.strokeStyle = css('--eye'); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-gz / 2, -gz * 0.1); ctx.lineTo(-gz * 0.95, -gz * 0.5); ctx.lineTo(-gz / 2, gz * 0.15); ctx.moveTo(gz / 2, -gz * 0.1); ctx.lineTo(gz * 0.95, -gz * 0.5); ctx.lineTo(gz / 2, gz * 0.15); ctx.stroke();   // wings
+      ctx.fillStyle = ink; ctx.font = 'bold 9px ' + css('--font-d'); ctx.textAlign = 'center'; ctx.fillText(o.gm === 'idle' ? 'IDLE' : o.gm === 'cycle' ? 'CYCLE ' + (o.move === 'vertical' ? '↕' : o.move === 'forward' ? '⇅' : '↔') : 'CHASE', 0, gz / 2 + 11); ctx.textAlign = 'start';
     } else if (o.t === 'minion') {
       var m = Math.max(6, 7 * z); ctx.fillStyle = css('--minion'); ctx.fillRect(-m / 2, -m / 2, m, m); ctx.fillStyle = css('--eye'); ctx.fillRect(-m * 0.3, -m * 0.35, m * 0.25, m * 0.25); ctx.fillRect(m * 0.05, -m * 0.35, m * 0.25, m * 0.25);
       if (o.idle) idleTag(m);
@@ -743,7 +749,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   function stripFoot(o) { var raw = o.t === 'mud' ? mudW(o) / 2 : o.t === 'ledge' ? Math.max(o.w / 2, 1.3) : o.w / 2, m = o.t === 'mud' ? 1 : 1.5; return { half: raw + m, m: m }; }   // what the game really covers: the piece's own half-width plus its margin (gap and ledge 1.5, mud 1) on every side, ends included
   function toxF(o) { return '<label class="f">Surface<select data-ok="tox"><option value="0"' + (o.tox ? '' : ' selected') + '>Normal</option><option value="1"' + (o.tox ? ' selected' : '') + '>Toxic (a heart a second to stand on, like a toxic patch)</option></select></label>'; }
   // ---- true Y: one flat height for the whole world, 0 where her feet are at the start of the path. A stamp sits on the ground until a Y is typed ----
-  var YWHAT = { plate: 'its surface', target: 'its foot (the bottom of its post, or the point under it)', tree: 'its foot', sign: 'its foot', goal: 'its foot', checkpoint: 'its foot', toxic: 'its surface', ramp: 'its low end', tip: 'the base of its range', cave: 'its mouth floor', seg: 'its middle', segchain: 'the middle of its first Seg', ledge: 'its top where it starts', platform: 'its top where it starts', door: 'its foot', minion: 'its feet (it stands on the floor at that height)', bigminion: 'its feet (it stands on the floor at that height)', start: 'her feet', spawner: 'where its minions appear', hill: 'the height it is built up from', crag: 'the height its rocks rise from', lake: 'the water\'s surface', patch: 'its ground', mud: 'the ground under it', gap: 'its rim (a gap stays bottomless: this changes nothing)' };
+  var YWHAT = { gazer: 'the ground under it (it hovers above that)', plate: 'its surface', target: 'its foot (the bottom of its post, or the point under it)', tree: 'its foot', sign: 'its foot', goal: 'its foot', checkpoint: 'its foot', toxic: 'its surface', ramp: 'its low end', tip: 'the base of its range', cave: 'its mouth floor', seg: 'its middle', segchain: 'the middle of its first Seg', ledge: 'its top where it starts', platform: 'its top where it starts', door: 'its foot', minion: 'its feet (it stands on the floor at that height)', bigminion: 'its feet (it stands on the floor at that height)', start: 'her feet', spawner: 'where its minions appear', hill: 'the height it is built up from', crag: 'the height its rocks rise from', lake: 'the water\'s surface', patch: 'its ground', mud: 'the ground under it', gap: 'its rim (a gap stays bottomless: this changes nothing)' };
   var yShown = {}, yKey = '';
   function yRow(o) {                                              // the Y field: the true Y if one is set, else where it is now (from the game, when the editor runs inside it)
     var fixed = o.ya !== undefined, v = fixed ? o.ya : yShown[o.id], ro = o.t === 'gap';
@@ -858,6 +864,10 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       h += num('w', 'Width', 2, 100, 0.5, o.w) + num('h', 'Height', 2, 100, 0.5, o.h) + num('roll', 'Roll of the shape (degrees)', -180, 180, 5, o.roll) + num('ang', 'Angle (0 = level, up to 90 = straight down, negative = climbing)' + (joinedCave ? (o.angSet ? ' — its own' : ' — carried on from the last cave; type a new one to set its own') : ''), -85, 90, 1, joinedCave && !o.angSet ? Math.round(cAng(o) * 10) / 10 : o.ang) + num('len', 'Depth (length of the tunnel)', 4, 2000, 1, o.len) + num('bend', 'Curvature (degrees turned over its length)', -720, 720, 5, o.bend) + num('slope', 'Slope (degrees the angle changes over its length)', -90, 90, 1, o.slope) + num('carve', 'Carve (shafts, angle 80 or more): 0 = the shaft opens right at the surface, 100 = the surface slopes in all the way down (%)', 0, 100, 5, o.carve || 0);
       h += '<p class="note" style="margin:6px 0 0;font-size:12px;opacity:.75">Rotation turns the whole cave. From 80° up it is a shaft: a pit with this outline. Below that it is a tunnel; it cuts open to the sky where it is shallower than its own height, and goes under a roof of ground past that.</p>';
     }
+    if (o.t === 'gazer') {
+      h += '<label class="f">Behavior<select data-ok="gm">' + [['chase', 'Chases Molly (buzzes round her head)'], ['idle', 'Idle (hovers still, turns to face her)'], ['cycle', 'Cycle (moves in a set pattern)']].map(function (m) { return '<option value="' + m[0] + '"' + ((o.gm || 'chase') === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>' + num('hgt', 'Hover height above the ground', -500, 500, 0.5, o.hgt);
+      if (o.gm === 'cycle') h += '<label class="f">Movement<select data-ok="move">' + [['side', 'Side to side'], ['forward', 'Forward and back'], ['vertical', 'Up and down']].map(function (m) { return '<option value="' + m[0] + '"' + (o.move === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>' + num('dist', 'Travel (units)', 1, 1000, 1, o.dist) + num('period', 'Seconds per full cycle', 0.5, 120, 0.5, o.period) + num('phase', 'Phase (seconds into the cycle)', 0, 120, 0.1, o.phase || 0);
+    }
     if (MOBS.indexOf(o.t) >= 0) h += '<label class="f">Behavior<select data-ok="idle"><option value="0"' + (o.idle ? '' : ' selected') + '>Chases Molly</option><option value="1"' + (o.idle ? ' selected' : '') + '>Idle (stands still, turns to face her)</option></select></label>';
     if (o.t === 'hill') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('h', 'Height', 1, 500, 0.5, o.h) + '<label class="f">Surface<select data-ok="rock"><option value="rock"' + (o.rock === 'rock' ? ' selected' : '') + '>Bare rock</option><option value="grass"' + (o.rock === 'grass' ? ' selected' : '') + '>Grass</option></select></label>';
     if (o.t === 'lake') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('depth', 'Depth', 1, 200, 0.5, o.depth) + num('wl', 'Water level adjust (+ raises it)', -500, 500, 0.5, o.wl || 0);
@@ -873,7 +883,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       h += num('w', 'Width', 2, 100, 1, o.w) + num('hgt', 'Height', 1, 60, 0.5, o.hgt);
       if (!ghost) {
         h += '<div class="stats" style="grid-column:1/-1"><b>Linked to</b> ' + (dl.length ? dl.map(function (id) { var q = S.objs.filter(function (z) { return z.id === id; })[0]; return '<button class="small" data-oact="unlink" data-lid="' + id + '" title="Unlink">' + NAMES[q.t] + ' #' + id + ' ✕</button>'; }).join(' ') : 'nothing') + '</div>';
-        var cand = S.objs.filter(function (q) { return (q.t === 'minion' || q.t === 'bigminion' || q.t === 'plate' || q.t === 'target') && dl.indexOf(q.id) < 0; });
+        var cand = S.objs.filter(function (q) { return (q.t === 'minion' || q.t === 'bigminion' || q.t === 'gazer' || q.t === 'plate' || q.t === 'target') && dl.indexOf(q.id) < 0; });
         if (cand.length) h += '<label class="f">Link to…<select data-ok="addlink"><option value="">Choose…</option>' + cand.map(function (q) { var p2 = pos(q); return '<option value="' + q.id + '">' + NAMES[q.t] + ' #' + q.id + ' (X ' + Math.round(p2.x) + ', Z ' + Math.round(p2.z) + ')</option>'; }).join('') + '</select></label>';
       }
       var linked = dl.length > 0, modeA = o.modeA || 'open';   // linked: only the mode changes once everything it is linked to is beaten; how it opens and shuts stays the same
@@ -943,7 +953,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     }
     else if (k === 'idle') { o.idle = t.value === '1'; DEF[o.t] = DEF[o.t] || {}; DEF[o.t].idle = o.idle; }
     else if (k === 'big') { o.big = t.value === '1'; DEF[o.t].big = o.big; }
-    else if (k === 'text' || k === 'shape' || k === 'move' || k === 'kind' || k === 'style' || k === 'rock' || k === 'ground' || k === 'edge' || k === 'ends') { o[k] = t.value; DEF[o.t][k] = t.value; }
+    else if (k === 'text' || k === 'shape' || k === 'move' || k === 'kind' || k === 'style' || k === 'rock' || k === 'ground' || k === 'edge' || k === 'ends' || k === 'gm') { o[k] = t.value; DEF[o.t][k] = t.value; }
     else if (k === 'tox') { o.tox = t.value === '1'; DEF[o.t].tox = o.tox; }
     else if (k === 'whl' || k === 'post') { o[k] = t.value === '1'; DEF[o.t][k] = o[k]; }
     else if (k === 'look') { o.look = t.value; DEF[o.t].look = t.value; }
@@ -1002,6 +1012,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (o.t === 'patch') { r.shape = o.shape; r.width = o.w; r.length = o.d; r.ground = o.ground; r.edge = o.edge; if (o.edge !== 'hard') r.soften = o.soft; }
       if (o.t === 'spawner') { r.radius = o.r; r.every = o.every; r.max = o.max; }
       if (MOBS.indexOf(o.t) >= 0 && o.idle) r.idle = true;
+      if (o.t === 'gazer') { r.mode = o.gm || 'chase'; r.height = o.hgt; if (o.gm === 'cycle') { r.move = o.move; r.travel = o.dist; r.period = o.period; r.phase = o.phase || 0; } }
       if (o.t === 'cave') { r.shape = o.shape; r.width = o.w; r.height = o.h; r.roll = o.roll; r.angle = o.ang; r.depth = o.len; r.curvature = o.bend; r.slope = o.slope; if (o.carve) r.carve = o.carve; if (o.angSet && o.after !== undefined) r.angleSet = true; }
       if (o.t === 'hill') { r.radius = o.r; r.height = o.h; r.surface = o.rock; }
       if (o.t === 'lake') { r.radius = o.r; r.depth = o.depth; if (o.wl) r.waterAdjust = o.wl; }
@@ -1178,6 +1189,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         if (r.type === 'sign') o.text = r.text || '';
         if (r.type === 'ledge') { o.w = r.thickness || 4; o.hgt = r.height === undefined ? 5 : r.height; }
         if (r.type === 'platform') { o.w = r.width || 16; o.thick = r.thick === undefined ? 2 : r.thick; o.hgt = r.height === undefined ? 10 : r.height; o.move = r.move || 'none'; o.dist = r.travel || 40; o.period = r.period || 4; o.phase = r.phase || 0; o.group = r.group || 0; }
+        if (r.type === 'gazer') { o.gm = r.mode === 'idle' || r.mode === 'cycle' ? r.mode : 'chase'; o.hgt = r.height === undefined ? 6 : r.height; o.move = r.move === 'forward' || r.move === 'vertical' ? r.move : 'side'; o.dist = r.travel || 40; o.period = r.period || 4; o.phase = r.phase || 0; }
         if (r.type === 'gap') o.w = r.width || 15;
         if (r.type === 'gap' || r.type === 'ledge' || r.type === 'mud') o.ends = r.ends === 'square' ? 'square' : 'round';
         if (r.type === 'ledge' || r.type === 'platform') o.tox = !!r.toxic;
