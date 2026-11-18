@@ -3,7 +3,6 @@
 Open work only, in focused groups. Ricky decides priority and version numbers (see CLAUDE.md). Move finished items into the CHANGELOG and `audit-notes.md`, then delete them here. Items marked **Decision** need Ricky's answer first.
 
 ## 2. Molly's stats and enemies
-- [ ] Grip during drift should be an editable stat.
 - [ ] Big minions: push Molly back when they hit her, not up (bug and idea are the same change); longer cooldown before they can hit her after they've been damaged; their heads shouldn't hurt to touch.
 - [ ] Minions can push Molly straight up a wall.
 - [ ] Dev mode: an "invulnerable mode" option where Molly can't be hurt or pushed by enemies.
