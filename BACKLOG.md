@@ -3,14 +3,13 @@
 Open work only, in focused groups. Ricky decides priority and version numbers (see CLAUDE.md). Move finished items into the CHANGELOG and `audit-notes.md`, then delete them here. Items marked **Decision** need Ricky's answer first.
 
 ## 2. Molly's stats and enemies
-- [ ] **Decision:** grip stat is in units/s^2 (40) while everything else is in Zips; the card shows it /2. Convert the slider to Zips/s^2?
-- [ ] **Decision:** grip does not fade with slope on ordinary ground but does on walls (jump at 80 degrees). Fade everywhere (grip x cos slope)?
-- [ ] **Decision:** gravity as an editable stat?
 - [ ] Grip during drift should be an editable stat.
 - [ ] Big minions: push Molly back when they hit her, not up (bug and idea are the same change); longer cooldown before they can hit her after they've been damaged; their heads shouldn't hurt to touch.
 - [ ] Minions can push Molly straight up a wall.
 - [ ] Dev mode: an "invulnerable mode" option where Molly can't be hurt or pushed by enemies.
 - [ ] Hedron barrier should lean on slopes like Molly's body does.
+- [ ] New Mob: Roost Gazer. Flying. It looks like a little minion head with tiny legs, wings, and one big eye in the center with a distinct pupil. Can be set to chase, idle, or cycle. Cycle has it move in a set pattern like a floating platform would. When it chases, it simply attempts to buzz around the runner's head in a 10 unit radius. Has collision, but touching it does no damage. Within 30 units, it can shoot a laser at the target every 2 seconds, which does half a heart of damage.
+- [ ] A half heart looks like a heart that's cracked down the middle on the UI.
 
 ## 3. Editor and UI polish
 - [ ] Path editor: the buttons squish the level name so it can barely be read. They should be much narrower.
@@ -19,6 +18,13 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 - [ ] When the level is a lot to load, the cursor doesn't always lock.
 - [ ] Screens like dev mode and characters should show the checkerboard background of the main menu.
 - [ ] Being underwater should make everything look blue.
+- [ ] Path labels should be in the middle, and the individual path fields should be collapsible and collapsed by default so they don't clutter the UI.
+
+## Unsorted
+- [ ] Runner model faceting should be mirrored down the center line.
+- [ ] Option for terrain stamps with heights to "Supersede", which cuts any other terrain or stamps touching them flat to their bottom where they touch.
+- [ ] Paths that curve into walls need to be easier to follow somehow. If you don't aim pixel perfect you risk shooting off the edge at high speeds.
+- [ ] Wind: Placed kind of the same way as tunnels, but it has no collision, it's just an area that gives the runner a directional acceleration.
 
 ## Separate track: split the game into source files and rename to Poly Runner
 (Discussed 2026-11-16; Ricky backs up saves first. Best done after groups 1-2 so those fixes aren't mixed into the move.)
