@@ -6160,7 +6160,7 @@ requestAnimationFrame(tick);
       if (st0 > groundH0(x, z)) { var sd = 0.4, sa1 = sbSlabTop(x + sd, z, spy), sa2 = sbSlabTop(x - sd, z, spy), sb1 = sbSlabTop(x, z + sd, spy), sb2 = sbSlabTop(x, z - sd, spy); ggx = sa1 > -1e8 && sa2 > -1e8 ? (sa1 - sa2) / (2 * sd) : 0; ggz = sb1 > -1e8 && sb2 > -1e8 ? (sb1 - sb2) / (2 * sd) : 0; return; } }
     if (level === 3 && SB && SB.caveZone) { var cq2 = sbCaveQ(SB.caveZone, x, z), py2 = player.position.y; if (cq2 && py2 < cq2.rf + 0.2 && py2 >= cq2.fl - 4) {
         var ce2 = cq2.e, la = Math.max(-ce2.hw, Math.min(ce2.hw, cq2.lat)), ra = polyRange(ce2.pts, Math.max(-ce2.hw, la - 0.3)), rb = polyRange(ce2.pts, Math.min(ce2.hw, la + 0.3)), dl = 0;   // the floor drops along the tunnel as it descends, and tilts sideways in a round or pointed cross-section
-        if (ra && rb) dl = ce2.cp * (rb[0] - ra[0]) / Math.max(0.01, Math.min(ce2.hw, la + 0.3) - Math.max(-ce2.hw, la - 0.3));
+        if (ra && rb) dl = (rb[0] - ra[0]) / ce2.cp / Math.max(0.01, Math.min(ce2.hw, la + 0.3) - Math.max(-ce2.hw, la - 0.3));
         ggx = -ce2.Thx * ce2.tn + ce2.Lx * dl; ggz = -ce2.Thz * ce2.tn + ce2.Lz * dl; return; } }
     if (level === 3 && SB && SB.shafts.length && sbShaftIn(x, z, 0)) { ggx = 0; ggz = 0; return; }
     groundH0(x, z);
@@ -7028,7 +7028,7 @@ requestAnimationFrame(tick);
   var CAVE_JW = 3;                                                 // how far either side of the joint between two tunnels the floor and roof ease from one to the other
   function sbCaveFR(f, ex, z) {                                   // the floor and roof of a tunnel sample's own stretch at (ex, z), carried on straight past it
     var dx = ex - f.x, dz = z - f.z, al = dx * f.Thx + dz * f.Thz, rg = polyRange(f.pts, Math.max(-f.hw, Math.min(f.hw, dx * f.Lx + dz * f.Lz))); if (!rg) return null;
-    return [f.y + f.cp * rg[0] - f.tn * al, f.y + f.cp * rg[1] - f.tn * al];
+    return [f.y + rg[0] / f.cp - f.tn * al, f.y + rg[1] / f.cp - f.tn * al];
   }
   function sbCaveQ(hash, x, z, slack) {                          // the tunnel floor and roof under (x, z), where a stretch of tunnel is (hash: the covered samples, or the mouth zone)
     var B = SB; if (!B || !hash) return null; var ex = x - L3_X, best = null, bd = 1e9; slack = slack || 0;
@@ -7038,7 +7038,7 @@ requestAnimationFrame(tick);
       var ab = Math.abs(al); if (ab < bd) { bd = ab; best = { e: e, lat: lat, al: al }; }
     });
     if (!best) return null; var e2 = best.e, rg = polyRange(e2.pts, Math.max(-e2.hw, Math.min(e2.hw, best.lat))); if (!rg) return null;
-    best.fl = e2.y + e2.cp * rg[0] - e2.tn * best.al; best.rf = e2.y + e2.cp * rg[1] - e2.tn * best.al; best.rg = rg;
+    best.fl = e2.y + rg[0] / e2.cp - e2.tn * best.al; best.rf = e2.y + rg[1] / e2.cp - e2.tn * best.al; best.rg = rg;   // straight down through the tilted cross-section: a section height of rg is rg / cos(angle) tall upright, as the tunnel is drawn
     if (e2.jn) {                                                  // near the joint between two tunnels of different angles (or shapes) each one's own floor and roof would stop at a step: ease from one to the other over CAVE_JW either side, so she can run across it
       var eP = e2.jn.P, eQ = e2.jn.Q, jx = eP.Thx + eQ.Thx, jz = eP.Thz + eQ.Thz, jl = Math.hypot(jx, jz) || 1, ja = ((ex - eP.x) * jx + (z - eP.z) * jz) / jl;
       if (ja > -CAVE_JW && ja < CAVE_JW) {
@@ -7105,7 +7105,7 @@ requestAnimationFrame(tick);
           var t0 = a[2] + (b[2] - a[2]) * u0 + 0.3, t1 = a[2] + (b[2] - a[2]) * u1 + 0.3, mxp = (x0 + x1) / 2 - sh.x, mzp = (z0 + z1) / 2 - sh.z, hy0 = null, hy1 = null, hi;
           for (hi = 0; hi < sh.holes.length && hy0 === null; hi++) {
             var ho = sh.holes[hi], hl = mxp * Math.cos(ho.th) + mzp * Math.sin(ho.th), hf = mxp * ho.dx + mzp * ho.dz;
-            if (hf > 0 && Math.abs(hl) < ho.hw - 0.05) { var hr = polyRange(ho.pts, hl); if (hr) { hy0 = ho.S0.y + ho.S0.cp * hr[0]; hy1 = ho.S0.y + ho.S0.cp * hr[1]; } }
+            if (hf > 0 && Math.abs(hl) < ho.hw - 0.05) { var hr = polyRange(ho.pts, hl); if (hr) { hy0 = ho.S0.y + hr[0] / ho.S0.cp; hy1 = ho.S0.y + hr[1] / ho.S0.cp; } }
           }
           function strip(ylo0, ylo1, yhi0, yhi1) { rock(P, C, [L3_X + x0, ylo0, z0], [L3_X + x1, ylo1, z1], [L3_X + x1, yhi1, z1], 0.85); rock(P, C, [L3_X + x0, ylo0, z0], [L3_X + x1, yhi1, z1], [L3_X + x0, yhi0, z0], 0.85); }
           if (hy0 === null) strip(sh.floor, sh.floor, t0, t1);
@@ -7996,13 +7996,13 @@ requestAnimationFrame(tick);
     if (cqq && pp.y < cqq.rf + 0.2 && pp.y >= cqq.fl - 4) {      // inside a tunnel: the walls hold her in and the roof stops her head
       inC = true;
       var ce = cqq.e, lo = cqq.lat, st = 0.25, aL = 0, aR = 0, lt, hOpen = 0, r0q;
-      for (lt = -ce.hw; lt <= ce.hw; lt += 0.5) { r0q = polyRange(ce.pts, lt); if (r0q) hOpen = Math.max(hOpen, (r0q[1] - r0q[0]) * ce.cp); }   // the tallest the opening gets across its width
+      for (lt = -ce.hw; lt <= ce.hw; lt += 0.5) { r0q = polyRange(ce.pts, lt); if (r0q) hOpen = Math.max(hOpen, (r0q[1] - r0q[0]) / ce.cp); }   // the tallest the opening gets across its width
       var lowT = hOpen < PLAYER_H + 0.1, gHs = ballOn ? 2 * BALL_R : SLIDE_H + (PLAYER_H - SLIDE_H) * (1 - slideBlend), need = lowT ? Math.max(0.4, hOpen * 0.85) : PLAYER_H - 0.4;   // 3.6 tall standing, 1 tall sliding: a low tunnel can only be slid into
       if (!B.inCave && gHs > hOpen - 0.05) {                       // at the mouth: she does not fit, so she stops at the face
         pp.x = L3_X + B.px; pp.z = B.pz; speed = 0; inC = false; cqq = null;
       } else {
-        for (lt = 0; lt >= -ce.hw; lt -= st) { var r1 = polyRange(ce.pts, lt); if (!r1 || (r1[1] - r1[0]) * ce.cp < need) break; aL = lt; }
-        for (lt = 0; lt <= ce.hw; lt += st) { var r2 = polyRange(ce.pts, lt); if (!r2 || (r2[1] - r2[0]) * ce.cp < need) break; aR = lt; }
+        for (lt = 0; lt >= -ce.hw; lt -= st) { var r1 = polyRange(ce.pts, lt); if (!r1 || (r1[1] - r1[0]) / ce.cp < need) break; aL = lt; }
+        for (lt = 0; lt <= ce.hw; lt += st) { var r2 = polyRange(ce.pts, lt); if (!r2 || (r2[1] - r2[0]) / ce.cp < need) break; aR = lt; }
         var want = Math.max(aL + 0.4, Math.min(aR - 0.4, lo)); if (aR - aL < 0.9) want = (aL + aR) / 2;
         if (Math.abs(want - lo) > 0.001) { pp.x += (want - lo) * ce.Lx; pp.z += (want - lo) * ce.Lz; }
         if (lowT) { B.caveLow = true; if (pp.y + gHs > cqq.rf) { pp.y = Math.max(cqq.fl, cqq.rf - gHs); if (vy > 0) vy = 0; } }   // too low to stand: she is made to slide, and the roof stops her head
@@ -10906,6 +10906,12 @@ requestAnimationFrame(tick);
 
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'Next', d: 'Nov 17, 2026', t: 'Tunnel floors and cone bottoms, unreleased', g: [
+    ['Fixes', [
+      'In a sloped tunnel Molly now stands on the floor as it is drawn. Before, she stood above it: about 0.5 at 20 degrees, 1.6 at 35. The roof, a tunnel mouth\'s height and the opening a tunnel cuts in a shaft wall match the drawing too.',
+      'The very bottom of a cone or bowl counts as flat, so the slope no longer creeps her about once she has landed there.'
+    ]]
+  ]},
   { v: 'v184', d: 'Nov 17, 2026', t: 'Toxic bubbles and level fixes', g: [
     ['Fixes', [
       'Doors stop Molly at any speed. A closed door is only 2 thick, and from about 20 Zips she could pass straight through it.',
@@ -11778,6 +11784,7 @@ function showScreen(name) {                                // the menu shows one
     plOn = false; sbWallEnter(now);
     if (playing && grounded && !wallOn) {
       slopeAt(player.position.x, player.position.z);
+      if (slA > 0 && lowPoint(player.position.x, player.position.z)) slA = 0;   // the very bottom of a cone or bowl counts as flat: nowhere within 1.2 is lower, so no pull
       if (slA > 0) {
         sl = slDx * -Math.sin(heading) + slDz * -Math.cos(heading);
         perpD = slDx * -Math.cos(heading) + slDz * Math.sin(heading);
