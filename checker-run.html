@@ -189,6 +189,8 @@
   #hp svg { width: 24px; height: 22px; display: block; }
   #hp .heart-full { fill: #e0243a; stroke: #8f1424; stroke-width: 1.5; filter: drop-shadow(0 0 3px rgba(224, 36, 58, 0.55)); }
   #hp .heart-empty { fill: rgba(43, 29, 20, 0.12); stroke: rgba(43, 29, 20, 0.45); stroke-width: 1.5; }
+  #hp .heart-half { fill: #e0243a; stroke: none; }
+  #hp .heart-crack { fill: none; stroke: #8f1424; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
   #hp .breath { display: flex; gap: 5px; justify-content: center; margin-top: 5px; }
   #hp .breath[hidden] { display: none; }
   #hp .breath svg { width: 13px; height: 13px; }
@@ -9616,7 +9618,10 @@ requestAnimationFrame(tick);
   var HEART_PATH = 'M12 21 C12 21 3 15.2 3 9.2 C3 6.2 5.3 4 8 4 C9.6 4 11.1 4.8 12 6.2 C12.9 4.8 14.4 4 16 4 C18.7 4 21 6.2 21 9.2 C21 15.2 12 21 12 21 Z';
   function drawHearts() {
     var h = '';
-    for (var k = 0; k < MAXHP; k++) h += '<svg viewBox="0 0 24 24" aria-hidden="true"><path class="' + (k < hp ? 'heart-full' : 'heart-empty') + '" d="' + HEART_PATH + '"/></svg>';
+    for (var k = 0; k < MAXHP; k++) {
+      if (hp - k > 0.25 && hp - k < 0.75) h += '<svg viewBox="0 0 24 24" aria-hidden="true"><defs><clipPath id="hpHalf"><rect x="0" y="0" width="12" height="24"/></clipPath></defs><path class="heart-empty" d="' + HEART_PATH + '"/><path class="heart-half" clip-path="url(#hpHalf)" d="' + HEART_PATH + '"/><path class="heart-crack" d="M12 5.5 L10.4 9.5 L13.4 12.5 L10.8 16 L12 19.5"/></svg>';   // half a heart: the left half full, cracked down the middle
+      else h += '<svg viewBox="0 0 24 24" aria-hidden="true"><path class="' + (hp - k >= 0.75 ? 'heart-full' : 'heart-empty') + '" d="' + HEART_PATH + '"/></svg>';
+    }
     heartsEl.innerHTML = h;
     hpEl.setAttribute('aria-label', 'Health: ' + hp + (hp === 1 ? ' heart' : ' hearts'));
   }
@@ -10931,6 +10936,9 @@ var CHANGELOG = [
       'A Big Minion that has just been damaged cannot hurt her for 1.5 seconds.',
       'Touching a minion\'s head from the side no longer hurts (the stomp bounce is unchanged).',
       'A minion can no longer shove Molly up or down a wall she is running on.'
+    ]],
+    ['Health display', [
+      'A half heart now draws as a heart cracked down the middle (left half red). Nothing deals half damage yet; this is for the coming Roost Gazer.'
     ]],
     ['Hedron Barrier', [
       'The Barrier now tilts to the ground\'s cross-slope (and to a wall\'s bank) the way Molly\'s body does, instead of staying level.'

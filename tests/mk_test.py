@@ -33,6 +33,7 @@ hooks=r"""
   window.__phys = function () { return { GRAV: GRAV, GRIP: GRIP, DRIFT_GRIP: DRIFT_GRIP, WALL_FADE: WALL_FADE, SLOPE_FADE: SLOPE_FADE, WALL_GRIP: WALL_GRIP, JUMP_V: JUMP_V, JUMP_H: JUMP_H, TURN_R: TURN_R, ARC_CX: ARC_CX, RUN_SPEED: RUN_SPEED, PLAYER_H: PLAYER_H, PLAYER_RADIUS: PLAYER_RADIUS, SLIDE_H: SLIDE_H, mollyScale: mollyScale, FRIC: FRIC, FALL_MAX: FALL_MAX }; };
   window.__pushOutOf = function (x, z, d) { pushOutOf(x, z, d); }; window.__bounce = function (i) { var e = ENEMIES[i]; bounceOffBig(e, e.R + 0.5); };
   window.__ballLean = function () { return [ballGroup.rotation.z, sideLean, ballOn, grounded, wallOn]; };
+  window.__setHp = function (v) { hp = v; drawHearts(); };
   window.__state = function () { return { grounded: grounded, vy: vy, speed: speed, heading: heading, yaw: yaw, wallOn: wallOn, fpOn: fpOn, hp: hp, x: player.position.x, y: player.position.y, z: player.position.z, plOn: plOn, slDeg: slDeg }; };
 """
 s=s.replace(a,hooks+a)
