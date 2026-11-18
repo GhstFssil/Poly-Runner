@@ -23,6 +23,7 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 
 ## Unsorted
 - [ ] Runner model faceting should be mirrored down the center line.
+- [ ] Option for terrain stamps with heights to "Supersede", which cuts any other terrain or stamps touching them flat to their bottom where they touch.
 
 ## Separate track: split the game into source files and rename to Poly Runner
 (Discussed 2026-11-16; Ricky backs up saves first. Best done after groups 1-2 so those fixes aren't mixed into the move.)
