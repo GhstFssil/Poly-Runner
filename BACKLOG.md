@@ -3,15 +3,12 @@
 Open work only, in focused groups. Ricky decides priority and version numbers (see CLAUDE.md). Move finished items into the CHANGELOG and `audit-notes.md`, then delete them here. Items marked **Decision** need Ricky's answer first.
 
 ## 2. Molly's stats and enemies
-- [ ] **Decision:** grip stat is in units/s^2 (40) while everything else is in Zips; the card shows it /2. Convert the slider to Zips/s^2?
-- [ ] **Decision:** grip does not fade with slope on ordinary ground but does on walls (jump at 80 degrees). Fade everywhere (grip x cos slope)?
-- [ ] **Decision:** gravity as an editable stat?
 - [ ] Grip during drift should be an editable stat.
 - [ ] Big minions: push Molly back when they hit her, not up (bug and idea are the same change); longer cooldown before they can hit her after they've been damaged; their heads shouldn't hurt to touch.
 - [ ] Minions can push Molly straight up a wall.
 - [ ] Dev mode: an "invulnerable mode" option where Molly can't be hurt or pushed by enemies.
 - [ ] Hedron barrier should lean on slopes like Molly's body does.
-- [ ] New Mob: Roost Gazer. Flying. It looks like a little minion head with tiny legs, wings, and one big eye in the center with a distinct pupil. Can be set to chase, idle, or cycle. Cycle has it move in a set pattern like a floating platform would. When it chases, it simply attempts to buzz around the runner's head in a 10 unit radius. Has collision, but touching it does no damage. Within 30 units, it can shoot a laser at the target every 2 seconds, which does half a heart of damage,
+- [ ] New Mob: Roost Gazer. Flying. It looks like a little minion head with tiny legs, wings, and one big eye in the center with a distinct pupil. Can be set to chase, idle, or cycle. Cycle has it move in a set pattern like a floating platform would. When it chases, it simply attempts to buzz around the runner's head in a 10 unit radius. Has collision, but touching it does no damage. Within 30 units, it can shoot a laser at the target every 2 seconds, which does half a heart of damage.
 - [ ] A half heart looks like a heart that's cracked down the middle on the UI.
 
 ## 3. Editor and UI polish
