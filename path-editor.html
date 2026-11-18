@@ -32,6 +32,9 @@ button.small{padding:3px 8px;font-size:12px}
 .piece{border:1px solid var(--line);border-radius:9px;padding:6px 8px;display:flex;flex-direction:column;gap:5px;background:var(--bg)}
 .piece .head{display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:700}
 .piece .head .num{font-family:var(--font-m);color:var(--mute);font-weight:400}
+.piece.shut .fields{display:none}
+.piece .head>span:first-child{cursor:pointer;user-select:none}
+.piece .car{display:inline-block;width:12px;color:var(--mute)}
 .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:6px}
 .fields.std{grid-template-columns:repeat(2,minmax(0,1fr))}
 .fields.std select,.fields.std input{min-width:0;max-width:100%;text-overflow:ellipsis}
@@ -52,8 +55,9 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
 .mapcol{display:flex;flex-direction:column;gap:8px;min-width:0;position:sticky;top:16px}
 @media(max-width:820px){.mapcol{position:static}}
 .lrow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding-bottom:4px;border-bottom:1px solid var(--grid)}
-.lrow input[type=text]{flex:1 1 90px;min-width:90px}
-.lrow .lr2{display:flex;gap:4px;margin-left:auto}
+.lrow input[type=text]{flex:1 1 110px;min-width:110px}
+.lrow button.small{padding:1px 4px;font-size:11px;line-height:1.3;border-width:1px;border-radius:6px;min-width:0}
+.lrow .lr2{display:flex;gap:2px;margin-left:auto}
 .lrow.off input[type=text]{opacity:.5;text-decoration:line-through}
 .legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--mute);font-size:12px}
 </style>
@@ -158,7 +162,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   var cv = $('cv'), ctx = cv.getContext('2d');
   var KEY = 'polyrun-path-editor-v2';
   var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: {}, gazer: { gm: 'chase', hgt: 6, move: 'side', dist: 40, period: 4, phase: 0 }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, slide: 'down', sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {}, plate: { shape: 'rect', w: 8, d: 8, r: 4, look: 'gray', whl: false }, target: { size: 6, post: true, h: 7, tilt: 0, spin: 0, hb: 1, k: 20, sd: 0, sp: 4, vd: 0, vp: 4, phase: 0 } };
-  var S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }, { len: 1005.3, ang: 90, r: 640, dy: 0 }, { len: 400, ang: 0, r: 640, dy: 20 }, { len: 502.65, ang: -45, r: 640, dy: 0 }, { len: 300, ang: 0, r: 640, dy: 0 }], objs: [] };
+  var S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0, ov: 1 }, { len: 1005.3, ang: 90, r: 640, dy: 0, ov: 1 }, { len: 400, ang: 0, r: 640, dy: 20, ov: 1 }, { len: 502.65, ang: -45, r: 640, dy: 0, ov: 1 }, { len: 300, ang: 0, r: 640, dy: 0, ov: 1 }], objs: [] };
   var GH = null, DEFUSER = {};                                  // GH: the not-yet-placed stamp whose settings the panel shows while a stamp tool is chosen
   function ghostMode() { return tool !== 'select' && tool !== 'erase' && tool !== 'preset' && tool !== 'forest'; }
   var tool = 'select', view = { cx: 300, cz: -300, zoom: 0.5 }, samples = [], total = 0, hist = [], hover = null, sel = -1, dpr = 1;
@@ -513,7 +517,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       vsamp.forEach(function (p, i) { var q = w2s(p.x, p.z); if (i && !p.brk) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
       ctx.fillStyle = css('--ink');
       if (!MAPMODE) DISCS.forEach(function (D) { if (!pathVis(D.pk) || z < 0.15) return; var qc = w2s(D.cx, D.cz), cs = Math.atan(D.tanC) * 180 / Math.PI, bk = Math.atan(D.tanB) * 180 / Math.PI, ox = qc[0] + Math.sin(D.hh) * D.R * z, oy = qc[1] - Math.cos(D.hh) * D.R * z; ctx.strokeStyle = css('--accent'); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(qc[0], qc[1]); ctx.lineTo(ox, oy); ctx.stroke(); ctx.fillText('DECK r ' + Math.round(D.R) + (Math.abs(cs) > 0.05 ? (cs > 0 ? ' · hill ' : ' · bowl ') + Math.round(Math.abs(cs) * 10) / 10 + '°' : '') + (Math.abs(bk) > 0.05 ? ' · bank ' + Math.round(bk * 10) / 10 + '°' : ''), qc[0] + 6, qc[1] + 14); });
-      if (!MAPMODE) allPaths().forEach(function (pth, pk) { if (!pathVis(pk)) return; var acc = pk * STRIDE; pth.pieces.forEach(function (p, i) { acc += upg(p).len; var pt = at(acc), q = w2s(pt.x, pt.z); ctx.beginPath(); ctx.arc(q[0], q[1], 3, 0, 7); ctx.fill(); if (z > 0.3) ctx.fillText((pk ? (pk + 1) + '.' : '') + String(i + 1), q[0] + 6, q[1] - 6); }); });
+      if (!MAPMODE) allPaths().forEach(function (pth, pk) { if (!pathVis(pk)) return; var acc = pk * STRIDE; pth.pieces.forEach(function (p, i) { var pl = upg(p).len; acc += pl; var pt = at(acc), q = w2s(pt.x, pt.z); ctx.beginPath(); ctx.arc(q[0], q[1], 3, 0, 7); ctx.fill(); if (z > 0.3) { var pm = at(acc - pl / 2), qm = w2s(pm.x, pm.z), ta = ctx.textAlign; ctx.textAlign = 'center'; ctx.fillText((pk ? (pk + 1) + '.' : '') + String(i + 1), qm[0], qm[1] - 6); ctx.textAlign = ta; } }); });   // the dot marks where a piece ends; its number sits in the middle of the piece
     }
     allPaths().forEach(function (pth, pk) { if (!pathVis(pk)) return; var st = w2s(pth.x, pth.z); ctx.fillStyle = css('--accent'); ctx.beginPath(); ctx.arc(st[0], st[1], 6, 0, 7); ctx.fill(); ctx.fillText(pk ? 'PATH ' + (pk + 1) : 'START', st[0] + 9, st[1] + 4); });
     drawOrder(S.objs).forEach(function (o) { if (o.t === 'tip') return; if (objVis(o)) drawObj(o, isSel(o)); else if (ghostObj(o)) { ctx.save(); ctx.globalAlpha = 0.16; drawObj(o, false); ctx.restore(); } });   // layer by layer, back to front; hidden layers as faint shadows
@@ -710,13 +714,14 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       sel('gf', 'Ground', [['0', 'Independent: keeps its own height'], ['1', 'Follows the ground: terrain height + Rise']], p.gf ? 1 : 0, 'Follows the ground: the path sits at the terrain\'s own height all along the segment (the surface of the water, over water), with Rise added on top. Independent: it starts where the last segment ended and rises by its Rise, whatever the terrain does.') +
       f('fl', 'Slab thickness', 0, 2000, 1, '0 = no slab. How far the underside is below the top of the path. Where that would be under the ground, the slab merges with the ground; otherwise the underside floats in the air.'));
   }
-  var openPaths = { 0: true };
+  var openPaths = { 0: true }, openPcs = new WeakMap();   // openPcs: which segments have their fields showing (keyed by the segment itself, so reordering keeps it right)
   function renderPieces() {
     var out = '', np = 1 + (S.more || []).length;
     for (var k = 0; k < np; k++) {
       var list = pcs(k), m = k ? S.more[k - 1] : null; list.forEach(upg);
       var body = list.map(function (p, i) {
-        return '<div class="piece"><div class="head"><span><span class="num">' + (i + 1) + '</span> ' + segName(p) + '</span><span class="row" style="gap:4px">' +
+        var shut = !openPcs.get(p);                                    // each segment's fields start collapsed; click its title to open them
+        return '<div class="piece' + (shut ? ' shut' : '') + '"><div class="head"><span data-tg="' + i + '" title="Show / hide this segment\'s fields"><span class="car">' + (shut ? '▸' : '▾') + '</span><span class="num">' + (i + 1) + '</span> ' + segName(p) + '</span><span class="row" style="gap:4px">' +
           '<button class="small" data-act="up" data-i="' + i + '" title="Move up">↑</button><button class="small" data-act="down" data-i="' + i + '" title="Move down">↓</button>' +
           (Math.abs(p.ang || 0) > 1e-9 ? '<button class="small" data-act="flip" data-i="' + i + '" title="Mirror the curve (left ↔ right)">⇄</button>' : '') +
           '<button class="small" data-act="del" data-i="' + i + '" title="Delete">✕</button></span></div><div class="fields">' + fields(p, i, k) + '</div></div>';
@@ -727,6 +732,12 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     }
     $('pieces').innerHTML = out;
   }
+  $('pieces').addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('[data-tg]'); if (!t) return;
+    var box = t.closest('[data-p]'), pc = box && pcs(+box.dataset.p)[+t.dataset.tg]; if (!pc) return;
+    var open = !openPcs.get(pc); openPcs.set(pc, open);
+    var card = t.closest('.piece'); card.classList.toggle('shut', !open); t.querySelector('.car').textContent = open ? '▾' : '▸';
+  });
   $('pieces').addEventListener('toggle', function (e) { var d = e.target; if (d && d.dataset && d.dataset.path !== undefined) openPaths[+d.dataset.path] = d.open; }, true);
 
   // ---- the inspector for the selected stamp ----
@@ -1049,9 +1060,13 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       v = Math.max(-360, Math.min(360, v));
       if (Math.abs(v) < 1e-9) { pc.r = straight ? pc.r : segRadius(pc); pc.ang = 0; }
       else if (straight) { pc.len = Math.max(1, pc.len); pc.r = pc.len / (Math.abs(v) * D2R); pc.ang = v; }
-      else { rr = pc.len / (A0 * D2R); pc.r = rr; pc.ang = v; pc.len = rr * Math.abs(v) * D2R; }
+      else { pc.len = Math.max(1, pc.len); pc.r = pc.len / (Math.abs(v) * D2R); pc.ang = v; }   // the length stays: the radius follows from the angle
     }
-    else if (k === 'r') { v = Math.max(1, v); pc.r = v; if (!straight) pc.len = v * A0 * D2R; }
+    else if (k === 'r') {                                         // the length stays: the angle follows from the radius (a straight piece starts curving right; the angle tops out at 360°)
+      v = Math.max(1, v); pc.len = Math.max(1, pc.len); var a2 = pc.len / v / D2R;
+      if (a2 > 360) { a2 = 360; v = pc.len / (2 * Math.PI); }
+      pc.ang = (straight || pc.ang > 0 ? 1 : -1) * a2; pc.r = v;
+    }
     else if (k === 'dy') pc.dy = v;
     else if (k === 'pitch') pc.dy = Math.round(Math.tan(Math.max(-85, Math.min(85, v)) * D2R) * horizOf(pc) * 10) / 10;   // set by angle: the rise follows from the segment's length
     else if (k === 'roll') pc.roll = v;
@@ -1103,8 +1118,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     else if (a === 'flip') list[i].ang = -(list[i].ang || 0);
     else if (a === 'up' && i > 0) list.splice(i - 1, 0, list.splice(i, 1)[0]);
     else if (a === 'down' && i < list.length - 1) list.splice(i + 1, 0, list.splice(i, 1)[0]);
-    else if (a === 'addSeg') list.push({ len: 200, ang: 0, r: 640, dy: 0 });
-    else if (a === 'addDisc') list.push({ disc: 1, rad: 40, cs: 0, bk: 0, len: 80, ang: 0, r: 640, dy: 0 });
+    else if (a === 'addSeg') list.push({ len: 200, ang: 0, r: 640, dy: 0, ov: 1 });
+    else if (a === 'addDisc') list.push({ disc: 1, rad: 40, cs: 0, bk: 0, len: 80, ang: 0, r: 640, dy: 0, ov: 1 });
     else if (a === 'attach') { var c0 = list[i]; ['sx', 'sz', 'sy', 'sh', 'b0', 'w0'].forEach(function (q) { delete c0[q]; }); }
     else if (a === 'delPath') {                                    // stamps on that path go with it; stamps on later paths move up one
       S.objs = S.objs.filter(function (o) { return o.s === undefined || Math.floor((o.s + 0.5) / STRIDE) !== pk; });
@@ -1114,7 +1129,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     else { hist.pop(); return; }                                   // nothing to do (up on the first piece, down on the last): no empty undo step
     afterEdit(true); renderInsp();
   });
-  $('addPath').onclick = function () { snap(); var e = samples[samples.length - 1] || { x: 0, z: 0 }; S.more.push({ x: Math.round(e.x / 10) * 10 + 200, z: Math.round(e.z / 10) * 10, th: 0, y: 0, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }] }); openPaths[S.more.length] = true; afterEdit(true); };
+  $('addPath').onclick = function () { snap(); var e = samples[samples.length - 1] || { x: 0, z: 0 }; S.more.push({ x: Math.round(e.x / 10) * 10 + 200, z: Math.round(e.z / 10) * 10, th: 0, y: 0, pieces: [{ len: 300, ang: 0, r: 640, dy: 0, ov: 1 }] }); openPaths[S.more.length] = true; afterEdit(true); };
   $('width').onchange = function () { snap(); S.width = Math.max(2, Math.min(40, +this.value || 9)); afterEdit(false); };
   var DEFR = { S: 800000, A: 720000, B: 640000, C: 560000, D: 480000 };
   $('tlim').onchange = function () { snap(); S.timeLimit = Math.max(0, parseFloat(this.value) || 0); afterEdit(false); };
@@ -1217,7 +1232,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       setSel(-1); afterEdit(true); renderInsp(); fitView(); $('msg').textContent = 'Loaded.';
     } catch (e) { $('msg').textContent = 'That is not a path file.'; }
   };
-  $('reset').onclick = function () { snap(); S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0 }], objs: [] }; setSel(-1); afterEdit(true); renderInsp(); };
+  $('reset').onclick = function () { snap(); S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0, ov: 1 }], objs: [] }; setSel(-1); afterEdit(true); renderInsp(); };
 
   var drag = null, hintT = 0;
   function flashHint(t) { var h = $('hint'), old = h.textContent; h.textContent = t; clearTimeout(hintT); hintT = setTimeout(function () { h.textContent = tool === 'select' ? 'click a stamp to select it (click again to cycle through stamps stacked there), drag it to move it · shift+drag box-selects · alt+click adds or removes one · drag empty ground to pan' : tool === 'erase' ? 'click a stamp to remove it' : 'click to stamp · drag to pan · wheel to zoom'; }, 3200); }
@@ -1389,7 +1404,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         '<button class="small' + (l.lock ? ' on' : '') + '" data-lact="lock" title="Lock: its stamps cannot be selected or moved">' + (l.lock ? '🔒' : '🔓') + '</button>' +
         '<input type="text" data-lname value="' + l.name.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" maxlength="30">' +
         '<span class="stats" style="min-width:22px;text-align:right">' + cnt[l.id] + '</span>' +
-        '<span class="lr2"><button class="small" data-lact="sel" title="Select every stamp on this layer">Select</button>' +
+        '<span class="lr2"><button class="small" data-lact="sel" title="Select every stamp on this layer">▣</button>' +
         '<button class="small" data-lact="up" title="Move this layer up: drawn above the ones below it"' + (S.layers[0] === l ? ' disabled' : '') + '>▲</button>' +
         '<button class="small" data-lact="dn" title="Move this layer down: drawn under the ones above it"' + (S.layers[S.layers.length - 1] === l ? ' disabled' : '') + '>▼</button>' +
         '<button class="small" data-lact="del" title="Delete this layer (its stamps move to the first layer)"' + (S.layers.length < 2 ? ' disabled' : '') + '>✕</button></span></div>';
