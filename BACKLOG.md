@@ -19,6 +19,10 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 - [ ] When the level is a lot to load, the cursor doesn't always lock.
 - [ ] Screens like dev mode and characters should show the checkerboard background of the main menu.
 - [ ] Being underwater should make everything look blue.
+- [ ] Path labels should be in the middle, and the individual path fields should be collapsible and collapsed by default so they don't clutter the UI.
+
+## Unsorted
+- [ ] Runner model faceting should be mirrored down the center line.
 
 ## Separate track: split the game into source files and rename to Poly Runner
 (Discussed 2026-11-16; Ricky backs up saves first. Best done after groups 1-2 so those fixes aren't mixed into the move.)
