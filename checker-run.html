@@ -10931,6 +10931,9 @@ var CHANGELOG = [
       'A Big Minion that has just been damaged cannot hurt her for 1.5 seconds.',
       'Touching a minion\'s head from the side no longer hurts (the stomp bounce is unchanged).',
       'A minion can no longer shove Molly up or down a wall she is running on.'
+    ]],
+    ['Hedron Barrier', [
+      'The Barrier now tilts to the ground\'s cross-slope (and to a wall\'s bank) the way Molly\'s body does, instead of staying level.'
     ]]
   ]},
   { v: 'v184', d: 'Nov 17, 2026', t: 'Toxic bubbles and level fixes', g: [
@@ -12046,13 +12049,14 @@ function showScreen(name) {                                // the menu shows one
     // Side tilt: on a banked path or a cross-slope her frame tilts to the ground under her, as it does for slopes ahead and behind (the right side up when the ground rises to her right)
     var sideTarget = 0;
     if (wallOn) sideTarget = Math.max(-1.45, Math.min(1.45, -wallR));
-    else if (grounded && !ballOn) {                                   // the ground's cross-slope averaged over a small patch round her feet, so the facets of bumpy ground do not each flick her
+    else if (grounded) {                                              // (the Barrier leans too, below) the ground's cross-slope averaged over a small patch round her feet, so the facets of bumpy ground do not each flick her
       var gsx = 0, gsz = 0, ppx = player.position.x, ppz = player.position.z;
       [[0, 0], [1.5, 0], [-1.5, 0], [0, 1.5], [0, -1.5]].forEach(function (o) { groundGrad(ppx + o[0], ppz + o[1]); gsx += ggx; gsz += ggz; });
       sideTarget = Math.max(-0.9, Math.min(0.9, tiltSoft(Math.atan((gsx * Math.cos(player.rotation.y) - gsz * Math.sin(player.rotation.y)) / 5)) * RIGCFG['slope.side']));
     }
     sideLean += (sideTarget - sideLean) * Math.min(1, dt * (wallOn ? 8 : 5));
     body.rotation.z = leanZ + sideLean * (1 - Math.max(slideBlend, rpBlend, fpBlend));
+    ballGroup.rotation.z = ballOn ? sideLean : 0;                     // the Hedron Barrier tips its axle to the ground's cross-slope (or the wall's bank) the way her body does
     // Pitch: her frame tilts to the way she is actually travelling up and down, as it turns to the way she travels sideways (nose up rising, nose down falling)
     var hsp = Math.abs(speed) + 6, vmove = dt > 0 ? (player.position.y - pitchPrevY) / dt : 0;
     if (!isFinite(vmove) || dt <= 0 || Math.abs(player.position.y - pitchPrevY) > 20) vmove = 0;   // a respawn or teleport is not a motion

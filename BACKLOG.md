@@ -3,7 +3,6 @@
 Open work only, in focused groups. Ricky decides priority and version numbers (see CLAUDE.md). Move finished items into the CHANGELOG and `audit-notes.md`, then delete them here. Items marked **Decision** need Ricky's answer first.
 
 ## 2. Molly's stats and enemies
-- [ ] Hedron barrier should lean on slopes like Molly's body does.
 - [ ] New Mob: Roost Gazer. Flying. It looks like a little minion head with tiny legs, wings, and one big eye in the center with a distinct pupil. Can be set to chase, idle, or cycle. Cycle has it move in a set pattern like a floating platform would. When it chases, it simply attempts to buzz around the runner's head in a 10 unit radius. Has collision, but touching it does no damage. Within 30 units, it can shoot a laser at the target every 2 seconds, which does half a heart of damage.
 - [ ] A half heart looks like a heart that's cracked down the middle on the UI.
 
