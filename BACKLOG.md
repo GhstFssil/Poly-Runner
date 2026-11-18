@@ -27,6 +27,7 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 - [ ] Runner model faceting should be mirrored down the center line.
 - [ ] Option for terrain stamps with heights to "Supersede", which cuts any other terrain or stamps touching them flat to their bottom where they touch.
 - [ ] Paths that curve into walls need to be easier to follow somehow. If you don't aim pixel perfect you risk shooting off the edge at high speeds.
+- [ ] Wind: Placed kind of the same way as tunnels, but it has no collision, it's just an area that gives the runner a directional acceleration.
 
 ## Separate track: split the game into source files and rename to Poly Runner
 (Discussed 2026-11-16; Ricky backs up saves first. Best done after groups 1-2 so those fixes aren't mixed into the move.)
