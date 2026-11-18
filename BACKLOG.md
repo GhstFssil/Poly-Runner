@@ -2,11 +2,6 @@
 
 Open work only, in focused groups. Ricky decides priority and version numbers (see CLAUDE.md). Move finished items into the CHANGELOG and `audit-notes.md`, then delete them here. Items marked **Decision** need Ricky's answer first.
 
-## 1. Level geometry and collision
-- [ ] **Decision:** in a sloped tunnel Molly stands above the drawn floor (about 0.5 at 20°, 1.6 at 35°): the collision floor uses cos(angle) × half its height where the drawn cross-section gives half its height ÷ cos(angle). Make collision match the drawing?
-- [ ] **Decision:** at the bottom of a narrow cone she now lands, but the slope pull on the steep ground there still creeps her slightly (under 1 unit every 5 s). Treat the very bottom as flat (no slope pull there)?
-- [ ] Check how the joint between two caves of different angles looks: the floor now eases across it for Molly, but the drawn tunnels still meet at their own end sections.
-
 ## 2. Molly's stats and enemies
 - [ ] **Decision:** grip stat is in units/s^2 (40) while everything else is in Zips; the card shows it /2. Convert the slider to Zips/s^2?
 - [ ] **Decision:** grip does not fade with slope on ordinary ground but does on walls (jump at 80 degrees). Fade everywhere (grip x cos slope)?
