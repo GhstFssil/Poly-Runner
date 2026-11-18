@@ -2,8 +2,6 @@
 
 Open work only, in focused groups. Ricky decides priority and version numbers (see CLAUDE.md). Move finished items into the CHANGELOG and `audit-notes.md`, then delete them here. Items marked **Decision** need Ricky's answer first.
 
-## 2. Molly's stats and enemies
-
 ## Unsorted
 - [ ] Runner model faceting should be mirrored down the center line.
 - [ ] Option for terrain stamps with heights to "Supersede", which cuts any other terrain or stamps touching them flat to their bottom where they touch.
