@@ -381,6 +381,7 @@
           <button class="go2" id="dv3" type="button">Start from Checkpoint 3</button>
           <button class="go2" id="dvpower" type="button">Fill Power Line</button>
           <button class="go2" id="dvcoordsBtn" type="button">Show Coordinates: Off</button>
+          <button class="go2" id="dvinvBtn" type="button">Invulnerable: Off</button>
           <p id="dvcoords" hidden></p>
         </div>
         <button class="go2 back" id="bDevBack" type="button">Back</button>
@@ -10570,7 +10571,9 @@ requestAnimationFrame(tick);
     });
   }
   function enFlash(e, k) { if (e.flashK === k) return; e.flashK = k; for (var i = 0; i < e.mats.length; i++) e.mats[i].emissive.setRGB(0.95 * k, 0.05 * k, 0.03 * k); }
+  var invulnMode = false;   // Dev Mode > Invulnerable: enemies can neither hurt nor push her (she can still hurt them and bounce off a head)
   function bounceOffBig(e, rs) {
+    if (invulnMode) return;
     var pp = player.position, bx = pp.x - e.x, bz = pp.z - e.z, bd = Math.hypot(bx, bz);
     if (bd < 0.001) { bx = -Math.sin(heading); bz = Math.cos(heading); bd = 1; }
     pp.x = e.x + bx / bd * (rs + 0.8); pp.z = e.z + bz / bd * (rs + 0.8);
@@ -10650,11 +10653,11 @@ requestAnimationFrame(tick);
         }
       } else if (!ballOn && onHeadZone && now > e.invUntil) { e.invUntil = now + 400; vy = Math.max(vy, e.c.stomp * TILE); grounded = false; }   // landing on its head without the Barrier: the same bounce, no damage
 
-      else if (e.big && ballOn && ((hd < rs && vOver) || onHeadZone) && now > (e.zapUntil || 0)) {   // the Barrier touches a Big Minion (side or head) without damaging it: the Barrier loses 20 segs and she is thrown back
+      else if (e.big && ballOn && !invulnMode && ((hd < rs && vOver) || onHeadZone) && now > (e.zapUntil || 0)) {   // the Barrier touches a Big Minion (side or head) without damaging it: the Barrier loses 20 segs and she is thrown back
         e.zapUntil = now + 1000; setPower(segCount - 20); bounceOffBig(e, rs);
       }
       var cd2 = Math.hypot(pp.x - e.x, pp.z - e.z);
-      if (cd2 < rs && vOver) {
+      if (!invulnMode && cd2 < rs && vOver) {
         if (cd2 > 0.0001) { pp.x = e.x + (pp.x - e.x) / cd2 * rs; pp.z = e.z + (pp.z - e.z) / cd2 * rs; } else pp.x = e.x + rs;
         if (!ballOn && now > enHurtUntil && hp > 0) {
           enHurtUntil = now + e.c.cool * 1000; hp = Math.max(0, hp - e.dmg); drawHearts(); flashHurt();
@@ -10914,6 +10917,9 @@ var CHANGELOG = [
     ]],
     ['Molly\'s stats', [
       'New stat in the Rig Editor: Grip while drifting (x her grip). It multiplies her sideways grip while A or D is held in a Drift. 1 is the same as before, so nothing changes until you move it.'
+    ]],
+    ['Dev Mode', [
+      'New button in the in-game Dev Mode: Invulnerable. While it is On, minions can neither hurt Molly nor push her (she passes through them), and a Big Minion no longer drains her Barrier. She can still damage them and bounce off their heads. It resets when you reload.'
     ]]
   ]},
   { v: 'v184', d: 'Nov 17, 2026', t: 'Toxic bubbles and level fixes', g: [
@@ -11401,6 +11407,7 @@ function showScreen(name) {                                // the menu shows one
     showCoords = !showCoords; coordsEl.hidden = dvCoordsEl.hidden = !showCoords;
     document.getElementById('dvcoordsBtn').textContent = 'Show Coordinates: ' + (showCoords ? 'On' : 'Off'); updateCoords();
   });
+  on('dvinvBtn', function () { invulnMode = !invulnMode; document.getElementById('dvinvBtn').textContent = 'Invulnerable: ' + (invulnMode ? 'On' : 'Off'); });
   on('bCpsBack', function () { showScreen('pause'); });
   on('bMap', function () { showScreen('map'); });
   on('bMapBack', function () { showScreen('pause'); });

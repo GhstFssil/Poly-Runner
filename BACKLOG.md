@@ -5,7 +5,6 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 ## 2. Molly's stats and enemies
 - [ ] Big minions: push Molly back when they hit her, not up (bug and idea are the same change); longer cooldown before they can hit her after they've been damaged; their heads shouldn't hurt to touch.
 - [ ] Minions can push Molly straight up a wall.
-- [ ] Dev mode: an "invulnerable mode" option where Molly can't be hurt or pushed by enemies.
 - [ ] Hedron barrier should lean on slopes like Molly's body does.
 - [ ] New Mob: Roost Gazer. Flying. It looks like a little minion head with tiny legs, wings, and one big eye in the center with a distinct pupil. Can be set to chase, idle, or cycle. Cycle has it move in a set pattern like a floating platform would. When it chases, it simply attempts to buzz around the runner's head in a 10 unit radius. Has collision, but touching it does no damage. Within 30 units, it can shoot a laser at the target every 2 seconds, which does half a heart of damage.
 - [ ] A half heart looks like a heart that's cracked down the middle on the UI.
