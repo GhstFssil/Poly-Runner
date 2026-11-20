@@ -31,8 +31,9 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (levels) and
 ## Shipping
 - Do not send a zip or publish an artifact unless asked.
 - Interactive work goes on `next`. Always ask before merging `next` into `main` or any other push to `main`.
-- Every push to `main` that touches the game, `desktop/` or the release tooling bumps the `<div class="ver">` label in that same push (with its CHANGELOG entry), unless Ricky says otherwise: no decimals, next whole number (v184 -> v185); with decimals, next decimal (v184.1 -> v184.2). The release workflow publishes under the label, so an unchanged label overwrites that release.
-- Exception: doc-only changes (`.md` files only, not sweep reports) go straight to `main` by default, then merge `main` into `next`. They don't publish a release or bump the label.
+- By default, every push to `main` that isn't docs-only bumps the `<div class="ver">` label to the next whole number (v184 -> v185) in that same push, with its CHANGELOG entry, unless Ricky says otherwise. The release workflow publishes under the label, so an unchanged label overwrites that release.
+- Nightly sweeps: one decimal bump per night (v184 -> v184.1, then v184.1 -> v184.2), applied when the night's first fix branch is merged to `main`; the rest of that night's edits keep the number (details: ARCHITECTURE.md).
+- Docs-only pushes (only `.md` files and `.gitattributes`) never change the version unless Ricky explicitly says so. They go straight to `main` by default, then merge `main` into `next`.
 - Commit messages end with the attribution lines the session was given.
 
 ## Rules maintenance
