@@ -8,3 +8,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-20 17:10 | main | SWEEP-BUGS/EDGES/PERF: each nightly sweep now appends its own line (tag nightly-<sweep>) to HISTORY.md; the audit-notes rule now says frozen
 - 2026-11-20 17:10 | main | HANDOFF.md moved to the common headings (Goal/Done/In progress/Decisions/Next steps/Gotchas) with a Last updated line; BACKLOG.md header gets the common wording, the Done recently pointer is removed; README.md expanded (Run, Test, Updating, Files); ARCHITECTURE.md gets a What line, Docs section and the HISTORY merge note
 - 2026-11-20 17:27 | next | Merged main into next (docs overhaul: common format, HISTORY.md, sweeps log to HISTORY.md; merge was clean)
+- 2026-11-20 17:33 | main | Fast-forwarded main to next (groups 2-3: Roost Gazer, invulnerable mode, drift grip, minion hits, barrier lean, half heart, editor/UI polish); Ricky approved
