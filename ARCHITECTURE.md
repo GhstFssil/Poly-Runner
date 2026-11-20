@@ -39,10 +39,10 @@
 ## Branches and versions
 - `next`: interactive work (push freely). `main`: releases; a push publishes when it touches the game, `desktop/` or the release tooling, under the `<div class="ver">` label. `nightly/YYYY-MM-DD-<bugs|edges|perf>`: the three nightly sweeps (staggered times), never `main` except appending to `.md` docs (see SWEEP-*.md).
 - A nightly branch is based on the newest unmerged branch of its own sweep (so nights stack as a chain), otherwise on `main`.
-- Whole-number versions (v181, v182...) are Ricky's call: always ask before bumping the label or merging `next` into `main`.
-- Nightly fixes merged to `main` take the next decimal (v181 -> v181.1 -> v181.2), each with its own CHANGELOG entry and label; then merge `main` into `next`.
+- Every push to `main` that touches the game, `desktop/` or the release tooling bumps the label in that same push, with its CHANGELOG entry, unless Ricky says otherwise: a label with no decimals goes to the next whole number (v184 -> v185); a label with decimals goes to the next decimal (v184.1 -> v184.2). The workflow replaces the files of a release with the same label, so a push without a bump overwrites the current release. Always ask before merging `next` into `main`. Doc-only pushes don't bump.
+- Exception: nightly fixes merged to `main` take the next decimal even from a whole number (v181 -> v181.1 -> v181.2), each with its own CHANGELOG entry and label; then merge `main` into `next`.
 - Find nightly branches with `git ls-remote origin 'refs/heads/nightly/*'` (`git fetch` leaves no remote-tracking refs). GitHub refuses branch deletion, so merged nightly branches stay.
-- Publish (only when Ricky says): bump the label on `next`, merge `--no-ff` into `main`, push, `gh run list -b main -L 1`, fast-forward `next`.
+- Publish (only when Ricky says): bump the label on `next` (rule above), merge `--no-ff` into `main`, push, `gh run list -b main -L 1`, fast-forward `next`.
 - `HISTORY.md` is append-only and merges with git's union driver (`.gitattributes`), so branches that both appended keep every line. Merge on the command line as above (GitHub's web merge button ignores `.gitattributes`).
 
 ## Run and test

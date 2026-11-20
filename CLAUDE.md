@@ -30,8 +30,9 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (levels) and
 
 ## Shipping
 - Do not send a zip or publish an artifact unless asked.
-- Interactive work goes on `next`. Always ask before bumping the version label (`<div class="ver">`), merging `next` into `main`, or any other push to `main` (game or desktop changes publish a release).
-- Exception: doc-only changes (`.md` files only, not sweep reports) go straight to `main` by default, then merge `main` into `next`. They don't publish a release.
+- Interactive work goes on `next`. Always ask before merging `next` into `main` or any other push to `main`.
+- Every push to `main` that touches the game, `desktop/` or the release tooling bumps the `<div class="ver">` label in that same push (with its CHANGELOG entry), unless Ricky says otherwise: no decimals, next whole number (v184 -> v185); with decimals, next decimal (v184.1 -> v184.2). The release workflow publishes under the label, so an unchanged label overwrites that release.
+- Exception: doc-only changes (`.md` files only, not sweep reports) go straight to `main` by default, then merge `main` into `next`. They don't publish a release or bump the label.
 - Commit messages end with the attribution lines the session was given.
 
 ## Rules maintenance
