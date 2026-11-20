@@ -1,4 +1,6 @@
-# Poly Runner: architecture (stable facts; update when they change)
+# Architecture (stable facts; update when they change)
+
+**What:** Poly Run (Polyrunner), a single-file three.js r128 platformer starring Molly, with an embedded Path Editor and Rig Editor.
 
 ## Files
 - `checker-run.html`: the whole game, a single file built on three.js r128. It embeds:
@@ -14,7 +16,7 @@
 - `tests/`: the Playwright + swiftshader harness (`righ.py` has the `Rig` class).
 - `.github/workflows/release.yml`: publishes under the `<div class="ver">` label when a push to `main` touches the game, `desktop/` or the release tooling.
 - `SWEEP-BUGS.md`, `SWEEP-EDGES.md`, `SWEEP-PERF.md`: the three nightly sweeps; their state files and reports go in `sweep-reports/`.
-- `audit-notes.md`: the long log. The `var CHANGELOG` in the game is the player-facing log.
+- `audit-notes.md`: the long log, frozen on 2026-11-20 (last entry v184); `HISTORY.md` continues it. The `var CHANGELOG` in the game is the player-facing log.
 
 ## Runners
 - `CHAR` is 'molly' or 'comet' (localStorage `pr_char`), picked on the Characters page; `setChar` switches.
@@ -41,6 +43,7 @@
 - Nightly fixes merged to `main` take the next decimal (v181 -> v181.1 -> v181.2), each with its own CHANGELOG entry and label; then merge `main` into `next`.
 - Find nightly branches with `git ls-remote origin 'refs/heads/nightly/*'` (`git fetch` leaves no remote-tracking refs). GitHub refuses branch deletion, so merged nightly branches stay.
 - Publish (only when Ricky says): bump the label on `next`, merge `--no-ff` into `main`, push, `gh run list -b main -L 1`, fast-forward `next`.
+- `HISTORY.md` is append-only and merges with git's union driver (`.gitattributes`), so branches that both appended keep every line. Merge on the command line as above (GitHub's web merge button ignores `.gitattributes`).
 
 ## Run and test
 - Once per fresh session: `sh tests/setup.sh`.
@@ -48,3 +51,13 @@
 - Tests under `tests/fu/` are per-feature; run one only when touching that feature.
 - Old build for comparison: `python3 tests/mk_test.py OLD.html /tmp/polyrun-work/t/aud_main.html`, then pass `html='aud_main.html'` to `Rig()`.
 - Keep scratch backups in `/tmp`, never in the repo.
+
+## Docs
+- `README.md`: what it is, run, test, updating, files.
+- `CLAUDE.md`: working rules for sessions (Ricky approves edits).
+- `ARCHITECTURE.md`: this file.
+- `HANDOFF.md`: current state; overwritten each time.
+- `BACKLOG.md`: open bugs and ideas (the nightly sweeps append their suggestions here).
+- `HISTORY.md`: append-only record of every change since 2026-11-20; not read unless Ricky asks. The nightly sweeps add their own line each night.
+- `SWEEP-BUGS.md`, `SWEEP-EDGES.md`, `SWEEP-PERF.md`, `sweep-reports/`: the nightly sweeps (see Files).
+- `audit-notes.md`: frozen long log (see Files). `desktop/README.md`: the desktop app.

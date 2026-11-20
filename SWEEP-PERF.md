@@ -8,8 +8,9 @@ This file is the whole job for the unattended run. Read it as cloned from `main`
 - Nobody is watching: never ask. Decide, or leave the thing alone and write the question for Ricky (see "For Ricky").
 - From CLAUDE.md, these do not apply tonight: the session-start summary, naming files before a big read, proposing a plan and waiting for a go-ahead, and the closing reply style. Everything else in CLAUDE.md does. It loads by itself when the repo is registered: don't read it again.
 - Git identity: `git config user.email noreply@anthropic.com` and `git config user.name "Poly Run nightly sweep"`. Never use or write Ricky's email anywhere. Commit messages end with the attribution lines this session was given; if none were given, end with `Co-Authored-By: Claude <noreply@anthropic.com>`.
-- Never: change features, physics, tuning numbers, level content, looks or design; reformat or refactor; bump the version label; add a CHANGELOG entry or edit `audit-notes.md` (those come when Ricky merges, see ARCHITECTURE.md); send a zip or publish anything.
+- Never: change features, physics, tuning numbers, level content, looks or design; reformat or refactor; bump the version label; add a CHANGELOG entry (that comes when Ricky merges, see ARCHITECTURE.md) or touch `audit-notes.md` (frozen); send a zip or publish anything.
 - On `main`, the run only appends to `.md` docs (never rewrites them, never sweep reports or state files), mainly the "For Ricky" lines in BACKLOG.md, then merges `main` into `next` (below). Everything else goes on tonight's branch.
+- HISTORY.md: every night, append one line for tonight with `echo '- YYYY-MM-DD HH:MM | nightly/<name> | nightly-perf: slice N; what you fixed (or "nothing found"); report sweep-reports/<name>.md' >> HISTORY.md` (America/Chicago time). Commit it with the report on tonight's branch, and add a line in the same commit as the `main` append described under "For Ricky". Never read, edit or delete earlier lines.
 
 ## Names
 - This sweep's tag: `perf`. Tonight's branch: `nightly/YYYY-MM-DD-perf` (today in America/Chicago). Its `<name>` is the branch name without `nightly/`, for example `2026-11-18-perf`.
@@ -33,7 +34,7 @@ Read it from the base branch. If the base has none (the first night, or every br
 3. **Get the slices.** Run `python3 tools/reslice.py --check` (always with `--check`: it prints the table and writes nothing). Take the row numbered "Next slice". Also look at the slices for this sweep's next three nights (Next slice + 1, + 2, + 3; after 20 comes 1): any that is over 7% of the code goes in tonight's message. Slice 5 is about 12.5% (one long section the tool can't cut); leave it as it is.
 4. **Read the slice.** Read all of its code. A slice is a starting point, not a fence: if something in it leans on code elsewhere (a helper, a shared value), read that too.
 5. **Do the work** (below), with the tests that fit the area (below).
-6. **Close the night.** In `sweep-reports/STATE-perf.md`: "Next slice" + 1 (after 20 comes 1), and add any test you wrote to "Tests added by nights". Write the report. Commit, then push: `git -c push.negotiate=true push -u origin <branch>`. Write the "For Ricky" items to BACKLOG.md (below). Then send the message (below).
+6. **Close the night.** In `sweep-reports/STATE-perf.md`: "Next slice" + 1 (after 20 comes 1), and add any test you wrote to "Tests added by nights". Write the report and tonight's HISTORY.md line. Commit, then push: `git -c push.negotiate=true push -u origin <branch>`. Write the "For Ricky" items to BACKLOG.md (below). Then send the message (below).
 7. **If a usage limit stops you**, write the slice and step you reached in the report, still update the state file so the next night continues from the right place, and push whatever is safe.
 
 ## The work: performance (lighter and smoother, same behaviour)
@@ -59,7 +60,7 @@ Anything that might be a bug but might be intended, or needs a decision (includi
 ```
 git fetch --depth=200 origin main:refs/remotes/origin/main next:refs/remotes/origin/next
 git worktree add --detach /tmp/pr-main origin/main
-(append to /tmp/pr-main/BACKLOG.md, that section only, and any other .md note)
+(append to /tmp/pr-main/BACKLOG.md, that section only, any other .md note, and one HISTORY.md line with `>>`)
 git -C /tmp/pr-main commit -am "Nightly <name>: notes for Ricky"      (message ends with the attribution lines)
 git -C /tmp/pr-main -c push.negotiate=true push origin HEAD:main
 M=$(git -C /tmp/pr-main rev-parse HEAD)
