@@ -1,6 +1,6 @@
-# Poly Runner backlog
-
-Open work only, in focused groups. Ricky decides priority and version numbers (see CLAUDE.md). Move finished items into the CHANGELOG and `audit-notes.md`, then delete them here. Items marked **Decision** need Ricky's answer first.
+# Backlog
+Open work only, in focused groups. Ricky decides priority and version numbers (see CLAUDE.md). Either of us adds items. Delete an item when it's done (HISTORY.md records the change; add a CHANGELOG entry too if players see it). Items marked **Decision** need Ricky's answer first.
+Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to reproduce`. The sweeps tag theirs `(nightly/<name>)`. Older entries below have no who or date.
 
 ## 2. Molly's stats and enemies
 - [ ] Grip during drift should be an editable stat.
@@ -41,6 +41,3 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 
 ## Nightly sweep suggestions
 Questions and suggestions the sweep may not act on (possible bugs that might be intended, features, physics, tuning, looks, design) are appended below by the sweep itself, one line each, tagged with the night's branch; details are in that night's report in `sweep-reports/`. Ricky promotes or deletes them.
-
-## Done recently
-See the CHANGELOG at the top of `var CHANGELOG` in `checker-run.html`.
