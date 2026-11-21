@@ -14,3 +14,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-20 18:44 | next | removed the old procedural runner body (Character/Head/Arms/Legs, its joint animation and ponytail; about 485 lines); the glb model is the only runner. Fixed tests/mk_test.py's __molly hook
 - 2026-11-20 18:46 | next | split step 0: src/manifest.json + src/index.html + tools/build.py; checker-run.html is now generated (byte-identical); mk_pe_embed.py and bake_models.py edit src and rebuild; chk.py checks the build is in sync
 - 2026-11-20 21:39 | main | Docs: shipping means pushing to main as the next version; never give zips or artifacts unless asked
+- 2026-11-20 22:06 | main | Docs: publish wording matches the other projects (next merged into main as the next version)
