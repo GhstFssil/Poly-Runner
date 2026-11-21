@@ -8667,109 +8667,6 @@ requestAnimationFrame(tick);
     return hit;
   }
 
-  // ---- Character: girl in a red jumpsuit ----
-  // Built from irregular faceted pieces: tubes whose rings have jittered, slightly rotated vertices and uneven triangle
-  // splits, plus a small colour shift on every facet, so no two sides match. Suit details are painted onto the facets.
-  // The face and neck are smooth. She is about six heads tall, 3.6 units from boots to hair.
-  var C = {
-    suit: 0xc9222a, hair: 0xd1181f, hair2: 0xa8141a, skin: 0xeab48c, skinLight: 0xf0c09a,
-    black: 0x1e1e22, white: 0xf3f3f3, shoe: 0xd02a30, iris: 0x3a78c8, mouth: 0xa5453f, blush: 0xe9a190, gold: 0xd9a93a
-  };
-  // Repeatable pseudo-random value in [-1, 1] from three numbers and a seed
-  function nz(a, b, c, seed) {
-    var h = Math.sin(a * 127.1 + b * 311.7 + c * 74.7 + seed * 19.19) * 43758.5453;
-    return (h - Math.floor(h)) * 2 - 1;
-  }
-  var facetMat = new THREE.MeshPhongMaterial({ vertexColors: true, flatShading: true, specular: 0x000000, shininess: 0, side: THREE.DoubleSide });
-  var solidMats = {};
-  function solidMat(color, smooth) {
-    var key = color + (smooth ? 's' : 'f');
-    if (!solidMats[key]) solidMats[key] = new THREE.MeshPhongMaterial({ color: color, flatShading: !smooth, specular: 0x000000, shininess: 0, side: THREE.DoubleSide });
-    return solidMats[key];
-  }
-  var tc = new THREE.Color();
-  function addMesh(parent, geo, mat, x, y, z) {
-    var m = new THREE.Mesh(geo, mat);
-    m.position.set(x || 0, y || 0, z || 0);
-    m.castShadow = true;
-    parent.add(m);
-    return m;
-  }
-  // A faceted tube through elliptical rings. rings: {y, rx, rz, cx, cz, id}. The front is -Z. The front vertex of every
-  // ring stays put so a seam line can follow it; the rest wobble in radius, angle and height. paint(x,y,z,segment,column)
-  // returns a hex colour for each facet.
-  function facetTube(rings, sides, o) {
-    var seed = o.seed || 1, jit = o.jit === undefined ? 0.07 : o.jit, aj = o.angJit === undefined ? 0.12 : o.angJit;
-    var amt = o.shade === undefined ? 0.12 : o.shade;
-    var P = [], front = [], r, k;
-    for (r = 0; r < rings.length; r++) {
-      var g = rings[r], id = g.id === undefined ? r : g.id, row = [];
-      for (k = 0; k < sides; k++) {
-        var th = k / sides * Math.PI * 2 + (k === 0 ? 0 : nz(id, k, 1, seed) * aj);
-        var rr = k === 0 ? 1 : 1 + nz(id, k, 2, seed) * jit;
-        row.push([(g.cx || 0) + Math.sin(th) * g.rx * rr,
-                  g.y + (k === 0 ? 0 : nz(id, k, 3, seed) * jit * 0.3 * g.rx),
-                  (g.cz || 0) - Math.cos(th) * g.rz * rr]);
-      }
-      P.push(row); front.push(row[0]);
-    }
-    var pos = [], col = [], tri = 0;
-    function add(a, b, c, ri, kk) {
-      pos.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
-      var hex = o.paint ? o.paint((a[0] + b[0] + c[0]) / 3, (a[1] + b[1] + c[1]) / 3, (a[2] + b[2] + c[2]) / 3, ri, kk) : undefined;
-      tc.setHex(hex === undefined ? o.color : hex);
-      tc.multiplyScalar(1 + amt * nz(tri, ri, 7, seed));
-      for (var q = 0; q < 3; q++) col.push(tc.r, tc.g, tc.b);
-      tri++;
-    }
-    for (r = 0; r < rings.length - 1; r++) {
-      for (k = 0; k < sides; k++) {
-        var k2 = (k + 1) % sides;
-        var a = P[r][k], b = P[r][k2], c = P[r + 1][k], d = P[r + 1][k2];
-        if (nz(r, k, 4, seed) > 0) { add(a, b, c, r, k); add(b, d, c, r, k); }   // the quad splits along either diagonal
-        else { add(a, b, d, r, k); add(a, d, c, r, k); }
-      }
-    }
-    function cap(rIdx, ri) {
-      var g2 = rings[rIdx], ctr = [g2.cx || 0, g2.y, g2.cz || 0];
-      for (var kk = 0; kk < sides; kk++) add(ctr, P[rIdx][kk], P[rIdx][(kk + 1) % sides], ri, kk);
-    }
-    if (o.capBottom !== false) cap(0, 0);
-    if (o.capTop !== false) cap(rings.length - 1, rings.length - 2);
-    var geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
-    geo.computeVertexNormals();
-    geo.userData.front = front;
-    return geo;
-  }
-  // A lumpy faceted ellipsoid. cut(ux,uy,uz) drops facets; paint(ux,uy,uz,facet) picks colours. u is on the unit sphere.
-  function facetBlob(sx, sy, sz, detail, o) {
-    var g = new THREE.IcosahedronGeometry(1, detail), p = g.attributes.position;
-    var seed = o.seed || 1, jit = o.jit === undefined ? 0.1 : o.jit, amt = o.shade === undefined ? 0.12 : o.shade;
-    var pos = [], col = [];
-    for (var f = 0; f < p.count / 3; f++) {
-      var u = [], cx = 0, cy = 0, cz = 0, q;
-      for (q = 0; q < 3; q++) {
-        var ux = p.getX(f * 3 + q), uy = p.getY(f * 3 + q), uz = p.getZ(f * 3 + q);
-        u.push([ux, uy, uz]); cx += ux / 3; cy += uy / 3; cz += uz / 3;
-      }
-      if (o.cut && o.cut(cx, cy, cz)) continue;
-      tc.setHex(o.paint ? o.paint(cx, cy, cz, f) : o.color);
-      tc.multiplyScalar(1 + amt * nz(f, 2, 7, seed));
-      for (q = 0; q < 3; q++) {
-        var j = 1 + jit * nz(u[q][0] * 9, u[q][1] * 9, u[q][2] * 9, seed);
-        pos.push(u[q][0] * sx * j, u[q][1] * sy * j, u[q][2] * sz * j);
-        col.push(tc.r, tc.g, tc.b);
-      }
-    }
-    var geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
-    geo.computeVertexNormals();
-    return geo;
-  }
-
   var player = new THREE.Group();
   player.position.y = groundH(0, 0);
   scene.add(player);
@@ -9076,343 +8973,20 @@ requestAnimationFrame(tick);
   var ballIsSphere = false, dashNow = false, dashHold = 0, DASH_RATE = 20, DASH_MAX = 120;
   ballGroup.add(new THREE.Mesh(new THREE.DodecahedronGeometry(BALL_R * 1.14, 0),
     new THREE.MeshBasicMaterial({ color: 0xff3a2a, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide })));
-  var lower = new THREE.Group();   // hips and legs
-  var upper = new THREE.Group();   // chest, head, arms (twists a little against the hips)
-  body.add(lower);
-  body.add(upper);
-
-  // Torso: hips, a narrow waist under a black belt, a chest with a gentle bust, and shoulders that slope into the neck
-  var SIDES_T = 10;
-  var pelvisRings = [
-    { id: 20, y: 1.50, rx: 0.21, rz: 0.17, cz: 0.015 },
-    { id: 0, y: 1.62, rx: 0.35, rz: 0.235, cz: 0.02 },
-    { id: 1, y: 1.76, rx: 0.41, rz: 0.26, cz: 0.02 },
-    { id: 2, y: 1.95, rx: 0.36, rz: 0.235, cz: 0.01 },
-    { id: 3, y: 2.09, rx: 0.29, rz: 0.20 },
-    { id: 4, y: 2.21, rx: 0.265, rz: 0.185 }
-  ];
-  var chestRings = [
-    { id: 4, y: 2.21, rx: 0.265, rz: 0.185 },
-    { id: 5, y: 2.40, rx: 0.285, rz: 0.205, cz: -0.005 },
-    { id: 6, y: 2.62, rx: 0.32, rz: 0.245, cz: -0.02 },
-    { id: 7, y: 2.78, rx: 0.345, rz: 0.225 },
-    { id: 8, y: 2.88, rx: 0.26, rz: 0.185, cz: 0.01 },
-    { id: 9, y: 2.96, rx: 0.16, rz: 0.135, cz: 0.015 },
-    { id: 10, y: 3.03, rx: 0.095, rz: 0.1, cz: 0.02 }
-  ];
-  var pelvisGeo = facetTube(pelvisRings, SIDES_T, {
-    seed: 11, color: C.suit, shade: 0.13, capBottom: false, capTop: false,
-    paint: function (x, y, z, ri) { return ri === 4 ? C.black : C.suit; }
-  });
-  addMesh(lower, pelvisGeo, facetMat);
-  var chestGeo = facetTube(chestRings, SIDES_T, {
-    seed: 11, color: C.suit, shade: 0.13, capBottom: false,
-    paint: function (x, y, z, ri, k) {
-      if (ri === 5) return C.black;                                         // collar
-      if (ri === 4 && (k === 0 || k === 1 || k === SIDES_T - 1)) return C.black;   // the V at the front of the collar
-      return C.suit;
-    }
-  });
-  addMesh(upper, chestGeo, facetMat);
-  // Zipper: a thin black ribbon along the front vertices from the belt to the collar
-  (function zipper() {
-    var f = chestGeo.userData.front, pos = [], idx = [];
-    for (var i = 0; i < 6; i++) {
-      pos.push(f[i][0] - 0.011, f[i][1], f[i][2] - 0.006, f[i][0] + 0.011, f[i][1], f[i][2] - 0.006);
-      if (i > 0) { var b = i * 2; idx.push(b - 2, b - 1, b, b - 1, b + 1, b); }
-    }
-    var g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    g.setIndex(idx);
-    g.computeVertexNormals();
-    addMesh(upper, g, solidMat(C.black, true)).castShadow = false;
-  })();
-  // Belt buckle at the front of the black band
-  (function buckle() {
-    var f = pelvisGeo.userData.front;
-    var mid = [(f[4][0] + f[5][0]) / 2, (f[4][1] + f[5][1]) / 2, (f[4][2] + f[5][2]) / 2];
-    addMesh(lower, new THREE.BoxGeometry(0.11, 0.08, 0.025), solidMat(C.gold, false), mid[0], mid[1], mid[2] - 0.012);
-  })();
-  // Neck, smooth
-  var neck = addMesh(upper, new THREE.CylinderGeometry(0.088, 0.105, 0.3, 10), solidMat(C.skin, true), 0, 3.09, 0.02);
-  neck.rotation.x = -0.1;
-
-  // ---- Head: a shaped skull with a narrowing jaw, smooth skin, then faceted hair ----
-  var head = new THREE.Group();
-  head.position.set(0, 3.33, 0.015);
-  upper.add(head);
-  var HRX = 0.26, HRY = 0.30, HRZ = 0.27;
-  // Face width from the cheekbones down: it holds, then runs in a straight line from the jaw angle to a narrow chin
-  var JAW_U = [0, -0.2, -0.4, -0.6, -0.78, -0.9, -1];
-  var JAW_F = [1.0, 1.0, 1.05, 1.08, 0.78, 0.5, 0.28];
-  function jawFactor(uy) {
-    if (uy >= 0) return 1;
-    for (var i = 1; i < JAW_U.length; i++) {
-      if (uy >= JAW_U[i]) {
-        var t = (uy - JAW_U[i - 1]) / (JAW_U[i] - JAW_U[i - 1]);
-        return JAW_F[i - 1] + (JAW_F[i] - JAW_F[i - 1]) * t;
-      }
-    }
-    return JAW_F[JAW_F.length - 1];
-  }
-  function headShape(ux, uy, uz) {
-    var low = Math.max(0, -uy);
-    var cheek = 1 + 0.06 * Math.exp(-Math.pow((uy + 0.12) / 0.32, 2));    // widest at the cheekbones
-    return [ux * HRX * jawFactor(uy) * cheek, uy * HRY * (uy < 0 ? 1.05 : 1),
-            uz * HRZ * (uz < 0 ? 1 - 0.1 * low : 1) * (uy < 0 ? 1 - 0.08 * low : 1)];
-  }
-  function headAt(th, ph) {
-    var rho = Math.sin(th);
-    return headShape(rho * Math.cos(ph), Math.cos(th), rho * Math.sin(ph));
-  }
-  (function skull() {
-    var g = new THREE.SphereGeometry(1, 24, 18), p = g.attributes.position, nrm = g.attributes.normal, e = 0.03;
-    for (var i = 0; i < p.count; i++) {
-      var ux = p.getX(i), uy = p.getY(i), uz = p.getZ(i), s2 = headShape(ux, uy, uz);
-      var th = Math.acos(Math.max(-1, Math.min(1, uy))), ph = Math.atan2(uz, ux);
-      var n;
-      if (Math.sin(th) < 1e-3) n = new THREE.Vector3(0, uy > 0 ? 1 : -1, 0);
-      else {
-        var t1 = headAt(th + e, ph), t0 = headAt(th - e, ph), q1 = headAt(th, ph + e), q0 = headAt(th, ph - e);
-        n = new THREE.Vector3(t1[0] - t0[0], t1[1] - t0[1], t1[2] - t0[2])
-          .cross(new THREE.Vector3(q1[0] - q0[0], q1[1] - q0[1], q1[2] - q0[2])).normalize();
-        if (n.x * s2[0] + n.y * s2[1] + n.z * s2[2] < 0) n.negate();
-      }
-      p.setXYZ(i, s2[0], s2[1], s2[2]);
-      nrm.setXYZ(i, n.x, n.y, n.z);
-    }
-    addMesh(head, g, solidMat(C.skin, true), 0, 0, 0);
-  })();
-  // A group sitting on the face at (azimuth, elevation) and turned to face outward (its local +Z points out of the skin)
-  function onHead(parent, az, el, off) {
-    var ux = Math.sin(az) * Math.cos(el), uy = Math.sin(el), uz = -Math.cos(az) * Math.cos(el);
-    var s2 = headShape(ux, uy, uz);
-    var n = new THREE.Vector3(ux / HRX, uy / HRY, uz / HRZ).normalize();
-    var g = new THREE.Group();
-    g.position.set(s2[0] + n.x * off, s2[1] + n.y * off, s2[2] + n.z * off);
-    // Local +Z points out of the skin and local +Y stays as upright as it can; local +X ends up toward her left
-    var bx = new THREE.Vector3(0, 1, 0).cross(n).normalize(), by = n.clone().cross(bx);
-    g.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(bx, by, n));
-    parent.add(g);
-    return g;
-  }
-  function ellipsoid(parent, mat, sx, sy, sz, x, y, z) {
-    var m = addMesh(parent, new THREE.SphereGeometry(1, 10, 8), mat, x, y, z);
-    m.scale.set(sx, sy, sz);
-    m.castShadow = false;
-    return m;
-  }
-  [-1, 1].forEach(function (sd) {
-    var eye = onHead(head, sd * 0.37, 0.05, 0.002);
-    ellipsoid(eye, solidMat(C.white, true), 0.064, 0.078, 0.022, 0, 0, 0);
-    ellipsoid(eye, solidMat(C.iris, true), 0.041, 0.054, 0.012, sd * 0.003, -0.004, 0.013);
-    ellipsoid(eye, solidMat(C.black, true), 0.02, 0.029, 0.008, sd * 0.003, -0.004, 0.02);
-    ellipsoid(eye, solidMat(C.white, true), 0.009, 0.009, 0.005, sd * 0.003 + 0.012, 0.016, 0.024);
-    var lid = addMesh(eye, new THREE.BoxGeometry(0.15, 0.017, 0.012), solidMat(C.black, false), 0, 0.074, 0.006);
-    lid.rotation.z = -sd * 0.1; lid.castShadow = false;
-    var wing = addMesh(eye, new THREE.BoxGeometry(0.05, 0.015, 0.012), solidMat(C.black, false), -sd * 0.075, 0.085, 0.006);
-    wing.rotation.z = sd * 0.35; wing.castShadow = false;
-    var brow = addMesh(onHead(head, sd * 0.40, 0.27, 0.004), new THREE.BoxGeometry(0.105, 0.02, 0.014), solidMat(C.hair2, false), 0, 0, 0);
-    brow.rotation.z = -sd * 0.24; brow.castShadow = false;                 // inner ends lower: a determined look
-    ellipsoid(onHead(head, sd * 0.64, -0.2, 0.0), solidMat(C.blush, true), 0.05, 0.03, 0.008, 0, 0, 0);
-    ellipsoid(head, solidMat(C.skin, true), 0.016, 0.046, 0.03, sd * 0.262, -0.045, 0.03);   // ears
-  });
-  ellipsoid(onHead(head, 0, -0.1, 0.014), solidMat(C.skinLight, true), 0.028, 0.042, 0.034, 0, 0, 0);   // nose
-  (function mouth() {
-    var g = onHead(head, 0.03, -0.43, 0.004);
-    var m = addMesh(g, new THREE.TorusGeometry(0.058, 0.0085, 4, 9, Math.PI * 0.8), solidMat(C.mouth, false), 0, 0.05, 0);
-    m.rotation.z = Math.PI * 1.1 + 0.1; m.scale.x = 0.95; m.castShadow = false;   // a slight smirk, a touch higher on one side
-  })();
-
-  // Hair: a smooth faceted cap with the face, ears and nape cut away, three broad swept fringe panels, two side locks
-  var hairCap = addMesh(head, facetBlob(0.305, 0.33, 0.335, 1, {
-    seed: 21, jit: 0.025, shade: 0.09, color: C.hair,
-    cut: function (x, y, z) { return (z < -0.25 && y < 0.34) || (Math.abs(x) > 0.62 && y < 0.05 && z < 0.35) || y < -0.78; }
-  }), facetMat, 0, 0.045, 0.035);
-  function lock(len, w, bend, seed) {
-    return facetTube([
-      { y: 0, rx: w, rz: w * 0.5 },
-      { y: -len * 0.4, rx: w * 1.05, rz: w * 0.55, cx: bend * 0.2 },
-      { y: -len * 0.8, rx: w * 0.6, rz: w * 0.4, cx: bend * 0.7 },
-      { y: -len, rx: 0.006, rz: 0.006, cx: bend }
-    ], 5, { seed: seed, color: C.hair, shade: 0.09, jit: 0.03, angJit: 0.05, capBottom: false, capTop: false });
-  }
-  function placeLock(az, el, len, w, bend, tiltX, tiltZ, seed) {
-    var ux = Math.sin(az) * Math.cos(el), uy = Math.sin(el), uz = -Math.cos(az) * Math.cos(el);
-    var s2 = headShape(ux, uy, uz), n = new THREE.Vector3(ux / HRX, uy / HRY, uz / HRZ).normalize();
-    var m = addMesh(head, lock(len, w, bend, seed), facetMat, s2[0] + n.x * 0.045, s2[1] + n.y * 0.045 + 0.02, s2[2] + n.z * 0.045);
-    m.rotation.x = tiltX; m.rotation.z = tiltZ;
-    return m;
-  }
-  // Fringe, parted a little left of centre and swept outward; the side locks differ in length
-  placeLock(-0.62, 0.56, 0.19, 0.14, -0.07, 0.4, -0.24, 31);
-  placeLock(-0.08, 0.64, 0.16, 0.13, 0.04, 0.45, 0.1, 32);
-  placeLock(0.44, 0.58, 0.19, 0.13, 0.05, 0.42, 0.2, 33);
-  placeLock(-1.28, -0.02, 0.4, 0.1, -0.04, 0.05, 0.1, 41);
-  placeLock(1.26, 0.0, 0.48, 0.105, 0.05, 0.04, -0.12, 42);
-
-  // Ponytail: two strands from one tie high on the back of the head, rebuilt each frame so they flow and ripple
-  var ponyRoot = new THREE.Group();
-  ponyRoot.position.set(0, 0.2, 0.3);
-  head.add(ponyRoot);
-  addMesh(ponyRoot, facetBlob(0.075, 0.06, 0.075, 0, { seed: 5, color: C.black, shade: 0.1 }), facetMat);
-  var TAIL_RINGS = 14, TAIL_SIDES = 6;
-  var STRANDS = [
-    { len: [0.30, 0.32, 0.32, 0.30, 0.26], rad: 1.0, ox: 0.0, a0: 0.0, side: 0.0, ph: 0.0, seed: 3, hex: C.hair, hex2: C.hair },
-    { len: [0.24, 0.27, 0.25, 0.20], rad: 0.55, ox: 0.07, a0: 0.3, side: 0.38, ph: 1.7, seed: 8, hex: C.hair2, hex2: C.hair2 }
-  ];
-  STRANDS.forEach(function (st) {
-    st.mesh = new THREE.Mesh(new THREE.BufferGeometry(), facetMat);
-    st.mesh.castShadow = true;
-    st.mesh.frustumCulled = false;
-    ponyRoot.add(st.mesh);
-    var ringSize = TAIL_SIDES + 1;
-    st.jit = [];
-    for (var r = 0; r <= TAIL_RINGS; r++) for (var j = 0; j < ringSize; j++) st.jit.push(j === TAIL_SIDES ? st.jit[r * ringSize] : nz(r, j, 9, st.seed) * 0.07);
-    st.shade = [];
-    for (var f = 0; f < TAIL_RINGS * TAIL_SIDES * 2; f++) st.shade.push(nz(f, 3, 11, st.seed));
-  });
-  function tailRadius(u, scale) {
-    return scale * (0.25 * Math.pow(Math.sin(Math.PI * Math.pow(u, 0.55)), 0.7) + 0.045 * (1 - u));
-  }
-  function updateTail(k, sway, tphase) {
-    STRANDS.forEach(function (st) {
-      var a0 = 1.15 + 0.6 * k + st.a0, curl = 0.42 - 0.34 * k;
-      var cur = new THREE.Vector3(st.ox, 0, 0), pts = [cur.clone()];
-      for (var i = 0; i < st.len.length; i++) {
-        var a = a0 - i * curl + Math.sin(tphase * (1 + 0.15 * st.side) - i * 0.9 + st.ph) * (0.04 + 0.1 * k) * (0.4 + 0.3 * i);
-        var sw = sway * (0.25 + 0.2 * (i + 1)) + st.side * (0.3 + 0.1 * i) + Math.sin(tphase * 0.7 - i * 0.6 + st.ph) * 0.05 * (1 - 0.5 * k);
-        cur.addScaledVector(new THREE.Vector3(Math.sin(sw), -Math.cos(a) * Math.cos(sw), Math.sin(a) * Math.cos(sw)), st.len[i]);
-        pts.push(cur.clone());
-      }
-      var curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
-      var tube = new THREE.TubeGeometry(curve, TAIL_RINGS, 1, TAIL_SIDES, false);
-      var pos = tube.attributes.position, ringSize = TAIL_SIDES + 1;
-      for (var r = 0; r <= TAIL_RINGS; r++) {
-        var u = r / TAIL_RINGS, c = curve.getPointAt(u), rad = tailRadius(u, st.rad);
-        for (var j = 0; j < ringSize; j++) {
-          var idx = r * ringSize + j, rj = rad * (1 + st.jit[idx]);
-          pos.setXYZ(idx, c.x + (pos.getX(idx) - c.x) * rj, c.y + (pos.getY(idx) - c.y) * rj, c.z + (pos.getZ(idx) - c.z) * rj);
-        }
-      }
-      var geo = tube.toNonIndexed();
-      tube.dispose();
-      var nf = geo.attributes.position.count / 3, col = new Float32Array(nf * 9);
-      for (var f = 0; f < nf; f++) {
-        tc.setHex(Math.floor(f / (TAIL_SIDES * 2)) % 2 ? st.hex2 : st.hex);
-        tc.multiplyScalar(1 + 0.09 * st.shade[f % st.shade.length]);
-        for (var q = 0; q < 3; q++) { col[f * 9 + q * 3] = tc.r; col[f * 9 + q * 3 + 1] = tc.g; col[f * 9 + q * 3 + 2] = tc.b; }
-      }
-      geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-      st.mesh.geometry.dispose();
-      st.mesh.geometry = geo;
-    });
-  }
-  updateTail(0, 0, 0);
-
-  // ---- Arms: shoulder, upper arm with a white band on the outside, forearm, black fingerless glove ----
-  function buildArm(sd) {
-    var seedA = 50 + (sd > 0 ? 1 : 0) * 7;
-    var sh = new THREE.Group();
-    sh.position.set(sd * 0.34, 2.71, 0);
-    upper.add(sh);
-    addMesh(sh, facetBlob(0.125, 0.115, 0.125, 0, { seed: seedA, color: C.suit, shade: 0.13 }), facetMat, 0, -0.01, 0);   // rounded shoulder
-    var upperArm = addMesh(sh, facetTube([
-      { y: 0.0, rx: 0.12, rz: 0.12 },
-      { y: -0.13, rx: 0.128, rz: 0.128, cx: sd * 0.006 },
-      { y: -0.31, rx: 0.105, rz: 0.108 },
-      { y: -0.5, rx: 0.09, rz: 0.095, cz: -0.004 },
-      { y: -0.58, rx: 0.086, rz: 0.09 }
-    ], 6, { seed: seedA, color: C.suit, shade: 0.13, capBottom: false,
-            paint: function (x, y, z, ri, k) {
-              if (ri === 1 && x * sd > -0.02) return C.white;          // the white band shows on the outside of the arm
-              if (ri === 0 && sd > 0 && k === 1) return C.white;       // and one extra panel on the right shoulder
-              return C.suit;
-            } }), facetMat);
-    upperArm.scale.set(1.08, 1, 1.08);
-    var el = new THREE.Group();
-    el.position.y = -0.58;
-    sh.add(el);
-    addMesh(el, facetBlob(0.1, 0.09, 0.1, 0, { seed: seedA + 1, color: C.suit, shade: 0.12 }), facetMat);   // elbow
-    var foreArm = addMesh(el, facetTube([
-      { y: 0, rx: 0.095, rz: 0.1 },
-      { y: -0.14, rx: 0.1, rz: 0.105, cz: -0.006 },
-      { y: -0.34, rx: 0.075, rz: 0.08 },
-      { y: -0.52, rx: 0.062, rz: 0.065 }
-    ], 6, { seed: seedA + 2, color: C.suit, shade: 0.13, capBottom: false,
-            paint: function (x, y, z, ri) { return ri === 2 ? C.black : C.suit; } }), facetMat);   // black glove cuff
-    foreArm.scale.set(1.1, 1, 1.1);
-    var hand = addMesh(el, facetBlob(0.078, 0.095, 0.088, 0, {
-      seed: seedA + 3, jit: 0.12, shade: 0.12,
-      paint: function (x, y, z) { return y < -0.22 ? C.skin : C.black; }          // fingertips show, the rest is glove
-    }), facetMat, sd * 0.004, -0.6, -0.012);
-    hand.rotation.z = sd * 0.1;
-    var thumb = addMesh(el, facetBlob(0.036, 0.06, 0.04, 0, { seed: seedA + 4, color: C.skin, shade: 0.1 }), facetMat, -sd * 0.06, -0.55, -0.045);
-    thumb.rotation.z = -sd * 0.4;
-    return { sh: sh, el: el };
-  }
-  // ---- Legs: thigh, calf with a back bulge, black knee diamond and ankle cuff, red-and-white sneaker ----
-  function buildLeg(sd) {
-    var seedL = 70 + (sd > 0 ? 1 : 0) * 9;
-    var hip = new THREE.Group();
-    hip.position.set(sd * 0.17, 1.76, 0);
-    lower.add(hip);
-    addMesh(hip, facetBlob(0.215, 0.2, 0.2, 0, { seed: seedL + 9, color: C.suit, shade: 0.13 }), facetMat, 0, -0.03, 0.01);
-    var thigh = addMesh(hip, facetTube([
-      { id: 0, y: 0.0, rx: 0.205, rz: 0.2 },
-      { id: 1, y: -0.2, rx: 0.195, rz: 0.19, cz: -0.005 },
-      { id: 2, y: -0.46, rx: 0.155, rz: 0.16 },
-      { id: 3, y: -0.7, rx: 0.115, rz: 0.125, cz: -0.005 },
-      { id: 4, y: -0.84, rx: 0.105, rz: 0.115 }
-    ], 7, { seed: seedL, color: C.suit, shade: 0.13, capBottom: false,
-            paint: function (x, y, z, ri) { return ri === 3 && z < -0.04 ? C.black : C.suit; } }), facetMat);   // top half of the knee diamond
-    thigh.scale.set(1.15, 1, 1.15);
-    var knee = new THREE.Group();
-    knee.position.y = -0.84;
-    hip.add(knee);
-    var shin = addMesh(knee, facetTube([
-      { id: 0, y: 0.0, rx: 0.105, rz: 0.115 },
-      { id: 1, y: -0.1, rx: 0.112, rz: 0.125, cz: 0.01 },
-      { id: 2, y: -0.27, rx: 0.118, rz: 0.13, cz: 0.03 },
-      { id: 3, y: -0.48, rx: 0.088, rz: 0.095, cz: 0.012 },
-      { id: 4, y: -0.68, rx: 0.062, rz: 0.065 },
-      { id: 5, y: -0.78, rx: 0.056, rz: 0.06 }
-    ], 7, { seed: seedL + 3, color: C.suit, shade: 0.13,
-            paint: function (x, y, z, ri) {
-              if (ri === 0 && z < -0.04) return C.black;               // bottom half of the knee diamond
-              if (ri === 4) return C.black;                            // ankle cuff
-              return C.suit;
-            } }), facetMat);
-    shin.scale.set(1.14, 1, 1.14);
-    var foot = new THREE.Group();
-    foot.position.y = -0.78;
-    knee.add(foot);
-    addMesh(foot, facetBlob(0.135, 0.11, 0.33, 1, {
-      seed: seedL + 5, jit: 0.07, shade: 0.12,
-      paint: function (x, y, z) { return (y < -0.42 || z < -0.7) ? C.white : C.shoe; }   // white sole and toe cap, red upper
-    }), facetMat, 0, -0.075, -0.11);
-    return { hip: hip, knee: knee };
-  }
-  var armL = buildArm(-1), armR = buildArm(1);
-  armL.sh.rotation.z = -0.08;
-  armR.sh.rotation.z = 0.08;
-  var legL = buildLeg(-1), legR = buildLeg(1);
-
   // ---- State ----
   var yaw = 0;                 // 0 = facing -Z
   function yawAdd(d) { if (!plOn) { yaw += d; return; } yaw = plHu + fromPl(wrapA(toPl(wrapA(yaw - plHu)) + d)); }   // turning the camera by d turns it by d along the surface she is on
   var pitch = 0.35;
   var speed = 0;
   var phase = 0;
-  var tailPhase = 0;
   var turnRate = 0;
   var cpTime = [], cpBest = 0;   // this run: the clock reading at each checkpoint (cpTime[1..3]) and the furthest she has got
   var bumpUntil = 0;           // collisions cost speed at most once every quarter second
   var heading = 0;             // the direction she is actually moving, as an angle like yaw (0 = toward -Z)
-  var RP_DROP = -0.6, RP_FHIP = 1.4, RP_FKNEE = -1.6, RP_BHIP = -0.35, RP_HAND = 0.85, RP_BACK = -0.8;   // Runner's Pose joint angles
+  var RP_DROP = -0.6;   // Runner's Pose: how far her body drops
   var driftSide = 0, driftBlend = 0, driftHeld = false, driftKick = 0, driftCool = 0;   // Drift: A / D tighten the turn radius by half in that direction (side +1 = left, -1 = right)
   var DRIFT_TIGHT = 2;                 // turning rate multiplier while drifting (radius x 0.5)
-  // ---- Molly's model: a low-poly rigged runner (a .glb embedded in the page) whose clips are driven by what she is doing. The procedural body stays as the fallback. ----
+  // ---- Molly's model: a low-poly rigged runner (a .glb embedded in the page) whose clips are driven by what she is doing. ----
   var MOLLY_YAW = Math.PI, mollyOn = false, mollyMix = null, mollyAct = {}, mollyW = {}, mollyT = {}, mollyRunPh = 0, mollyPrevGround = true, mollyMesh = null, mollyV0 = 0;
   var MOLLY_CLIPS = ['Idle', 'Run_Slow', 'Run_Mid', 'Run_Fast', 'Jump', 'Slide', 'Faceplant', 'RunnersPose', 'Drift_L', 'Drift_R'];
   var mollyRoot = null;
@@ -9440,7 +9014,7 @@ requestAnimationFrame(tick);
         mollyDriftRun = false; model.traverse(function (o) { if (o.userData && o.userData.driftRun) mollyDriftRun = true; });   // a model saved from v179's Rig Editor carries drift clips made from her run (older ones carry a held pose, which the game does not use)
         mollyHoldF = {};                                          // a model saved from the Rig Editor carries where its slide and face-plant are held; the built-in one uses the built-in settings
         model.traverse(function (o) { var ud = o.userData; if (ud && typeof ud.slideHold === 'number' && ud.slideHold > 0 && ud.slideHold <= 1) mollyHoldF.Slide = ud.slideHold; if (ud && typeof ud.fallHold === 'number' && ud.fallHold > 0 && ud.fallHold <= 1) mollyHoldF.Faceplant = ud.fallHold; });
-        mollyRoot = root; body.add(root); lower.visible = false; upper.visible = false; mollyOn = true; glowMats = null;
+        mollyRoot = root; body.add(root); mollyOn = true; glowMats = null;
         mollyScale = scl; applyStats(); refreshStatCards();        // her collision box follows the model's scale
         if (onOk) onOk();
       }, function (e) { console.warn('Molly model failed', e); if (onFail) onFail(); });
@@ -9700,7 +9274,7 @@ requestAnimationFrame(tick);
   }
   var TILT_DEAD = 0.07, vmoveS = 0;                             // TILT_DEAD (about 4 degrees): slopes and banks gentler than this do not tilt her at all, and the tilt grows in smoothly over the next 4 degrees; vmoveS: her rise or fall rate, smoothed
   function tiltSoft(a) { var m = Math.abs(a); return m <= TILT_DEAD ? 0 : a * smooth01((m - TILT_DEAD) / TILT_DEAD); }
-  var pitchLean = 0, pitchPrevY = 0, grounded = true, vy = 0, jumpBuf = 0, airBlend = 0, spaceDown = false;   // jumpBuf: a jump pressed just before landing still counts
+  var pitchLean = 0, pitchPrevY = 0, grounded = true, vy = 0, jumpBuf = 0, spaceDown = false;   // jumpBuf: a jump pressed just before landing still counts
 
   // ---- Strafe: an instant sidestep of one square, to her right (+1) or left (-1) of the way she is heading ----
   // Her direction and speed are untouched. She only slides as far as the way is clear: a trunk, a wall or a ledge face
@@ -12283,86 +11857,38 @@ function showScreen(name) {                                // the menu shows one
     if (playing && !cleared && player.position.z < GOAL_Z && player.position.z > GOAL_Z - 60 && Math.abs(player.position.x - DR_XE) < GOAL_HALF + 2 && player.position.y > FIELD_Y - 6 && player.position.y < FIELD_Y + 25) levelClear();
     setZips(speed / TILE); updateCoords();
 
-    // Run cycle: thighs swing, knees and elbows bend, upper body twists against the hips.
+    // Run bob and lean (the model's clips pose the limbs).
     var k = Math.min(1, speed / STRIDE_REF);
     var topFrac = Math.min(1, speed / RUN_SPEED);
     phase += sdt * 22 * (1 - Math.exp(-speed / 12));   // stride rate levels off so the legs stay readable at high speed
     var s = Math.sin(phase);
-    var swing = s * 0.85 * k;
-    legL.hip.rotation.x = swing;
-    legR.hip.rotation.x = -swing;
-    legL.knee.rotation.x = -k * (0.2 + 1.0 * Math.max(0, -s));
-    legR.knee.rotation.x = -k * (0.2 + 1.0 * Math.max(0, s));
-    armL.sh.rotation.x = -swing * 1.1;
-    armR.sh.rotation.x = swing * 1.1;
-    armL.el.rotation.x = 0.12 * (1 - k) + k * (1.0 + 0.3 * Math.max(0, -s));
-    armR.el.rotation.x = 0.12 * (1 - k) + k * (1.0 + 0.3 * Math.max(0, s));
-    // In the air the run cycle gives way to a leap: front leg reaching, back leg trailing, arms thrown up and forward
-    // (a little higher on the way up than on the way down).
-    airBlend += ((grounded ? 0 : 1) - airBlend) * Math.min(1, dt * 12);
-    if (airBlend > 0.001) {
-      var ab = airBlend, up = vy > 0 ? 1 : 0.55;
-      legL.hip.rotation.x += (0.95 - legL.hip.rotation.x) * ab;
-      legL.knee.rotation.x += (-0.8 - legL.knee.rotation.x) * ab;
-      legR.hip.rotation.x += (-0.45 - legR.hip.rotation.x) * ab;
-      legR.knee.rotation.x += (-1.25 - legR.knee.rotation.x) * ab;
-      armL.sh.rotation.x += (2.1 * up - armL.sh.rotation.x) * ab;
-      armR.sh.rotation.x += (1.6 * up - armR.sh.rotation.x) * ab;
-      armL.el.rotation.x += (0.5 - armL.el.rotation.x) * ab;
-      armR.el.rotation.x += (0.5 - armR.el.rotation.x) * ab;
-    }
-    upper.rotation.y = -s * 0.11 * k;
-    lower.rotation.y = s * 0.05 * k;
     body.position.y = Math.abs(s) * 0.1 * k + Math.sin(now / 600) * 0.012 * (1 - k);
     body.rotation.x = -(0.16 * k + 0.2 * topFrac);
-    head.rotation.x = 0.1 * k;
     // Braking while moving on the ground is a slide, feet first, like a runner into home: she lies back until she is about one unit tall.
     slideBlend += ((((playing && keys.s && !keys.w && grounded && speed > 6 && !ballOn) || gateIn || (SB && SB.caveLow)) ? 1 : 0) - slideBlend) * Math.min(1, dt * 10);
     if (slideBlend > 0.001) {
       var sb = slideBlend;
       body.rotation.x += (1.35 - body.rotation.x) * sb;
       body.position.y += (0.12 - body.position.y) * sb;
-      legL.hip.rotation.x += (0.55 - legL.hip.rotation.x) * sb; legL.knee.rotation.x += (-0.25 - legL.knee.rotation.x) * sb;
-      legR.hip.rotation.x += (0.15 - legR.hip.rotation.x) * sb; legR.knee.rotation.x += (-1.5 - legR.knee.rotation.x) * sb;
-      armL.sh.rotation.x += (0.3 - armL.sh.rotation.x) * sb; armR.sh.rotation.x += (0.3 - armR.sh.rotation.x) * sb;
-      armL.el.rotation.x += (0.3 - armL.el.rotation.x) * sb; armR.el.rotation.x += (0.3 - armR.el.rotation.x) * sb;
-      upper.rotation.y *= 1 - sb; lower.rotation.y *= 1 - sb;
-      head.rotation.x += (-1.1 - head.rotation.x) * sb;
     }
-    // Runner's Pose: a sprinter's crouch. Front knee folded under her, back leg long, left hand flat on the ground, right arm swept back.
+    // Runner's Pose: a sprinter's crouch (the body lowers and tips; the clip folds the limbs).
     rpBlend += ((rpHold > 0.05 ? 1 : 0) - rpBlend) * Math.min(1, dt * 9);
     if (rpBlend > 0.001) {
       var rb = rpBlend;
       body.rotation.x += (-0.85 - body.rotation.x) * rb;
       body.position.y += (RP_DROP - body.position.y) * rb;
-      legL.hip.rotation.x += (RP_FHIP - legL.hip.rotation.x) * rb; legL.knee.rotation.x += (RP_FKNEE - legL.knee.rotation.x) * rb;
-      legR.hip.rotation.x += (RP_BHIP - legR.hip.rotation.x) * rb; legR.knee.rotation.x += (-0.25 - legR.knee.rotation.x) * rb;
-      armL.sh.rotation.x += (RP_HAND - armL.sh.rotation.x) * rb; armL.el.rotation.x += (0.05 - armL.el.rotation.x) * rb;
-      armR.sh.rotation.x += (RP_BACK - armR.sh.rotation.x) * rb; armR.el.rotation.x += (0.0 - armR.el.rotation.x) * rb;
-      head.rotation.x += (0.55 - head.rotation.x) * rb;
-      upper.rotation.y *= 1 - rb; lower.rotation.y *= 1 - rb;
     }
-    armL.sh.rotation.z = -0.08; armR.sh.rotation.z = 0.08;       // back to the resting arm angle every frame, so a drift never leaves an arm splayed out
-    // Face-plant: flat on her face, head first, arms stretched ahead of her, sliding.
+    // Face-plant: flat on her face, sliding (the body tips flat; the clip stretches the limbs).
     fpBlend += ((fpOn ? 1 : 0) - fpBlend) * Math.min(1, dt * 10);
     if (fpBlend > 0.001) {
       var fb2 = fpBlend;
       body.rotation.x += (-1.5 - body.rotation.x) * fb2;
       body.position.y += (0.3 - body.position.y) * fb2;
-      legL.hip.rotation.x += (0 - legL.hip.rotation.x) * fb2; legL.knee.rotation.x += (0 - legL.knee.rotation.x) * fb2;
-      legR.hip.rotation.x += (0 - legR.hip.rotation.x) * fb2; legR.knee.rotation.x += (0 - legR.knee.rotation.x) * fb2;
-      armL.sh.rotation.x += (2.8 - armL.sh.rotation.x) * fb2; armR.sh.rotation.x += (2.8 - armR.sh.rotation.x) * fb2;
-      armL.el.rotation.x += (0 - armL.el.rotation.x) * fb2; armR.el.rotation.x += (0 - armR.el.rotation.x) * fb2;
-      upper.rotation.y *= 1 - fb2; lower.rotation.y *= 1 - fb2;
     }
-    // Drift: the arm on the inside of the turn reaches straight down and lays its hand on the ground; she crouches a little to get there.
+    // Drift: she crouches a little (the clip reaches the inside arm down).
     if (driftBlend > 0.001) {
-      var db = driftBlend, inner = driftSide > 0 ? armL : armR;
-      inner.sh.rotation.x += (0.12 - inner.sh.rotation.x) * db;
-      inner.sh.rotation.z += (-leanZ - inner.sh.rotation.z) * db;    // cancels her lean, so the arm hangs plumb
-      inner.el.rotation.x += (0.05 - inner.el.rotation.x) * db;
+      var db = driftBlend;
       body.position.y += (-0.32 - body.position.y) * db * 0.6;
-      upper.rotation.y *= 1 - db;
     }
     if (mollyOn && !ballOn) { body.rotation.x = 0; body.position.y = 0; updateMolly(sdt, Math.abs(speed) / TILE); }
     cometPose(sdt);   // the clips pose her; only the lean into turns and the slope pitch below still apply
@@ -12370,11 +11896,6 @@ function showScreen(name) {                                // the menu shows one
     var pk = pitchLean * (1 - Math.max(slideBlend, rpBlend, fpBlend));
     body.rotation.x += pk;
     body.position.z = -1.4 * Math.sin(pk);                         // pivot about her middle rather than her feet
-
-    // Ponytail: flows back as she speeds up, ripples along its length, swings opposite to turns.
-    tailPhase += sdt * (2.5 + k * 7);
-    var sway = Math.max(-0.5, Math.min(0.5, turnRate * 0.05));
-    updateTail(k, sway, tailPhase);
 
     sun.position.set(player.position.x + 24, player.position.y + 48, player.position.z + 16);
     sun.target.position.copy(player.position);
