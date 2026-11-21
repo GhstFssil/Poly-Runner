@@ -1,5 +1,8 @@
 import re,subprocess,sys
 ok=True
+# the game file is generated from src/: a hand edit of it, or a forgotten `python3 tools/build.py`, fails here
+r=subprocess.run(['python3','/home/claude/poly-runner/tools/build.py','--check'],capture_output=True,text=True); print(r.stdout.strip())
+if r.returncode: ok=False
 for f in ['/home/claude/poly-runner/checker-run.html','/home/claude/poly-runner/path-editor.html']:
     s=open(f).read()
     for i,m in enumerate(re.findall(r'<script(?![^>]*src)[^>]*>(.*?)</script>',s,re.S)):

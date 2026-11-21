@@ -1,5 +1,5 @@
-# Builds the Path Editor into the game: a <template> + a boot function, between markers in checker-run.html
-import re,sys
+# Builds the Path Editor into the game: a <template> + a boot function, between markers in the source part that holds them (see src/manifest.json), then rebuilds the game file
+import re,sys,os
 src=open('/home/claude/poly-runner/path-editor.html').read()
 css=re.search(r'<style>(.*?)</style>',src,re.S).group(1)
 css=css[css.index('*{box-sizing'):].replace('body{','.pe-wrap{',1)
@@ -38,10 +38,12 @@ js+="""
   $('peL2').onclick = function () { if (HOST.__import) HOST.__import(2); };
 """
 block="<!--PE-BEGIN-->\n<template id=\"pe-tpl\"><style>"+head+css+"</style>"+body+"</template>\n<script>window.__peBoot=function(SR,HOST){"+js+"};</script>\n<!--PE-END-->\n"
-g=open('/home/claude/poly-runner/checker-run.html').read()
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import build
+try: sp,g=build.part_with('<!--PE-BEGIN-->')
+except SystemExit: sp,g=build.part_with('<script id="molly-settings"')
 if '<!--PE-BEGIN-->' in g:
     i=g.index('<!--PE-BEGIN-->'); j=g.index('<!--PE-END-->\n')+len('<!--PE-END-->\n'); g=g[:i]+block+g[j:]
 else:
     k=g.index('<script id="molly-settings"'); g=g[:k]+block+g[k:]
-open('/home/claude/poly-runner/checker-run.html','w').write(g)
+build.write_part(sp,g); build.write()
 print('ok',len(block))

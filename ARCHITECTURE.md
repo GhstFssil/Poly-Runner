@@ -3,7 +3,8 @@
 **What:** Poly Run (Polyrunner), a single-file three.js r128 platformer starring Molly, with an embedded Path Editor and Rig Editor.
 
 ## Files
-- `checker-run.html`: the whole game, a single file built on three.js r128. It embeds:
+- `src/` and `tools/build.py`: the game's source. `src/manifest.json` names the output file and lists the source parts, which `python3 tools/build.py` joins byte for byte, in that order, into `checker-run.html` (`--check` fails if the two differ). The split into parts is in progress (see BACKLOG.md); until it is done `src/index.html` holds the whole game. **Edit `src/`, then build.** `tools/mk_pe_embed.py` and `tools/bake_models.py` edit the part that holds their markers, then build.
+- `checker-run.html`: the shipped game, a single file built on three.js r128. It is generated from `src/` but committed (tests, the release workflow and the desktop app read it); never hand-edit it. It embeds:
   - the Path Editor, between `<!--PE-BEGIN-->` and `<!--PE-END-->`, generated from `path-editor.html` by `python3 tools/mk_pe_embed.py` (never hand-edit the embed);
   - the Rig Editor, in `<template id="rig-tpl">`, booted by `window.__rigBoot`;
   - the built-in models `#molly-glb` and `#comet-glb`, baked by `python3 tools/bake_models.py`;
@@ -48,13 +49,14 @@
 
 ## Run and test
 - Once per fresh session: `sh tests/setup.sh`.
-- After every edit: `python3 tests/chk.py && python3 tests/mk_test.py`. Then run only the tests for the area touched (map in any SWEEP-*.md), from inside `tests/`.
+- After every edit to `src/`: `python3 tools/build.py && python3 tests/chk.py && python3 tests/mk_test.py` (`chk.py` fails if the game file is out of sync with `src/`). Then run only the tests for the area touched (map in any SWEEP-*.md), from inside `tests/`.
 - Tests under `tests/fu/` are per-feature; run one only when touching that feature.
 - Old build for comparison: `python3 tests/mk_test.py OLD.html /tmp/polyrun-work/t/aud_main.html`, then pass `html='aud_main.html'` to `Rig()`.
 - Keep scratch backups in `/tmp`, never in the repo.
 
 ## Docs
 - `README.md`: what it is, run, test, updating, files.
+- `src/manifest.json`: the build's output name and part list.
 - `CLAUDE.md`: working rules for sessions (Ricky approves edits).
 - `ARCHITECTURE.md`: this file.
 - `HANDOFF.md`: current state; overwritten each time.

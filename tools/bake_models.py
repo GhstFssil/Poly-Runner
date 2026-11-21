@@ -1,9 +1,11 @@
 # Bakes the built-in runner models from the shipped settings (the molly-settings and comet-settings script tags), using the Rig Editor's own
-# Save to game export in a headless browser with empty storage, and writes them into checker-run.html as molly-glb and comet-glb.
+# Save to game export in a headless browser with empty storage, and writes them into the source part that holds them (see src/manifest.json) as molly-glb and comet-glb, then rebuilds the game file.
 # Needs the test harness (sh tests/setup.sh once). Run from the repo root:  python3 tools/bake_models.py
 import os, re, subprocess, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'tests'))
+sys.path.insert(0, os.path.join(ROOT, 'tools')); import build
+subprocess.check_call([sys.executable, os.path.join(ROOT, 'tools', 'build.py')], stdout=subprocess.DEVNULL)   # the test copy is made from the built game file
 subprocess.check_call([sys.executable, os.path.join(ROOT, 'tests', 'mk_test.py')], stdout=subprocess.DEVNULL)
 from righ import Rig, R
 
@@ -26,12 +28,12 @@ errs = [e for e in g.errs if 'flatShading' not in e and 'normalized normal' not 
 g.close()
 if errs: print('warnings:', errs[:4])
 
-p = os.path.join(ROOT, 'checker-run.html'); s = open(p).read()
+p, s = build.part_with('<script id="molly-glb"')
 s = re.sub(r'(<script id="molly-glb" type="text/plain">)[^<]*(</script>)', lambda m: m.group(1) + molly + m.group(2), s, count=1)
 if '<script id="comet-glb"' in s:
     s = re.sub(r'(<script id="comet-glb" type="text/plain">)[^<]*(</script>)', lambda m: m.group(1) + comet + m.group(2), s, count=1)
 else:
     m = re.search(r'<script id="molly-glb" type="text/plain">[^<]*</script>', s)
     s = s[:m.end()] + '\n<script id="comet-glb" type="text/plain">' + comet + '</script>' + s[m.end():]
-open(p, 'w').write(s)
+build.write_part(p, s); build.write()
 print('molly-glb %d bytes, comet-glb %d bytes (base64)' % (len(molly), len(comet)))
