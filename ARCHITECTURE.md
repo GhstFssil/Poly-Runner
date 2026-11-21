@@ -17,6 +17,7 @@
 - `tests/`: the Playwright + swiftshader harness (`righ.py` has the `Rig` class).
 - `.github/workflows/release.yml`: publishes under the `<div class="ver">` label when a push to `main` touches the game, `desktop/` or the release tooling.
 - `SWEEP-BUGS.md`, `SWEEP-EDGES.md`, `SWEEP-PERF.md`: the three nightly sweeps; their state files and reports go in `sweep-reports/`.
+- `GLOSSARY.md`: the one list of terms (what each means, which spelling to use, which names are frozen because they hold saved data). Use it in text, comments and docs; add a term when you introduce one.
 - `audit-notes.md`: the long log, frozen on 2026-11-20 (last entry v184); `HISTORY.md` continues it. The `var CHANGELOG` in the game is the player-facing log.
 
 ## Runners

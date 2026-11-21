@@ -15,3 +15,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-20 18:46 | next | split step 0: src/manifest.json + src/index.html + tools/build.py; checker-run.html is now generated (byte-identical); mk_pe_embed.py and bake_models.py edit src and rebuild; chk.py checks the build is in sync
 - 2026-11-20 21:39 | main | Docs: shipping means pushing to main as the next version; never give zips or artifacts unless asked
 - 2026-11-20 22:06 | main | Docs: publish wording matches the other projects (next merged into main as the next version)
+- 2026-11-21 07:59 | next | added GLOSSARY.md (terms, 'say this not that', frozen storage names); linked from ARCHITECTURE.md; entries marked proposed wait for Ricky

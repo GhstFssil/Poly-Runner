@@ -10,6 +10,7 @@ Poly Run (Polyrunner): a single-file three.js r128 platformer starring Molly, wi
 
 ## In progress
 - The split into source files (BACKLOG.md, "Separate track"). Next is step 1.
+- GLOSSARY.md is drafted on `next` (2026-11-21); the entries marked **proposed** wait for Ricky.
 
 ## Decisions (Ricky's unless marked)
 - Split plan (Claude's proposal, Ricky agreed broadly): files named by function (`src/data`, `editors/`, `game/{core,level1,level2,sandbox,runner,enemies,ui}`), joined by the manifest in today's order so each pure cut can be checked byte-identical; regrouping/reordering later, verified by tests. The main script is one closure: no code changes while cutting, no ES modules (`file://`).
@@ -19,9 +20,9 @@ Poly Run (Polyrunner): a single-file three.js r128 platformer starring Molly, wi
 - Mob dials live only in Molly's store. Comet's store never holds `mn.*` (`noMobs`).
 
 ## Next steps
-1. Ricky: approve the CLAUDE.md changes (it still says `checker-run.html` is THE game) before `next` goes to `main`.
+1. Ricky: approve the CLAUDE.md changes before `next` goes to `main`: edit `src/` then build (it still says `checker-run.html` is THE game), one area per task, and "use GLOSSARY.md terms; add new ones". Also confirm or change the proposed glossary terms (mob/enemy, character/runner, stat/dial, tile/square, Hedron Barrier).
 2. Step 1: cut the data (settings JSON, glb blobs, CHANGELOG, `OFFICIAL_L1`) into `src/data/`; step 2 editors; step 3 main script; step 4 update tools and tests; step 5 dependency check.
-3. Keep the rename to Poly Runner and the glossary in mind: no new "Poly Run"/"checker-run" strings (the output name is `output` in `src/manifest.json`).
+3. Use GLOSSARY.md for every new name (file, area, comment). No new "Poly Run"/"checker-run" strings (the output name is `output` in `src/manifest.json`). Area names follow the glossary: `characters`, not `runner`, if "character" is confirmed.
 4. Session start: check nightly branches (none unmerged as of 2026-11-17).
 
 ## Gotchas
