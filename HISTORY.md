@@ -16,3 +16,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-20 21:39 | main | Docs: shipping means pushing to main as the next version; never give zips or artifacts unless asked
 - 2026-11-20 22:06 | main | Docs: publish wording matches the other projects (next merged into main as the next version)
 - 2026-11-21 07:59 | next | added GLOSSARY.md (terms, 'say this not that', frozen storage names); linked from ARCHITECTURE.md; entries marked proposed wait for Ricky
+- 2026-11-21 08:52 | main | docs only: GLOSSARY.md added (final terms: mob not enemy, character, stat, tile, Barrier, Mud, Crags, capitalized labels); CLAUDE.md names it, says Poly Runner and characters; ARCHITECTURE.md Characters heading and stat wording; SWEEP docs say stats; BACKLOG notes the sweep generator is behind the docs

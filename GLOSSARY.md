@@ -2,7 +2,8 @@
 
 One source of truth for the game's words. Use these terms, spelled this way, in the game's text, the CHANGELOG, code comments, docs and commit messages. Ricky owns the names.
 
-- **proposed** marks Claude's pick where the repo disagrees with itself. It stays proposed until Ricky confirms or changes it; then the mark goes.
+- **proposed** marks a term Ricky has not confirmed yet. Claude proposes where the repo disagrees with itself; the mark goes when Ricky confirms. Every term here is confirmed today.
+- Labels: the names of things on buttons, tabs, panels and stamps are capitalized, every word (Big Minion, Pressure Plate, Seg Chain). Descriptive captions and sentences are written normally. Old CHANGELOG entries keep their original wording.
 - Add a term here in the same change that introduces it. Numbers (speeds, costs, cooldowns, sizes) live in the game and the Rig Editor, never here, so they can't go stale.
 - Checked against the game at v184 (2026-11-21). "Code" cells name the identifiers to search for.
 
@@ -12,12 +13,12 @@ One source of truth for the game's words. Use these terms, spelled this way, in 
 | Poly Runner | Poly Run, Polyrunner, PolyRun | the rename is in BACKLOG.md; applied to prose as files are touched |
 | Seg | segment (for the collectible) | a segment is a piece of a path |
 | segment | Seg (for a path piece) | see above |
-| Barrier | ball, shell (in text); Hedron Barrier **proposed** as the long name only | the Controls screen says Barrier |
+| Barrier | ball, shell, Hedron Barrier | one name; the Controls screen says Barrier |
 | stamp | object, element | the Path Editor's word for something placed |
-| mob (any kind), minion (the kind) **proposed** | enemy | see Mobs |
-| character **proposed** | runner (for Molly or Comet) | "runner" is part of the game's name |
-| tile **proposed** | square | TILE is 2 units |
-| stats **proposed** | dials | the Rig Editor has a Stats panel and no panel of dials |
+| mob (any kind); minion, Big Minion, Roost Gazer (the kinds) | enemy, enemies | everywhere: text, comments and code names. See Mobs |
+| character | runner (for Molly or Comet) | "runner" is part of the game's name |
+| tile | square | TILE is 2 units |
+| stat, stats | dial, dials | the Rig Editor has a Stats panel and no panel of dials |
 | saved / shipped / built-in | custom, default, baked-in (see Settings) | three distinct places |
 | Zips | u/s, units per second (in anything players read) | speeds are shown in Zips |
 
@@ -27,14 +28,14 @@ One source of truth for the game's words. Use these terms, spelled this way, in 
 | Poly Runner | the game | file becomes `poly-runner.html` (now `checker-run.html`) |
 | Molly | the main character | `CHAR = 'molly'` |
 | Comet | the second character: no Strafe, no Barrier; has Star Throw, Hover and Fly | `CHAR = 'comet'` |
-| character **proposed** | Molly or Comet; picked on the Characters page | `CHAR`, `setChar`, `loadCharModel`, `pr_char`. ARCHITECTURE.md's heading "Runners" becomes "Characters" |
+| character | Molly or Comet; picked on the Characters page | `CHAR`, `setChar`, `loadCharModel`, `pr_char` |
 | Ricky | builds the levels; Claude builds the tools and mechanics | CLAUDE.md |
 
 ## Units and space
 | Term | Meaning | Code / notes |
 |---|---|---|
 | unit (u) | the base length | |
-| tile **proposed** | 2 units; players' text says "square" in places | `TILE` |
+| tile | 2 units. Players' text says "tile", never "square" | `TILE` |
 | Zip | the speed unit: 1 Zip = 2 u/s, so one tile a second. Gravity is also in Zips (per second) | |
 | True Y | height measured from where her feet are at the start of the path | `yAbs`, `B.y0`, `o.T = ya + y0` |
 | world offsets | each level sits at its own x offset so levels never overlap | `L2_X`, `L3_X` |
@@ -55,24 +56,24 @@ One source of truth for the game's words. Use these terms, spelled this way, in 
 | Saved Sandboxes | layouts kept in the browser | `polyrun-sandboxes` |
 
 ## Things you place (Path Editor stamps)
-Each is a stamp. The name in the first column is the canonical spelling; the Path Editor and docs should match it.
+Each is a stamp. The first column is the exact label, as the Path Editor shows it.
 
 | Stamp | Code id | Notes |
 |---|---|---|
-| Tree, Trees (patch) | `tree`, `forest` | |
-| Minion, Big Minion, Roost Gazer | `minion`, `bigminion`, `gazer` | see Mobs. The inspector's name list says "Big minion"; fix to "Big Minion" |
-| Seg, Seg chain | `seg`, `segchain` | a chain follows the path or its own curve |
-| Toxic patch | `toxic` | hurts. Toxic ground is terrain, a Toxic patch is a stamp |
-| Caution sign | `sign` | |
+| Tree, Trees (Patch) | `tree`, `forest` | |
+| Minion, Big Minion, Roost Gazer | `minion`, `bigminion`, `gazer` | see Mobs |
+| Seg, Seg Chain | `seg`, `segchain` | a chain follows the path or its own curve |
+| Toxic Patch | `toxic` | hurts. Toxic ground is terrain, a Toxic Patch is a stamp |
+| Caution Sign | `sign` | |
 | Ramp | `ramp` | its last stretch is the Style Boost zone, marked with a red and white checkerboard |
-| Door, Pressure plate, Target | `door`, `plate`, `target` | a Door opens once every linked minion is beaten, the plate is pressed and the target is broken (`sbDoorLinked`) |
+| Door, Pressure Plate, Target | `door`, `plate`, `target` | a Door opens once every linked minion is beaten, the plate is pressed and the target is broken (`sbDoorLinked`) |
 | Checkpoint, Goal | `checkpoint`, `goal` | |
-| Player start | `start` | the tool says "Player start" |
-| Tip area | `tip` | a hint box that types itself out when you enter it (`showHint`) |
+| Player Start | `start` | |
+| Tip Area | `tip` | a hint box that types itself out when you enter it (`showHint`) |
 | Cave, Hill, Lake, Spawner | `cave`, `hill`, `lake`, `spawner` | |
 | Ledge, Platform, Gap | `ledge`, `platform`, `gap` | |
-| Mud | `mud` | the inspector's name list says "Mud stretch"; one of them should change |
-| Crags, Terrain patch | `crag`, `patch` | the name list says "Crag patch" for `crag`; one of them should change |
+| Mud | `mud` | not "Mud stretch" |
+| Crags, Terrain Patch | `crag`, `patch` | Crags, not "Crag patch" |
 
 Path Editor panel words: inspector, next-stamp panel, presets (`polyrun-pe-presets`), Snap, Layer, Bend, Rise, Length, Width, Height, Rotation, Heading.
 
@@ -103,11 +104,11 @@ Path Editor panel words: inspector, next-stamp panel, presets (`polyrun-pe-prese
 ## Mobs
 | Term | Meaning | Code / notes |
 |---|---|---|
-| mob **proposed** | any kind of creature that is not a character: the umbrella word, and the Rig Editor's Mobs page | `mn.*` (Molly's store only; Comet's never has them: `noMobs`) |
+| mob | any kind of creature that is not a character: the umbrella word, and the Rig Editor's Mobs page | `mn.*` (Molly's store only; Comet's never has them: `noMobs`) |
 | minion | the basic mob; in the changelog the word for the kind | |
 | Big Minion | the large minion | |
 | Roost Gazer | the flying mob: a minion's head with wings and one big eye. Behavior is Chases, Idle or Cycle | |
-| enemy | avoid in new text. Player hints currently say "enemies" **proposed** change to "minions" or "mobs" | |
+| enemy | retired: say mob, or the kind. Applies to text, comments and code names | |
 
 ## Editors and settings
 | Term | Meaning | Code / notes |
@@ -115,7 +116,7 @@ Path Editor panel words: inspector, next-stamp panel, presets (`polyrun-pe-prese
 | Path Editor | builds layouts. Source `path-editor.html`, embedded in the game | `__peBoot`, `PE-BEGIN`/`PE-END` |
 | Rig Editor | edits the characters' and mobs' models and stats. Pages: Molly, Comet, Mobs | `rig-tpl`, `__rigBoot`, `setPage` |
 | model | a character's 3D body, a `.glb` file | |
-| stat **proposed** | one number that changes how a character or mob plays or looks. The Rig Editor's Stats panel lists them. "Dials" is retired | `DEFM`, `DEFC` |
+| stat | one number that changes how a character or mob plays or looks. The Rig Editor's Stats panel lists them. "Dials" is retired | `DEFM`, `DEFC` |
 | settings | a character's or the mobs' whole set of stats, as one bundle. Copy settings copies all three pages as a block | |
 | saved | in the player's browser: localStorage `runnerRig2`, `cometRig`; models in IndexedDB | |
 | shipped | inside the game file: `#molly-settings`, `#comet-settings` (Comet's has no `mn.*`), and the models `#molly-glb`, `#comet-glb` | `SHIPPED[ch]` |
@@ -124,12 +125,14 @@ Path Editor panel words: inspector, next-stamp panel, presets (`polyrun-pe-prese
 | bake | write the shipped models into the game file | `tools/bake_models.py` |
 
 ## Build, repo and process
+The rows for src, part, build and the game file describe the source split, which is on `next` until the next version ships. On `main` the game file is still edited directly.
+
 | Term | Meaning | Code / notes |
 |---|---|---|
 | src, part | the source files in `src/`; a part is one file the build joins | `src/manifest.json` |
 | build | join the parts, byte for byte, into the game file | `python3 tools/build.py` |
 | the game file | the generated, committed single HTML file | `checker-run.html` now |
-| area **proposed** | a group of source files by function (core, level1, level2, sandbox, characters, mobs, ui). One task works in one area. The tests are mapped by area | |
+| area | a group of source files by function (core, level1, level2, sandbox, characters, mobs, ui). One task works in one area. The tests are mapped by area | |
 | version label | the `v184` in `<div class="ver">`; a push to `main` bumps it | |
 | next, main | `next` is where work happens; `main` is what ships | |
 | publish | merge `next` into `main` as the next version; the release workflow does the rest | CLAUDE.md |
