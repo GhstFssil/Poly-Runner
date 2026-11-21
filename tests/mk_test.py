@@ -12,7 +12,7 @@ hooks=r"""
   window.__mudAt = function (x, z) { return sbMudAt(x, z); };
   window.__put = function (x, y, z) { player.position.set(x, y, z); fallTop = y; vy = 0; grounded = true; speed = 0; };
   window.__gH = function (x, z) { return groundH(x, z); };
-  window.__ens = function () { return ENEMIES.map(function (e, i) { return { i: i, x: e.x, z: e.z, fy: e.fy, H: e.H, R: e.R, sc: e.sc, dead: e.dead, act: e.act, hearts: e.hearts, big: e.big, sbp: !!e.sbp, top: e.c.top, stomp: e.c.stomp, vis: e.g.visible, gz: !!e.gz, ay: e.ay, gm: e.gm, vx: e.vx, vz: e.vz }; }); };
+  window.__ens = function () { return MOBS.map(function (e, i) { return { i: i, x: e.x, z: e.z, fy: e.fy, H: e.H, R: e.R, sc: e.sc, dead: e.dead, act: e.act, hearts: e.hearts, big: e.big, sbp: !!e.sbp, top: e.c.top, stomp: e.c.stomp, vis: e.g.visible, gz: !!e.gz, ay: e.ay, gm: e.gm, vx: e.vx, vz: e.vz }; }); };
   window.__vy = function (v) { if (v !== undefined) { vy = v; grounded = false; } return vy; };
   window.__ball = function () { return ballOn; };
   window.__spd = function (v) { if (v !== undefined) speed = v; return speed; };
@@ -31,7 +31,7 @@ hooks=r"""
   window.__camOv = null; (function () { var cam2 = null; function loop() { if (window.__camOv) { if (!cam2) cam2 = camera.clone(); var o = window.__camOv; cam2.aspect = camera.aspect; cam2.fov = o.fov || 60; cam2.far = 4000; cam2.updateProjectionMatrix(); cam2.position.set(o.p[0], o.p[1], o.p[2]); cam2.lookAt(o.l[0], o.l[1], o.l[2]); renderer.render(scene, cam2); } requestAnimationFrame(loop); } setTimeout(function () { requestAnimationFrame(loop); }, 3000); })();
   window.__molly = function () { var bb = mollyRoot ? new THREE.Box3().setFromObject(mollyRoot) : null, n = 0, nan = 0; if (mollyMesh) { var a = mollyMesh.geometry.attributes.position.array; n = a.length / 3; for (var i = 0; i < a.length; i++) if (!isFinite(a[i])) nan++; } return { on: mollyOn, hasRoot: !!mollyRoot, verts: n, nan: nan, bb: bb ? [bb.min.y, bb.max.y, bb.max.x - bb.min.x] : null, clips: Object.keys(mollyAct), durs: Object.keys(mollyAct).map(function (k) { return +mollyAct[k].getClip().duration.toFixed(3); }), holdF: mollyHoldF, bodyKids: body.children.length, stored: typeof mollySavedBytes === 'number' ? mollySavedBytes : -1, storedLS: (localStorage.getItem('mollyGlb') || '').length, hold: [typeof mollyHold === 'function' && mollyAct.Slide ? mollyHold('Slide', mollyAct.Slide.getClip().duration) : null, mollyAct.Faceplant ? mollyHold('Faceplant', mollyAct.Faceplant.getClip().duration) : null] }; };
   window.__phys = function () { return { GRAV: GRAV, GRIP: GRIP, DRIFT_GRIP: DRIFT_GRIP, WALL_FADE: WALL_FADE, SLOPE_FADE: SLOPE_FADE, WALL_GRIP: WALL_GRIP, JUMP_V: JUMP_V, JUMP_H: JUMP_H, TURN_R: TURN_R, ARC_CX: ARC_CX, RUN_SPEED: RUN_SPEED, PLAYER_H: PLAYER_H, PLAYER_RADIUS: PLAYER_RADIUS, SLIDE_H: SLIDE_H, mollyScale: mollyScale, FRIC: FRIC, FALL_MAX: FALL_MAX }; };
-  window.__pushOutOf = function (x, z, d) { pushOutOf(x, z, d); }; window.__bounce = function (i) { var e = ENEMIES[i]; bounceOffBig(e, e.R + 0.5); };
+  window.__pushOutOf = function (x, z, d) { pushOutOf(x, z, d); }; window.__bounce = function (i) { var e = MOBS[i]; bounceOffBig(e, e.R + 0.5); };
   window.__ballLean = function () { return [ballGroup.rotation.z, sideLean, ballOn, grounded, wallOn]; };
   window.__setHp = function (v) { hp = v; drawHearts(); };
   window.__solid = function (x, y, z) { return laserSolid(x, y, z, null); };

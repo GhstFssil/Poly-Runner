@@ -89,22 +89,22 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
 
     <h2>Stamps</h2>
     <div class="tools" id="tools">
-      <button data-tool="select" class="on">Select / move</button>
+      <button data-tool="select" class="on">Select / Move</button>
       <button data-tool="tree">Tree</button>
       <button data-tool="minion">Minion</button>
       <button data-tool="bigminion">Big Minion</button>
       <button data-tool="gazer">Roost Gazer</button>
-      <button data-tool="toxic">Toxic patch</button>
-      <button data-tool="sign">Caution sign</button>
+      <button data-tool="toxic">Toxic Patch</button>
+      <button data-tool="sign">Caution Sign</button>
       <button data-tool="seg">Seg</button>
-      <button data-tool="segchain">Seg chain</button>
+      <button data-tool="segchain">Seg Chain</button>
       <button data-tool="ledge">Ledge</button>
       <button data-tool="platform">Platform</button>
       <button data-tool="gap">Gap</button>
       <button data-tool="mud">Mud</button>
-      <button data-tool="forest">Trees (patch)</button>
+      <button data-tool="forest">Trees (Patch)</button>
       <button data-tool="crag">Crags</button>
-      <button data-tool="patch">Terrain patch</button>
+      <button data-tool="patch">Terrain Patch</button>
       <button data-tool="cave">Cave</button>
       <button data-tool="hill">Hill</button>
       <button data-tool="lake">Lake</button>
@@ -113,10 +113,10 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       <button data-tool="checkpoint">Checkpoint</button>
       <button data-tool="ramp">Ramp</button>
       <button data-tool="door">Door</button>
-      <button data-tool="plate">Pressure plate</button>
+      <button data-tool="plate">Pressure Plate</button>
       <button data-tool="target">Target</button>
-      <button data-tool="tip">Tip area</button>
-      <button data-tool="start">Player start</button>
+      <button data-tool="tip">Tip Area</button>
+      <button data-tool="start">Player Start</button>
       <button data-tool="erase">Erase</button>
     </div>
     <div id="clusterOpts" class="piece" hidden></div>
@@ -167,8 +167,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   function ghostMode() { return tool !== 'select' && tool !== 'erase' && tool !== 'preset' && tool !== 'forest'; }
   var tool = 'select', view = { cx: 300, cz: -300, zoom: 0.5 }, samples = [], total = 0, hist = [], hover = null, sel = -1, dpr = 1;
   var STRIPS = { segchain: 1, ledge: 1, platform: 1, gap: 1, mud: 1 };
-  var MOBS = ['minion', 'bigminion'];                         // enemies that can be set Idle (add any new mob type here)
-  var NAMES = { tree: 'Tree', minion: 'Minion', bigminion: 'Big minion', gazer: 'Roost Gazer', cave: 'Cave', toxic: 'Toxic patch', sign: 'Caution sign', seg: 'Seg', segchain: 'Seg chain', ledge: 'Ledge', platform: 'Platform', gap: 'Gap', mud: 'Mud stretch', crag: 'Crag patch', patch: 'Terrain patch', spawner: 'Spawner', hill: 'Hill', lake: 'Lake', goal: 'Goal', checkpoint: 'Checkpoint', ramp: 'Ramp', tip: 'Tip area', start: 'Player start', door: 'Door', plate: 'Pressure plate', target: 'Target' };
+  var MOB_KINDS = ['minion', 'bigminion'];                         // mob kinds that can be set Idle (add any new mob kind here)
+  var NAMES = { tree: 'Tree', minion: 'Minion', bigminion: 'Big Minion', gazer: 'Roost Gazer', cave: 'Cave', toxic: 'Toxic Patch', sign: 'Caution Sign', seg: 'Seg', segchain: 'Seg Chain', ledge: 'Ledge', platform: 'Platform', gap: 'Gap', mud: 'Mud', crag: 'Crags', patch: 'Terrain Patch', spawner: 'Spawner', hill: 'Hill', lake: 'Lake', goal: 'Goal', checkpoint: 'Checkpoint', ramp: 'Ramp', tip: 'Tip Area', start: 'Player Start', door: 'Door', plate: 'Pressure Plate', target: 'Target' };
 
   var msel = [], clip = null, marq = null, nextLayer = 2;
   function setSel(i) { sel = i; msel = []; }
@@ -879,7 +879,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       h += '<label class="f">Behavior<select data-ok="gm">' + [['chase', 'Chases Molly (buzzes round her head)'], ['idle', 'Idle (hovers still, turns to face her)'], ['cycle', 'Cycle (moves in a set pattern)']].map(function (m) { return '<option value="' + m[0] + '"' + ((o.gm || 'chase') === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>' + num('hgt', 'Hover height above the ground', -500, 500, 0.5, o.hgt);
       if (o.gm === 'cycle') h += '<label class="f">Movement<select data-ok="move">' + [['side', 'Side to side'], ['forward', 'Forward and back'], ['vertical', 'Up and down']].map(function (m) { return '<option value="' + m[0] + '"' + (o.move === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>' + num('dist', 'Travel (units)', 1, 1000, 1, o.dist) + num('period', 'Seconds per full cycle', 0.5, 120, 0.5, o.period) + num('phase', 'Phase (seconds into the cycle)', 0, 120, 0.1, o.phase || 0);
     }
-    if (MOBS.indexOf(o.t) >= 0) h += '<label class="f">Behavior<select data-ok="idle"><option value="0"' + (o.idle ? '' : ' selected') + '>Chases Molly</option><option value="1"' + (o.idle ? ' selected' : '') + '>Idle (stands still, turns to face her)</option></select></label>';
+    if (MOB_KINDS.indexOf(o.t) >= 0) h += '<label class="f">Behavior<select data-ok="idle"><option value="0"' + (o.idle ? '' : ' selected') + '>Chases Molly</option><option value="1"' + (o.idle ? ' selected' : '') + '>Idle (stands still, turns to face her)</option></select></label>';
     if (o.t === 'hill') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('h', 'Height', 1, 500, 0.5, o.h) + '<label class="f">Surface<select data-ok="rock"><option value="rock"' + (o.rock === 'rock' ? ' selected' : '') + '>Bare rock</option><option value="grass"' + (o.rock === 'grass' ? ' selected' : '') + '>Grass</option></select></label>';
     if (o.t === 'lake') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('depth', 'Depth', 1, 200, 0.5, o.depth) + num('wl', 'Water level adjust (+ raises it)', -500, 500, 0.5, o.wl || 0);
     if (o.t === 'spawner') h += num('r', 'Radius', 2, 1000, 1, o.r) + num('every', 'Every (seconds)', 0.2, 120, 0.2, o.every) + num('max', 'Most alive at once', 1, 100, 1, o.max);
@@ -1022,7 +1022,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (o.t === 'crag') { r.radius = o.r; r.count = o.count; r.baseRadius = o.base; r.baseRadiusVar = o.baseV; r.height = o.hgt; r.heightVar = o.hgtV; r.spacing = o.gap; r.spacingVar = o.gapV; r.seed = o.seed; }
       if (o.t === 'patch') { r.shape = o.shape; r.width = o.w; r.length = o.d; r.ground = o.ground; r.edge = o.edge; if (o.edge !== 'hard') r.soften = o.soft; }
       if (o.t === 'spawner') { r.radius = o.r; r.every = o.every; r.max = o.max; }
-      if (MOBS.indexOf(o.t) >= 0 && o.idle) r.idle = true;
+      if (MOB_KINDS.indexOf(o.t) >= 0 && o.idle) r.idle = true;
       if (o.t === 'gazer') { r.mode = o.gm || 'chase'; r.height = o.hgt; if (o.gm === 'cycle') { r.move = o.move; r.travel = o.dist; r.period = o.period; r.phase = o.phase || 0; } }
       if (o.t === 'cave') { r.shape = o.shape; r.width = o.w; r.height = o.h; r.roll = o.roll; r.angle = o.ang; r.depth = o.len; r.curvature = o.bend; r.slope = o.slope; if (o.carve) r.carve = o.carve; if (o.angSet && o.after !== undefined) r.angleSet = true; }
       if (o.t === 'hill') { r.radius = o.r; r.height = o.h; r.surface = o.rock; }
@@ -1215,7 +1215,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         if (r.type === 'tree' && r.exact) { o.ex = true; o.tH = r.trunkHeight || 15.5; o.tW = r.trunkWidth || 1.6; o.cH = r.canopyHeight || 14.9; o.cW = r.canopyWidth || 7.4; }
         if (r.type === 'crag') { o.r = r.radius || 60; o.count = r.count || 25; o.seed = r.seed || (1 + Math.floor(Math.random() * 2000000000)); if (r.heightVar !== undefined) { o.base = r.baseRadius || 5.5; o.baseV = r.baseRadiusVar || 0; o.hgt = r.height || 4; o.hgtV = r.heightVar || 0; o.gap = r.spacing || 0; o.gapV = r.spacingVar || 0; } else { o.base = 5.5; o.baseV = 2; o.hgt = Math.round(0.675 * (r.height || 6) * 10) / 10; o.hgtV = Math.round(0.325 * (r.height || 6) * 10) / 10; o.gap = 0; o.gapV = 0; } }
         if (r.type === 'patch') { o.shape = r.shape || 'ellipse'; o.w = r.width || 200; o.d = r.length || 150; o.ground = r.ground || 'grass'; o.edge = r.edge === 'hard' ? 'hard' : 'soft'; o.soft = r.soften === undefined ? 30 : r.soften; }
-        if (MOBS.indexOf(r.type) >= 0 && r.idle) o.idle = true;
+        if (MOB_KINDS.indexOf(r.type) >= 0 && r.idle) o.idle = true;
         if (r.type === 'cave') { o.shape = r.shape || 'rect'; o.w = r.width || 8; o.h = r.height || 8; o.roll = r.roll || 0; o.ang = r.angle === undefined ? 20 : r.angle; o.len = r.depth || 60; o.bend = r.curvature || 0; o.slope = r.slope || 0; o.carve = r.carve || 0; o.angSet = !!r.angleSet; }
         if (r.type === 'hill') { o.r = r.radius || 80; o.h = r.height || 20; o.rock = r.surface || 'rock'; }
         if (r.type === 'lake') { o.r = r.radius || 100; o.depth = r.depth || 12; o.wl = r.waterAdjust || 0; }

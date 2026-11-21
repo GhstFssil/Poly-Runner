@@ -104,7 +104,7 @@ Path Editor panel words: inspector, next-stamp panel, presets (`polyrun-pe-prese
 ## Mobs
 | Term | Meaning | Code / notes |
 |---|---|---|
-| mob | any kind of creature that is not a character: the umbrella word, and the Rig Editor's Mobs page | `mn.*` (Molly's store only; Comet's never has them: `noMobs`) |
+| mob | any kind of creature that is not a character: the umbrella word, and the Rig Editor's Mobs page | `MOBS` (the mobs in the level), `MOB_KINDS` (Path Editor: kinds that can be set Idle), `killMob`, `updateMobs`; `mn.*` (Molly's store only; Comet's never has them: `noMobs`) |
 | minion | the basic mob; in the changelog the word for the kind | |
 | Big Minion | the large minion | |
 | Roost Gazer | the flying mob: a minion's head with wings and one big eye. Behavior is Chases, Idle or Cycle | |
@@ -140,6 +140,9 @@ The rows for src, part, build and the game file describe the source split, which
 | CHANGELOG | the player-facing log, `var CHANGELOG` in the game | |
 | HISTORY, HANDOFF, BACKLOG | the change record (append-only), the state of the work, the list of bugs and ideas | |
 | audit-notes | the old log, frozen at v184 | |
+
+## Open conflicts (Ricky decides)
+- Rotation (`rot`) and Heading (`heading`) name the same thing on different stamps: free stamps turn with `rot`, strip stamps (ledges, mud, platforms, gaps, Seg Chains) with `heading`. Saved layouts hold these keys, so the old name must still be read on load.
 
 ## Frozen names (they look old but hold players' saved data)
 Renaming any of these loses saved layouts, settings and models unless the game reads the old name first and writes the new one. The rename task must decide each one; until then they stay as they are.

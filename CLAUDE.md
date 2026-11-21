@@ -20,10 +20,11 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (levels) and
 - `audit-notes.md` is frozen (log up to 2026-11-20, v184): no new entries; read only its last section if you need it. The player-facing log is `var CHANGELOG` in the game.
 
 ## Testing
-- After every edit: `python3 tests/chk.py && python3 tests/mk_test.py`, then only the tests for the area touched (each SWEEP-*.md has the map). Once per fresh session: `sh tests/setup.sh`.
+- After every edit: `python3 tools/build.py && python3 tests/chk.py && python3 tests/mk_test.py` (`chk.py` fails if the game file is out of sync with `src/`), then only the tests for the area touched (each SWEEP-*.md has the map). Once per fresh session: `sh tests/setup.sh`.
 
 ## Project
-- `checker-run.html` (3.4 MB) is THE game: grep and read line ranges only. Never hand-edit between `<!--PE-BEGIN-->` and `<!--PE-END-->`: edit `path-editor.html`, then run `python3 tools/mk_pe_embed.py`.
+- The game is built from `src/` (`src/manifest.json` lists the parts) into `checker-run.html` (3.4 MB, generated, committed). Edit `src/`, never `checker-run.html`, then run `python3 tools/build.py`. Grep and read line ranges only. Never hand-edit between `<!--PE-BEGIN-->` and `<!--PE-END-->`: edit `path-editor.html`, then run `python3 tools/mk_pe_embed.py` (it rebuilds).
+- Work in one area at a time (an area is a group of source files by function; see GLOSSARY.md): name it first, edit only its files and tests, and give a reason before touching another.
 - No physics changes to compensate for level problems. Units: TILE 2, 1 Zip = 2 u/s; show speeds in Zips.
 - Game-changing sessions: add a CHANGELOG entry at the top of `var CHANGELOG`.
 - Session start: `git ls-remote origin 'refs/heads/nightly/*'`; read the newest unmerged report of each sweep and give Ricky a 3-line summary. Merging nightly fixes follows the decimal-version rule in ARCHITECTURE.md.
