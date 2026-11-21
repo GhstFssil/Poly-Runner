@@ -29,7 +29,7 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (levels) and
 - The nightly sweeps (bugs, edges, perf) work only on `nightly/*` branches, never `main`, except appending to `.md` docs there (not sweep reports), then merging `main` into `next`. They never change features, physics, tuning, looks or design: those suggestions go in the report and BACKLOG.md (SWEEP-BUGS.md, SWEEP-EDGES.md, SWEEP-PERF.md).
 
 ## Shipping
-- Do not send a zip or publish an artifact unless asked.
+- Ship/publish means pushing to `main` as the next version (rules below); the release workflow does the rest. Never send a zip or publish an artifact unless asked.
 - Interactive work goes on `next`. Always ask before merging `next` into `main` or any other push to `main`.
 - By default, every push to `main` that isn't docs-only bumps the `<div class="ver">` label to the next whole number (v184 -> v185) in that same push, with its CHANGELOG entry, unless Ricky says otherwise. The release workflow publishes under the label, so an unchanged label overwrites that release.
 - Nightly sweeps: one decimal bump per night (v184 -> v184.1, then v184.1 -> v184.2), applied when the night's first fix branch is merged to `main`; the rest of that night's edits keep the number (details: ARCHITECTURE.md).
