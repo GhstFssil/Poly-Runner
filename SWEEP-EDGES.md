@@ -41,7 +41,7 @@ Read it from the base branch. If the base has none (the first night, or every br
 This sweep watches the game run rather than reading for bugs (the bugs sweep does that). Find out what the slice draws or does, then drive it headless to its edges and check both what it looks like and how it behaves.
 
 **Edges to try** (pick the ones that fit the slice):
-- Limits: the ends of a level or of the world, the first and last piece of a path, the smallest and largest values a dial or setting allows, zero, empty and one-of-something cases (an empty layout, a single stamp, many overlapping ones).
+- Limits: the ends of a level or of the world, the first and last piece of a path, the smallest and largest values a stat or setting allows, zero, empty and one-of-something cases (an empty layout, a single stamp, many overlapping ones).
 - Transitions: pause and resume, respawn, checkpoint, level switch, the five-minute clock running out, opening and closing an editor, saving and loading.
 - Extremes in play: top speed, steep and near-vertical slopes, walls, caves, landing from great heights, strafing into things, inputs pressed together or very fast, a dropped frame (a long time step).
 - The editor: undo and redo at both ends, copy and paste of nothing or of everything, presets and layers at their limits, a layout the game must still load.
@@ -60,7 +60,7 @@ Fix only a clear fault with one obvious cause, locally, with a test that shows i
 - Path Editor (`path-editor.html`): `peobj.py`, `pesave.py`, `pecycle.py`, `pegho.py`, `pefuzz.py` (several minutes: run it last).
 - Sandbox and levels (`sbBuild`, footprints, caves, walls): `fu/ends1.py` plus a test of your own for what you touched.
 - Stats and movement details: `fu/fu1.py`, `fu/fu1b.py`.
-- Rig Editor dials, loading and settings: `rx8.py`, `fu/fu2.py`, `fu/fu4.py`; model build, welds and weights: `rw4.py`, `rm1.py`, `fu/fu3.py`; saved model storage: `fu/fu6.py`.
+- Rig Editor stats, loading and settings: `rx8.py`, `fu/fu2.py`, `fu/fu4.py`; model build, welds and weights: `rw4.py`, `rm1.py`, `fu/fu3.py`; saved model storage: `fu/fu6.py`.
 - Plus every test in the state file's "Tests added by nights" for the area.
 
 ## For Ricky

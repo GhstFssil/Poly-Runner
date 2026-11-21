@@ -1,4 +1,4 @@
-# Poly Run (Polyrunner): working rules
+# Poly Runner: working rules
 Single-file three.js r128 platformer starring Molly, built by Ricky (levels) and Claude (tools, mechanics). Don't edit this file without Ricky's approval. Keep it under ~25 lines of rules.
 
 ## Session economy
@@ -12,7 +12,8 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (levels) and
 - When a task is done, say so and suggest continuing here or starting fresh.
 
 ## Docs
-- Stable facts (files, runners, world, branches, versions, test commands) live in ARCHITECTURE.md, not in conversation. Read only the section you need.
+- Stable facts (files, characters, world, branches, versions, test commands) live in ARCHITECTURE.md, not in conversation. Read only the section you need.
+- GLOSSARY.md is the one list of terms: use its terms and spellings in text, comments, docs and names, and add a term in the same change that introduces it. Names it lists as frozen hold saved data: never rename them without a migration.
 - HANDOFF.md (repo root; overwrite each time; Goal, Done, In progress, Decisions, Next steps, Gotchas; under 40 lines): update after each completed step or major decision. If the session gets long, off-topic or cluttered, say so in one line, update HANDOFF.md first, then recommend a fresh session.
 - BACKLOG.md: either of us logs bugs and ideas as `- [ ] (who, YYYY-MM-DD) text`. Don't act on entries unasked. Delete an entry when it's done.
 - HISTORY.md: append-only record of every change since 2026-11-20. In the same commit as each change, add one line: `echo '- YYYY-MM-DD HH:MM | branch or version | what changed' >> HISTORY.md` (America/Chicago time). Never edit or delete earlier lines (correct with a new line). It is long, so don't read it unless Ricky asks. The nightly sweeps add their own line every night.

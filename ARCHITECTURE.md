@@ -16,17 +16,18 @@
 - `tests/`: the Playwright + swiftshader harness (`righ.py` has the `Rig` class).
 - `.github/workflows/release.yml`: publishes under the `<div class="ver">` label when a push to `main` touches the game, `desktop/` or the release tooling.
 - `SWEEP-BUGS.md`, `SWEEP-EDGES.md`, `SWEEP-PERF.md`: the three nightly sweeps; their state files and reports go in `sweep-reports/`.
+- `GLOSSARY.md`: the one list of terms (what each means, which spelling to use, which names are frozen because they hold saved data). Use it in text, comments and docs; add a term when you introduce one.
 - `audit-notes.md`: the long log, frozen on 2026-11-20 (last entry v184); `HISTORY.md` continues it. The `var CHANGELOG` in the game is the player-facing log.
 
-## Runners
+## Characters
 - `CHAR` is 'molly' or 'comet' (localStorage `pr_char`), picked on the Characters page; `setChar` switches.
-- Dials are stored in `runnerRig2` (Molly, plus the `mn.*` mob dials) and `cometRig` (Comet, never `mn.*`).
+- Stats are stored in `runnerRig2` (Molly, plus the `mn.*` mob stats) and `cometRig` (Comet, never `mn.*`).
 - Lookup order is `rigPick`: what's stored, then `SHIPPED[ch]`, then the built-in RIGCFG / COMET_DEF numbers.
 - Saved models are in IndexedDB `polyrun` / `kv` under `mollyGlb` and `cometGlb`; `loadCharModel` falls back to the built-in model.
 - Comet:
   - Star Throw: Q/E, `starPress` / `starRelease` / `spawnStar` / `cometStars`.
   - Hover and Fly: `hovOn` / `flyOn` / `applyStats`.
-  - Poses: dial sets `comet.pc|pt|pf|ho|fl.*`, applied by `cometPose` through the shared `window.__cometQ`.
+  - Poses: stat sets `comet.pc|pt|pf|ho|fl.*`, applied by `cometPose` through the shared `window.__cometQ`.
 - The Rig Editor has pages Molly / Comet / Mobs (`setPage`, `loadChar`, `DEFM` / `DEFC`). Copy settings copies `{molly, comet, mobs}`.
 
 ## World

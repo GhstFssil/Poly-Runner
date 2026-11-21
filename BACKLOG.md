@@ -23,3 +23,4 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 
 ## Nightly sweep suggestions
 Questions and suggestions the sweep may not act on (possible bugs that might be intended, features, physics, tuning, looks, design) are appended below by the sweep itself, one line each, tagged with the night's branch; details are in that night's report in `sweep-reports/`. Ricky promotes or deletes them.
+- [ ] (Claude, 2026-11-21) `tools/mk_sweep_docs.py` is behind the three SWEEP-*.md docs (they were edited by hand on 2026-11-20: the HISTORY.md lines, the version wording), so `--check` fails and running it would delete those lines. Sync the generator from the docs, or retire it. Also carry over the 2026-11-21 wording change (dial -> stat).
