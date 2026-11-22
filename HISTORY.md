@@ -26,3 +26,7 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-22 08:14 | next | carved ui area (first cut): src/ui/speedometer.js, health.js, menu.js; b1 split into b1/b1b/b1c; b2 tail comment moved to data/changelog.js; build byte-identical
 - 2026-11-22 08:19 | next | ui second cut: src/ui/screens.js (screen handlers, Dev Mode, level map, scoring) from 06-script-d; build byte-identical
 - 2026-11-22 08:25 | v186 | published next as v186: ui area cuts (src/ui), version label and CHANGELOG entry; no game change
+- 2026-11-22 10:20 | next | synced next to main (fast-forward to v186 after next had been left at v185); no content change
+- 2026-11-22 10:21 | next | ui cut: Path Editor host (openPE, live view, yInfo) from 04-script-b1b to src/ui/path-editor-host.js; tail of b1b is now 04-script-b1b2; build byte-identical
+- 2026-11-22 10:22 | next | ui cut: Rig Editor host (openRig) from 04-script-b1b to src/ui/rig-editor-host.js; build byte-identical
+- 2026-11-22 10:23 | next | ui cut: 05-script-c.js moved whole to src/ui/menu-wiring.js; build byte-identical
