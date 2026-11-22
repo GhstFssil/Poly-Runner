@@ -20,6 +20,7 @@
     "unsorted/05-script-c.js",
     "data/level1.js",
     "data/level2.js",
+    "ui/screens.js",
     "unsorted/06-script-d.html"
   ]
 }
