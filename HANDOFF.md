@@ -9,6 +9,7 @@ Split the single-file game into `src/` parts by function (areas: core, level1, l
 - v185: mobs area (`src/mobs/mobs.js`), `tools/check_deps.py`. v186: ui cuts `speedometer`, `health`, `menu`, `screens`.
 - 2026-11-22: `next` had been left at v185 and was synced to `main` (fast-forward, v186).
 - 2026-11-22, on `next` (not published): ui cuts `src/ui/path-editor-host.js`, `rig-editor-host.js` (both from `04-script-b1b`; its tail is now `04-script-b1b2`) and `menu-wiring.js` (all of old `05-script-c.js`). Byte-identical; chk, mk_test, pe*, rx5/6/8, fu3, fu6, halfheart, y2, y3 pass.
+- 2026-11-22: level2 area: `src/level2/level2.js` (Oceana Crags, Crags, Sink; was `04-script-b1b` 483-713). Byte-identical; chk, mk_test, oc_new, reg2/3/4, coords1 pass. Part order is b1b, level2, b1b3, rig/path hosts, b1b2 (names are not in order).
 
 ## In progress
 Nothing half-done. The batch above is committed on `next`; no version bump until Ricky publishes.
@@ -19,7 +20,7 @@ Nothing half-done. The batch above is committed on `next`; no version bump until
 - The Rig Editor's own panel (`03-script-a`, about 57 rig mentions) stays for the characters area, not ui.
 
 ## Next steps
-1. Ui is mostly done. Still in `unsorted`: `06-script-d` (game loop, comet code), `04-script-b1b` (rest of core, caves, walls, plates). Pick the next area from `python3 tools/check_deps.py` (one area per task).
+1. Next areas, smallest first: level1 (`04-script-b1b` Valley, cave, doorway/mud ramp/field, about 445 lines at the top), then sandbox (Level 3, caves, walls, plates, about 1700 lines, split into several cuts), then `06-script-d` (game loop, comet code). One area per task; `python3 tools/check_deps.py` shows coupling.
 2. `menu-wiring.js` also holds pointer lock (`lockPointer`, `relockOnInput`): may belong in core; split later.
 3. `tools/mk_sweep_docs.py` is behind the SWEEP docs; sync or retire it, never regenerate blindly.
 4. Recheck on this build: `fu/nf1.py` (crashes), `fu/wall4.py` (times out), `fu/door4.py`, `fu/minionhit.py` (flaky).
