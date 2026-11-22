@@ -1,5 +1,5 @@
 var CHANGELOG = [
-  { v: 'Next', d: 'Nov 18, 2026', t: 'Tunnel floors, mobs and editor polish, unreleased', g: [
+  { v: 'v185', d: 'Nov 22, 2026', t: 'Tunnel floors, Roost Gazer, clearer names', g: [
     ['Fixes', [
       'In a sloped tunnel Molly now stands on the floor as it is drawn. Before, she stood above it: about 0.5 at 20 degrees, 1.6 at 35. The roof, a tunnel mouth\'s height and the opening a tunnel cuts in a shaft wall match the drawing too.',
       'The very bottom of a cone or bowl counts as flat, so the slope no longer creeps her about once she has landed there.'
@@ -38,6 +38,13 @@ var CHANGELOG = [
     ]],
     ['Barrier', [
       'The Barrier now tilts to the ground\'s cross-slope (and to a wall\'s bank) the way Molly\'s body does, instead of staying level.'
+    ]],
+    ['Names and wording', [
+      'Creatures that are not characters are now called mobs (minions, Big Minions and Roost Gazers are the kinds).',
+      'The Rig Editor lists numbers as Stats, not dials. Lengths are given in tiles.',
+      'The Barrier is called the Barrier everywhere, including the hints in the levels.',
+      'Every Path Editor, Rig Editor and menu label is now in Title Case.',
+      'Strips (ledges, mud, platforms, gaps, segment chains) now turn with Rotation, like the other stamps. Layouts you already saved still load.'
     ]]
   ]},
   { v: 'v184', d: 'Nov 17, 2026', t: 'Toxic bubbles and level fixes', g: [

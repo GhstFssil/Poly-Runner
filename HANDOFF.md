@@ -1,9 +1,10 @@
-# Handoff (2026-11-21)
+# Handoff (2026-11-22)
 
 ## Goal
 Split the single-file game into `src/` parts by function (areas: core, level1, level2, sandbox, characters, mobs, ui), with GLOSSARY.md as the one list of terms.
 
 ## Done
+- 2026-11-22: v185 published (next merged into main). Mobs area carved (`src/mobs/mobs.js`), `tools/check_deps.py` added.
 - Old procedural character body removed (47bdb52).
 - Step 0: `src/manifest.json` + `tools/build.py`; `checker-run.html` is generated, byte-identical, `chk.py` detects drift.
 - GLOSSARY.md written; docs-only push to main (7104d93), merged into `next`.
@@ -26,9 +27,9 @@ Nothing half-done. `next` has this batch committed (see HISTORY.md).
 - Done 2026-11-21: Title Case for 444 labels (script-converted; rule in GLOSSARY.md; `tcLabel` helper in `src/unsorted/03-script-a.html`). Tests and `tools/bake_models.py` text updated. `rg1.py` and `rig2.py` need comparison builds (aud_old.html, live.html) that are missing.
 
 ## Next steps
-1. Step 2: carve `src/unsorted/` into areas (one area per task, cut in place, byte-identical check), starting with a leaf (mobs or ui).
-2. Add `tools/check_deps.py` (warning only; plain split, no IIFEs for now: Ricky's call 2026-11-21).
-3. At release: v185 bump + CHANGELOG entry (Mob wording, Path Editor labels, Rotation, Barrier name in hints, Stats/tile wording); `tools/mk_sweep_docs.py` is behind the SWEEP docs, never regenerate it blindly.
+1. Carve the next area out of `src/unsorted/` (one area per task, cut in place, byte-identical check): `python3 tools/check_deps.py` shows the coupling; ui is the next leaf. Mobs is done (`src/mobs/mobs.js`).
+2. `tools/mk_sweep_docs.py` is behind the SWEEP docs; sync or retire it, never regenerate blindly (BACKLOG.md).
+3. Tests to recheck on this build: `fu/nf1.py` (crashes), `fu/wall4.py` (times out), `fu/door4.py`, `fu/minionhit.py` (flaky).
 
 ## Gotchas
 - Shallow clone: `git -c push.negotiate=true push`.
