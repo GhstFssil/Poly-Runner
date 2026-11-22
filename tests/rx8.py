@@ -59,9 +59,9 @@ g.ev("(function(){var R=document.getElementById('rigHost').shadowRoot;R.querySel
 print('J pasted bad settings:',g.status(),{k:g.P(k) for k in ['Shin.len','sides','cSuit','stat.grip','runF.dur']},'jump times',[g.P('m.jump.%d.t'%i) for i in range(8)],g.mesh())
 g.click('#resetAll',500)
 print('errs',errs(g)); g.close()
-# K + L: a browser that already holds bad dials and a broken saved model
+# K + L: a browser that already holds bad stats and a broken saved model
 g=Rig(draw=False, storage={'runnerRig2':json.dumps({'Foot.len':0,'sides':1e7,'m.slide.3.t':0.05,'cSuit':'xyz','barrier.radius':0,'m.drift.rate':-9,'stat.hearts':500,'barrier.cBody':'nope'}),'mollyGlb':bad64})
 m=json.loads(g.ev("JSON.stringify(__molly())")); print('L start with a broken saved model: molly on',m['on'],'verts',m['verts'],'nan',m['nan'],'bb finite',all(x is not None for x in m['bb']))
 print('K game hearts',g.ev("document.getElementById('hearts').children.length"))
-g.open(); print('  editor dials held:',{k:g.P(k) for k in ['Foot.len','sides','m.slide.3.t','cSuit','barrier.radius','m.drift.rate','stat.hearts','barrier.cBody']},g.mesh())
+g.open(); print('  editor stats held:',{k:g.P(k) for k in ['Foot.len','sides','m.slide.3.t','cSuit','barrier.radius','m.drift.rate','stat.hearts','barrier.cBody']},g.mesh())
 print('errs',errs(g)); g.close()

@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700&family=DM+Mono:wght@400;500&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  /* Layout: full-bleed 3D view with one centered start card and a speedometer dial in the bottom-left corner. */
+  /* Layout: full-bleed 3D view with one centered start card and a speedometer stat in the bottom-left corner. */
   :root {
     --sky: #9fc7e8;
     --ink: #2b1d14;
@@ -440,7 +440,7 @@
   <div id="speedo" hidden role="img" aria-label="Speedometer in Zips, tile lengths per second, with the time left">
     <div id="coords" hidden></div>
     <div class="timer" id="timer"><span class="tlabel">TIME LEFT</span><span class="tval" id="timeval">5:00</span></div>
-    <svg viewBox="0 0 200 124" id="dial">
+    <svg viewBox="0 0 200 124" id="stat">
       <path class="track" id="track"></path>
       <path class="fill" id="fill"></path>
       <path class="chtrack" id="chtrack" style="display:none"></path>
@@ -559,7 +559,7 @@ aside:not([data-page=comet]) #cometBox{display:none!important}
         <button data-m="rest" aria-pressed="false">Rest</button><button data-m="idle" aria-pressed="false">Idle</button><button data-m="runS" aria-pressed="false">Slow run</button><button data-m="run" aria-pressed="true">Mid run</button><button data-m="runF" aria-pressed="false">Fast run</button>
       </div>
       <div class="seg" id="modes2" role="group" aria-label="Moves">
-        <button data-m="jump" aria-pressed="false">Jump</button><button data-m="slide" aria-pressed="false">Slide</button><button data-m="fall" aria-pressed="false">Faceplant</button><button data-m="set" aria-pressed="false">Runner's pose</button><button data-m="drift" aria-pressed="false">Drift</button><button data-m="barrier" aria-pressed="false">Hedron Barrier</button><button data-m="cThrow" class="cometOnly" aria-pressed="false">Star throw</button><button data-m="cHover" class="cometOnly" aria-pressed="false">Hover</button><button data-m="cFly" class="cometOnly" aria-pressed="false">Fly</button>
+        <button data-m="jump" aria-pressed="false">Jump</button><button data-m="slide" aria-pressed="false">Slide</button><button data-m="fall" aria-pressed="false">Faceplant</button><button data-m="set" aria-pressed="false">Runner's pose</button><button data-m="drift" aria-pressed="false">Drift</button><button data-m="barrier" aria-pressed="false">Barrier</button><button data-m="cThrow" class="cometOnly" aria-pressed="false">Star throw</button><button data-m="cHover" class="cometOnly" aria-pressed="false">Hover</button><button data-m="cFly" class="cometOnly" aria-pressed="false">Fly</button>
       </div>
       <button class="btn" id="play" aria-pressed="false">Pause</button>
       <label class="phase"><span class="mono" style="color:var(--muted)">cycle</span><input type="range" id="phase" min="0" max="1" step="0.005" value="0.25" aria-label="Animation cycle position"></label>
@@ -585,7 +585,7 @@ aside:not([data-page=comet]) #cometBox{display:none!important}
       </details>
     </details>
     <details id="cometBox" open><summary>Comet's moves</summary>
-      <p class="sub">Comet has no Strafe and no Hedron Barrier. Q or E: Star Throw (hold to charge). 2: Hover. Space held in the air while hovering: Fly. Her look, run and stats above are her own copy of Molly's dials.</p>
+      <p class="sub">Comet has no Strafe and no Barrier. Q or E: Star Throw (hold to charge). 2: Hover. Space held in the air while hovering: Fly. Her look, run and stats above are her own copy of Molly's stats.</p>
       <h3>Hover</h3><div id="cHov"></div>
       <h3>Fly</h3><div id="cFly"></div>
       <h3>Star Throw</h3><div id="cStar"></div>
@@ -602,7 +602,7 @@ aside:not([data-page=comet]) #cometBox{display:none!important}
       <h3>Stats</h3><div id="minStats"></div>
       <div class="actions"><button class="btn" id="resetMin">Reset this one</button></div>
     </section>
-    <section class="editor" id="animSec" aria-label="Animation dials" hidden>
+    <section class="editor" id="animSec" aria-label="Animation stats" hidden>
       <h2 id="animTitle"></h2>
       <p class="sub" id="animNote"></p>
       <div id="animRows"></div>

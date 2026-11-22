@@ -14,7 +14,7 @@ for x,z in [(1672,-1000),(1700,-900),(1620,-1150),(1672,-1300),(1550,-800),(0,-3
     for k in range(16): pg.evaluate("([x,y,z])=>__put(x,y,z)",[X+x,yy,z]); pg.wait_for_timeout(250)
     res.append((x,z,round(yy,1),pg.evaluate("__bub()"),hp0-pg.evaluate("__dbg().hp")))
 cells=pg.evaluate("(function(){var m=__dbg().SB.toxCells,a=[];if(m)m.forEach(function(v){if(v)a.push(v[1])});a.sort(function(p,q){return p-q});return [m?m.size:0,a.length,a[0],a[a.length-1]]})()")
-print('poisoned squares cached (looked at, poisoned, lowest y, highest y):',cells)
+print('poisoned cells cached (looked at, poisoned, lowest y, highest y):',cells)
 print('(x, z, ground y, bubbles, hearts lost):',res)
 print('bubbles at every poisoned spot:',all(c>0 for *_,c,h in res[:5]),' none on the plain path:',res[5][3]==0,' all under cap 500:',all(c<=500 for _,_,_,c,_ in res))
 print('errors',[e for e in g.errs if 'GPU stall' not in e and 'flatShading' not in e and 'ERR_FAILED' not in e][:5])

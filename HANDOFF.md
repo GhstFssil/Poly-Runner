@@ -20,12 +20,13 @@ Nothing half-done. `next` has this batch committed (see HISTORY.md).
 - Cut in place first (byte-identical), reorder later.
 
 ## Open (Ricky decides)
-- Decided 2026-11-21, not yet done: use Rotation (`rot`; keep reading `heading` in old saves); sweep dials/squares/"Hedron Barrier"/sentence-case labels to the glossary terms; labels are Title Case.
+- Done 2026-11-21: Rotation (`rot`; old `heading` still read; test `tests/fu/rot1.py`), dials->stats, "Hedron Barrier"->Barrier (also in the level hints), tile-meaning "square"->tile/cell (`LENGTH_TILES`, `VALLEY_TILES`, `LEDGE_FREE_TILES`).
+- Open: Title Case for ~250 sentence-case UI labels (Ricky to confirm scope first); labels are Title Case.
 
 ## Next steps
 1. Step 2: carve `src/unsorted/` into areas (one area per task, cut in place, byte-identical check), starting with a leaf (mobs or ui).
 2. Add `tools/check_deps.py` (warning only; plain split, no IIFEs for now: Ricky's call 2026-11-21).
-3. At release: v185 bump + CHANGELOG entry (Mob wording, Path Editor labels); `tools/mk_sweep_docs.py` is behind the SWEEP docs, never regenerate it blindly.
+3. At release: v185 bump + CHANGELOG entry (Mob wording, Path Editor labels, Rotation, Barrier name in hints, Stats/tile wording); `tools/mk_sweep_docs.py` is behind the SWEEP docs, never regenerate it blindly.
 
 ## Gotchas
 - Shallow clone: `git -c push.negotiate=true push`.

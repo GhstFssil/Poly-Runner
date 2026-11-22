@@ -1,10 +1,10 @@
-# Rig Editor drift: the preview is her fast run with the lean, its dials change it, and a saved model plays the drift clips in the game while drifting
+# Rig Editor drift: the preview is her fast run with the lean, its stats change it, and a saved model plays the drift clips in the game while drifting
 import sys; sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
 SP=sys.argv[1] if len(sys.argv)>1 else '/tmp'
 g=Rig(w=1100,h=760); g.open(); pg=g.pg
 g.click('#modes2 button[data-m="drift"]',400); g.click('#views button[data-v="front"]',300)
-print('dials:',g.ev(R+".querySelectorAll('#animKey input[type=range]').length"),'note:',g.ev(R+".querySelector('#animNote').textContent")[:60])
+print('stats:',g.ev(R+".querySelectorAll('#animKey input[type=range]').length"),'note:',g.ev(R+".querySelector('#animNote').textContent")[:60])
 g.ev(g.q('#play')+".click()"); pg.wait_for_timeout(300)
 pg.screenshot(path=SP+'/drift_a.png')
 print(g.typed('dA.aLp',120,300), g.typed('dA.hp',20,300))

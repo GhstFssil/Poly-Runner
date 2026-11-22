@@ -3,20 +3,20 @@ if(USERDEF.stride!==undefined)RB.stride=USERDEF.stride;if(USERDEF.kneeLift!==und
 var RMUL={S:{stride:.7,knee:.6,arm:.7,elbow:1.05,lean:.45,bounce:.75},M:{stride:1,knee:1,arm:1,elbow:1,lean:1,bounce:1},F:{stride:1.45,knee:1.45,arm:1.55,elbow:1.1,lean:1.9,bounce:1.3}},RDUR={S:1.0,M:.8,F:.55};
 ['S','M','F'].forEach(function(kd){for(var f in RB)DEF['run'+kd+'.'+f]=Math.round(RB[f]*RMUL[kd][f]*10)/10;DEF['run'+kd+'.dur']=RDUR[kd];});
 for(k in USERDEF){if(DEF[k]!==undefined&&typeof DEF[k]===typeof USERDEF[k])DEF[k]=USERDEF[k];}
-/* Settings written by an older build are brought up to this one's meanings before they are read (the shipped Molly's, this browser's saved dials, anything pasted in). */
+/* Settings written by an older build are brought up to this one's meanings before they are read (the shipped Molly's, this browser's saved stats, anything pasted in). */
 function upgrade(o){
   if(!o||typeof o!=='object')return {};
   if(o['stat.gripZ']===undefined&&typeof o['stat.grip']==='number')o['stat.gripZ']=o['stat.grip']/2;   /* her grip used to be kept in units/s²: 1 Zip = 2 units */
   return o;
 }
-var defOld=true;                                                    /* the defaults' arm band dials are in the old meaning (see bandLegacy) until the shipped settings say otherwise */
-var bandOld=false,bandReady=false;                                  /* bandOld: the arm band dials in P are still in the old meaning (they are converted as soon as the part tables exist) */
+var defOld=true;                                                    /* the defaults' arm band stats are in the old meaning (see bandLegacy) until the shipped settings say otherwise */
+var bandOld=false,bandReady=false;                                  /* bandOld: the arm band stats in P are still in the old meaning (they are converted as soon as the part tables exist) */
 try{var gs=upgrade(JSON.parse(HOST.__init||'{}'));for(k in DEF){if(gs[k]!==undefined&&typeof gs[k]===typeof DEF[k])DEF[k]=gs[k];}defOld=!(gs.fmt>=2);}catch(e){}   /* the settings the shipped Molly was built from are the defaults, so every Reset button goes back to her and not to an older build */
 DEF.fmt=2;
 var DEFM=DEF,DEFC=JSON.parse(JSON.stringify(DEF));   /* Molly's defaults, and Comet's (hers over Molly's); every Reset on a page goes back to that runner's */
 try{var gc=upgrade(JSON.parse(HOST.__initC||'{}'));for(k in DEFC){if(gc[k]!==undefined&&typeof gc[k]===typeof DEFC[k])DEFC[k]=gc[k];}}catch(e){}
 var P=JSON.parse(JSON.stringify(DEF));
-/* A typed or pasted value can go past its slider, but not to where the build breaks (a part with no length, a loop with no time, a million sides): each dial is held to the nearest value that still works. [pattern, least, most, whole numbers only] */
+/* A typed or pasted value can go past its slider, but not to where the build breaks (a part with no length, a loop with no time, a million sides): each stat is held to the nearest value that still works. [pattern, least, most, whole numbers only] */
 var HOLDS=[[/\.len$/,.5,400],[/\.dia$/,.2,400],[/\.depth$/,.02,20],[/\.peak$/,.005,.995],[/\.t[SE]$/,.005,20],[/\.c[SE]$/,.05,50],
  [/\.u[12]w[lr]$/,.5,360],[/\.u[12]w[se]$/,.002,5],[/\.u[12]d$/,-100,100],[/\.u[12]p$/,-1,2],[/\.u[12]k[lrse]$/,-4,4],[/^Foot\.flat$/,0,.98],[/\.band[AL]$|^Shin\.pad$|^Foot\.(heel|sole|ankleH)$/,0,400],
  [/^scale$/,.05,20],[/^sides$/,5,48,1],[/^rings$/,1,8,1],[/^ringGap$/,0,20],[/^fmt$/,2,2],[/^hairVol$/,.05,10],[/^bangL$/,0,10],[/^j[A-Z]/,0,100],[/^(jit|irr|irrC)$/,0,5],
@@ -41,7 +41,7 @@ function orderTimes(){Object.keys(MOVEX).forEach(function(name){var n=MOVEX[name
 function takeSettings(o){var n=0,key;o=upgrade(o);for(key in DEF){if(o[key]!==undefined&&typeof o[key]===typeof DEF[key]){P[key]=hold(key,o[key]);n++;}}
   if(o['UpperArm.bandA']!==undefined||o['UpperArm.bandL']!==undefined)bandOld=!(o.fmt>=2);   /* arm band numbers from a build up to v173: changed to where that build drew the band */
   if(bandOld&&bandReady){bandFix();bandOld=false;}
-  P.fmt=2;orderTimes();return n;}   /* settings from outside (this browser's saved dials, pasted JSON): only the dials that exist, each held to a working value */
+  P.fmt=2;orderTimes();return n;}   /* settings from outside (this browser's saved stats, pasted JSON): only the stats that exist, each held to a working value */
 var ui={mode:'run',playing:true,phase:.25,wire:false,sel:'UpperArm'};
 bandOld=defOld;                                                     /* P starts as a copy of the defaults */
 var hadSaved=false;
@@ -115,8 +115,8 @@ function tList(id){
   out.sort(function(a,b){return a-b;});return out;
 }
 var DOMED={UpperArm:1,Thigh:1,Foot:1,Pony1:1,Pony2:1,Pony3:1};   /* parts whose start is rounded off with a small dome */
-/* Where a part's trim band is drawn, in cm from its start: exactly where its two dials say. Up to v173 that was not true of a domed part (the upper arm): its band was
-   drawn two rings nearer the start than the dials said, because the dome's two extra rings were not counted. Settings saved by those builds (they carry no fmt, or one
+/* Where a part's trim band is drawn, in cm from its start: exactly where its two stats say. Up to v173 that was not true of a domed part (the upper arm): its band was
+   drawn two rings nearer the start than the stats said, because the dome's two extra rings were not counted. Settings saved by those builds (they carry no fmt, or one
    below 2) have their two arm band numbers changed, once, to where the band really was, so nothing moves: the old ring list is worked out only to find those two rings. */
 function tListOld(id){
   var n=Math.round(P.rings),pk=P[id+'.peak'],L=P[id+'.len'],ts=[],i,B;
@@ -138,7 +138,7 @@ function tListOld(id){
   out.push(1);return out;
 }
 function bandRange(id){var bA=P[id+'.bandA'],bL=P[id+'.bandL'];if(bA===undefined||!(bL>0))return null;return [bA,bA+bL];}
-function bandLegacy(id){                                            /* where a build up to v173 drew this part's band, from the dials as they are now */
+function bandLegacy(id){                                            /* where a build up to v173 drew this part's band, from the stats as they are now */
   var bA=P[id+'.bandA'],bL=P[id+'.bandL'];if(bA===undefined||!(bL>0))return null;
   if(!DOMED[id])return [bA,bA+bL];
   var L=P[id+'.len'],o=tListOld(id),k,k0=-1,k1=-1;
@@ -146,7 +146,7 @@ function bandLegacy(id){                                            /* where a b
   return k0<0?null:[o[Math.max(0,k0-2)]*L,o[Math.max(0,k1-1)]*L];
 }
 function bandFix(){var r=bandLegacy('UpperArm');if(r){P['UpperArm.bandA']=Math.round(r[0]*1e4)/1e4;P['UpperArm.bandL']=Math.round((r[1]-r[0])*1e4)/1e4;}}
-/* (the thinnest strip of facets a part may have is the Faceting dial ringGap, in cm; on a short part it is never more than 6% of the part's length) */
+/* (the thinnest strip of facets a part may have is the Faceting stat ringGap, in cm; on a short part it is never more than 6% of the part's length) */
 var MAP={up:function(a,b,c){return [b,a,c];},down:function(a,b,c){return [b,-a,c];},fwd:function(a,b,c){return [b,c,a];}};
 
 /* ================= mesh helpers ================= */
@@ -376,7 +376,7 @@ function sidesOf(seg){return seg.pair?[{s:'L',g:1},{s:'R',g:-1}]:[{s:'',g:1}];}
 /* ================= welded joints =================
    Where a limb comes out of the body (a thigh out of the pelvis, an arm out of the torso) the two parts used to pass through each other, and the line where two
    faceted surfaces cross is ragged: the corners of one poke through the flats of the other. Here the two are joined into one skin instead. Each part is cut a
-   little short of the other (by a margin the joint's blend dial sets), whatever lay inside or under the other part is dropped, and the two cut edges are
+   little short of the other (by a margin the joint's blend stat sets), whatever lay inside or under the other part is dropped, and the two cut edges are
    bridged with a strip of facets. Everything works on plain lists of triangles [a,b,c,colour] in the figure's own space, a point being [x,y,z]. */
 function wKey(p){return Math.round(p[0]*2e5)+','+Math.round(p[1]*2e5)+','+Math.round(p[2]*2e5);}
 function wLess(a,b){return a[0]<b[0]||(a[0]===b[0]&&(a[1]<b[1]||(a[1]===b[1]&&a[2]<b[2])));}
@@ -709,7 +709,7 @@ function modeDur(m){
   if(MOVEX[m])return P['m.'+m+'.dur'];
   return 3;
 }
-function poseDrift(ph,right){   /* the game's drift: her fast run cycle, with the Drift dials added on top (right: mirrored, for drifting right) */
+function poseDrift(ph,right){   /* the game's drift: her fast run cycle, with the Drift stats added on top (right: mirrored, for drifting right) */
   var o=poseRun(ph,'F'),v={},k;for(k in KD)if(k!=='fl')v[k]=P['dA.'+k]||0;if(right)v=mirrorV(v);
   var H=hipsBase[1],mul=function(n,q){if(!o[n])o[n]={q:new THREE.Quaternion()};if(!o[n].q)o[n].q=new THREE.Quaternion();o[n].q.multiply(q);};
   var hp=(o.Hips&&o.Hips.pos)||hipsBase;o.Hips=o.Hips||{};o.Hips.pos=[hp[0],hp[1]+H*v.hyf,hp[2]+v.hz];
@@ -798,7 +798,7 @@ function fmt(v,u,step){
   return v.toFixed(step>=.1?1:2);
 }
 function statCardRefresh(){var h=SR.querySelector('#statLive');if(h&&window.__statCardHTML){var c={},k;for(k in P)c[k]=P[k];c.__who=CHAR;h.innerHTML=window.__statCardHTML(c,false);}moveRefresh();}
-/* Movement details: the tables follow the stat sliders; the situation below them has three dials of its own (not saved: they are only a calculator) */
+/* Movement details: the tables follow the stat sliders; the situation below them has three stats of its own (not saved: they are only a calculator) */
 var MSC={slope:20,dir:90,speed:80,mode:'run'};
 function moveRefresh(scenOnly){var b=SR.querySelector('#moveBox');if(!b||!b.open)return;var a=SR.querySelector('#moveLive'),o=SR.querySelector('#moveOut');
   try{if(a&&!scenOnly&&window.__moveStatsHTML)a.innerHTML=window.__moveStatsHTML(P);if(o&&window.__moveScenHTML)o.innerHTML=window.__moveScenHTML(P,MSC);}catch(e){}}
@@ -815,10 +815,10 @@ function moveScenBuild(){var host=SR.querySelector('#moveScen');if(!host||host.f
     bt.addEventListener('click',function(){MSC.mode=o[0];sg.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x.dataset.ms===o[0]));});moveRefresh(true);});sg.appendChild(bt);});
   host.appendChild(sg);}
 
-function addRows(host,list,opts){   /* every dial: a slider over a sensible range, and a box to type any value at all (the slider simply sits at its end for a value past its range) */
+function addRows(host,list,opts){   /* every stat: a slider over a sensible range, and a box to type any value at all (the slider simply sits at its end for a value past its range) */
   list.forEach(function(c){
     var key=c[0],id='s_'+key.replace(/\./g,'_'),row=document.createElement('div'),pc=c[2]==='pct',un=pc?'%':c[2]==='n'?'':c[2]==='x'?'×':c[2];row.className='row';
-    if(c[2]==='tog'){   /* an on / off dial (kept as 1 or 0) */
+    if(c[2]==='tog'){   /* an on / off stat (kept as 1 or 0) */
       row.innerHTML='<label id="'+id+'">'+c[1]+'</label><span class="seg" role="group" aria-labelledby="'+id+'"><button type="button" data-v="1">On</button><button type="button" data-v="0">Off</button></span>';
       host.appendChild(row);
       var tb=row.querySelectorAll('button'),paint=function(){for(var i=0;i<tb.length;i++)tb[i].setAttribute('aria-pressed',String((P[key]?1:0)===+tb[i].getAttribute('data-v')));};
@@ -916,16 +916,16 @@ function buildStatic(){
 function syncAll(){
   SR.querySelectorAll('#groups details').forEach(function(d){d.remove();});
   buildGroups();COLORS.forEach(function(c){$('#c_'+c[0]).value=P[c[0]];});renderPart();
-  try{renderStats();renderAnim();}catch(e){}barrierDirty=true;   /* the Stats menu, the animation dials and the Barrier preview show the new values too */
+  try{renderStats();renderAnim();}catch(e){}barrierDirty=true;   /* the Stats menu, the animation stats and the Barrier preview show the new values too */
 }
-/* Pages: Molly and Comet each have their own copy of every dial (kept in runnerRig2 and cometRig); Mobs are kept with Molly's. Comet starts as a copy of Molly. */
+/* Pages: Molly and Comet each have their own copy of every stat (kept in runnerRig2 and cometRig); Mobs are kept with Molly's. Comet starts as a copy of Molly. */
 var PAGE='molly',CHAR='molly',CHARKEY={molly:'runnerRig2',comet:'cometRig'},CHARNAME={molly:'Molly',comet:'Comet'};HOST.__char='molly';
-function noMobs(o){var r={},k;for(k in o)if(k.indexOf('mn.')!==0)r[k]=o[k];return r;}   /* Comet's dials never carry the mobs' (they live with Molly's) */
+function noMobs(o){var r={},k;for(k in o)if(k.indexOf('mn.')!==0)r[k]=o[k];return r;}   /* Comet's stats never carry the mobs' (they live with Molly's) */
 function save(){try{localStorage.setItem(CHARKEY[CHAR],JSON.stringify(CHAR==='comet'?noMobs(P):P));}catch(e){}}
 function loadChar(c){CHAR=c;HOST.__char=c;DEF=c==='comet'?DEFC:DEFM;P=JSON.parse(JSON.stringify(DEF));var sv=null;try{sv=localStorage.getItem(CHARKEY[c]);}catch(e){}
   if(sv){try{takeSettings(c==='comet'?noMobs(JSON.parse(sv)):JSON.parse(sv));}catch(e){}}
-  if(c==='comet'){var m=pageOf('molly');for(var k in m)if(k.indexOf('mn.')===0)P[k]=m[k];}}   /* (the mob dials on Comet's page are Molly's, unused) */
-function pageOf(c){   /* a runner's dials as they stand: the page open now, or that runner's defaults with what this browser saved */
+  if(c==='comet'){var m=pageOf('molly');for(var k in m)if(k.indexOf('mn.')===0)P[k]=m[k];}}   /* (the mob stats on Comet's page are Molly's, unused) */
+function pageOf(c){   /* a runner's stats as they stand: the page open now, or that runner's defaults with what this browser saved */
   if(c===CHAR)return JSON.parse(JSON.stringify(P));
   var d=c==='comet'?DEFC:DEFM,o=JSON.parse(JSON.stringify(d)),sv=null,k;try{sv=JSON.parse(localStorage.getItem(CHARKEY[c])||'null');}catch(e){}
   if(sv)for(k in d)if(sv[k]!==undefined&&typeof sv[k]===typeof d[k])o[k]=hold(k,sv[k]);return o;}
@@ -970,16 +970,16 @@ $('#copyJson').addEventListener('click',function(){
 });
 $('#applyJson').addEventListener('click',function(){
   try{var o=JSON.parse($('#json').value),all=o&&typeof o==='object'&&(o.molly||o.comet||o.mobs),n=all?applyAll(o):o&&typeof o==='object'?takeSettings(CHAR==='comet'?noMobs(o):o):0;
-    syncAll();dirty=true;if(!all)save();status(n?(all?'Applied Molly, Comet and Mobs settings ('+n+' dials).':'Applied '+n+' settings to '+CHARNAME[CHAR]+'.'):'No matching settings found.');}
+    syncAll();dirty=true;if(!all)save();status(n?(all?'Applied Molly, Comet and Mobs settings ('+n+' stats).':'Applied '+n+' settings to '+CHARNAME[CHAR]+'.'):'No matching settings found.');}
   catch(e){status('That is not valid settings JSON.');}
 });
 $('#rigClose').addEventListener('click',function(){HOST.__close();});
 $('#resetAll').addEventListener('click',function(){P=JSON.parse(JSON.stringify(DEF));syncAll();dirty=true;save();status(CHARNAME[CHAR]+' is back to her default build.');});
 
 
-/* ================= animation dials ================= */
+/* ================= animation stats ================= */
 var STAGES={jump:['Ready','Crouch','Takeoff','Peak','Fall','Land','Recover'],slide:['Run in','Drop','Slide','Get up'],fall:['Run','Trip','Fall','Impact','Bounce','Settle'],set:['Pose'],drift:['Pose']};
-var MOVELABEL={jump:'Jump',slide:'Slide',fall:'Faceplant',set:"Runner's pose",drift:'Drift',barrier:'Hedron Barrier',cThrow:'Star throw',cHover:'Hover',cFly:'Fly'};
+var MOVELABEL={jump:'Jump',slide:'Slide',fall:'Faceplant',set:"Runner's pose",drift:'Drift',barrier:'Barrier',cThrow:'Star throw',cHover:'Hover',cFly:'Fly'};
 var KEYGROUPS=[
  ['Body',[['hyf','Hips height (1 = standing)','x',.1,1.7,.01],['hz','Hips forward (m)','x',-1,1,.01],['hp','Body lean (+ forward)','deg',-110,110,1],['sp','Spine bend','deg',-60,60,1],['hd','Head tilt','deg',-70,70,1]]],
  ['Arms',[['aLp','Left arm raise','deg',-120,180,1],['aLr','Left arm out','deg',-20,120,1],['aLe','Left elbow bend','deg',0,150,1],['aRp','Right arm raise','deg',-120,180,1],['aRr','Right arm out','deg',-20,120,1],['aRe','Right elbow bend','deg',0,150,1]]],
@@ -1001,7 +1001,7 @@ function renderAnim(){
     $('#animNote').textContent='A gentle standing loop.';
     addRows(rows,[[pre+'dur','Loop length','s',1,6,.05],[pre+'breath','Breathing bob','cm',0,2,.1],[pre+'sway','Torso sway','deg',0,6,.1],[pre+'arm','Arm sway','deg',0,8,.1],[pre+'pony','Ponytail sway','x',0,3,.05]],{anim:1});
   }else if(isRun){
-    $('#animNote').textContent='A run cycle. Each of the three speeds has its own dials.';
+    $('#animNote').textContent='A run cycle. Each of the three speeds has its own stats.';
     addRows(rows,[[pre+'dur','Time per stride cycle','s',.25,2,.01],[pre+'stride','Stride','deg',5,62,1],[pre+'knee','Knee lift','deg',20,125,1],[pre+'arm','Arm swing','deg',0,78,1],[pre+'elbow','Elbow bend','deg',20,125,1],[pre+'lean','Forward lean','deg',0,30,1],[pre+'bounce','Bounce','cm',0,8,.5]],{anim:1});
   }else if(m==='barrier'){
     $('#animNote').textContent='The red dodecahedron she rolls inside. It stays a dodecahedron when slow, turns into a dashed sphere at speed, then squeezes along its axle and stretches round the spin. Use the preview speed to watch each stage; save closes the loop in the game when you close the editor.';
@@ -1027,7 +1027,7 @@ function renderAnim(){
       addRows(rows,[['comet.hov.height','Floats above the ground by','units',0,3,.05],['comet.hov.bob','Bob','units',0,1,.01],['comet.hov.bobT','Bob: seconds a cycle','s',.2,6,.05],['comet.hov.spinS','Stars: turns a second','x',0,6,.1],['comet.hov.ankle','Ankle stars: size','units',.05,2,.01],['comet.hov.ankleY','Ankle stars: up or down','units',-1,1,.01],['comet.hov.ankleTilt','Ankle stars: tilt','deg',-90,90,1],['comet.hov.back','Back star: size','units',.1,3,.01],['comet.hov.backD','Back star: behind her by','units',0,2,.01],['comet.hov.backY','Back star: up or down','units',-2,2,.01],['comet.hov.backTilt','Back star: tilt','deg',-90,90,1]],{anim:1});
       KEYGROUPS.forEach(function(g){grp(g[0]+' (changes while hovering)',g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['comet.ho.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}));});
     }else{
-      $('#animNote').textContent='Fly (Space held in the air while hovering). This pose takes over her arms, spine and head; the leg dials are changes to her jump. The star from her back goes up to her hands.';
+      $('#animNote').textContent='Fly (Space held in the air while hovering). This pose takes over her arms, spine and head; the leg stats are changes to her jump. The star from her back goes up to her hands.';
       addRows(rows,[['comet.fly.arms','How fast she goes into it','x',1,30,.5],['comet.fly.starY','Star above her hands','units',-1,2,.01],['comet.fly.starS','Star size there (× the back star)','x',.2,3,.05]],{anim:1});
       grp('Arms, spine and head',poseRows('comet.pf.',UBR));
       grp('Legs (changes to her jump)',[['hL','Left thigh forward'],['kL','Left knee bend'],['dL','Left toes up'],['hR','Right thigh forward'],['kR','Right knee bend'],['dR','Right toes up']].map(function(r){return ['comet.fl.'+r[0],r[1],'deg',-120,120,1];}));
@@ -1038,7 +1038,7 @@ function renderAnim(){
     KEYGROUPS.forEach(function(g){var h3=document.createElement('h3');h3.textContent=g[0]+' (added to her run)';kh.appendChild(h3);var d=document.createElement('div');kh.appendChild(d);
       addRows(d,g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['dA.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}),{anim:1});});
   }else{
-    $('#animNote').textContent=m==='drift'?'Her pose while drifting left (A held, camera to her left); drifting right is this pose mirrored. Pose is for the Molly model; lean and turn dials below are live in the game.':'A one-shot move that loops here so you can watch it. Pick a stage to jump to it and edit its pose; the moves in between are blended for you.';
+    $('#animNote').textContent=m==='drift'?'Her pose while drifting left (A held, camera to her left); drifting right is this pose mirrored. Pose is for the Molly model; lean and turn stats below are live in the game.':'A one-shot move that loops here so you can watch it. Pick a stage to jump to it and edit its pose; the moves in between are blended for you.';
     var extra=[[pre+'dur','Total length','s',.5,5,.05]];
     if(m==='set')extra.push([pre+'bob','Breathing bob','cm',0,4,.1],[pre+'rock','Breathing rock','deg',0,6,.1],[pre+'nod','Head nod','deg',0,6,.1]);
     if(m==='drift')extra.push([pre+'lean','Lean into the corner','deg',0,60,.5],[pre+'angle','Momentum shift when it starts','deg',0,45,.5],[pre+'time','Time to make the shift','s',.03,.6,.01],[pre+'minZips','Needs at least','Zips',0,80,1],[pre+'cool','Cooldown after release','s',0,5,.1],[pre+'rate','How fast she settles into it','x',2,20,.5],['slope.side','Tilt to sideways slopes (all running)','x',0,1.2,.05]);
@@ -1055,7 +1055,7 @@ function renderAnim(){
       addRows(d,g[1].map(function(r){return [kp+r[0]].concat(r.slice(1));}),{anim:1});});
   }
 }
-var STAT_ROWS=[['stat.top','Top speed','Zips',20,160,1],['stat.accelT','Time from 0 to top speed','s',1,20,.1],['stat.brake','Braking strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip fades on slopes (× the cosine of the slope)','tog'],['stat.driftGrip','Grip while drifting (x her grip)','x',0,3,.05],['stat.fall','Max fall speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision box height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision box width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier slam: top speed','Zips',10,200,1],['stat.strafe','Strafe distance (Q/E sidestep; 2 = one square)','units',0.5,12,.1]];
+var STAT_ROWS=[['stat.top','Top speed','Zips',20,160,1],['stat.accelT','Time from 0 to top speed','s',1,20,.1],['stat.brake','Braking strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip fades on slopes (× the cosine of the slope)','tog'],['stat.driftGrip','Grip while drifting (x her grip)','x',0,3,.05],['stat.fall','Max fall speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision box height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision box width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier slam: top speed','Zips',10,200,1],['stat.strafe','Strafe distance (Q/E sidestep; 2 = one tile)','units',0.5,12,.1]];
 function renderStats(){var h=$('#statRows');if(!h)return;h.innerHTML='';addRows(h,STAT_ROWS,{anim:1,stat:1});var sc=document.createElement('div');sc.id='statLive';sc.style.cssText='margin-top:10px;max-width:460px';h.appendChild(sc);statCardRefresh();}   /* the Stats menu at the top of the panel */
 try{renderStats();}catch(e){}
 var COMET_HOV=[['comet.hov.cost','Power to switch it on','n',0,50,1],['comet.hov.drain','Power a second while on','n',0,20,.1],['comet.hov.height','Floats above the ground by','units',0,3,.05],
@@ -1114,7 +1114,7 @@ function minPreview(dt){
 $('#resetAnim').addEventListener('click',function(){var pre=animPrefix(ui.mode),key;for(key in DEF){if(key.indexOf(pre)===0)P[key]=DEF[key];}
   if(ui.mode==='drift'){P['slope.side']=DEF['slope.side'];for(key in DEF)if(key.indexOf('dA.')===0)P[key]=DEF[key];}
   var CRS={cThrow:/^comet\.(pc\.|pt\.|throw\.|hold\.)/,cHover:/^comet\.(ho\.|hov\.(height|bob|bobT|spinS|ankle|ankleY|ankleTilt|back|backD|backY|backTilt)$)/,cFly:/^comet\.(pf\.|fl\.|fly\.(arms|starY|starS)$)/};
-  if(CRS[ui.mode])for(key in DEF)if(CRS[ui.mode].test(key))P[key]=DEF[key];   /* the sideways-slope tilt and the changes to her run sit with the drift dials */
+  if(CRS[ui.mode])for(key in DEF)if(CRS[ui.mode].test(key))P[key]=DEF[key];   /* the sideways-slope tilt and the changes to her run sit with the drift stats */
   barrierDirty=true;save();renderAnim();statCardRefresh();status('Animation reset.');});
 
 /* ================= export ================= */
@@ -1156,7 +1156,7 @@ $('#exportGlb').addEventListener('click',function(){
   }catch(e){restore();status('Export failed.');}
 });
 
-/* ================= Hedron Barrier preview ================= */
+/* ================= Barrier preview ================= */
 var barrierDirty=true,barrierObj=null,barrierGroup=null,barrierAng=0,barrierScale=.47;
 function barrierPreview(dt){
   var on=ui.mode==='barrier';
@@ -1215,7 +1215,7 @@ function tick(now){
   barrierPreview(dt);minPreview(dt);cometPreview(dt);
   controls.update();renderer.render(scene,camera);
 }
-bandReady=true;                                                     /* the part tables exist now: any arm band numbers still in the old meaning are converted, the defaults' and the dials' each against their own other dials */
+bandReady=true;                                                     /* the part tables exist now: any arm band numbers still in the old meaning are converted, the defaults' and the stats' each against their own other stats */
 try{if(defOld){var keepP=P;P=DEF;try{bandFix();}finally{P=keepP;}}if(bandOld){bandFix();bandOld=false;if(hadSaved)save();}}catch(e){}
 initScene();buildStatic();renderPart();setMode('run');applyTheme();$('aside').setAttribute('data-page','molly');$('#app').setAttribute('data-page','molly');
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);}catch(e){}

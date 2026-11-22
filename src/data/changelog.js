@@ -36,7 +36,7 @@ var CHANGELOG = [
     ['Health display', [
       'A half heart now draws as a heart cracked down the middle (left half red). Nothing deals half damage yet; this is for the coming Roost Gazer.'
     ]],
-    ['Hedron Barrier', [
+    ['Barrier', [
       'The Barrier now tilts to the ground\'s cross-slope (and to a wall\'s bank) the way Molly\'s body does, instead of staying level.'
     ]]
   ]},
@@ -77,7 +77,7 @@ var CHANGELOG = [
       'Big Minions no longer have a Placement option (Trapped in a pit). Layouts that already have a trapped one keep it.',
     ]],
     ['Rig Editor', [
-      'Stats has a Strafe distance row (Q/E sidestep). The default, 2 units, is the one square it always was.',
+      'Stats has a Strafe distance row (Q/E sidestep). The default, 2 units, is the one tile it always was.',
     ]],
     ['Gameplay', [
       'Fixed getting stuck against a ledge or crag after a glancing hit: her speed stayed on and answered W and S while she stood pinned. When a ledge face blocks her and she is not running into it (along it, or at a corner), she now stops, so her speed reads zero until she steers clear.',
@@ -104,8 +104,8 @@ var CHANGELOG = [
     ]],
     ['Rig Editor', [
       'Comet\'s page has three more animations: Star throw (timing, the star in her hand, a charging pose and a throw pose), Hover (float, bob, every star\'s size, place, tilt and spin, and changes laid over her run) and Fly (her arms, spine and head, changes to her legs, and the star at her hands). Each previews with its stars. The Hover box keeps Hover\'s costs and movement stats.',
-      'Copy settings now copies all three pages in one block (Molly, Comet and Mobs, each under its own name), and Apply pasted settings puts each back on its own page. A block copied from one page in an older build still applies to the page you are on. Comet\'s settings no longer carry a copy of the mob dials.',
-      'New defaults: Ricky\'s Molly and Comet settings are what each runner ships with, and her built-in model is rebuilt from them (Comet now has a built-in model of her own: blue suit, top speed 50, 4 s to top speed). Reset buttons on Comet\'s page go back to her defaults. A fresh browser plays with these settings, stats and mob dials included.'
+      'Copy settings now copies all three pages in one block (Molly, Comet and Mobs, each under its own name), and Apply pasted settings puts each back on its own page. A block copied from one page in an older build still applies to the page you are on. Comet\'s settings no longer carry a copy of the mob stats.',
+      'New defaults: Ricky\'s Molly and Comet settings are what each runner ships with, and her built-in model is rebuilt from them (Comet now has a built-in model of her own: blue suit, top speed 50, 4 s to top speed). Reset buttons on Comet\'s page go back to her defaults. A fresh browser plays with these settings, stats and mob stats included.'
     ]]
   ]},
   { v: 'v179', d: 'Nov 15, 2026', t: 'Comet, pressure plates, targets and a new Grass Canyon', g: [
@@ -119,14 +119,14 @@ var CHANGELOG = [
       'Every stamp is now free by default (Snap to the path is still a choice per stamp). A stamp placed near the path still faces along it. Mud and Seg chains stamp on their own curve, and can be set to follow the path afterwards.'
     ]],
     ['Comet', [
-      'A second runner. Pick her on the Characters page (Play as Comet). She starts as a copy of Molly, and has her own Rig Editor page with every one of Molly\'s dials, kept apart from Molly\'s, and her own saved model.',
-      'No Strafe and no Hedron Barrier. Instead, Q or E is Star Throw: a small, flat, spinning star of blue energy that flies straight where the camera faces, 50 units, for half a heart. It needs Power above 0 and costs 1, with a 2 s cooldown. Hold the key to charge it on the speedometer\'s charge bar: each second, up to 3, costs 2 Power and adds 50% size, half a heart and 50 units. It goes by itself at 3 s, or when she cannot pay for the next second. It hurts minions and breaks targets.',
+      'A second runner. Pick her on the Characters page (Play as Comet). She starts as a copy of Molly, and has her own Rig Editor page with every one of Molly\'s stats, kept apart from Molly\'s, and her own saved model.',
+      'No Strafe and no Barrier. Instead, Q or E is Star Throw: a small, flat, spinning star of blue energy that flies straight where the camera faces, 50 units, for half a heart. It needs Power above 0 and costs 1, with a 2 s cooldown. Hold the key to charge it on the speedometer\'s charge bar: each second, up to 3, costs 2 Power and adds 50% size, half a heart and 50 units. It goes by itself at 3 s, or when she cannot pay for the next second. It hurts minions and breaks targets.',
       '2 is Hover: 6 Power to start, then 1 a second. She floats half a unit over whatever she would stand on, with none of what standing does (no mud, no toxic ground, no pressure plates, no hard landings), on Hover\'s own movement stats. Two small spinning stars ride at her ankles and a bigger one behind her back.',
       'While hovering, Space held in the air is Fly: lift that cancels gravity (adjustable), for 4 more Power a second. She raises her arms over her head and the star from her back goes up to her hands.'
     ]],
     ['Rig Editor', [
-      'Pages across the top: Molly, Comet and Mobs. Mobs has the Minions and Big Minions tabs (the same dials as before); a new kind of mob is one more tab.',
-      'The Drift animation now shows what she does in the game: her Fast run, leaning into the corner from her feet. Its dials are now changes laid over her run while she drifts (all 0 to start, so nothing changes until you move one); Save to game puts them in the game.'
+      'Pages across the top: Molly, Comet and Mobs. Mobs has the Minions and Big Minions tabs (the same stats as before); a new kind of mob is one more tab.',
+      'The Drift animation now shows what she does in the game: her Fast run, leaning into the corner from her feet. Its stats are now changes laid over her run while she drifts (all 0 to start, so nothing changes until you move one); Save to game puts them in the game.'
     ]]
   ]},
   { v: 'v178.1', d: 'Nov 15, 2026', t: 'Nightly fixes', g: [
@@ -191,8 +191,8 @@ var CHANGELOG = [
     ]],
     ['Rig Editor', [
       'Overall scale now sizes Molly in the game too: her model is 3.6 x the scale and her collision box scales with it (the Barrier and the camera are unchanged).',
-      'New Thinnest strip dial (Faceting, cm, default 0.8; 0 keeps every ring).',
-      'The upper-arm trim band dials now show where the band is really drawn. Your numbers were converted (19 / 6.5 became 11.48 / 11.01), so nothing moved.',
+      'New Thinnest strip stat (Faceting, cm, default 0.8; 0 keeps every ring).',
+      'The upper-arm trim band stats now show where the band is really drawn. Your numbers were converted (19 / 6.5 became 11.48 / 11.01), so nothing moved.',
       'Knee pads bend with the knee (the top half follows the thigh, the bottom half the shin) instead of spiking on a deep bend.',
       'Her saved model now lives in IndexedDB instead of the shared 5 MB store, so a big build (48 sides, 8 rings) is kept. An old saved copy is moved over on the first load.',
       'The built-in Molly is re-baked with the welded hips and shoulders and all of the above.'
@@ -202,7 +202,7 @@ var CHANGELOG = [
     ['Sandbox', [
       'Gravity now keeps pulling on a wall: it bends her direction every frame instead of being thrown away, so the only thing that holds her line is her grip.',
       'Her grip fades with the wall\'s steepness (her grip x the cosine of the wall angle): about 15% of it on an 81 degree wall, none at all on a vertical one. A new Wall grip stat in the Rig Editor scales this (1 = normal, 0 = none, 2 = double).',
-      'The Hedron Barrier can now run on walls, so Dodecadash speed can carry her across one.',
+      'The Barrier can now run on walls, so Dodecadash speed can carry her across one.',
       'Walls are measured in 3D: her progress along a wall follows its rise, gravity pulls along a climbing or falling wall as well as across it, and stepping onto a rising wall keeps her true speed on its surface.',
       'Minions and Big Minions have a Behavior setting in the Path Editor: Chases Molly, or Idle. An idle one stands still and only turns to face her; it shows an IDLE tag on the map.'
     ]],
@@ -309,7 +309,7 @@ var CHANGELOG = [
       'Sky slivers and tears at cave mouths are fixed: ground near a mouth is cut finer, the hole is narrower, and the tunnel floor extends out as a lip.']],
     ['Movement', [
       'Drift redesigned: holding A or D at 30 Zips or more turns her momentum and the camera 15° in about 0.15 s, with a 1 second cooldown after you let go.',
-      'Strafe and Drift no longer work inside the Hedron Barrier.']],
+      'Strafe and Drift no longer work inside the Barrier.']],
     ['Characters', [
       'A Characters page on the main menu with stat cards (just Molly for now).',
       'The stat card shows in the pause menu, in regular levels and the Sandbox.',
@@ -329,7 +329,7 @@ var CHANGELOG = [
   ]},
   { v: 'Before v156', d: 'To Nov 7, 2026', t: 'The foundation', g: [
     ['What was already there', [
-      'Molly and the low-poly look, speed counted in Zips, hearts, checkpoints, ramps, plateaus and platforms, the Hedron Barrier (2 key) and Drift (A and D).',
+      'Molly and the low-poly look, speed counted in Zips, hearts, checkpoints, ramps, plateaus and platforms, the Barrier (2 key) and Drift (A and D).',
       'Level 1 Grass Canyon, Level 2 Oceana Crags, and Dev Mode with the Path Editor, Rig Editor and Sandbox.']]
   ]}
 ];

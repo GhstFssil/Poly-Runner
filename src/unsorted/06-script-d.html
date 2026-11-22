@@ -112,7 +112,7 @@
     if (!document.pointerLockElement && playing && mouseMode !== 'drag') pause();
   });
 
-  // ---- Comet's moves (the Rig Editor's Comet page sets every number). She has no Strafe and no Hedron Barrier. ----
+  // ---- Comet's moves (the Rig Editor's Comet page sets every number). She has no Strafe and no Barrier. ----
   // Star Throw: Q or E. Needs more than 0 Power and costs 1; a small flat spinning five-pointed star of blue energy flies straight where the camera points, 50 units, for half a heart.
   // Held, it charges (the speedometer's charge bar): each whole second, up to 3, costs 2 Power and adds 50% size, half a heart and 50 units. Out of Power or at 3 seconds it goes by itself. 2 s cooldown.
   // Hover: 2. Costs 6 Power, then 1 a second; she floats half a unit over whatever she would stand on (no mud, toxic ground, pressure plates or hard landings) on Hover's own movement stats.
@@ -251,7 +251,7 @@
     if (!sp) sp = new THREE.Vector3(pp.x, pp.y + lift + H * 0.62, pp.z);
     var ay = cometC('hov.ankleY'), at = cometC('hov.ankleTilt') * Math.PI / 180;
     hovFx.L.position.set(aL.x, aL.y + ay, aL.z); hovFx.R.position.set(aR.x, aR.y + ay, aR.z);
-    [hovFx.L, hovFx.R].forEach(function (m, i) { m.spin.rotation.set(-Math.PI / 2 + at, 0, (i ? -1 : 1) * hovFx.a); });   // flat round her ankles (tilted by the dial), turning
+    [hovFx.L, hovFx.R].forEach(function (m, i) { m.spin.rotation.set(-Math.PI / 2 + at, 0, (i ? -1 : 1) * hovFx.a); });   // flat round her ankles (tilted by the stat), turning
     var bd = cometC('hov.backD'), back = new THREE.Vector3(sp.x - fx * bd, sp.y + cometC('hov.backY'), sp.z - fz * bd);
     var top = wL && wR ? wL.clone().add(wR).multiplyScalar(0.5).add(new THREE.Vector3(0, cometC('fly.starY'), 0)) : new THREE.Vector3(pp.x, pp.y + lift + H + 0.9, pp.z);
     hovFx.B.position.copy(back.lerp(top, flyBlend));
@@ -388,14 +388,14 @@
       if (!hintDone && hintPrevZ > -100 && hz <= -100 && player.position.x > -HALF && player.position.x < HALF) { hintDone = true; showHint('Strafe (Q/E) to avoid the trees!', 4000, now); }
       if (hintStart) { hintStart = false; if (level === 3) { /* the Sandbox starts with no tip */ } else if (level === 2) showHint('Watch out for deep water! Molly can\'t swim!', 5000, now); else showHint('Hold W to have Molly run! Move the mouse to look around! Molly will steer toward the direction of the camera.', 7000, now); }
       var hx = player.position.x;
-      if (!signDone && hintPrevX > SIGN_X && hx <= SIGN_X && hintPrevX - hx < 20 && Math.abs(hz - RMP_ZC) < 70) { signDone = true; showHint('Falling from too high up will hurt you! Use Hedron Barrier (2) to prevent damage!', 5000, now); }
+      if (!signDone && hintPrevX > SIGN_X && hx <= SIGN_X && hintPrevX - hx < 20 && Math.abs(hz - RMP_ZC) < 70) { signDone = true; showHint('Falling from too high up will hurt you! Use Barrier (2) to prevent damage!', 5000, now); }
       if (level === 2 && !signDone && hintPrevX < L2SIGN_X && hx >= L2SIGN_X && hx - hintPrevX < 20 && Math.abs(hz - L2SIGN_Z) < 40) { signDone = true; showHint('Do a slide to get under low barriers!', 5000, now); }
       hintPrevX = hx;
       if (!jumpDone && hintPrevZ > -3800 && hz <= -3800 && hintPrevZ - hz < 20 && player.position.x > -HALF && player.position.x < HALF) { jumpDone = true; showHint('Jump (spacebar) to avoid ledges! The longer you hold it, the higher the jump!', 5000, now); }
       if (!endDone && hintPrevZ > -END && hz <= -END && hintPrevZ - hz < 20 && player.position.x > -HALF && player.position.x < HALF) { endDone = true; showHint('Go into a slide (S) if you need to brake more quickly!', 4000, now); }
       if (!segTipDone && Math.hypot(hx - chainX[0], hz - chainZ[0]) < 40) { segTipDone = true; showHint('Collect Segs to fill up your Power Line!', 4000, now); }
       if (!readyDone && valley2Dist(hx, hz) < V2_HALF && V2_S >= V2_DESC + (V2_LEN - V2_DESC) * 2 / 3) { readyDone = true; showHint('Get ready to jump!', 3000, now); }
-      if (!chamberDone && Math.hypot(hx - CH_X, hz - CH_Z) < CH_R - 3) { chamberDone = true; showHint("Look out, it's Dr. Rektangulik's minions! Smash them with Hedron Barrier! You can either ram them or jump on their heads.", 10000, now); }
+      if (!chamberDone && Math.hypot(hx - CH_X, hz - CH_Z) < CH_R - 3) { chamberDone = true; showHint("Look out, it's Dr. Rektangulik's minions! Smash them with Barrier! You can either ram them or jump on their heads.", 10000, now); }
       if (!mudTipDone && pathDist(DR_PIECES, hx, hz) < DR_W && PATH_S >= DR_CLIMB0 - 12) { mudTipDone = true; showHint('This muddy incline is too slick to walk up. Take off at high speed by holding Runner\'s Pose (S) for 3 seconds, then releasing it!', 7000, now); }
       hintPrevZ = hz;
     }
@@ -658,7 +658,7 @@
     }
     sideLean += (sideTarget - sideLean) * Math.min(1, dt * (wallOn ? 8 : 5));
     body.rotation.z = leanZ + sideLean * (1 - Math.max(slideBlend, rpBlend, fpBlend));
-    ballGroup.rotation.z = ballOn ? sideLean : 0;                     // the Hedron Barrier tips its axle to the ground's cross-slope (or the wall's bank) the way her body does
+    ballGroup.rotation.z = ballOn ? sideLean : 0;                     // the Barrier tips its axle to the ground's cross-slope (or the wall's bank) the way her body does
     // Pitch: her frame tilts to the way she is actually travelling up and down, as it turns to the way she travels sideways (nose up rising, nose down falling)
     var hsp = Math.abs(speed) + 6, vmove = dt > 0 ? (player.position.y - pitchPrevY) / dt : 0;
     if (!isFinite(vmove) || dt <= 0 || Math.abs(player.position.y - pitchPrevY) > 20) vmove = 0;   // a respawn or teleport is not a motion

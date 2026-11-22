@@ -1,4 +1,4 @@
-# Shipped defaults (fresh browser): Molly and Comet play with their own settings and models; Copy settings carries all three pages and Apply puts each back; Comet keeps no mob dials
+# Shipped defaults (fresh browser): Molly and Comet play with their own settings and models; Copy settings carries all three pages and Apply puts each back; Comet keeps no mob stats
 import sys,json; sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
 g=Rig(w=1100,h=760,draw=False); pg=g.pg

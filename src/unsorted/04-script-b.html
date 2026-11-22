@@ -13,7 +13,7 @@
   var timerEl = document.getElementById('timer'), timeValEl = document.getElementById('timeval'), toastEl = document.getElementById('toast');
 
   var SKY = 0x9fc7e8;
-  var TILE = 2;            // one square, in world units. 1 Zip = one square per second.
+  var TILE = 2;            // one tile, in world units. 1 Zip = one tile per second.
   var RUN_SPEED = 160;     // top speed in world units per second (80 Zips)
   var ACCEL_TIME = 7;      // seconds to go from 0 to top speed, and back to 0
   var ACCEL = RUN_SPEED / ACCEL_TIME;
@@ -33,7 +33,7 @@
   var STEP_UP = 1;          // a ledge this small or smaller she just steps up, with no loss of speed
   var CLIMB_SLOPE = 1.05;   // ground steeper than this (rise per unit run, a little over 45 degrees) stops her like a wall
   var DROP_SLOPE = 0.35;   // ground that falls away faster than this leaves her in the air
-  var BOUNCE_KEEP = 0.5, BOUNCE_MIN = 8, SLAM_ACC = 40 * TILE, SLAM_MAX = 60 * TILE, STRAFE_DIST = TILE;   // the Hedron Barrier: it bounces back up at half the speed it landed at, and S in the air drives it straight down (40 Zips/s^2, 60 Zips at most)
+  var BOUNCE_KEEP = 0.5, BOUNCE_MIN = 8, SLAM_ACC = 40 * TILE, SLAM_MAX = 60 * TILE, STRAFE_DIST = TILE;   // the Barrier: it bounces back up at half the speed it landed at, and S in the air drives it straight down (40 Zips/s^2, 60 Zips at most)
   var FALL_MAX = 100;      // free-fall speed limit: 50 Zips (units/s)
   var MIN_UP = 60;         // running uphill, the slope bleeds her speed down to 30 Zips and no further
   var FRIC = 160 / 7;       // friction (units/s^2): her slowdown whenever she is not driving herself (coasting, braking, or past her own top speed). Set by the Friction stat
@@ -160,16 +160,16 @@
   scene.add(sun);
   scene.add(sun.target);
 
-  // ---- Valley: rolling grass between two cliff walls and a back wall, running 3,750 squares toward -Z, then a narrow curve climbing out ----
-  var VALLEY_SQUARES = 100;
-  var LENGTH_SQUARES = 3750;              // the valley ends in a cliff this far from the start
-  var LEDGE_FREE_SQUARES = 2000;          // no ledges until she has run this far
-  var HALF = VALLEY_SQUARES * TILE / 2;   // 100 units from the centre line to each side wall, and from the start to the back wall
+  // ---- Valley: rolling grass between two cliff walls and a back wall, running 3,750 tiles toward -Z, then a narrow curve climbing out ----
+  var VALLEY_TILES = 100;
+  var LENGTH_TILES = 3750;              // the valley ends in a cliff this far from the start
+  var LEDGE_FREE_TILES = 2000;          // no ledges until she has run this far
+  var HALF = VALLEY_TILES * TILE / 2;   // 100 units from the centre line to each side wall, and from the start to the back wall
   var GRID = 2.5;                         // size of one terrain facet
   var EXTENT = 150;                       // terrain reaches 150 to each side and 150 behind (the cliffs are 50 thick)
   var WALL_HEIGHT = 46;
-  var END = LENGTH_SQUARES * TILE;        // z = -END is the end wall
-  var LEDGE_START = LEDGE_FREE_SQUARES * TILE;
+  var END = LENGTH_TILES * TILE;        // z = -END is the end wall
+  var LEDGE_START = LEDGE_FREE_TILES * TILE;
   // Past the 7,500-unit mark the valley closes in and curves away. The walls pinch from 100 to 25 units either side of
   // centre at 45 degrees, then follow a 180-degree left-hand arc whose centre line has exactly the radius she can hold at top
   // speed (speed^2 / GRIP). The floor climbs along the arc until it is as high as the wall tops, and the channel opens
@@ -2535,10 +2535,10 @@
   }
   updateChunks(0, 0, 99);
 
-  // ---- Trees: one per jittered grid cell, in rows running down the valley, so neighbours are 7 to 20 squares apart ----
+  // ---- Trees: one per jittered grid cell, in rows running down the valley, so neighbours are 7 to 20 tiles apart ----
   var T_CS = 18;                 // each 18-unit cell holds exactly one tree, a little off its centre, so the forest is evenly spread
   var MIN_R = 3;                 // how many cells away a tree can still be too close
-  var MIN_D = 14.8;              // two trees are never closer than this (7.4 squares)
+  var MIN_D = 14.8;              // two trees are never closer than this (7.4 tiles)
   var MAX_TREES = 1400;          // room for the most that can be built around her
   var PLAYER_RADIUS; if (PLAYER_RADIUS === undefined) PLAYER_RADIUS = 0.5;       // how close her centre can get to a trunk or wall (half the collision box's width, from her stats)
   var PLAYER_H; if (PLAYER_H === undefined) PLAYER_H = 3.6;                      // the collision box's height standing (from her stats)
@@ -2575,7 +2575,7 @@
   // Placement is random but never regular. Every cell of the valley floor offers one candidate tree at a random spot with a
   // random priority; a candidate is planted unless a higher-priority tree that is itself planted sits closer than MIN_D.
   // Each answer depends only on the cells around it, so the forest is the same wherever and whenever it is rebuilt,
-  // with no rows or columns to follow and no two trees closer than 7.4 squares.
+  // with no rows or columns to follow and no two trees closer than 7.4 tiles.
   var CP_Z = -END + 50, CP_X = 0;           // the first checkpoint gate: 50 units short of the valley's end wall
   var CP2_X = -3400, CP2_Z = -7500;     // the second, across the narrow west end of the plateau
   var candCache = new Map(), plantCache = new Map();
@@ -2794,9 +2794,9 @@
   scene.add(player);
   var body = new THREE.Group();
   player.add(body);
-  // Hedron Barrier: a dodecahedron of solid glowing red energy that she rolls along the ground inside. Hidden until the 2 key.
+  // Barrier: a dodecahedron of solid glowing red energy that she rolls along the ground inside. Hidden until the 2 key.
   var BALL_R = 1.76, ballOn = false, ballAngle = 0;
-  // The tunable parts of Molly's moves and the Hedron Barrier. The Rig Editor keeps its dials in this browser (runnerRig2); RIGCFG reads them again whenever the editor is closed or saved.
+  // The tunable parts of Molly's moves and the Barrier. The Rig Editor keeps its stats in this browser (runnerRig2); RIGCFG reads them again whenever the editor is closed or saved.
   var RIGCFG = {
     'barrier.radius': 1.76, 'barrier.height': 1.64, 'barrier.spin': 1, 'barrier.sphereAt': 40, 'barrier.squeezeAt': 75, 'barrier.squeezeLen': 5, 'barrier.squeeze': 0.2, 'barrier.stretch': 0.12,
     'barrier.chargeSphere': 2, 'barrier.chargeSqueeze': 3.5, 'barrier.glow': 0.2, 'barrier.glowSize': 1.14, 'barrier.dashLen': 0.32, 'barrier.dashGap': 0.22,
@@ -2805,7 +2805,7 @@
     'stat.top': 80, 'stat.accelT': 7, 'stat.brake': 3, 'stat.jumpH': 7.2, 'stat.grav': 20, 'stat.gripZ': 20, 'stat.fadeSlope': 0, 'stat.driftGrip': 1, 'stat.fall': 50, 'stat.hearts': 3, 'stat.colH': 3.6, 'stat.colW': 1, 'stat.wallGrip': 1, 'stat.fadeWall': 1, 'stat.fric': 11.4, 'stat.slamAcc': 40, 'stat.slamMax': 60, 'stat.strafe': 2
   };
   var MAXHP = 3;
-  var mollyScale = 1, SLIDE_H = 1, mollyDriftRun = false;   // mollyScale: the Overall scale the model in use was saved with (the Rig Editor's dial). She stands 3.6 units x this, and her collision box (standing and sliding) is multiplied by it too
+  var mollyScale = 1, SLIDE_H = 1, mollyDriftRun = false;   // mollyScale: the Overall scale the model in use was saved with (the Rig Editor's stat). She stands 3.6 units x this, and her collision box (standing and sliding) is multiplied by it too
   // Minions and Big Minions are set in the Rig Editor's Minions panel: their blocks, colours, walk and stats. [Minion, Big Minion]. Speeds in Zips; swing angles in degrees; a damage speed of 0 means never
   var MN_DEF = { scale: [1, 5], radius: [1, 3], headW: [0.9, 0.9], headH: [0.9, 0.9], headD: [0.9, 0.9], torsoW: [0.7, 0.7], torsoH: [1.35, 1.35], torsoD: [0.45, 0.45], armW: [0.3, 0.3], armL: [1.35, 1.35], legW: [0.33, 0.33, .15], legD: [0.4, 0.4, .2], legL: [1.35, 1.35, .4],
     cHead: ['#45484e', '#45484e', '#5b4b73'], cBody: ['#2f3237', '#2f3237'], cLimb: ['#26282c', '#26282c', '#3a3148'], cEye: ['#ff2a1a', '#ff2a1a', '#e8a020'],
@@ -2817,7 +2817,7 @@
     'comet.hov.ankle': 0.35, 'comet.hov.back': 0.75, 'comet.hov.spinS': 1.5, 'comet.fly.drain': 4, 'comet.fly.lift': 1, 'comet.fly.arms': 8,
     'comet.star.cost': 1, 'comet.star.range': 50, 'comet.star.dmg': 0.5, 'comet.star.cool': 2, 'comet.star.speed': 100, 'comet.star.size': 1.2, 'comet.star.spin': 4,
     'comet.star.cMax': 3, 'comet.star.cCost': 2, 'comet.star.cSize': 0.5, 'comet.star.cDmg': 0.5, 'comet.star.cRange': 50, 'comet.cStar': '#4fc3ff', 'comet.cGlow': '#a8e6ff',
-    // her animations (the Rig Editor's Star throw, Hover and Fly modes), with the Rig Editor's key dials in degrees. Groups: pc the charging pose (right hand; Q mirrors it), pt the follow-through, pf Fly's arms and body, ho the changes while hovering, fl Fly's changes to her legs
+    // her animations (the Rig Editor's Star throw, Hover and Fly modes), with the Rig Editor's key stats in degrees. Groups: pc the charging pose (right hand; Q mirrors it), pt the follow-through, pf Fly's arms and body, ho the changes while hovering, fl Fly's changes to her legs
     'comet.throw.in': 0.15, 'comet.throw.swing': 0.14, 'comet.throw.rel': 0.6, 'comet.throw.hold': 0.12, 'comet.throw.out': 0.3, 'comet.hold.scale': 0.8, 'comet.hold.out': 0.15,
     'comet.hov.bob': 0.08, 'comet.hov.bobT': 1.6, 'comet.hov.ankleY': 0, 'comet.hov.ankleTilt': 0, 'comet.hov.backD': 0.55, 'comet.hov.backY': 0.15, 'comet.hov.backTilt': 0, 'comet.fly.starY': 0.25, 'comet.fly.starS': 1 };
   var CQ_KEYS = ['hyf', 'hz', 'hp', 'sp', 'hd', 'aLp', 'aLr', 'aLe', 'aRp', 'aRr', 'aRe', 'hL', 'kL', 'dL', 'hR', 'kR', 'dR', 'p1', 'p2', 'p3'];
@@ -2825,7 +2825,7 @@
     var P0 = { pc: { sp: 24, hd: -14, aLp: 45, aLr: 18, aLe: 35, aRp: -55, aRr: 25, aRe: 75 }, pt: { sp: 32, hd: -10, aLp: -25, aLr: 12, aLe: 30, aRp: 115, aRr: 8, aRe: 12 }, pf: { sp: 0, hd: 0, aLp: 170, aLr: 8, aLe: 8, aRp: 170, aRr: 8, aRe: 8 } };
     ['pc', 'pt', 'pf', 'ho', 'fl'].forEach(function (g) { CQ_KEYS.forEach(function (k) { COMET_DEF['comet.' + g + '.' + k] = (P0[g] && P0[g][k]) || 0; }); });
   })();
-  // A pose dial set's turn for one bone (the Rig Editor's key-pose rules), shared by the game and the Rig Editor's preview
+  // A pose stat set's turn for one bone (the Rig Editor's key-pose rules), shared by the game and the Rig Editor's preview
   window.__cometQ = function (n, v) {
     var D = Math.PI / 180, X = new THREE.Vector3(1, 0, 0), Z = new THREE.Vector3(0, 0, 1), qx = function (a) { return new THREE.Quaternion().setFromAxisAngle(X, a * D); }, qz = function (a) { return new THREE.Quaternion().setFromAxisAngle(Z, a * D); };
     switch (n) {
@@ -2841,7 +2841,7 @@
   for (var ck in COMET_DEF) RIGCFG[ck] = COMET_DEF[ck];
   window.__COMET_DEF = COMET_DEF;
   var RIGDEF = JSON.parse(JSON.stringify(RIGCFG));
-  // Which runner she plays as: 'molly' or 'comet' (the Characters page). Each keeps her own Rig Editor dials (runnerRig2, cometRig) and her own saved model (mollyGlb, cometGlb); Comet starts as a copy of Molly. Mobs' dials always come from Molly's.
+  // Which runner she plays as: 'molly' or 'comet' (the Characters page). Each keeps her own Rig Editor stats (runnerRig2, cometRig) and her own saved model (mollyGlb, cometGlb); Comet starts as a copy of Molly. Mobs' stats always come from Molly's.
   var CHAR = 'molly'; try { if (localStorage.getItem('pr_char') === 'comet') CHAR = 'comet'; } catch (e) {}
   function isComet() { return CHAR === 'comet'; }
   // The settings each runner ships with (what a fresh browser plays): under whatever this browser has saved, over the built-in numbers above
@@ -2852,14 +2852,14 @@
   }
   function rigOk(v, d) { return v !== undefined && v !== null && typeof v === typeof d && (typeof v !== 'string' || /^#[0-9a-f]{6}$/i.test(v)); }
   function rigPick(k, ch, o, om) { var mn = k.indexOf('mn.') === 0, src = mn ? om : o, sh = mn ? SHIPPED.molly : SHIPPED[ch]; return src && rigOk(src[k], RIGDEF[k]) ? src[k] : sh && rigOk(sh[k], RIGDEF[k]) ? sh[k] : RIGDEF[k]; }
-  function rigCfgFor(ch) {                                       // a runner's dials, read fresh (for the Characters page's cards)
+  function rigCfgFor(ch) {                                       // a runner's stats, read fresh (for the Characters page's cards)
     var so = rigStored(ch), o = so[0], c = {};
     for (var k in RIGDEF) c[k] = rigPick(k, ch, o, so[1]);
     c.scale = o && typeof o.scale === 'number' ? o.scale : typeof SHIPPED[ch].scale === 'number' ? SHIPPED[ch].scale : 1; c.__who = ch; return c;
   }
   function rigRead() {
     var so = rigStored(CHAR), o = so[0], om = so[1];
-    if (o && o['stat.gripZ'] === undefined && typeof o['stat.grip'] === 'number') o['stat.gripZ'] = o['stat.grip'] / 2;   // dials saved by an older build kept her grip in units/s^2 (1 Zip = 2 units)
+    if (o && o['stat.gripZ'] === undefined && typeof o['stat.grip'] === 'number') o['stat.gripZ'] = o['stat.grip'] / 2;   // stats saved by an older build kept her grip in units/s^2 (1 Zip = 2 units)
     for (var k in RIGDEF) RIGCFG[k] = rigPick(k, CHAR, o, om);
     RIGCFG['barrier.radius'] = Math.max(0.2, RIGCFG['barrier.radius']); RIGCFG['m.drift.rate'] = Math.max(0.1, RIGCFG['m.drift.rate']);   // a Barrier with no size or a drift that never settles would break her spin and her lean
     applyStats(); if (typeof enRestyle === 'function') enRestyle(); applyCharColors();
@@ -2899,9 +2899,9 @@
     h += '</div>';
     if (!compact) {
       var rows = [['Time to top speed', f1(aT) + ' s over ' + f1(top * 2 * aT / 2) + ' units'], ['Top speed to a stop (braking)', f1(top / brk) + ' s over ' + f1(top * 2 * (top / brk) / 2) + ' units'], ['Friction', f1(fr) + ' Zips/s² · hills steeper than ' + f1(Math.asin(Math.min(1, fr / gv)) * 57.29578) + '° speed her up'], ['Turn radius at top speed', f1(top * 2 * top / gz) + ' units'], ['Grip on slopes', g('stat.fadeSlope', 0) ? 'fades with the slope (× its cosine)' : 'the same on any slope'], ['Jump', f1(air) + ' s in the air · ' + f1(top * 2 * air) + ' units at top speed'],
-        ['Drift', f1(g('m.drift.angle', 15)) + '° shift · needs ' + f1(g('m.drift.minZips', 30)) + ' Zips · ' + f1(g('m.drift.cool', 1)) + ' s cooldown'], ['Hedron Barrier', 'costs 12 Power to start · half acceleration · no strafe or drift']];
+        ['Drift', f1(g('m.drift.angle', 15)) + '° shift · needs ' + f1(g('m.drift.minZips', 30)) + ' Zips · ' + f1(g('m.drift.cool', 1)) + ' s cooldown'], ['Barrier', 'costs 12 Power to start · half acceleration · no strafe or drift']];
       if (c.__who === 'comet') rows.splice(rows.length - 1, 1, ['Star Throw (Q / E)', f1(g('comet.star.dmg', 0.5)) + ' heart · ' + f1(g('comet.star.range', 50)) + ' units · ' + f1(g('comet.star.cool', 2)) + ' s cooldown · costs ' + f1(g('comet.star.cost', 1)) + ' Power; hold to charge'],
-        ['Hover (2)', 'costs ' + f1(g('comet.hov.cost', 6)) + ' Power to start, ' + f1(g('comet.hov.drain', 1)) + ' a second · top speed ' + f1(g('comet.hov.top', 80)) + ' Zips'], ['Fly (Space, hovering)', f1(g('comet.fly.drain', 4)) + ' more Power a second'], ['No Strafe or Hedron Barrier', '']);
+        ['Hover (2)', 'costs ' + f1(g('comet.hov.cost', 6)) + ' Power to start, ' + f1(g('comet.hov.drain', 1)) + ' a second · top speed ' + f1(g('comet.hov.top', 80)) + ' Zips'], ['Fly (Space, hovering)', f1(g('comet.fly.drain', 4)) + ' more Power a second'], ['No Strafe or Barrier', '']);
       h += '<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:12px">';
       rows.forEach(function (r) { h += '<tr><td style="padding:3px 4px 3px 0;border-top:1px solid #d9c7a8;opacity:.75">' + r[0] + '</td><td style="padding:3px 0;border-top:1px solid #d9c7a8;text-align:right;font-family:monospace">' + r[1] + '</td></tr>'; });
       h += '</table>';
@@ -2954,7 +2954,7 @@
       ['Coasting, top speed to a stop', msS(-m.fr), msF(top / m.fr) + ' s', msF(top * top / m.fr, 0)],
       ['Braking (S), top speed to a stop', msS(-brk), msF(top / brk) + ' s', msF(top * top / brk, 0)],
       ['Dodecadash (' + m.dash + ' Zips) back down to top speed', msS(-m.fr / 2), msF(Math.max(0, m.dash - top) / (m.fr / 2)) + ' s', msF(Math.max(0, m.dash * m.dash - top * top) / (m.fr / 2), 0)]];
-    h += msTable('Flat ground, straight line', ['', 'Zips/s²', 'Time', 'Units'], rows, 'In the Hedron Barrier her drive and her friction are both halved.');
+    h += msTable('Flat ground, straight line', ['', 'Zips/s²', 'Time', 'Units'], rows, 'In the Barrier her drive and her friction are both halved.');
     // straight down and straight up a slope
     rows = [5, 10, 15, 20, 30, 45, 60].map(function (a) {
       var gs = G * Math.sin(a * D), dn = gs - m.fr, up = m.acc - gs, steep = a > m.climb;
@@ -3144,7 +3144,7 @@
   }
   function b64ToBuf(t) { var bin = atob(t.trim()), u8 = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); return u8.buffer; }
   // A model saved from the Rig Editor is kept in this browser's IndexedDB (database 'polyrun', store 'kv', key 'mollyGlb') as its raw bytes. Up to v173 it was kept as text in
-  // localStorage, where it took a fifth or more of the 5 MB that the Path Editor's layouts and the dials share, and a big build did not fit at all. A model found there is moved
+  // localStorage, where it took a fifth or more of the 5 MB that the Path Editor's layouts and the stats share, and a big build did not fit at all. A model found there is moved
   // across the first time and then removed. Only where IndexedDB cannot be used at all (some private windows) is localStorage still used.
   var mollyDB = null, mollySavedBytes = 0;                      // mollySavedBytes: the size of the saved model this browser holds (0: none)
   function mollyDbOpen(cb) {
@@ -3322,7 +3322,7 @@
     else if (!grounded) want = 'Jump';
     else if (zp < 0.75) want = 'Idle';
     else want = zp <= 15 ? 'Run_Slow' : zp < 45 ? 'Run_Mid' : 'Run_Fast';
-    if (mollyDriftRun && driftBlend > 0.5 && grounded && want.indexOf('Run_') === 0 && mollyAct.Drift_L && mollyAct.Drift_R) want = driftSide > 0 ? 'Drift_L' : 'Drift_R';   // her run with the Drift dials' changes, stride for stride
+    if (mollyDriftRun && driftBlend > 0.5 && grounded && want.indexOf('Run_') === 0 && mollyAct.Drift_L && mollyAct.Drift_R) want = driftSide > 0 ? 'Drift_L' : 'Drift_R';   // her run with the Drift stats' changes, stride for stride
     if (!grounded && mollyPrevGround) mollyV0 = 0;
     if (!grounded && vy > mollyV0) mollyV0 = vy;                // the launch speed of this jump (a ledge walk-off has none)
     mollyPrevGround = grounded;
@@ -3388,7 +3388,7 @@
     hpEl.classList.add('hurt'); hurtEl.classList.add('on');
   }
   function landFall(h) {
-    if (ballOn || hovOn) return;                                // the Hedron Barrier (or Comet's Hover) takes the landing                                        // she has just touched down after falling h units from her highest point
+    if (ballOn || hovOn) return;                                // the Barrier (or Comet's Hover) takes the landing                                        // she has just touched down after falling h units from her highest point
     var dmg = h >= 135 ? 3 : h >= 90 ? 2 : h >= 45 ? 1 : 0;
     if (dmg === 0 || hp <= 0) return;
     hp = Math.max(0, hp - dmg); drawHearts(); flashHurt();
@@ -3398,11 +3398,11 @@
   function tiltSoft(a) { var m = Math.abs(a); return m <= TILT_DEAD ? 0 : a * smooth01((m - TILT_DEAD) / TILT_DEAD); }
   var pitchLean = 0, pitchPrevY = 0, grounded = true, vy = 0, jumpBuf = 0, spaceDown = false;   // jumpBuf: a jump pressed just before landing still counts
 
-  // ---- Strafe: an instant sidestep of one square, to her right (+1) or left (-1) of the way she is heading ----
+  // ---- Strafe: an instant sidestep of one tile, to her right (+1) or left (-1) of the way she is heading ----
   // Her direction and speed are untouched. She only slides as far as the way is clear: a trunk, a wall or a ledge face
   // too steep to walk up stops the slide short, and a drop at the far end leaves her in the air.
   function strafe(dir) {
-    if (!playing || !grounded || ballOn) return;                 // no sidestep inside the Hedron Barrier
+    if (!playing || !grounded || ballOn) return;                 // no sidestep inside the Barrier
     var rx = Math.cos(heading) * dir, rz = -Math.sin(heading) * dir;
     var pp = player.position, sub = 0.25, n = Math.round(STRAFE_DIST / sub);
     var sx = pp.x, sy = pp.y, sz = pp.z;
@@ -3683,9 +3683,9 @@
     }
     var nearTox = B.terrain === 'level2';                     // poisoned ground: Oceana's own low ground, and toxic terrain patches
     for (i = 0; i < B.patches.length && !nearTox; i++) { var pa = B.patches[i]; if (pa.ground === 'toxic' && Math.abs(pa.x - ex) <= pa.rr + 100 && Math.abs(pa.z - pp.z) <= pa.rr + 100) nearTox = true; }
-    if (nearTox && n < CAP) {                                  // poisoned ground near her, up to 84 units off, in 6-unit squares: a bubble in every square of a toxic terrain patch (about as thick as a toxic patch's), and in 1 of 5 on Oceana's own ground (about as thick as the Sink's were)
+    if (nearTox && n < CAP) {                                  // poisoned ground near her, up to 84 units off, in 6-unit cells: a bubble in every cell of a toxic terrain patch (about as thick as a toxic patch's), and in 1 of 5 on Oceana's own ground (about as thick as the Sink's were)
       var CS = 6, ca = Math.floor(ex / CS), cb = Math.floor(pp.z / CS);
-      if (!B.toxCells) B.toxCells = new Map();                 // each square's bubble: worked out once (ground height included); null if the ground there is not poisoned
+      if (!B.toxCells) B.toxCells = new Map();                 // each cell's bubble: worked out once (ground height included); null if the ground there is not poisoned
       for (a = ca - 14; a <= ca + 14 && n < CAP; a++) for (b = cb - 14; b <= cb + 14 && n < CAP; b++) {
         var key = a * 1000003 + b, cq = B.toxCells.get(key);
         if (cq === undefined) {
@@ -3731,7 +3731,7 @@
     if (level !== 2 || !playing) { toxBub.count = 0; ovBub.count = 0; return; }
     var pp = player.position;
     updateSinkToxic(pp, now);
-    if (!dropTipDone && pp.x > L2_X + 1360 && pp.x < L2_X + 1500 && pp.y > L2_Y + 50 && Math.abs(pp.z + 500.7) < 20) { dropTipDone = true; showHint('Taking out mobs refills your power line! Use that to maintain your Hedron Barrier!', 6000, now); }
+    if (!dropTipDone && pp.x > L2_X + 1360 && pp.x < L2_X + 1500 && pp.y > L2_Y + 50 && Math.abs(pp.z + 500.7) < 20) { dropTipDone = true; showHint('Taking out mobs refills your power line! Use that to maintain your Barrier!', 6000, now); }
     l2Dist(pp.x, pp.z);
     var onPath = L2_PI >= L2_NAR0, sg = L2_S, v = onPath ? l2Signed(pp.x, pp.z) : 0, n = 0, i, k;
     if (!onPath && L2_S < L2_FLAT0 - 600) { toxBub.count = 0; return; }
@@ -4184,7 +4184,7 @@
   }
 
   // ---- Mobs: three blocky dark grey husks in the cave's round chamber. Each is Molly's size (3.6 tall), accelerates at 5 Zips/s^2 to at most
-  // 10 Zips and chases her whenever she is within 100 units. A touch costs her a heart, unless she is inside the Hedron Barrier: then if she
+  // 10 Zips and chases her whenever she is within 100 units. A touch costs her a heart, unless she is inside the Barrier: then if she
   // is doing 20 Zips or more, or lands on its head at any speed, it falls apart and its pieces vanish 3 seconds later. ----
   var EN_H = 3.6, EN_R = 1, EN_SEE = 100, EN_MAX = 10 * TILE, EN_ACC = 5 * TILE, EN_KILL_SPEED = 20 * TILE, EN_HIT_COOL = 1.2;
   var MOBS = [], mobsReady = false, enHurtUntil = 0, enPrevX = 0, enPrevZ = 0, enPrevOK = false;
@@ -4228,7 +4228,7 @@
     var wL = wing(-1), wR = wing(1), body = new THREE.Group(); body.add(head, lL, lR, wL, wR); g.add(body);
     return { body: body, parts: [head, lL, lR, wL, wR], aL: wL, aR: wR, lL: lL, lR: lR, wL: wL, wR: wR, mats: [mHead, mLimb, mWing], H: c.legL + c.headH };
   };
-  window.__poseGazer = function (m, c, ph) {                     // wings beat (flap per second is a Rig Editor dial: ph runs at 2 pi per beat), tiny legs dangle and swing, the body bobs
+  window.__poseGazer = function (m, c, ph) {                     // wings beat (flap per second is a Rig Editor stat: ph runs at 2 pi per beat), tiny legs dangle and swing, the body bobs
     var D = Math.PI / 180, a = 0.35 + 0.55 * Math.sin(ph), sw = Math.sin(ph * 0.5);
     m.wR.rotation.z = a; m.wL.rotation.z = -a; m.lL.rotation.x = sw * c.legSwing * D; m.lR.rotation.x = -sw * c.legSwing * D; m.body.position.y = sw * c.bob;
   };

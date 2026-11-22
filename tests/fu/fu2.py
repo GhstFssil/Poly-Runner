@@ -1,4 +1,4 @@
-# follow-ups 3/2/4: same rest model as before, band dials converted, pad weights
+# follow-ups 3/2/4: same rest model as before, band stats converted, pad weights
 import sys,json,hashlib
 sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
@@ -10,7 +10,7 @@ res={}
 for html in ['aud_pre.html','aud.html']:
     g=Rig(draw=False, html=html); g.open(); g.pg.wait_for_timeout(1500)
     res[html]=grab(g)
-    print(html,'verts',res[html]['n'],'band dials',res[html]['bA'],res[html]['bL'],'defaults',res[html]['dA'],res[html]['dL'],'fmt',res[html]['fmt'],'ringGap',res[html]['rg'],'errors',[e for e in g.errs if 'flatShading' not in e and 'ERR_FAILED' not in e][:3])
+    print(html,'verts',res[html]['n'],'band stats',res[html]['bA'],res[html]['bL'],'defaults',res[html]['dA'],res[html]['dL'],'fmt',res[html]['fmt'],'ringGap',res[html]['rg'],'errors',[e for e in g.errs if 'flatShading' not in e and 'ERR_FAILED' not in e][:3])
     if html=='aud.html':
         print('  saved to storage on a clean open:',g.ev("localStorage.getItem('runnerRig2')===null"))
     g.close()

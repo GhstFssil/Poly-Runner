@@ -19,3 +19,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-21 08:52 | main | docs only: GLOSSARY.md added (final terms: mob not enemy, character, stat, tile, Barrier, Mud, Crags, capitalized labels); CLAUDE.md names it, says Poly Runner and characters; ARCHITECTURE.md Characters heading and stat wording; SWEEP docs say stats; BACKLOG notes the sweep generator is behind the docs
 - 2026-11-21 09:10 | next | Enemy->Mob rename, Title Case Path Editor labels, src/ rules in CLAUDE.md, glossary/backlog/handoff updates
 - 2026-11-21 18:14 | next | split step 1: src/index.html cut in place into src/data/* and src/unsorted/*; build byte-identical
+- 2026-11-21 18:31 | next | Rotation: strips save rot, old heading still loads (commit 9962738; line missed then); dials->stats, Hedron Barrier->Barrier (hints too), tile names/wording; tests/fu/rot1.py

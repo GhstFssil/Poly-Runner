@@ -4,7 +4,7 @@ sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
 D="document.getElementById('rigHost').__rigdbg()"
 def errs(g): return [e for e in g.errs if 'flatShading' not in e and 'ERR_FAILED' not in e and 'normalized normal' not in e][:6]
-# 1. a browser with OLD saved dials (grip in units/s2 = 50) and nothing else
+# 1. a browser with OLD saved stats (grip in units/s2 = 50) and nothing else
 old={'stat.grip':50,'stat.top':90}
 g=Rig(draw=False, storage={'runnerRig2':json.dumps(old)})
 ph=g.ev("__phys()"); print('1 game on load, old saved grip 50 u/s2:',ph)
@@ -26,7 +26,7 @@ for key in ['Gravity is','Her grip','Past ','On a wall','Her grip on this slope'
 # the across-a-slope table
 i=mv.find('SLOPES: RUNNING STRAIGHT ACROSS'); print('   table:',mv[i:i+700].replace('\n',' ~ ') if i>=0 else mv[:300])
 i=mv.find('WALL RUNNING'); print('   walls:',mv[i:i+500].replace('\n',' ~ ') if i>=0 else None)
-saved=json.loads(g.ev("localStorage.getItem('runnerRig2')")); print('  saved dials: stat.grip' ,saved.get('stat.grip'),'gripZ',saved.get('stat.gripZ'),'grav',saved.get('stat.grav'),'fadeSlope',saved.get('stat.fadeSlope'),'fadeWall',saved.get('stat.fadeWall'))
+saved=json.loads(g.ev("localStorage.getItem('runnerRig2')")); print('  saved stats: stat.grip' ,saved.get('stat.grip'),'gripZ',saved.get('stat.gripZ'),'grav',saved.get('stat.grav'),'fadeSlope',saved.get('stat.fadeSlope'),'fadeWall',saved.get('stat.fadeWall'))
 # 3. close the editor: the game takes them
 g.ev("(function(){var b=document.getElementById('rigHost').shadowRoot.querySelector('#closeRig')||document.querySelector('#rigClose');if(b)b.click();})()"); g.pg.wait_for_timeout(500)
 print('3 buttons that could close:',g.ev("(function(){var R=document.getElementById('rigHost').shadowRoot;return Array.prototype.map.call(R.querySelectorAll('button'),function(b){return b.id+':'+b.textContent.trim().slice(0,18)}).filter(function(t){return /clos|back|done|exit|game/i.test(t)})})()"))

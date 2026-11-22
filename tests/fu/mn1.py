@@ -1,4 +1,4 @@
-# Minions panel: dials reach the game; the preview builds; stomp and damage rules
+# Minions panel: stats reach the game; the preview builds; stomp and damage rules
 import sys,json
 sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *

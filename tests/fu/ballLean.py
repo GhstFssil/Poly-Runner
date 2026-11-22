@@ -1,4 +1,4 @@
-# The Hedron Barrier leans to the ground's cross-slope like her body does (it used to stay level).
+# The Barrier leans to the ground's cross-slope like her body does (it used to stay level).
 import sys
 sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
