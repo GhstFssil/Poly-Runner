@@ -15,8 +15,10 @@ Split the single-file game into `src/` parts by function (areas: core, level1, l
 
 - 2026-11-22, on `next` (not published): sandbox area: `src/sandbox/sandbox.js` (Level 3 / `sbBuild`, Caves, Walls, Pressure plates and targets; was `04-script-b1b3` 1-1699, one cut by Ricky's choice; b1b3 now starts at Trees). Byte-identical; chk, mk_test, ends1, cavejoin, door1/2, tunfloor, shaft1, nopit, coords1, wall1, reg2/3/4 pass (door1/reg2 print only GL perf noise). Part order: ..., sandbox, b1b3.
 
+- 2026-11-22: v188 published (level1 + sandbox cuts, then the rest): `src/core/scene.js`, `src/core/loop.js` (Sizing, Clock, Loop), `src/level1/trees.js`, `src/characters/molly.js` (Movement details, State vars, Molly's model), `src/characters/comet.js`. Byte-identical; chk, mk_test, comet1/2, modes, rot1, ends1, reg2/3/4, rl1, righ, y2 pass. `mov`, `phys`, `rig1` fail only on missing comparison builds (same before the cuts). Part order: ..., sandbox, trees, molly, ..., 06-script-d (5 lines), comet, loop, 07-script-end (`})();` + `</script>`).
+
 ## In progress
-Nothing half-done. level1 and sandbox are committed on `next`; no version bump until Ricky publishes.
+Nothing half-done. `next` = `main` after v188.
 
 ## Decisions
 - Terms: mob / minion / Big Minion / Roost Gazer; character; stat; tile; Barrier; Mud; Crags; every word of a label capitalized.
@@ -24,8 +26,8 @@ Nothing half-done. level1 and sandbox are committed on `next`; no version bump u
 - The Rig Editor's own panel (`03-script-a`, about 57 rig mentions) stays for the characters area, not ui.
 
 ## Next steps
-1. Next areas, smallest first: `06-script-d` (game loop, comet code), then what is left of `04-script-b1b3` (Trees, Movement details, State, Molly's model; check which area each belongs to). `04-script-b1b` (Renderer / scene, 37 lines) goes to core. One area per task; `python3 tools/check_deps.py` shows coupling.
-2. `menu-wiring.js` also holds pointer lock (`lockPointer`, `relockOnInput`): may belong in core; split later.
+1. Only `unsorted/` leftovers remain (head, script-start, script-a, b1, b1b2, b1c, b2, 06 head, 07 end). Next: `03-script-a` (Rig Editor panel -> characters), `01-head` (CSS/HTML), `04-script-b1c`; then reorder parts by area. `python3 tools/check_deps.py` shows coupling.
+2. `menu-wiring.js` also holds pointer lock (`lockPointer`, `relockOnInput`): may belong in core; the State vars in `molly.js` (yaw, pitch, speed, drift) may belong in core. Split later.
 3. `tools/mk_sweep_docs.py` is behind the SWEEP docs; sync or retire it, never regenerate blindly.
 4. Recheck on this build: `fu/nf1.py` (crashes), `fu/wall4.py` (times out), `fu/door4.py`, `fu/minionhit.py` (flaky). `fu/door3.py` and `fu/steep1.py` also need the missing comparison builds.
 

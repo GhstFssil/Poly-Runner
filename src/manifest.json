@@ -10,11 +10,12 @@
     "data/models.html",
     "unsorted/04-script-b1.html",
     "ui/speedometer.js",
-    "unsorted/04-script-b1b.html",
+    "core/scene.js",
     "level1/level1.js",
     "level2/level2.js",
     "sandbox/sandbox.js",
-    "unsorted/04-script-b1b3.html",
+    "level1/trees.js",
+    "characters/molly.js",
     "ui/rig-editor-host.js",
     "ui/path-editor-host.js",
     "unsorted/04-script-b1b2.html",
@@ -28,6 +29,9 @@
     "data/level1.js",
     "data/level2.js",
     "ui/screens.js",
-    "unsorted/06-script-d.html"
+    "unsorted/06-script-d.html",
+    "characters/comet.js",
+    "core/loop.js",
+    "unsorted/07-script-end.html"
   ]
 }

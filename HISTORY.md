@@ -35,3 +35,5 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-22 10:41 | v187 | published next as v187: ui host cuts, menu wiring, level2 area, backlog idea; no game change
 - 2026-11-22 11:02 | next | level1 area: Valley, cave, doorway/mud ramp/field from 04-script-b1b to src/level1/level1.js (b1b keeps Renderer / scene); build byte-identical
 - 2026-11-22 11:45 | next | sandbox area: cut Level 3 / sbBuild, Caves, Walls, Pressure plates and targets into src/sandbox/sandbox.js (byte-identical)
+- 2026-11-22 14:37 | next | sandbox, level1 Trees, characters (molly, comet) and core (scene, loop) cut out of src/unsorted/ into their area files (byte-identical)
+- 2026-11-22 14:37 | v188 | published: version label v188 and CHANGELOG entry for the source split (next merged into main)
