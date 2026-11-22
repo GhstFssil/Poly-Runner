@@ -9,7 +9,7 @@ print('A clean browser: P==DEF',P0==DEF,'| DEF differs from shipped settings in'
 g.ev(g.q('#statBox')+".open=true"); g.typed('stat.top',123); g.typed('runM.stride',55); g.typed('Thigh.dia',30)
 g.click('#resetAll',500)
 P1=json.loads(g.ev("JSON.stringify("+D+".P)"))
-print('B Reset all: P==shipped defaults',P1==DEF,'| stat slider',g.ev(g.q('#s_stat_top')+".value"),'| runM.stride slider',g.ev(g.q('#s_runM_stride')+".value"),'(shipped',emb['runM.stride'],')')
+print('B Reset All: P==shipped defaults',P1==DEF,'| stat slider',g.ev(g.q('#s_stat_top')+".value"),'| runM.stride slider',g.ev(g.q('#s_runM_stride')+".value"),'(shipped',emb['runM.stride'],')')
 # C typed extremes through the boxes
 g.click('#chips [data-id="Foot"]',200)
 r=[]
@@ -53,7 +53,7 @@ g.typed('barrier.preview',60,300); a0=g.ev(D+".barrier.children[0].rotation.x");
 g.click('#play',100); a2=g.ev(D+".barrier.children[0].rotation.x"); g.pg.wait_for_timeout(300); a3=g.ev(D+".barrier.children[0].rotation.x"); g.click('#play',100)
 print('H barrier: selection',sel0,'->',g.ev(D+".ui.sel"),'| rolling while playing',a0!=a1,'| rolling while paused',a2!=a3,'| cycle slider disabled',g.ev(g.q('#phase')+".disabled"))
 g.typed('barrier.radius',2.5,300); r1=g.ev(D+".barrier.children[0].children[0].geometry.parameters.radius"); g.click('#resetAnim',400); r2=g.ev(D+".barrier.children[0].children[0].geometry.parameters.radius")
-print('  Reset this animation rebuilds the preview: radius',r1,'->',r2)
+print('  Reset This Animation rebuilds the preview: radius',r1,'->',r2)
 # J pasted settings
 g.ev("(function(){var R=document.getElementById('rigHost').shadowRoot;R.querySelector('#json').value=JSON.stringify({'Shin.len':0,'sides':1e9,'m.jump.3.t':0.05,'m.jump.5.t':0.02,'cSuit':'banana','stat.grip':-4,'runF.dur':-2,'nonsense':5});R.querySelector('#applyJson').click()})()"); g.pg.wait_for_timeout(900)
 print('J pasted bad settings:',g.status(),{k:g.P(k) for k in ['Shin.len','sides','cSuit','stat.grip','runF.dur']},'jump times',[g.P('m.jump.%d.t'%i) for i in range(8)],g.mesh())

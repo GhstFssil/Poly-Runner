@@ -3,7 +3,7 @@
 One source of truth for the game's words. Use these terms, spelled this way, in the game's text, the CHANGELOG, code comments, docs and commit messages. Ricky owns the names.
 
 - **proposed** marks a term Ricky has not confirmed yet. Claude proposes where the repo disagrees with itself; the mark goes when Ricky confirms. Every term here is confirmed today.
-- Labels: the names of things on buttons, tabs, panels and stamps are capitalized, every word (Big Minion, Pressure Plate, Seg Chain). Descriptive captions and sentences are written normally. Old CHANGELOG entries keep their original wording.
+- Labels: every label in the UI is in Title Case: buttons, tabs, panels, menu items, stat names, field names and option names (Big Minion, Pressure Plate, Seg Chain, Left Arm Raise). Small words stay lowercase (a, an, the, and, but, or, for, at, by, in, of, on, to, per) unless first; the word after a colon is capitalized; each part of a hyphenated word is (Side-to-Side). Not changed: anything in parentheses, units, tooltips (`title=`), placeholders, messages, hints and sentences. A label built from pieces goes through `tcLabel` (in the Rig Editor code). Stat keys (`Foot.len`) and file keys (`'Poly Runner rig settings'`) are not labels.
 - Add a term here in the same change that introduces it. Numbers (speeds, costs, cooldowns, sizes) live in the game and the Rig Editor, never here, so they can't go stale.
 - Checked against the game at v184 (2026-11-21). "Code" cells name the identifiers to search for.
 

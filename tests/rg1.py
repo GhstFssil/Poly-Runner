@@ -1,4 +1,4 @@
-# Molly in a level after "Save to game": close-ups from a camera that follows her
+# Molly in a level after "Save to Game": close-ups from a camera that follows her
 from righ import *
 from PIL import Image
 import io,sys,os

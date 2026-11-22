@@ -2,22 +2,22 @@ from righ import *
 g=Rig(draw=False); g.open()
 D="document.getElementById('rigHost').__rigdbg()"
 emb=json.loads(g.ev("document.getElementById('molly-settings').textContent"))
-# (a) Reset all vs the embedded settings
+# (a) Reset All vs the embedded settings
 P0=json.loads(g.ev("JSON.stringify("+D+".P)")); DEF=json.loads(g.ev("JSON.stringify("+D+".DEF)"))
 d1=[(k,DEF[k],emb[k]) for k in DEF if k in emb and DEF[k]!=emb[k]]
-print('(a) keys where Reset all (DEF) differs from the shipped Molly settings:',len(d1), d1[:25])
+print('(a) keys where Reset All (DEF) differs from the shipped Molly settings:',len(d1), d1[:25])
 print('    keys in DEF missing from embedded:',[k for k in DEF if k not in emb][:40])
 print('    P at first open differs from embedded:',[(k,P0[k],emb.get(k)) for k in P0 if k in emb and P0[k]!=emb[k]][:10])
-# (b) stale after Reset all
+# (b) stale after Reset All
 g.ev(g.q('#statBox')+".open=true")
 g.typed('stat.top',123); g.click('#modes [data-m="run"]'); g.typed('runM.stride',55)
 g.click('#resetAll',400)
-print('(b) after Reset all: P stat.top',g.P('stat.top'),'slider shows',g.ev(g.q('#s_stat_top')+".value"),'| P runM.stride',g.P('runM.stride'),'slider shows',g.ev(g.q('#s_runM_stride')+".value"),'| card top:',re.findall(r'Top speed\s*([\d.]+)',g.ev(g.q('#statLive')+".innerText").replace('\n',' '))[:1])
+print('(b) after Reset All: P stat.top',g.P('stat.top'),'slider shows',g.ev(g.q('#s_stat_top')+".value"),'| P runM.stride',g.P('runM.stride'),'slider shows',g.ev(g.q('#s_runM_stride')+".value"),'| card top:',re.findall(r'Top Speed\s*([\d.]+)',g.ev(g.q('#statLive')+".innerText").replace('\n',' '))[:1])
 # (c) hold key crossing
 g.click('#modes2 [data-m="slide"]',300)
 g.ev("(function(){var R=document.getElementById('rigHost').shadowRoot;var b=R.querySelectorAll('#animStages .chip');b[2].click();})()"); g.pg.wait_for_timeout(300)
 print('(c) slide stage keys t:',[g.P('m.slide.%d.t'%i) for i in range(6)])
-print('    drag "When it happens" (key2) to max:',g.slide('m.slide.2.t',0.99),' then "Slide held until" (key3) to min:',g.slide('m.slide.3.t',0.0))
+print('    drag "When it happens" (key2) to max:',g.slide('m.slide.2.t',0.99),' then "Slide Held Until" (key3) to min:',g.slide('m.slide.3.t',0.0))
 print('    now t:',[g.P('m.slide.%d.t'%i) for i in range(6)])
 g.click('#resetAnim',300)
 print('    typed key3 t = 5%:',g.typed('m.slide.3.t',5),[g.P('m.slide.%d.t'%i) for i in range(6)])

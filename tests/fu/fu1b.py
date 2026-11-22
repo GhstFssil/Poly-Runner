@@ -11,7 +11,7 @@ print('pause/character card:',g.ev("(function(){var a=document.getElementById('c
 # reset stats goes back to the shipped ones
 print('visible:',g.ev("['bDevT','dtRig','bPlay','devMenu','titleCard'].map(function(i){var e=document.getElementById(i);return i+':'+(e?(e.offsetParent!==null):'none')})"));
 g.ev("document.getElementById('dtRig').click()"); g.pg.wait_for_timeout(2500); g.ev(g.q('#statBox')+".open=true"); g.click('#resetStats',300)
-print('after Reset stats:',{k:g.P(k) for k in ['stat.top','stat.grav','stat.gripZ','stat.fadeSlope','stat.fadeWall','stat.wallGrip']})
+print('after Reset Stats:',{k:g.P(k) for k in ['stat.top','stat.grav','stat.gripZ','stat.fadeSlope','stat.fadeWall','stat.wallGrip']})
 g.click('#rigClose',800); print('game:',g.ev("__phys()"))
 print([e for e in g.errs if 'flatShading' not in e and 'ERR_FAILED' not in e][:5])
 g.close()

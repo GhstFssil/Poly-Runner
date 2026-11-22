@@ -1,4 +1,4 @@
-# The 'Grip while drifting' stat: default 1, reaches the game, clamps at 0..10, a settings file from before it still loads as 1.
+# The 'Grip While Drifting' stat: default 1, reaches the game, clamps at 0..10, a settings file from before it still loads as 1.
 import sys,json
 sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *

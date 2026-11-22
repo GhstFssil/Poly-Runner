@@ -287,8 +287,8 @@
         <div class="menu">
           <button class="go2" id="dtPath" type="button">Path Editor</button>
           <button class="go2" id="dtRig" type="button">Rig Editor</button>
-          <button class="go2" id="dtSandbox" type="button">Sandbox: play my last layout</button>
-          <button class="go2" id="dtBlank" type="button">Sandbox: blank ground</button>
+          <button class="go2" id="dtSandbox" type="button">Sandbox: Play My Last Layout</button>
+          <button class="go2" id="dtBlank" type="button">Sandbox: Blank Ground</button>
           <button class="go2" id="dtSaves" type="button">Saved Sandboxes</button>
         </div>
         <button class="go2 back" id="dtBack" type="button">Back</button>
@@ -320,8 +320,8 @@
         <h1>Graphics</h1>
         <div class="menu">
           <button class="go2" id="gAA" type="button">Antialiasing: On</button>
-          <button class="go2" id="gSoft" type="button">Soft shadows: On</button>
-          <label class="gfog">Fog distance: <b id="gFogV">100%</b><input id="gFog" type="range" min="30" max="100" step="5" value="100"></label>
+          <button class="go2" id="gSoft" type="button">Soft Shadows: On</button>
+          <label class="gfog">Fog Distance: <b id="gFogV">100%</b><input id="gFog" type="range" min="30" max="100" step="5" value="100"></label>
         </div>
         <button class="go2 back" id="bSetBack" type="button">Back</button>
       </div>
@@ -330,15 +330,15 @@
       <div class="card">
         <h1>Controls</h1>
       <div class="keys">
-        <span><span class="key">Mouse</span></span><span>Aim; she steers toward it</span>
-        <span><span class="key">W</span></span><span>Run forward</span>
-        <span><span class="key">S</span></span><span>Brake: slide to a stop</span>
+        <span><span class="key">Mouse</span></span><span>Aim; She Steers Toward It</span>
+        <span><span class="key">W</span></span><span>Run Forward</span>
+        <span><span class="key">S</span></span><span>Brake: Slide to a Stop</span>
         <span><span class="key">Space</span></span><span>Jump: hold for full height, tap to hop</span>
-        <span><span class="key">Q</span> <span class="key">E</span></span><span>Molly: sidestep left / right (not in the Barrier)</span>
+        <span><span class="key">Q</span> <span class="key">E</span></span><span>Molly: Sidestep Left / Right (not in the Barrier)</span>
         <span><span class="key">2</span></span><span>Molly: Barrier on / off, an unhurtable red shell</span>
-        <span><span class="key">Q</span> <span class="key">E</span></span><span>Comet: Star Throw where the camera faces (hold to charge, up to 3 s)</span>
-        <span><span class="key">2</span></span><span>Comet: Hover on / off</span>
-        <span><span class="key">Space</span></span><span>Comet, hovering, held in the air: Fly</span>
+        <span><span class="key">Q</span> <span class="key">E</span></span><span>Comet: Star Throw Where the Camera Faces (hold to charge, up to 3 s)</span>
+        <span><span class="key">2</span></span><span>Comet: Hover On / Off</span>
+        <span><span class="key">Space</span></span><span>Comet, Hovering, Held in the Air: Fly</span>
         <span><span class="key">A</span> <span class="key">D</span></span><span>Drift: at 30 Zips or more, swing 15° that way (1 s cooldown; not in the Barrier)</span>
         <span><span class="key">Hold S</span></span><span>Standing still: Runner's Pose. After 3 s, let go to launch at 50 Zips</span>
         <span><span class="key">Hold S</span></span><span>Standing still in the Barrier: Dodecadash. Let go to launch, +20 Zips per second held (max 120), 4 power a second</span>
@@ -378,11 +378,11 @@
       <div class="card narrow">
         <h1>Dev Mode</h1>
         <div class="menu">
-          <button class="go2" id="dvstart" type="button">Start from the beginning</button>
+          <button class="go2" id="dvstart" type="button">Start From the Beginning</button>
           <div id="dvDyn" class="menu"></div>
-          <button class="go2" id="dv1" type="button">Start from Checkpoint 1</button>
-          <button class="go2" id="dv2" type="button">Start from Checkpoint 2</button>
-          <button class="go2" id="dv3" type="button">Start from Checkpoint 3</button>
+          <button class="go2" id="dv1" type="button">Start From Checkpoint 1</button>
+          <button class="go2" id="dv2" type="button">Start From Checkpoint 2</button>
+          <button class="go2" id="dv3" type="button">Start From Checkpoint 3</button>
           <button class="go2" id="dvpower" type="button">Fill Power Line</button>
           <button class="go2" id="dvcoordsBtn" type="button">Show Coordinates: Off</button>
           <button class="go2" id="dvinvBtn" type="button">Invulnerable: Off</button>
@@ -395,7 +395,7 @@
       <div class="card narrow">
         <h1>Checkpoints</h1>
         <div class="menu">
-          <button class="go2" id="gostart" type="button">Restart from the beginning</button>
+          <button class="go2" id="gostart" type="button">Restart From the Beginning</button>
           <button class="go2" id="gocp" type="button">Checkpoint 1</button>
           <button class="go2" id="gocp2" type="button">Checkpoint 2</button>
           <button class="go2" id="gocp3" type="button">Checkpoint 3</button>
@@ -556,10 +556,10 @@ aside:not([data-page=comet]) #cometBox{display:none!important}
         <button data-v="front" aria-pressed="true">Front</button><button data-v="side" aria-pressed="false">Side</button><button data-v="back" aria-pressed="false">Back</button><button data-v="tq" aria-pressed="false">3/4</button>
       </div>
       <div class="seg" id="modes" role="group" aria-label="Pose">
-        <button data-m="rest" aria-pressed="false">Rest</button><button data-m="idle" aria-pressed="false">Idle</button><button data-m="runS" aria-pressed="false">Slow run</button><button data-m="run" aria-pressed="true">Mid run</button><button data-m="runF" aria-pressed="false">Fast run</button>
+        <button data-m="rest" aria-pressed="false">Rest</button><button data-m="idle" aria-pressed="false">Idle</button><button data-m="runS" aria-pressed="false">Slow Run</button><button data-m="run" aria-pressed="true">Mid Run</button><button data-m="runF" aria-pressed="false">Fast Run</button>
       </div>
       <div class="seg" id="modes2" role="group" aria-label="Moves">
-        <button data-m="jump" aria-pressed="false">Jump</button><button data-m="slide" aria-pressed="false">Slide</button><button data-m="fall" aria-pressed="false">Faceplant</button><button data-m="set" aria-pressed="false">Runner's pose</button><button data-m="drift" aria-pressed="false">Drift</button><button data-m="barrier" aria-pressed="false">Barrier</button><button data-m="cThrow" class="cometOnly" aria-pressed="false">Star throw</button><button data-m="cHover" class="cometOnly" aria-pressed="false">Hover</button><button data-m="cFly" class="cometOnly" aria-pressed="false">Fly</button>
+        <button data-m="jump" aria-pressed="false">Jump</button><button data-m="slide" aria-pressed="false">Slide</button><button data-m="fall" aria-pressed="false">Faceplant</button><button data-m="set" aria-pressed="false">Runner's Pose</button><button data-m="drift" aria-pressed="false">Drift</button><button data-m="barrier" aria-pressed="false">Barrier</button><button data-m="cThrow" class="cometOnly" aria-pressed="false">Star Throw</button><button data-m="cHover" class="cometOnly" aria-pressed="false">Hover</button><button data-m="cFly" class="cometOnly" aria-pressed="false">Fly</button>
       </div>
       <button class="btn" id="play" aria-pressed="false">Pause</button>
       <label class="phase"><span class="mono" style="color:var(--muted)">cycle</span><input type="range" id="phase" min="0" max="1" step="0.005" value="0.25" aria-label="Animation cycle position"></label>
@@ -567,30 +567,30 @@ aside:not([data-page=comet]) #cometBox{display:none!important}
     </div>
   </div>
   <aside>
-    <div class="actions pgAll"><button class="btn" id="rigClose">&larr; Back to title screen</button></div>
+    <div class="actions pgAll"><button class="btn" id="rigClose">&larr; Back to Title Screen</button></div>
     <div class="seg pgAll" id="pages" role="group" aria-label="Page"><button type="button" data-pg="molly" aria-pressed="true">Molly</button><button type="button" data-pg="comet" aria-pressed="false">Comet</button><button type="button" data-pg="mobs" aria-pressed="false">Mobs</button></div>
-    <h1 class="pgAll" id="rigH1">Molly: rig editor</h1>
+    <h1 class="pgAll" id="rigH1">Molly: Rig Editor</h1>
     <p class="sub">Pick a part below, or click it on the model. Orbit by dragging, zoom with scroll. Left and right sides match.</p>
     <details id="statBox"><summary>Stats</summary>
       <p class="sub">Molly's stat card. These numbers are the ones the game runs on: change a slider, close the editor, and she plays that way, with the card on the Characters page and pause menu following.</p>
       <div id="statRows"></div>
-      <div class="actions"><button class="btn" id="resetStats">Reset stats</button></div>
-      <details id="moveBox"><summary>Movement details</summary>
+      <div class="actions"><button class="btn" id="resetStats">Reset Stats</button></div>
+      <details id="moveBox"><summary>Movement Details</summary>
         <p class="sub">What the stats above do to her speed, acceleration, heading and turn radius. Every number here follows the sliders as you move them.</p>
         <div id="moveLive"></div>
-        <h3>Try a situation</h3>
+        <h3>Try a Situation</h3>
         <p class="sub">Put her on a slope at a speed and a heading, and see what each part of the formula does to her.</p>
         <div id="moveScen"></div>
         <div id="moveOut"></div>
       </details>
     </details>
-    <details id="cometBox" open><summary>Comet's moves</summary>
+    <details id="cometBox" open><summary>Comet's Moves</summary>
       <p class="sub">Comet has no Strafe and no Barrier. Q or E: Star Throw (hold to charge). 2: Hover. Space held in the air while hovering: Fly. Her look, run and stats above are her own copy of Molly's stats.</p>
       <h3>Hover</h3><div id="cHov"></div>
       <h3>Fly</h3><div id="cFly"></div>
       <h3>Star Throw</h3><div id="cStar"></div>
-      <h3>Star colours</h3><div class="colors" id="cCols"></div>
-      <div class="actions"><button class="btn" id="resetComet">Reset Comet's moves</button></div>
+      <h3>Star Colours</h3><div class="colors" id="cCols"></div>
+      <div class="actions"><button class="btn" id="resetComet">Reset Comet's Moves</button></div>
     </details>
     <section class="editor" id="mobBox" aria-label="Mobs">
       <h2>Mobs</h2>
@@ -600,7 +600,7 @@ aside:not([data-page=comet]) #cometBox{display:none!important}
       <h3>Look</h3><div id="minLook"></div><div id="minCols" class="mcols"></div>
       <h3>Walk</h3><div id="minWalk"></div>
       <h3>Stats</h3><div id="minStats"></div>
-      <div class="actions"><button class="btn" id="resetMin">Reset this one</button></div>
+      <div class="actions"><button class="btn" id="resetMin">Reset This One</button></div>
     </section>
     <section class="editor" id="animSec" aria-label="Animation stats" hidden>
       <h2 id="animTitle"></h2>
@@ -608,7 +608,7 @@ aside:not([data-page=comet]) #cometBox{display:none!important}
       <div id="animRows"></div>
       <div class="chips" id="animStages" role="group" aria-label="Stage"></div>
       <div id="animKey"></div>
-      <div class="actions"><button class="btn" id="resetAnim">Reset this animation</button></div>
+      <div class="actions"><button class="btn" id="resetAnim">Reset This Animation</button></div>
     </section>
     <div class="chips" id="chips" role="group" aria-label="Body part"></div>
     <section class="editor" aria-label="Selected part">
@@ -619,30 +619,30 @@ aside:not([data-page=comet]) #cometBox{display:none!important}
         <figure><figcaption id="pvBcap">Side view</figcaption><svg id="pvB" viewBox="0 0 150 150" role="img" aria-label="Side outline of the selected part"></svg></figure>
       </div>
       <h3>Size</h3><div id="rSize"></div>
-      <h3>Position of the max diameter</h3><div id="rCenter"></div>
-      <h3 id="hStart">Start taper and curve</h3><div id="rStart"></div>
-      <h3 id="hEnd">End taper and curve</h3><div id="rEnd"></div>
+      <h3>Position of the Max Diameter</h3><div id="rCenter"></div>
+      <h3 id="hStart">Start Taper and Curve</h3><div id="rStart"></div>
+      <h3 id="hEnd">End Taper and Curve</h3><div id="rEnd"></div>
       <h3>Bulge 1</h3><div id="rB1"></div>
       <h3>Bulge 2</h3><div id="rB2"></div>
       <p class="note">Each part has two bulges, flat until you give them a depth. Position and direction place a bulge; the four widths set how far it reaches radially (degrees) and along the part (% of length); the four curvatures shape each side, from concave (pinched) to convex (boxy). Narrow bulges need more Sides per ring under Faceting.</p>
-      <div id="xWrap"><h3>Extras for this part</h3><div id="rExtra"></div></div>
+      <div id="xWrap"><h3>Extras for This Part</h3><div id="rExtra"></div></div>
       <p class="note">Taper is the size of that end as a percent of the max diameter. Curve of 1 is a straight cone, above 1 is fuller and rounder, below 1 is more pointed.</p>
-      <div class="actions"><button class="btn" id="resetPart">Reset this part</button></div>
+      <div class="actions"><button class="btn" id="resetPart">Reset This Part</button></div>
     </section>
     <div id="groups"></div>
     <details open><summary>Colors</summary>
       <div class="colors" id="colors"></div>
     </details>
-    <details open><summary>Save and export</summary>
+    <details open><summary>Save and Export</summary>
       <div class="actions">
-        <button class="btn primary" id="exportGlb">Save to game</button>
-        <button class="btn" id="copyJson">Copy settings</button>
-        <button class="btn" id="resetAll">Reset all</button>
+        <button class="btn primary" id="exportGlb">Save to Game</button>
+        <button class="btn" id="copyJson">Copy Settings</button>
+        <button class="btn" id="resetAll">Reset All</button>
       </div>
       <div id="status" role="status"></div>
       <p class="note">Save to game rebuilds this runner (Molly or Comet) from these settings, rigs and animates her, and keeps her in this browser. Her new look and moves show up the next time you start a level.</p>
       <textarea id="json" spellcheck="false" aria-label="Settings JSON" placeholder="Paste settings JSON here, then press Apply"></textarea>
-      <div class="actions"><button class="btn" id="applyJson">Apply pasted settings</button></div>
+      <div class="actions"><button class="btn" id="applyJson">Apply Pasted Settings</button></div>
     </details>
   </aside>
 </div>
@@ -711,12 +711,12 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
 
     <h2>Path</h2>
     <div class="row">
-      <label class="f" style="flex:1">Path width<input type="number" id="width" value="9" min="2" max="40" step="1"></label>
+      <label class="f" style="flex:1">Path Width<input type="number" id="width" value="9" min="2" max="40" step="1"></label>
     </div>
-    <label class="f">Ground<select id="terrain"><option value="">Flat patchy grass</option><option value="level1">Grass Canyon's generated terrain</option><option value="level2">Oceana Crags' generated terrain</option><option value="grass">Bumpy grass (Grass Canyon's rolling ground only)</option><option value="ocean">Open ocean (Oceana Crags' sea only)</option><option value="crags">Crags (the jagged rock of Oceana Crags only)</option><option value="giant">Giant Hill (one enormous hill, for Sunset Hill)</option></select></label>
+    <label class="f">Ground<select id="terrain"><option value="">Flat Patchy Grass</option><option value="level1">Grass Canyon's Generated Terrain</option><option value="level2">Oceana Crags' Generated Terrain</option><option value="grass">Bumpy Grass (Grass Canyon's rolling ground only)</option><option value="ocean">Open Ocean (Oceana Crags' sea only)</option><option value="crags">Crags (the jagged rock of Oceana Crags only)</option><option value="giant">Giant Hill (one enormous hill, for Sunset Hill)</option></select></label>
     <div id="lvset" style="display:flex;flex-direction:column;gap:6px">
-      <label class="f">Time limit (seconds; 0 = no clock)<input id="tlim" type="number" min="0" max="36000" step="1" value="0"></label>
-      <div class="f" style="gap:4px"><span>Score needed for each rank (E is anything below D)</span>
+      <label class="f">Time Limit (seconds; 0 = no clock)<input id="tlim" type="number" min="0" max="36000" step="1" value="0"></label>
+      <div class="f" style="gap:4px"><span>Score Needed for Each Rank (E is anything below D)</span>
         <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
           <label class="f">S<input id="rkS" type="number" min="0" step="1000"></label><label class="f">A<input id="rkA" type="number" min="0" step="1000"></label><label class="f">B<input id="rkB" type="number" min="0" step="1000"></label><label class="f">C<input id="rkC" type="number" min="0" step="1000"></label><label class="f">D<input id="rkD" type="number" min="0" step="1000"></label>
         </div>
@@ -764,12 +764,12 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.35"><input type="checkbox" id="attach" checked style="margin-top:2px"><span>Attach to the path: stamps near it follow it when the path changes</span></label>
     <div class="stats" id="counts"></div>
     <h2>Presets</h2>
-    <div class="row"><input type="text" id="prName" placeholder="Name for the selection" maxlength="40" style="flex:1;min-width:0"><button class="small" id="prSave">Save selection</button></div>
+    <div class="row"><input type="text" id="prName" placeholder="Name for the selection" maxlength="40" style="flex:1;min-width:0"><button class="small" id="prSave">Save Selection</button></div>
     <div id="presets" style="display:flex;flex-direction:column;gap:6px"></div>
     <div class="stats" style="font-size:12px;line-height:1.4">Select some stamps, name them and save. Click a preset, then click the map to stamp a copy there (Esc stops). Presets live in this browser, on every level.</div>
     <h2>Layers</h2>
     <div id="layers" style="display:flex;flex-direction:column;gap:6px"></div>
-    <div class="row"><button class="small" id="addLayer">+ Layer</button><button class="small" id="showAllL">Show all</button><label style="display:flex;gap:6px;align-items:center;font-size:12px;color:var(--mute)"><input type="checkbox" id="terShow" checked> Show the ground</label></div>
+    <div class="row"><button class="small" id="addLayer">+ Layer</button><button class="small" id="showAllL">Show All</button><label style="display:flex;gap:6px;align-items:center;font-size:12px;color:var(--mute)"><input type="checkbox" id="terShow" checked> Show the ground</label></div>
     <div class="stats" style="font-size:12px;line-height:1.4">Layers only exist in the editor: hiding one never changes the game. The top row is drawn on top (▲ ▼ reorder). A hidden layer shows as a faint shadow. ★ = new stamps go on that layer. Alt+click an eye to show only that layer. Select picks every stamp on a layer; with several stamps selected, Layer-Split Overlap spreads overlapping ones across layers.</div>
     <div class="stats" id="terNote"></div>
     <div id="insp" class="piece" hidden></div>
@@ -778,13 +778,13 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     <textarea id="json" spellcheck="false"></textarea>
     <div class="row">
       <button class="small" id="copy">Copy</button>
-      <button class="small" id="load">Load from box</button>
-      <button class="small" id="reset">Start over</button>
+      <button class="small" id="load">Load From Box</button>
+      <button class="small" id="reset">Start Over</button>
     </div>
     <div class="row">
-      <button class="small" id="saveFile" title="Download the layout as a file you keep anywhere (a backup that does not depend on this browser)">Save to file</button>
-      <button class="small" id="openFile" title="Open a layout file saved earlier; it replaces the layout here (Ctrl+Z undoes it)">Open from file</button>
-      <button class="small" id="restoreBk" title="Open the layout the desktop app last copied to ~/PolyRun/layouts" hidden>Open latest backup</button>
+      <button class="small" id="saveFile" title="Download the layout as a file you keep anywhere (a backup that does not depend on this browser)">Save to File</button>
+      <button class="small" id="openFile" title="Open a layout file saved earlier; it replaces the layout here (Ctrl+Z undoes it)">Open From File</button>
+      <button class="small" id="restoreBk" title="Open the layout the desktop app last copied to ~/PolyRun/layouts" hidden>Open Latest Backup</button>
       <input type="file" id="fileIn" accept=".json,.txt,application/json,text/plain" hidden>
     </div>
     <div class="stats" id="msg"></div>
@@ -975,9 +975,9 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var el = $('clusterOpts'), d = DEF[tool];
     if (tool !== 'forest') { el.hidden = true; return; }
     el.hidden = false;
-    var n = function (k, l, mn, mx, st) { return '<label class="f">' + l + '<input type="number" data-ck="' + k + '" value="' + d[k] + '" min="' + mn + '" max="' + mx + '" step="' + st + '"></label>'; }, h = '<h3>' + (tool === 'forest' ? 'Next patch of trees' : 'Next patch of crags') + '</h3>';
-    if (tool === 'forest') h += '<label class="f">Shape<select data-ck="shape"><option value="circle"' + (d.shape === 'circle' ? ' selected' : '') + '>Circle</option><option value="rect"' + (d.shape === 'rect' ? ' selected' : '') + '>Rectangle</option></select></label>' + (d.shape === 'rect' ? n('w', 'Width (across)', 4, 2000, 1) + n('d', 'Depth (along)', 4, 2000, 1) : n('r', 'Patch radius', 2, 2000, 1)) + n('count', 'Total number of trees', 1, 500, 1) + n('tH', 'Average trunk height', 1, 80, 0.5) + n('tHV', 'Trunk height variation (±)', 0, 40, 0.5) + n('tW', 'Average trunk width', 0.2, 12, 0.1) + n('tWV', 'Trunk width variation (±)', 0, 6, 0.1) + n('cH', 'Average canopy height', 1, 80, 0.5) + n('cHV', 'Canopy height variation (±)', 0, 40, 0.5) + n('cW', 'Average canopy width', 1, 40, 0.5) + n('cWV', 'Canopy width variation (±)', 0, 20, 0.5) + n('gap', 'Average space between canopies', 0, 200, 0.5) + n('gapV', 'Spacing variation (±)', 0, 200, 0.5);
-    else h += n('r', 'Patch radius', 2, 2000, 1) + n('count', 'Total number of crags', 1, 500, 1) + n('base', 'Average base radius', 1, 15, 0.1) + n('baseV', 'Base radius variation (±)', 0, 14, 0.1) + n('hgt', 'Average peak height', 0.3, 200, 0.1) + n('hgtV', 'Peak height variation (±)', 0, 200, 0.1) + n('gap', 'Average space between (edge to edge)', 0, 1000, 0.5) + n('gapV', 'Spacing variation (±)', 0, 1000, 0.5);
+    var n = function (k, l, mn, mx, st) { return '<label class="f">' + l + '<input type="number" data-ck="' + k + '" value="' + d[k] + '" min="' + mn + '" max="' + mx + '" step="' + st + '"></label>'; }, h = '<h3>' + (tool === 'forest' ? 'Next Patch of Trees' : 'Next Patch of Crags') + '</h3>';
+    if (tool === 'forest') h += '<label class="f">Shape<select data-ck="shape"><option value="circle"' + (d.shape === 'circle' ? ' selected' : '') + '>Circle</option><option value="rect"' + (d.shape === 'rect' ? ' selected' : '') + '>Rectangle</option></select></label>' + (d.shape === 'rect' ? n('w', 'Width (across)', 4, 2000, 1) + n('d', 'Depth (along)', 4, 2000, 1) : n('r', 'Patch Radius', 2, 2000, 1)) + n('count', 'Total Number of Trees', 1, 500, 1) + n('tH', 'Average Trunk Height', 1, 80, 0.5) + n('tHV', 'Trunk Height Variation (±)', 0, 40, 0.5) + n('tW', 'Average Trunk Width', 0.2, 12, 0.1) + n('tWV', 'Trunk Width Variation (±)', 0, 6, 0.1) + n('cH', 'Average Canopy Height', 1, 80, 0.5) + n('cHV', 'Canopy Height Variation (±)', 0, 40, 0.5) + n('cW', 'Average Canopy Width', 1, 40, 0.5) + n('cWV', 'Canopy Width Variation (±)', 0, 20, 0.5) + n('gap', 'Average Space Between Canopies', 0, 200, 0.5) + n('gapV', 'Spacing Variation (±)', 0, 200, 0.5);
+    else h += n('r', 'Patch Radius', 2, 2000, 1) + n('count', 'Total Number of Crags', 1, 500, 1) + n('base', 'Average Base Radius', 1, 15, 0.1) + n('baseV', 'Base Radius Variation (±)', 0, 14, 0.1) + n('hgt', 'Average Peak Height', 0.3, 200, 0.1) + n('hgtV', 'Peak Height Variation (±)', 0, 200, 0.1) + n('gap', 'Average Space Between (edge to edge)', 0, 1000, 0.5) + n('gapV', 'Spacing Variation (±)', 0, 1000, 0.5);
     el.innerHTML = h + '<div class="stats" style="font-size:12px;line-height:1.4">Click the map to stamp the patch. Every ' + (tool === 'forest' ? 'tree' : 'crag') + ' lands as its own stamp, so each can be moved or tuned alone.</div>';
   }
   function isOneCrag(o) { return o.t === 'crag' && o.count === 1 && o.r < 1; }
@@ -1338,20 +1338,20 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var g = function (t) { return '<div class="stats" style="grid-column:1/-1;margin-top:4px;text-transform:uppercase;letter-spacing:.06em;font-size:10px">' + t + '</div>'; };
     var hand = pk === 0 || i > 0 ? hasHand(p) : false;
     return g('Start' + (i === 0 ? ' (the start of the path)' : hand ? ' (set by hand)' : ' (where the last one ended)')) + f('sx', 'Start X', -99999, 99999, 1) + f('sy', 'Start Y', -3000, 3000, 1) + f('sz', 'Start Z', -99999, 99999, 1) + f('sh', 'Facing °', -360, 360, 1, '0 = north, 90 = east') +
-      (hand && i > 0 ? '<div style="grid-column:1/-1"><button class="small" data-act="attach" data-i="' + i + '">Start where the last segment ended</button></div>' : '') +
+      (hand && i > 0 ? '<div style="grid-column:1/-1"><button class="small" data-act="attach" data-i="' + i + '">Start Where the Last Segment Ended</button></div>' : '') +
       g('End') + f('ex', 'End X', -99999, 99999, 1) + f('ey', 'End Y', -3000, 3000, 1) + f('ez', 'End Z', -99999, 99999, 1) +
-      (p.disc ? g('Circular deck') + f('rad', 'Radius', 2, 5000, 1) + f('dh', 'Heading °', -360, 360, 1, 'Where the next segment leaves the rim, and the way it then faces: 0 = north, 90 = east. The same heading as the way in leaves straight across, on the far side') + f('cs', 'Slope °', -89, 89, 0.5, '+ rises toward the centre (a hill), − falls toward it (a bowl), 0 = flat') + f('bk', 'Bank °', -89, 89, 0.5, 'Tips the whole deck: + lowers its right side, looking along its heading') +
-        g('Surface') + sel('tx', 'Texture', [['0', 'Stone'], ['1', 'Wood planks'], ['2', 'Metal plates'], ['3', 'Grass']], p.tx || 0) + g('Ground') + sel('ov', 'Over the terrain', [['0', 'Terrain wins where it is higher'], ['1', 'Supersedes the terrain: the ground is cut or raised to the deck']], p.ov ? 1 : 0) + f('fl', 'Deck thickness (Oceana)', 0, 2000, 1, 'On Oceana terrain every path is a deck of its own: how deep this one is (0 = the usual 2)') : '') +
+      (p.disc ? g('Circular Deck') + f('rad', 'Radius', 2, 5000, 1) + f('dh', 'Heading °', -360, 360, 1, 'Where the next segment leaves the rim, and the way it then faces: 0 = north, 90 = east. The same heading as the way in leaves straight across, on the far side') + f('cs', 'Slope °', -89, 89, 0.5, '+ rises toward the centre (a hill), − falls toward it (a bowl), 0 = flat') + f('bk', 'Bank °', -89, 89, 0.5, 'Tips the whole deck: + lowers its right side, looking along its heading') +
+        g('Surface') + sel('tx', 'Texture', [['0', 'Stone'], ['1', 'Wood Planks'], ['2', 'Metal Plates'], ['3', 'Grass']], p.tx || 0) + g('Ground') + sel('ov', 'Over the Terrain', [['0', 'Terrain Wins Where It Is Higher'], ['1', 'Supersedes the terrain: the ground is cut or raised to the deck']], p.ov ? 1 : 0) + f('fl', 'Deck Thickness (Oceana)', 0, 2000, 1, 'On Oceana terrain every path is a deck of its own: how deep this one is (0 = the usual 2)') : '') +
       (p.disc ? '' : 
-      g('Shape') + f('len', 'Length', 0.5, 20000, 10) + f('ang', 'Curve angle °', -360, 360, 1, '+ curves right, − curves left, 0 = straight') + f('r', 'Curve radius', 1, 20000, 10) +
-      g('Height') + f('dy', p.gf ? 'Rise (above the ground)' : 'Rise (Y)', -3000, 3000, 1) + f('pitch', 'Slope angle °', -85, 85, 0.5) +
-      sel('sm', 'Slope change at its ends', [['0', 'Sharp: the slope changes at the joint'], ['1', 'Gradual: eases from the last segment\'s slope and into the next one\'s']], p.sm ? 1 : 0, 'Gradual blends the slope over the blend length, half before each joint and half after, so the path has no kink. It applies at both ends of this segment (a joint is gradual if either segment asks for it). The path rounds the joint off, so right at the joint it sits a little above or below the Start/End Y shown (by an eighth of the slope change times the blend length); away from the joint nothing moves.') + (p.sm ? f('smL', 'Blend length', 1, 2000, 1, 'How far the change is spread, centred on each joint (at most the length of the shorter segment)') : '') +
-      g('Bank (+ tips the right side down)') + f('b0', 'Start bank °', -90, 90, 1) + f('roll', 'End bank °', -90, 90, 1) +
-      g('Width') + f('w0', 'Start width', 1, 40, 1) + f('w', 'End width', 1, 40, 1) + sel('wm', 'Width change', [['taper', 'Taper along the segment'], ['step', 'Step at the start']], p.wm === 'step' ? 'step' : 'taper') +
-      g('Surface') + sel('tx', 'Texture', [['0', 'Stone'], ['1', 'Wood planks'], ['2', 'Metal plates'], ['3', 'Grass']], p.tx || 0) +
-      g('Ground') + sel('ov', 'Over the terrain', [['0', 'Terrain wins where it is higher'], ['1', 'Supersedes the terrain: the ground is cut or raised to the path']], p.ov ? 1 : 0) +
-      sel('gf', 'Ground', [['0', 'Independent: keeps its own height'], ['1', 'Follows the ground: terrain height + Rise']], p.gf ? 1 : 0, 'Follows the ground: the path sits at the terrain\'s own height all along the segment (the surface of the water, over water), with Rise added on top. Independent: it starts where the last segment ended and rises by its Rise, whatever the terrain does.') +
-      f('fl', 'Slab thickness', 0, 2000, 1, '0 = no slab. How far the underside is below the top of the path. Where that would be under the ground, the slab merges with the ground; otherwise the underside floats in the air.'));
+      g('Shape') + f('len', 'Length', 0.5, 20000, 10) + f('ang', 'Curve Angle °', -360, 360, 1, '+ curves right, − curves left, 0 = straight') + f('r', 'Curve Radius', 1, 20000, 10) +
+      g('Height') + f('dy', p.gf ? 'Rise (above the ground)' : 'Rise (Y)', -3000, 3000, 1) + f('pitch', 'Slope Angle °', -85, 85, 0.5) +
+      sel('sm', 'Slope Change at Its Ends', [['0', 'Sharp: The Slope Changes at the Joint'], ['1', 'Gradual: eases from the last segment\'s slope and into the next one\'s']], p.sm ? 1 : 0, 'Gradual blends the slope over the blend length, half before each joint and half after, so the path has no kink. It applies at both ends of this segment (a joint is gradual if either segment asks for it). The path rounds the joint off, so right at the joint it sits a little above or below the Start/End Y shown (by an eighth of the slope change times the blend length); away from the joint nothing moves.') + (p.sm ? f('smL', 'Blend Length', 1, 2000, 1, 'How far the change is spread, centred on each joint (at most the length of the shorter segment)') : '') +
+      g('Bank (+ tips the right side down)') + f('b0', 'Start Bank °', -90, 90, 1) + f('roll', 'End Bank °', -90, 90, 1) +
+      g('Width') + f('w0', 'Start Width', 1, 40, 1) + f('w', 'End Width', 1, 40, 1) + sel('wm', 'Width Change', [['taper', 'Taper Along the Segment'], ['step', 'Step at the Start']], p.wm === 'step' ? 'step' : 'taper') +
+      g('Surface') + sel('tx', 'Texture', [['0', 'Stone'], ['1', 'Wood Planks'], ['2', 'Metal Plates'], ['3', 'Grass']], p.tx || 0) +
+      g('Ground') + sel('ov', 'Over the Terrain', [['0', 'Terrain Wins Where It Is Higher'], ['1', 'Supersedes the terrain: the ground is cut or raised to the path']], p.ov ? 1 : 0) +
+      sel('gf', 'Ground', [['0', 'Independent: Keeps Its Own Height'], ['1', 'Follows the Ground: Terrain Height + Rise']], p.gf ? 1 : 0, 'Follows the ground: the path sits at the terrain\'s own height all along the segment (the surface of the water, over water), with Rise added on top. Independent: it starts where the last segment ended and rises by its Rise, whatever the terrain does.') +
+      f('fl', 'Slab Thickness', 0, 2000, 1, '0 = no slab. How far the underside is below the top of the path. Where that would be under the ground, the slab merges with the ground; otherwise the underside floats in the air.'));
   }
   var openPaths = { 0: true }, openPcs = new WeakMap();   // openPcs: which segments have their fields showing (keyed by the segment itself, so reordering keeps it right)
   function renderPieces() {
@@ -1366,7 +1366,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
           '<button class="small" data-act="del" data-i="' + i + '" title="Delete">✕</button></span></div><div class="fields">' + fields(p, i, k) + '</div></div>';
       }).join('') || '<div class="stats">No segments yet. Add one.</div>';
       var plsel = '<label class="f">Layer<select data-playr="' + k + '">' + S.layers.map(function (l) { return '<option value="' + l.id + '"' + (l.id === pathLayerOf(k).id ? ' selected' : '') + '>' + l.name.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</option>'; }).join('') + '</select></label>';
-      var adds = '<div class="row"><button class="small" data-act="addSeg">+ Segment</button><button class="small" data-act="addDisc">+ Circular deck</button>' + (m ? '<button class="small" data-act="delPath">Delete this path</button>' : '') + '</div>';
+      var adds = '<div class="row"><button class="small" data-act="addSeg">+ Segment</button><button class="small" data-act="addDisc">+ Circular deck</button>' + (m ? '<button class="small" data-act="delPath">Delete This Path</button>' : '') + '</div>';
       out += '<details class="pathbox" data-path="' + k + '"' + (openPaths[k] ? ' open' : '') + '><summary><b>Path ' + (k + 1) + '</b> <span class="stats" style="display:inline">' + list.length + ' segment' + (list.length === 1 ? '' : 's') + (k ? '' : ' · where the level starts') + '</span></summary><div data-p="' + k + '" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">' + plsel + adds + body + '</div></details>';
     }
     $('pieces').innerHTML = out;
@@ -1387,7 +1387,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var ids = Object.keys(lids), one = ids.length === 1 ? +ids[0] : -1;
     $('insp').innerHTML = '<div class="head"><span>' + sl.length + ' stamps selected</span><span class="row" style="gap:4px"><button class="small" data-gact="copy">Copy</button><button class="small" data-gact="dup">Duplicate</button><button class="small" data-gact="del">Delete</button></span></div>' +
       '<div class="stats">' + Object.keys(c).map(function (k) { return c[k] + ' ' + NAMES[k].toLowerCase(); }).join(' · ') + '</div>' +
-      '<div class="fields">' + layerSelect(one, 'data-gk="layer"', 'Move all to layer', one < 0) + '</div>' +
+      '<div class="fields">' + layerSelect(one, 'data-gk="layer"', 'Move All to Layer', one < 0) + '</div>' +
       '<div class="row" style="gap:6px;margin:6px 0"><button class="small" data-gact="split" title="Wherever selected stamps overlap, put each one of the pile on its own layer (new layers are made when needed)">Layer-Split Overlap</button></div>' +
       '<div class="stats">Drag any of them to move the lot · Ctrl+C / Ctrl+V copy and paste · Ctrl+A selects everything · Esc clears</div>';
     $('insp').hidden = false;
@@ -1419,14 +1419,14 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   // ---- the inspector's look: every box has a fixed slot in a two-column grid, labels are one or two words, and the longer wording lives in tooltips ----
   var SLOT = { noat: [1, 1], after: [1, 1], layer: [1, 2], X: [2, 1], s: [2, 1], Z: [2, 2], u: [2, 2], rot: [3, 1], th: [3, 1], turn: [3, 1], ya: [3, 2], len: [4, 1], d: [4, 1], r: [4, 1], w: [4, 2], hgt: [5, 1], h: [5, 1], bend: [5, 2] };
   var SHORTL = { noat: 'Snap', hm: 'Stacking', layer: 'Layer', after: 'From', follow: 'Shape', exs: 'Size', X: 'X', Z: 'Z', rot: 'Rotation', th: 'Heading', turn: 'Turn', s: 'Start', u: 'Across', ya: 'Y', len: 'Length', d: 'Length', w: 'Width', h: 'Height', hgt: 'Height', thick: 'Thickness', bend: 'Bend', r: 'Radius', ends: 'Ends', tox: 'Surface', rock: 'Surface', shape: 'Shape',
-    tH: 'Trunk height', tW: 'Trunk width', cH: 'Canopy height', cW: 'Canopy width', big: 'Size', rise: 'Rise', arc: 'Arc', gap: 'Spacing', gapV: 'Spacing ±', count: 'Count', base: 'Base', baseV: 'Base ±', hgtV: 'Peak ±', roll: 'Roll', ang: 'Angle', angSet: 'Angle from', slope: 'Slope', carve: 'Carve',
-    move: 'Movement', dist: 'Travel', period: 'Cycle', group: 'Group', phase: 'Phase', slow: 'Slowdown', idle: 'Behavior', depth: 'Depth', wl: 'Water level', every: 'Every', max: 'Max', kind: 'Type', style: 'Look', look: 'Look', whl: 'Pressed', ground: 'Terrain', edge: 'Edge', soft: 'Softness', boost: 'Boost', up: 'Reach up', dn: 'Reach down',
-    size: 'Size', post: 'Stands on', tilt: 'Tilt', spin: 'Spin', hb: 'Hitbox', k: 'Break speed', sd: 'Side travel', sp: 'Side cycle', vd: 'Up travel', vp: 'Up cycle', mode: 'Mode', modeA: 'After', open: 'Open for', shut: 'Shut for', speed: 'Move time', slide: 'Opens by', sTx: 'Shut tilt', sTz: 'Shut side', oTx: 'Open tilt', oTz: 'Open side', addlink: 'Link', text: 'Text' };
-  var SHORTT = { 'ledge.w': 'Thickness', 'checkpoint.w': 'Gate width', 'cave.len': 'Depth', 'cave.bend': 'Curve', 'ramp.ang': 'Slope', 'crag.hgt': 'Peak', 'crag.r': 'Radius', 'hill.h': 'Height', 'cave.shape': 'Shape' };
-  var OPTS = { 'Once she steps on it, for the rest of the run': 'Latches', 'Only while she stands on it': 'While on', 'Sliding straight down into the floor': 'Down', 'Sliding toward its bottom edge (along its own lean)': 'Edge', 'Swinging only (to its open tilt)': 'Swing', 'Opens and shuts on a cycle': 'Cycle', 'Always open': 'Open', 'Always closed': 'Closed',
-    'A sign post': 'Post', 'Nothing (it hangs in the air)': 'Nothing', 'A faint glowing halo round its edge': 'Halo', 'Carries on at the angle the last cave ended on': 'Carried', 'Its own angle (set below)': 'Own', 'Its own mouth': 'Own mouth', 'Its own start': 'Own start', 'Follows the path': 'Path', 'Its own curve': 'Own curve', 'On the path (as wide as the path)': 'On path', 'Anywhere, on its own curve': 'Free',
-    'Random, like the level\'s own trees': 'Random', 'Exactly these sizes': 'Exact', 'Big (5×, worth 10)': 'Big', 'Chases Molly': 'Chases', 'Toxic ground (hurts, like the Sink)': 'Toxic ground' };
-  var BTNS = { next: 'Next piece', reroll: 'Re-roll', split: 'Split crags', space: 'Space evenly' };
+    tH: 'Trunk Height', tW: 'Trunk Width', cH: 'Canopy Height', cW: 'Canopy Width', big: 'Size', rise: 'Rise', arc: 'Arc', gap: 'Spacing', gapV: 'Spacing ±', count: 'Count', base: 'Base', baseV: 'Base ±', hgtV: 'Peak ±', roll: 'Roll', ang: 'Angle', angSet: 'Angle From', slope: 'Slope', carve: 'Carve',
+    move: 'Movement', dist: 'Travel', period: 'Cycle', group: 'Group', phase: 'Phase', slow: 'Slowdown', idle: 'Behavior', depth: 'Depth', wl: 'Water Level', every: 'Every', max: 'Max', kind: 'Type', style: 'Look', look: 'Look', whl: 'Pressed', ground: 'Terrain', edge: 'Edge', soft: 'Softness', boost: 'Boost', up: 'Reach Up', dn: 'Reach Down',
+    size: 'Size', post: 'Stands on', tilt: 'Tilt', spin: 'Spin', hb: 'Hitbox', k: 'Break Speed', sd: 'Side Travel', sp: 'Side Cycle', vd: 'Up Travel', vp: 'Up Cycle', mode: 'Mode', modeA: 'After', open: 'Open for', shut: 'Shut for', speed: 'Move Time', slide: 'Opens by', sTx: 'Shut Tilt', sTz: 'Shut Side', oTx: 'Open Tilt', oTz: 'Open Side', addlink: 'Link', text: 'Text' };
+  var SHORTT = { 'ledge.w': 'Thickness', 'checkpoint.w': 'Gate Width', 'cave.len': 'Depth', 'cave.bend': 'Curve', 'ramp.ang': 'Slope', 'crag.hgt': 'Peak', 'crag.r': 'Radius', 'hill.h': 'Height', 'cave.shape': 'Shape' };
+  var OPTS = { 'Once she steps on it, for the rest of the run': 'Latches', 'Only While She Stands on It': 'While on', 'Sliding Straight Down Into the Floor': 'Down', 'Sliding Toward Its Bottom Edge (along its own lean)': 'Edge', 'Swinging Only (to its open tilt)': 'Swing', 'Opens and Shuts on a Cycle': 'Cycle', 'Always Open': 'Open', 'Always Closed': 'Closed',
+    'A sign post': 'Post', 'Nothing (it hangs in the air)': 'Nothing', 'A faint glowing halo round its edge': 'Halo', 'Carries on at the angle the last cave ended on': 'Carried', 'Its Own Angle (set below)': 'Own', 'Its Own Mouth': 'Own Mouth', 'Its Own Start': 'Own Start', 'Follows the Path': 'Path', 'Its Own Curve': 'Own Curve', 'On the Path (as wide as the path)': 'On Path', 'Anywhere, on Its Own Curve': 'Free',
+    'Random, Like the Level\'s Own Trees': 'Random', 'Exactly These Sizes': 'Exact', 'Big (5×, worth 10)': 'Big', 'Chases Molly': 'Chases', 'Toxic Ground (hurts, like the Sink)': 'Toxic Ground' };
+  var BTNS = { next: 'Next Piece', reroll: 'Re-Roll', split: 'Split Crags', space: 'Space Evenly' };
   function tidyInsp(el, o, ghost) {
     var f = el.querySelector('.fields'); if (!f) return;
     var notes = [], extra = [], kids = Array.prototype.slice.call(f.children);
@@ -1451,7 +1451,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       c.style.gridRow = String(row); c.style.gridColumn = String(col); if (col === 1) col = 2; else { col = 1; row++; }
     });
     Array.prototype.forEach.call(el.querySelectorAll('button[data-oact]'), function (b) { var t = BTNS[b.dataset.oact]; if (t && b.textContent !== t) { b.title = b.textContent; b.textContent = t; } });
-    var tl = el.querySelector('label.f textarea'); if (tl && tl.parentNode.firstChild.nodeType === 3 && tl.parentNode.firstChild.nodeValue === 'Tip text') tl.parentNode.firstChild.nodeValue = 'Text';
+    var tl = el.querySelector('label.f textarea'); if (tl && tl.parentNode.firstChild.nodeType === 3 && tl.parentNode.firstChild.nodeValue === 'Tip Text') tl.parentNode.firstChild.nodeValue = 'Text';
     var hd = el.querySelector('.head span'); if (hd && (notes.length || ghost)) { var tp = document.createElement('span'); tp.className = 'tip'; tp.textContent = 'ⓘ'; tp.title = (ghost ? 'Set before placing. ' : '') + notes.join(' '); hd.appendChild(tp); }
   }
   function renderInsp() {
@@ -1462,73 +1462,73 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var p = ghost ? { x: 0, z: 0, th: 0 } : pos(o), h = '<div class="head"><span>' + (ghost ? 'Next ' + NAMES[o.t].toLowerCase() : NAMES[o.t]) + '</span>' + (ghost ? '' : '<span class="row" style="gap:4px"><button class="small" data-oact="del">Delete</button></span>') + '</div><div class="fields std">';
     var joinedCave = !ghost && o.t === 'cave' && o.after !== undefined;
     if (!ghost) h += layerSelect(lyrOf(o).id, 'data-ok="layer"', 'Layer', false);
-    if (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag') h += '<label class="f">Height with others<select data-ok="hm"><option value="add"' + (o.hm === 'ind' ? '' : ' selected') + '>Additive: stacks on what it crosses</option><option value="ind"' + (o.hm === 'ind' ? ' selected' : '') + '>Independent: its own height, merges in</option></select></label>';
-    if (joinedCave) h += '<label class="f">Starts from<select data-ok="after"><option value="">Its own mouth</option>' + S.objs.filter(function (q) { return q !== o && q.t === 'cave'; }).map(function (q) { return '<option value="' + q.id + '"' + (o.after === q.id ? ' selected' : '') + '>End of Cave #' + (S.objs.indexOf(q) + 1) + '</option>'; }).join('') + '</select></label>';
+    if (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag') h += '<label class="f">Height With Others<select data-ok="hm"><option value="add"' + (o.hm === 'ind' ? '' : ' selected') + '>Additive: Stacks on What It Crosses</option><option value="ind"' + (o.hm === 'ind' ? ' selected' : '') + '>Independent: Its Own Height, Merges in</option></select></label>';
+    if (joinedCave) h += '<label class="f">Starts From<select data-ok="after"><option value="">Its Own Mouth</option>' + S.objs.filter(function (q) { return q !== o && q.t === 'cave'; }).map(function (q) { return '<option value="' + q.id + '"' + (o.after === q.id ? ' selected' : '') + '>End of Cave #' + (S.objs.indexOf(q) + 1) + '</option>'; }).join('') + '</select></label>';
     var isFree = o.noat || (!ghost && o.s === undefined);
-    if (!STRIPS[o.t] && !joinedCave) h += '<label class="f">Snap to the path<select data-ok="noat"><option value="0"' + (isFree ? '' : ' selected') + '>Snaps: follows the path when it changes</option><option value="1"' + (isFree ? ' selected' : '') + '>Free: stays where it is</option></select></label>';
+    if (!STRIPS[o.t] && !joinedCave) h += '<label class="f">Snap to the Path<select data-ok="noat"><option value="0"' + (isFree ? '' : ' selected') + '>Snaps: Follows the Path When It Changes</option><option value="1"' + (isFree ? ' selected' : '') + '>Free: Stays Where It Is</option></select></label>';
     if (!ghost && !joinedCave && (!STRIPS[o.t] || o.follow === false)) h += num('X', 'X', -99999, 99999, 1, Math.round(p.x * 10) / 10) + num('Z', 'Z', -99999, 99999, 1, Math.round(p.z * 10) / 10) + (STRIPS[o.t] ? '' : num('rot', 'Rotation °', -360, 360, 5, o.rot || 0));
-    if (o.t === 'tree') h += '<label class="f">Size<select data-ok="exs"><option value="rand"' + (o.ex ? '' : ' selected') + '>Random, like the level\'s own trees</option><option value="exact"' + (o.ex ? ' selected' : '') + '>Exactly these sizes</option></select></label>' + (o.ex ? num('tH', 'Trunk height', 1, 80, 0.5, o.tH) + num('tW', 'Trunk width', 0.2, 12, 0.1, o.tW) + num('cH', 'Canopy height', 1, 80, 0.5, o.cH) + num('cW', 'Canopy width', 1, 40, 0.5, o.cW) : '');
+    if (o.t === 'tree') h += '<label class="f">Size<select data-ok="exs"><option value="rand"' + (o.ex ? '' : ' selected') + '>Random, Like the Level\'s Own Trees</option><option value="exact"' + (o.ex ? ' selected' : '') + '>Exactly These Sizes</option></select></label>' + (o.ex ? num('tH', 'Trunk Height', 1, 80, 0.5, o.tH) + num('tW', 'Trunk Width', 0.2, 12, 0.1, o.tW) + num('cH', 'Canopy Height', 1, 80, 0.5, o.cH) + num('cW', 'Canopy Width', 1, 40, 0.5, o.cW) : '');
     if (ghost && !STRIPS[o.t]) h += num('rot', 'Rotation °', -360, 360, 5, o.rot || 0);      // the next stamp can be turned before it is placed, like a placed one
     if (!ghost && !joinedCave) h += yRow(o);
     if (o.t === 'seg' || o.t === 'segchain') h += '<label class="f">Size<select data-ok="big"><option value="0"' + (o.big ? '' : ' selected') + '>Regular</option><option value="1"' + (o.big ? ' selected' : '') + '>Big (5×, worth 10)</option></select></label>';
-    if (o.t === 'seg') h += num('h', 'Height above the ground', -1, 500, 0.5, o.h || 0);
-    if (o.t === 'segchain') h += num('h', 'Height above the ground (at the start)', -1, 500, 0.5, o.h || 0) + num('rise', 'Rise by the end of the chain', -500, 500, 0.5, o.rise || 0) + num('arc', 'Vertical arc (extra height in the middle)', -500, 500, 0.5, o.arc || 0);
+    if (o.t === 'seg') h += num('h', 'Height Above the Ground', -1, 500, 0.5, o.h || 0);
+    if (o.t === 'segchain') h += num('h', 'Height Above the Ground (at the start)', -1, 500, 0.5, o.h || 0) + num('rise', 'Rise by the End of the Chain', -500, 500, 0.5, o.rise || 0) + num('arc', 'Vertical Arc (extra height in the middle)', -500, 500, 0.5, o.arc || 0);
     if (o.t === 'mud') {
-      if (!ghost) h += '<label class="f">Shape<select data-ok="follow"><option value="1"' + (o.follow === false ? '' : ' selected') + '>On the path (as wide as the path)</option><option value="0"' + (o.follow === false ? ' selected' : '') + '>Anywhere, on its own curve</option></select></label>';
+      if (!ghost) h += '<label class="f">Shape<select data-ok="follow"><option value="1"' + (o.follow === false ? '' : ' selected') + '>On the Path (as wide as the path)</option><option value="0"' + (o.follow === false ? ' selected' : '') + '>Anywhere, on Its Own Curve</option></select></label>';
       if (o.follow === false) h += (ghost ? '' : num('th', 'Rotation ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10)) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10) + num('w', 'Width', 1, 300, 1, mudW(o));   // the next mud takes its heading from where it is placed, so no Heading box
       else h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10);
       h += num('len', 'Length', 1, 5000, 1, o.len) + num('slow', 'Slowdown %', 0, 95, 1, o.slow) + endsF(o);
     }
     else if (STRIPS[o.t]) {
       var canJoin = o.t === 'segchain' || o.t === 'ledge' || o.t === 'gap';
-      if (canJoin && !ghost) h += '<label class="f">Starts from<select data-ok="after"><option value="">Its own start</option>' + S.objs.filter(function (q) { return q !== o && q.t === o.t; }).map(function (q) { return '<option value="' + q.id + '"' + (o.after === q.id ? ' selected' : '') + '>End of ' + NAMES[q.t] + ' #' + (S.objs.indexOf(q) + 1) + '</option>'; }).join('') + '</select></label>';
-      if (o.after !== undefined) h += num('turn', 'Turn at the joint °', -180, 180, 1, o.turn || 0) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10);
+      if (canJoin && !ghost) h += '<label class="f">Starts From<select data-ok="after"><option value="">Its Own Start</option>' + S.objs.filter(function (q) { return q !== o && q.t === o.t; }).map(function (q) { return '<option value="' + q.id + '"' + (o.after === q.id ? ' selected' : '') + '>End of ' + NAMES[q.t] + ' #' + (S.objs.indexOf(q) + 1) + '</option>'; }).join('') + '</select></label>';
+      if (o.after !== undefined) h += num('turn', 'Turn at the Joint °', -180, 180, 1, o.turn || 0) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10);
       else {
         if (!ghost) {
-        h += '<label class="f">Shape<select data-ok="follow"><option value="1"' + (o.follow === false ? '' : ' selected') + '>Follows the path</option><option value="0"' + (o.follow === false ? ' selected' : '') + '>Its own curve</option></select></label>';
+        h += '<label class="f">Shape<select data-ok="follow"><option value="1"' + (o.follow === false ? '' : ' selected') + '>Follows the Path</option><option value="0"' + (o.follow === false ? ' selected' : '') + '>Its Own Curve</option></select></label>';
         }
         if (ghost) { if (o.follow === false) h += num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round((o.bend || 0) * 10) / 10); }
         else if (o.follow === false) h += num('th', 'Rotation ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10);
         else h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10) + num('u', 'Across (− left, + right)', -200, 200, 0.5, Math.round(o.u * 10) / 10);
       }
-      h += num('len', o.t === 'segchain' ? 'Chain length' : 'Length', 1, 5000, 1, o.len);
+      h += num('len', o.t === 'segchain' ? 'Chain Length' : 'Length', 1, 5000, 1, o.len);
       if (o.t === 'segchain') h += num('gap', 'Spacing', 1, 500, 1, o.gap);
       if (o.t === 'ledge') h += num('w', 'Thickness', 0.5, 100, 0.5, o.w) + num('hgt', 'Height (any)', -500, 500, 0.5, o.hgt) + endsF(o) + toxF(o);
       if (o.t === 'platform') {
-        h += num('w', 'Width', 1, 300, 1, o.w) + num('hgt', 'Height of the top above the ground', -500, 500, 0.5, o.hgt) + num('thick', 'Thickness (top to bottom)', 0.5, 200, 0.5, o.thick === undefined ? 2 : o.thick) + toxF(o);
-        h += '<label class="f">Movement<select data-ok="move">' + [['none', 'Stays put'], ['side', 'Side to side'], ['forward', 'Forward and back'], ['vertical', 'Up and down']].map(function (m) { return '<option value="' + m[0] + '"' + (o.move === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>';
-        if (o.move !== 'none') h += num('dist', 'Travel (units)', 1, 1000, 1, o.dist) + num('period', 'Seconds per full cycle', 0.5, 120, 0.5, o.period) + num('group', 'Link group (0 = none)', 0, 99, 1, o.group || 0) + num('phase', 'Phase (seconds into the cycle)', 0, 120, 0.1, o.phase || 0);
+        h += num('w', 'Width', 1, 300, 1, o.w) + num('hgt', 'Height of the Top Above the Ground', -500, 500, 0.5, o.hgt) + num('thick', 'Thickness (top to bottom)', 0.5, 200, 0.5, o.thick === undefined ? 2 : o.thick) + toxF(o);
+        h += '<label class="f">Movement<select data-ok="move">' + [['none', 'Stays Put'], ['side', 'Side to Side'], ['forward', 'Forward and Back'], ['vertical', 'Up and Down']].map(function (m) { return '<option value="' + m[0] + '"' + (o.move === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>';
+        if (o.move !== 'none') h += num('dist', 'Travel (units)', 1, 1000, 1, o.dist) + num('period', 'Seconds per Full Cycle', 0.5, 120, 0.5, o.period) + num('group', 'Link Group (0 = none)', 0, 99, 1, o.group || 0) + num('phase', 'Phase (seconds into the cycle)', 0, 120, 0.1, o.phase || 0);
       }
       if (o.t === 'gap') h += num('w', 'Width (across)', 1, 300, 1, o.w) + endsF(o);
     }
-    if (isOneCrag(o)) h += num('base', 'Base radius', 1, 15, 0.1, o.base) + num('hgt', 'Peak height', 0.3, 200, 0.1, o.hgt);
-    else if (o.t === 'crag') h += (ghost ? '' : '<div class="row"><button class="small" data-oact="split">Break into separate crags</button></div>') + num('r', 'Patch radius', 2, 2000, 1, o.r) + num('count', 'Total number of crags', 1, 500, 1, o.count) + num('base', 'Average base radius', 1, 15, 0.1, o.base) + num('baseV', 'Base radius variation (±)', 0, 14, 0.1, o.baseV) + num('hgt', 'Average peak height', 0.3, 200, 0.1, o.hgt) + num('hgtV', 'Peak height variation (±)', 0, 200, 0.1, o.hgtV) + num('gap', 'Average space between (edge to edge)', 0, 1000, 0.5, o.gap) + num('gapV', 'Spacing variation (±)', 0, 1000, 0.5, o.gapV) + '<div class="row"><button class="small" data-oact="reroll">Re-roll the layout</button></div>';
+    if (isOneCrag(o)) h += num('base', 'Base Radius', 1, 15, 0.1, o.base) + num('hgt', 'Peak Height', 0.3, 200, 0.1, o.hgt);
+    else if (o.t === 'crag') h += (ghost ? '' : '<div class="row"><button class="small" data-oact="split">Break Into Separate Crags</button></div>') + num('r', 'Patch Radius', 2, 2000, 1, o.r) + num('count', 'Total Number of Crags', 1, 500, 1, o.count) + num('base', 'Average Base Radius', 1, 15, 0.1, o.base) + num('baseV', 'Base Radius Variation (±)', 0, 14, 0.1, o.baseV) + num('hgt', 'Average Peak Height', 0.3, 200, 0.1, o.hgt) + num('hgtV', 'Peak Height Variation (±)', 0, 200, 0.1, o.hgtV) + num('gap', 'Average Space Between (edge to edge)', 0, 1000, 0.5, o.gap) + num('gapV', 'Spacing Variation (±)', 0, 1000, 0.5, o.gapV) + '<div class="row"><button class="small" data-oact="reroll">Re-Roll the Layout</button></div>';
     if (o.t === 'patch') {
       var psel = function (k, label, opts) { return '<label class="f">' + label + '<select data-ok="' + k + '">' + opts.map(function (m) { return '<option value="' + m[0] + '"' + (o[k] === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>'; };
-      h += psel('ground', 'Terrain', [['grass', 'Bumpy grass'], ['flat', 'Flat grass'], ['ocean', 'Open ocean'], ['toxic', 'Toxic ground (hurts, like the Sink)']]) + psel('shape', 'Shape', [['ellipse', 'Ellipse'], ['rect', 'Rectangle']]) + num('w', 'Width (across)', 4, 20000, 1, o.w) + num('d', 'Length (along)', 4, 20000, 1, o.d) + psel('edge', 'Edge', [['soft', 'Soft (blends in)'], ['hard', 'Hard (abrupt)']]);
+      h += psel('ground', 'Terrain', [['grass', 'Bumpy Grass'], ['flat', 'Flat Grass'], ['ocean', 'Open Ocean'], ['toxic', 'Toxic Ground (hurts, like the Sink)']]) + psel('shape', 'Shape', [['ellipse', 'Ellipse'], ['rect', 'Rectangle']]) + num('w', 'Width (across)', 4, 20000, 1, o.w) + num('d', 'Length (along)', 4, 20000, 1, o.d) + psel('edge', 'Edge', [['soft', 'Soft (blends in)'], ['hard', 'Hard (abrupt)']]);
       if (o.edge !== 'hard') h += num('soft', 'Softness (width of the blend)', 1, 2000, 1, o.soft);
     }
     if (o.t === 'cave') {
-      if (joinedCave) h += '<label class="f">Angle<select data-ok="angSet"><option value="0"' + (o.angSet ? '' : ' selected') + '>Carries on at the angle the last cave ended on</option><option value="1"' + (o.angSet ? ' selected' : '') + '>Its own angle (set below)</option></select></label>';
+      if (joinedCave) h += '<label class="f">Angle<select data-ok="angSet"><option value="0"' + (o.angSet ? '' : ' selected') + '>Carries on at the angle the last cave ended on</option><option value="1"' + (o.angSet ? ' selected' : '') + '>Its Own Angle (set below)</option></select></label>';
       h += '<label class="f">Shape<select data-ok="shape">' + [['rect', 'Rectangle'], ['tri', 'Triangle'], ['hex', 'Hexagon'], ['oct', 'Octagon'], ['circle', 'Circle']].map(function (m) { return '<option value="' + m[0] + '"' + (o.shape === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>';
-      h += num('w', 'Width', 2, 100, 0.5, o.w) + num('h', 'Height', 2, 100, 0.5, o.h) + num('roll', 'Roll of the shape (degrees)', -180, 180, 5, o.roll) + num('ang', 'Angle (0 = level, up to 90 = straight down, negative = climbing)' + (joinedCave ? (o.angSet ? ' — its own' : ' — carried on from the last cave; type a new one to set its own') : ''), -85, 90, 1, joinedCave && !o.angSet ? Math.round(cAng(o) * 10) / 10 : o.ang) + num('len', 'Depth (length of the tunnel)', 4, 2000, 1, o.len) + num('bend', 'Curvature (degrees turned over its length)', -720, 720, 5, o.bend) + num('slope', 'Slope (degrees the angle changes over its length)', -90, 90, 1, o.slope) + num('carve', 'Carve (shafts, angle 80 or more): 0 = the shaft opens right at the surface, 100 = the surface slopes in all the way down (%)', 0, 100, 5, o.carve || 0);
+      h += num('w', 'Width', 2, 100, 0.5, o.w) + num('h', 'Height', 2, 100, 0.5, o.h) + num('roll', 'Roll of the Shape (degrees)', -180, 180, 5, o.roll) + num('ang', 'Angle (0 = level, up to 90 = straight down, negative = climbing)' + (joinedCave ? (o.angSet ? ' — its own' : ' — carried on from the last cave; type a new one to set its own') : ''), -85, 90, 1, joinedCave && !o.angSet ? Math.round(cAng(o) * 10) / 10 : o.ang) + num('len', 'Depth (length of the tunnel)', 4, 2000, 1, o.len) + num('bend', 'Curvature (degrees turned over its length)', -720, 720, 5, o.bend) + num('slope', 'Slope (degrees the angle changes over its length)', -90, 90, 1, o.slope) + num('carve', 'Carve (shafts, angle 80 or more): 0 = the shaft opens right at the surface, 100 = the surface slopes in all the way down (%)', 0, 100, 5, o.carve || 0);
       h += '<p class="note" style="margin:6px 0 0;font-size:12px;opacity:.75">Rotation turns the whole cave. From 80° up it is a shaft: a pit with this outline. Below that it is a tunnel; it cuts open to the sky where it is shallower than its own height, and goes under a roof of ground past that.</p>';
     }
     if (o.t === 'gazer') {
-      h += '<label class="f">Behavior<select data-ok="gm">' + [['chase', 'Chases Molly (buzzes round her head)'], ['idle', 'Idle (hovers still, turns to face her)'], ['cycle', 'Cycle (moves in a set pattern)']].map(function (m) { return '<option value="' + m[0] + '"' + ((o.gm || 'chase') === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>' + num('hgt', 'Hover height above the ground', -500, 500, 0.5, o.hgt);
-      if (o.gm === 'cycle') h += '<label class="f">Movement<select data-ok="move">' + [['side', 'Side to side'], ['forward', 'Forward and back'], ['vertical', 'Up and down']].map(function (m) { return '<option value="' + m[0] + '"' + (o.move === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>' + num('dist', 'Travel (units)', 1, 1000, 1, o.dist) + num('period', 'Seconds per full cycle', 0.5, 120, 0.5, o.period) + num('phase', 'Phase (seconds into the cycle)', 0, 120, 0.1, o.phase || 0);
+      h += '<label class="f">Behavior<select data-ok="gm">' + [['chase', 'Chases Molly (buzzes round her head)'], ['idle', 'Idle (hovers still, turns to face her)'], ['cycle', 'Cycle (moves in a set pattern)']].map(function (m) { return '<option value="' + m[0] + '"' + ((o.gm || 'chase') === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>' + num('hgt', 'Hover Height Above the Ground', -500, 500, 0.5, o.hgt);
+      if (o.gm === 'cycle') h += '<label class="f">Movement<select data-ok="move">' + [['side', 'Side to Side'], ['forward', 'Forward and Back'], ['vertical', 'Up and Down']].map(function (m) { return '<option value="' + m[0] + '"' + (o.move === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>' + num('dist', 'Travel (units)', 1, 1000, 1, o.dist) + num('period', 'Seconds per Full Cycle', 0.5, 120, 0.5, o.period) + num('phase', 'Phase (seconds into the cycle)', 0, 120, 0.1, o.phase || 0);
     }
     if (MOB_KINDS.indexOf(o.t) >= 0) h += '<label class="f">Behavior<select data-ok="idle"><option value="0"' + (o.idle ? '' : ' selected') + '>Chases Molly</option><option value="1"' + (o.idle ? ' selected' : '') + '>Idle (stands still, turns to face her)</option></select></label>';
-    if (o.t === 'hill') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('h', 'Height', 1, 500, 0.5, o.h) + '<label class="f">Surface<select data-ok="rock"><option value="rock"' + (o.rock === 'rock' ? ' selected' : '') + '>Bare rock</option><option value="grass"' + (o.rock === 'grass' ? ' selected' : '') + '>Grass</option></select></label>';
-    if (o.t === 'lake') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('depth', 'Depth', 1, 200, 0.5, o.depth) + num('wl', 'Water level adjust (+ raises it)', -500, 500, 0.5, o.wl || 0);
-    if (o.t === 'spawner') h += num('r', 'Radius', 2, 1000, 1, o.r) + num('every', 'Every (seconds)', 0.2, 120, 0.2, o.every) + num('max', 'Most alive at once', 1, 100, 1, o.max);
+    if (o.t === 'hill') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('h', 'Height', 1, 500, 0.5, o.h) + '<label class="f">Surface<select data-ok="rock"><option value="rock"' + (o.rock === 'rock' ? ' selected' : '') + '>Bare Rock</option><option value="grass"' + (o.rock === 'grass' ? ' selected' : '') + '>Grass</option></select></label>';
+    if (o.t === 'lake') h += num('r', 'Radius', 2, 2000, 1, o.r) + num('depth', 'Depth', 1, 200, 0.5, o.depth) + num('wl', 'Water Level Adjust (+ raises it)', -500, 500, 0.5, o.wl || 0);
+    if (o.t === 'spawner') h += num('r', 'Radius', 2, 1000, 1, o.r) + num('every', 'Every (seconds)', 0.2, 120, 0.2, o.every) + num('max', 'Most Alive at Once', 1, 100, 1, o.max);
     if (o.t === 'goal') {
       var sel2 = function (k, label, opts) { return '<label class="f">' + label + '<select data-ok="' + k + '">' + opts.map(function (m) { return '<option value="' + m[0] + '"' + (o[k] === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>'; };
-      h += sel2('kind', 'Goal type', [['regular', 'Regular goal'], ['bonus', 'Bonus goal']]) + sel2('style', 'Look', [['banner', 'Banner'], ['ring', 'Ring']]) + num('w', 'Width', 4, 200, 1, o.w);
+      h += sel2('kind', 'Goal Type', [['regular', 'Regular Goal'], ['bonus', 'Bonus Goal']]) + sel2('style', 'Look', [['banner', 'Banner'], ['ring', 'Ring']]) + num('w', 'Width', 4, 200, 1, o.w);
     }
     if (o.t === 'door') {
       var dsl = function (k, l, v, opts) { return '<label class="f">' + l + '<select data-ok="' + k + '">' + opts.map(function (m) { return '<option value="' + m[0] + '"' + (String(v) === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>'; };
-      var MODES = [['cycle', 'Opens and shuts on a cycle'], ['open', 'Always open'], ['closed', 'Always closed']];
+      var MODES = [['cycle', 'Opens and Shuts on a Cycle'], ['open', 'Always Open'], ['closed', 'Always Closed']];
       var dl = (o.links || []).filter(function (id) { return S.objs.some(function (q) { return q.id === id; }); });
       h += num('w', 'Width', 2, 100, 1, o.w) + num('hgt', 'Height', 1, 60, 0.5, o.hgt);
       if (!ghost) {
@@ -1537,38 +1537,38 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         if (cand.length) h += '<label class="f">Link to…<select data-ok="addlink"><option value="">Choose…</option>' + cand.map(function (q) { var p2 = pos(q); return '<option value="' + q.id + '">' + NAMES[q.t] + ' #' + q.id + ' (X ' + Math.round(p2.x) + ', Z ' + Math.round(p2.z) + ')</option>'; }).join('') + '</select></label>';
       }
       var linked = dl.length > 0, modeA = o.modeA || 'open';   // linked: only the mode changes once everything it is linked to is beaten; how it opens and shuts stays the same
-      h += dsl('mode', linked ? 'Before interaction' : 'Behaviour', o.mode, MODES) + (linked ? dsl('modeA', 'After interaction (once every minion linked is beaten, plate pressed and target broken)', modeA, MODES) : '');
-      if (o.mode === 'cycle' || (linked && modeA === 'cycle')) h += num('open', 'Open for (seconds)', 0.1, 600, 0.1, o.open) + num('shut', 'Closed for (seconds)', 0.1, 600, 0.1, o.shut) + num('phase', 'Start offset (seconds)', 0, 600, 0.1, o.phase);
-      h += num('speed', 'Time to open or shut (seconds)', 0.05, 60, 0.05, o.speed)
-        + dsl('slide', 'Opens by', doorSlide(o), [['down', 'Sliding straight down into the floor'], ['edge', 'Sliding toward its bottom edge (along its own lean)'], ['none', 'Swinging only (to its open tilt)']])
-        + num('sTx', 'Tilt when shut: forward / back °', -180, 180, 1, o.sTx) + num('sTz', 'Tilt when shut: sideways °', -180, 180, 1, o.sTz) + num('oTx', 'Tilt when open: forward / back °', -180, 180, 1, o.oTx) + num('oTz', 'Tilt when open: sideways °', -180, 180, 1, o.oTz);
+      h += dsl('mode', linked ? 'Before Interaction' : 'Behaviour', o.mode, MODES) + (linked ? dsl('modeA', 'After interaction (once every minion linked is beaten, plate pressed and target broken)', modeA, MODES) : '');
+      if (o.mode === 'cycle' || (linked && modeA === 'cycle')) h += num('open', 'Open for (seconds)', 0.1, 600, 0.1, o.open) + num('shut', 'Closed for (seconds)', 0.1, 600, 0.1, o.shut) + num('phase', 'Start Offset (seconds)', 0, 600, 0.1, o.phase);
+      h += num('speed', 'Time to Open or Shut (seconds)', 0.05, 60, 0.05, o.speed)
+        + dsl('slide', 'Opens by', doorSlide(o), [['down', 'Sliding Straight Down Into the Floor'], ['edge', 'Sliding Toward Its Bottom Edge (along its own lean)'], ['none', 'Swinging Only (to its open tilt)']])
+        + num('sTx', 'Tilt When Shut: Forward / Back °', -180, 180, 1, o.sTx) + num('sTz', 'Tilt When Shut: Sideways °', -180, 180, 1, o.sTz) + num('oTx', 'Tilt When Open: Forward / Back °', -180, 180, 1, o.oTx) + num('oTz', 'Tilt When Open: Sideways °', -180, 180, 1, o.oTz);
       h += '<div class="stats" style="grid-column:1/-1">Tilts pivot at the door\'s base: forward / back leans its top along the way ahead, sideways leans it to the right. Sliding toward its bottom edge moves it its own height along its lean, so its top edge ends where its bottom edge was. If it shuts on someone in the doorway, they are pushed out the side they came from.</div>';
     }
     var isel = function (k, l, v, opts) { return '<label class="f">' + l + '<select data-ok="' + k + '">' + opts.map(function (m) { return '<option value="' + m[0] + '"' + (String(v) === m[0] ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>'; };
     if (o.t === 'toxic') h += num('w', 'Width (across)', 1, 4000, 0.5, o.w) + num('d', 'Length (along)', 1, 4000, 0.5, o.d);
     if (o.t === 'plate') {
-      h += isel('look', 'Look', o.look, [['gray', 'Light gray'], ['brown', 'Light brown'], ['halo', 'A faint glowing halo round its edge'], ['none', 'Invisible']]) + isel('shape', 'Shape', o.shape, [['rect', 'Rectangle'], ['circle', 'Circle']]);
+      h += isel('look', 'Look', o.look, [['gray', 'Light Gray'], ['brown', 'Light Brown'], ['halo', 'A faint glowing halo round its edge'], ['none', 'Invisible']]) + isel('shape', 'Shape', o.shape, [['rect', 'Rectangle'], ['circle', 'Circle']]);
       h += o.shape === 'circle' ? num('r', 'Radius', 0.5, 2000, 0.5, o.r) : num('w', 'Width (across)', 0.5, 4000, 0.5, o.w) + num('d', 'Length (along)', 0.5, 4000, 0.5, o.d);
-      h += isel('whl', 'Stays pressed', o.whl ? '1' : '0', [['0', 'Once she steps on it, for the rest of the run'], ['1', 'Only while she stands on it']]);
+      h += isel('whl', 'Stays Pressed', o.whl ? '1' : '0', [['0', 'Once she steps on it, for the rest of the run'], ['1', 'Only While She Stands on It']]);
       h += '<div class="stats" style="grid-column:1/-1">Pressed when Molly stands on it. A door linked to it counts it as done while it is pressed. It lies on the ground (or at its Y) and does not change the ground\'s height.</div>';
     }
     if (o.t === 'target') {
-      h += num('size', 'Size (diameter)', 0.5, 200, 0.5, o.size) + isel('post', 'Stands on', o.post ? '1' : '0', [['1', 'A sign post'], ['0', 'Nothing (it hangs in the air)']]) + num('h', 'Height of its middle above its Y', -50, 500, 0.5, o.h)
-        + num('tilt', 'Tilt ° (+ leans its top back)', -180, 180, 1, o.tilt) + num('spin', 'Spin ° (turns it round its middle)', -360, 360, 1, o.spin) + num('hb', 'Hitbox size (× its own size)', 0.1, 5, 0.05, o.hb) + num('k', 'Barrier speed that breaks it (Zips; 0 = never)', 0, 200, 0.5, o.k)
-        + num('sd', 'Side-to-side travel (0 = still)', 0, 1000, 0.5, o.sd) + (o.sd ? num('sp', 'Side to side: seconds per full cycle', 0.5, 120, 0.5, o.sp) : '') + num('vd', 'Up-and-down travel (0 = still)', 0, 1000, 0.5, o.vd) + (o.vd ? num('vp', 'Up and down: seconds per full cycle', 0.5, 120, 0.5, o.vp) : '') + (o.sd || o.vd ? num('phase', 'Phase (seconds into the cycle)', 0, 120, 0.1, o.phase) : '');
+      h += num('size', 'Size (diameter)', 0.5, 200, 0.5, o.size) + isel('post', 'Stands on', o.post ? '1' : '0', [['1', 'A sign post'], ['0', 'Nothing (it hangs in the air)']]) + num('h', 'Height of Its Middle Above Its Y', -50, 500, 0.5, o.h)
+        + num('tilt', 'Tilt ° (+ leans its top back)', -180, 180, 1, o.tilt) + num('spin', 'Spin ° (turns it round its middle)', -360, 360, 1, o.spin) + num('hb', 'Hitbox Size (× its own size)', 0.1, 5, 0.05, o.hb) + num('k', 'Barrier Speed That Breaks It (Zips; 0 = never)', 0, 200, 0.5, o.k)
+        + num('sd', 'Side-to-Side Travel (0 = still)', 0, 1000, 0.5, o.sd) + (o.sd ? num('sp', 'Side to Side: Seconds per Full Cycle', 0.5, 120, 0.5, o.sp) : '') + num('vd', 'Up-and-Down Travel (0 = still)', 0, 1000, 0.5, o.vd) + (o.vd ? num('vp', 'Up and Down: Seconds per Full Cycle', 0.5, 120, 0.5, o.vp) : '') + (o.sd || o.vd ? num('phase', 'Phase (seconds into the cycle)', 0, 120, 0.1, o.phase) : '');
       h += '<div class="stats" style="grid-column:1/-1">One heart. The Barrier breaks it when it hits it at that speed or faster; otherwise it is solid. When it breaks it splits in two and falls apart. A door linked to it counts it as done once it is broken. It moves on the level clock, like platforms.</div>';
     }
     if (o.t === 'ramp') h += num('len', 'Length', 5, 300, 1, o.len) + num('w', 'Width', 2, 100, 1, o.w) + num('ang', 'Slope °', 0, 60, 1, o.ang) + num('boost', 'Style Boost (last units)', 0, 100, 1, o.boost);
-    if (o.t === 'checkpoint') h += num('w', 'Gate width', 4, 200, 1, o.w);
+    if (o.t === 'checkpoint') h += num('w', 'Gate Width', 4, 200, 1, o.w);
     if (o.t === 'tip') {
       h += '<label class="f">Shape<select data-ok="shape"><option value="circle"' + (o.shape === 'circle' ? ' selected' : '') + '>Circle</option><option value="rect"' + (o.shape === 'rect' ? ' selected' : '') + '>Rectangle</option></select></label>';
       h += o.shape === 'circle' ? num('r', 'Radius', 2, 1000, 1, o.r) : num('w', 'Width (across)', 2, 2000, 1, o.w) + num('d', 'Length (along)', 2, 2000, 1, o.d);
-      h += num('up', 'Activates up to this far above it (0 = no limit)', 0, 5000, 1, o.up || 0) + num('dn', 'Activates up to this far below it (0 = no limit)', 0, 5000, 1, o.dn || 0);
+      h += num('up', 'Activates Up to This Far Above It (0 = no limit)', 0, 5000, 1, o.up || 0) + num('dn', 'Activates Up to This Far Below It (0 = no limit)', 0, 5000, 1, o.dn || 0);
     }
     h += '</div>';
-    if (o.t === 'segchain' || o.t === 'ledge' || o.t === 'gap' || o.t === 'cave') h += '<div class="row"><button class="small" data-oact="next">' + (o.t === 'cave' ? 'Add a tunnel from this one\'s end' : 'Add next piece (joined)') + '</button></div>';
-    if (o.t === 'platform' && o.group && o.move !== 'none') h += '<div class="row"><button class="small" data-oact="space">Space this group evenly</button></div>';
-    if (o.t === 'tip') h += '<label class="f">Tip text<textarea data-ok="text" style="height:64px">' + (o.text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</textarea></label>';
+    if (o.t === 'segchain' || o.t === 'ledge' || o.t === 'gap' || o.t === 'cave') h += '<div class="row"><button class="small" data-oact="next">' + (o.t === 'cave' ? 'Add a Tunnel From This One\'s End' : 'Add Next Piece (joined)') + '</button></div>';
+    if (o.t === 'platform' && o.group && o.move !== 'none') h += '<div class="row"><button class="small" data-oact="space">Space This Group Evenly</button></div>';
+    if (o.t === 'tip') h += '<label class="f">Tip Text<textarea data-ok="text" style="height:64px">' + (o.text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</textarea></label>';
     if (!ghost) h += '<div class="stats">' + (o.t === 'segchain' ? (chainPts(o).length + ' segs' + (o.follow === false ? ', on its own curve' : ', following the path')) : o.s !== undefined ? 'attached to the path: ' + Math.round(o.s) + ' along, ' + Math.round(o.u * 10) / 10 + ' across' : 'free on the map') + '</div>';
     el.innerHTML = h; el.hidden = false; tidyInsp(el, o, ghost); if (!ghost) yRefresh();
   }
@@ -4521,14 +4521,14 @@ var rad=Math.PI/180;
 /* ================= part table ================= */
 /* kind: which way the part runs from its joint. up and down run along Y, fwd runs along Z (feet). */
 var SEGS=[
- {id:'Foot',label:'Feet',bone:'Ankle',pair:1,kind:'fwd',ends:['heel','toe'],lat:['Top view','Side view']},
+ {id:'Foot',label:'Feet',bone:'Ankle',pair:1,kind:'fwd',ends:['heel','toe'],lat:['Top View','Side View']},
  {id:'Shin',label:'Calves',bone:'Knee',pair:1,kind:'down',ends:['knee','ankle']},
  {id:'Thigh',label:'Thighs',bone:'Hip',pair:1,kind:'down',ends:['hip','knee']},
- {id:'LowerTorso',label:'Lower torso',bone:'Hips',kind:'up',ends:['crotch','waist']},
- {id:'UpperTorso',label:'Upper torso',bone:'Spine',kind:'up',ends:['waist','shoulder line']},
+ {id:'LowerTorso',label:'Lower Torso',bone:'Hips',kind:'up',ends:['crotch','waist']},
+ {id:'UpperTorso',label:'Upper Torso',bone:'Spine',kind:'up',ends:['waist','shoulder line']},
  {id:'Neck',label:'Neck',bone:'Spine',kind:'up',ends:['base','top']},
  {id:'Head',label:'Head',bone:'Head',kind:'up',ends:['chin','crown']},
- {id:'UpperArm',label:'Upper arms',bone:'Shoulder',pair:1,kind:'down',ends:['shoulder','elbow']},
+ {id:'UpperArm',label:'Upper Arms',bone:'Shoulder',pair:1,kind:'down',ends:['shoulder','elbow']},
  {id:'Forearm',label:'Forearms',bone:'Elbow',pair:1,kind:'down',ends:['elbow','wrist']},
  {id:'Hand',label:'Hands',bone:'Wrist',pair:1,kind:'down',ends:['wrist','fingertips']},
  {id:'Pony1',label:'Ponytail 1',bone:'Pony1',kind:'down',ends:['hair tie','first bend']},
@@ -4602,7 +4602,7 @@ var MOVES={
 };
 var TIEK={jump:{7:0},slide:{3:2,5:0},fall:{6:5,7:5},set:{1:0},drift:{1:0}};
 var STAGEKEYS={jump:[0,1,2,3,4,5,6],slide:[0,1,2,4],fall:[0,1,2,3,4,5],set:[0],drift:[0]};
-var HOLDKEY={slide:[3,'Slide held until'],fall:[6,'Settle held until']};
+var HOLDKEY={slide:[3,'Slide Held Until'],fall:[6,'Settle Held Until']};
 var MOVEDUR={jump:1.7,slide:2.0,fall:2.8,set:3.0,drift:3.0};
 var MOVEX={};
 Object.keys(MOVES).forEach(function(n){var cur={},k;for(k in KD)cur[k]=KD[k];
@@ -4627,27 +4627,28 @@ var INLP={},INLC={};
 INLINE.forEach(function(j){INLC[j[0]]=[j[1],j[2]];INLP[j[1]]=[j[0],j[2]];});
 
 /* slider meta: [key, label, unit, min, max, step] */
-function band(id){return [[id+'.bandA','Trim band start','cm',0,70,.5],[id+'.bandL','Trim band length','cm',0,40,.5]];}
+function band(id){return [[id+'.bandA','Trim Band Start','cm',0,70,.5],[id+'.bandL','Trim Band Length','cm',0,40,.5]];}
 var EXTRA={
- Foot:[['Foot.heel','Heel behind the ankle','cm',0,16,.5],['Foot.sole','Sole thickness','cm',0,8,.25],['Foot.ankleH','Ankle height above floor','cm',4,18,.5],['Foot.flat','Toe flattening','pct',0,.9,.01]],
- Shin:[['Shin.pad','Knee pad size (0 = none)','cm',0,16,.2]].concat(band('Shin')),
+ Foot:[['Foot.heel','Heel Behind the Ankle','cm',0,16,.5],['Foot.sole','Sole Thickness','cm',0,8,.25],['Foot.ankleH','Ankle Height Above Floor','cm',4,18,.5],['Foot.flat','Toe Flattening','pct',0,.9,.01]],
+ Shin:[['Shin.pad','Knee Pad Size (0 = none)','cm',0,16,.2]].concat(band('Shin')),
  LowerTorso:band('LowerTorso'),
- Head:[['hairVol','Hair volume','x',.9,1.5,.01],['bangL','Bang length','x',.3,2,.05]],
+ Head:[['hairVol','Hair Volume','x',.9,1.5,.01],['bangL','Bang Length','x',.3,2,.05]],
  UpperArm:band('UpperArm'),
  Forearm:band('Forearm')
 };
 var GROUPS=[
- ['Joint smoothing',[
-   ['jShoulder','Shoulder blend into torso','cm',0,12,.5],['jHip','Hip blend into torso','cm',0,12,.5],['jAnkle','Ankle blend into foot','cm',0,8,.5],['jPony','Hair blend (head and ponytail)','cm',0,6,.5],
-   ['jElbow','Elbow blend length','cm',0,16,.5],['jWrist','Wrist blend length','cm',0,8,.5],['jKnee','Knee blend length','cm',0,16,.5],
-   ['jWaist','Waist blend length','cm',0,14,.5],['jNeckBase','Neck base blend length','cm',0,10,.5],['jNeckTop','Neck top blend length','cm',0,10,.5]]],
- ['Skeleton and joints',[['scale','Overall scale (her size in the game too, after Save to game)','x',.8,1.25,.01],['pelvisDrop','Pelvis below hip joint','cm',0,30,.5],['shoulderX','Shoulder joint X','cm',8,40,.5],['shoulderY','Shoulder joint height on torso','cm',15,42,.5],['hipX','Hip joint X','cm',4,16,.5],['shoulderOver','Shoulder overlap into torso','cm',-3,5,.5],['armSpread','Arm spread','deg',0,40,1]]],
- ['Ponytail pose',[['ponyAng','Rise angle','deg',70,150,1],['ponyCurl','Droop per bend','deg',0,90,1]]],
- ['Faceting',[['sides','Sides per ring','n',5,20,1],['rings','Rings per side of the max','n',1,4,1],['ringGap','Thinnest strip of facets (rings closer than this are merged)','cm',0,3,.05],['jit','Shading variation','x',0,.5,.01],['irr','Irregularity of the ring sides','x',0,1,.01],['irrC','Contour shift (up/down along the form)','x',0,1.5,.01]]],
+ ['Joint Smoothing',[
+   ['jShoulder','Shoulder Blend Into Torso','cm',0,12,.5],['jHip','Hip Blend Into Torso','cm',0,12,.5],['jAnkle','Ankle Blend Into Foot','cm',0,8,.5],['jPony','Hair Blend (head and ponytail)','cm',0,6,.5],
+   ['jElbow','Elbow Blend Length','cm',0,16,.5],['jWrist','Wrist Blend Length','cm',0,8,.5],['jKnee','Knee Blend Length','cm',0,16,.5],
+   ['jWaist','Waist Blend Length','cm',0,14,.5],['jNeckBase','Neck Base Blend Length','cm',0,10,.5],['jNeckTop','Neck Top Blend Length','cm',0,10,.5]]],
+ ['Skeleton and Joints',[['scale','Overall Scale (her size in the game too, after Save to game)','x',.8,1.25,.01],['pelvisDrop','Pelvis Below Hip Joint','cm',0,30,.5],['shoulderX','Shoulder Joint X','cm',8,40,.5],['shoulderY','Shoulder Joint Height on Torso','cm',15,42,.5],['hipX','Hip Joint X','cm',4,16,.5],['shoulderOver','Shoulder Overlap Into Torso','cm',-3,5,.5],['armSpread','Arm Spread','deg',0,40,1]]],
+ ['Ponytail Pose',[['ponyAng','Rise Angle','deg',70,150,1],['ponyCurl','Droop per Bend','deg',0,90,1]]],
+ ['Faceting',[['sides','Sides per Ring','n',5,20,1],['rings','Rings per Side of the Max','n',1,4,1],['ringGap','Thinnest Strip of Facets (rings closer than this are merged)','cm',0,3,.05],['jit','Shading Variation','x',0,.5,.01],['irr','Irregularity of the Ring Sides','x',0,1,.01],['irrC','Contour Shift (up/down along the form)','x',0,1.5,.01]]],
 
 ];
-var COLORS=[['cSuit','Jumpsuit'],['cHair','Hair'],['cSkin','Skin'],['cBlk','Belt, gloves, pads'],['cWht','Arm bands, soles'],['cEye','Eyes']];
+var COLORS=[['cSuit','Jumpsuit'],['cHair','Hair'],['cSkin','Skin'],['cBlk','Belt, Gloves, Pads'],['cWht','Arm Bands, Soles'],['cEye','Eyes']];
 var USERDEF={"scale":1,"pelvisDrop":9.5,"shoulderX":13.5,"shoulderY":28.5,"hipX":9.5,"armSpread":9,"hairVol":1,"bangL":1,"ponyAng":108,"ponyCurl":67,"jShoulder":5,"jHip":4,"jAnkle":2,"jPony":1,"jElbow":7,"jWrist":2,"jKnee":0,"jWaist":7.5,"jNeckBase":2.5,"jNeckTop":3,"sides":8,"rings":2,"jit":0.2,"speed":1,"stride":32,"kneeLift":75,"armSwing":40,"elbow":80,"lean":11,"bounce":3,"cSuit":"#d9232b","cHair":"#e0202a","cSkin":"#f2a978","cBlk":"#2a1f22","cWht":"#f4f1ee","cEye":"#2f8fd0","Foot.len":27,"Foot.dia":9.6,"Foot.depth":1.2,"Foot.peak":0.55,"Foot.tS":0.77,"Foot.tE":0.55,"Foot.cS":1.5,"Foot.cE":2.8,"Foot.heel":7.5,"Foot.sole":3.5,"Foot.ankleH":9,"Foot.flat":0.5,"Foot.u1p":0.3,"Foot.u1a":0,"Foot.u1d":0,"Foot.u1wl":50,"Foot.u1wr":50,"Foot.u1ws":0.2,"Foot.u1we":0.2,"Foot.u1kl":0,"Foot.u1kr":0,"Foot.u1ks":0,"Foot.u1ke":0,"Foot.u2p":0.7,"Foot.u2a":180,"Foot.u2d":0,"Foot.u2wl":50,"Foot.u2wr":50,"Foot.u2ws":0.2,"Foot.u2we":0.2,"Foot.u2kl":0,"Foot.u2kr":0,"Foot.u2ks":0,"Foot.u2ke":0,"Shin.len":42,"Shin.dia":14.6,"Shin.depth":1,"Shin.peak":0.29,"Shin.tS":0.7,"Shin.tE":0.37,"Shin.cS":3.4,"Shin.cE":0.67,"Shin.pad":8.4,"Shin.bandA":30,"Shin.bandL":12,"Shin.u1p":0.3,"Shin.u1a":0,"Shin.u1d":0,"Shin.u1wl":50,"Shin.u1wr":50,"Shin.u1ws":0.2,"Shin.u1we":0.2,"Shin.u1kl":0,"Shin.u1kr":0,"Shin.u1ks":0,"Shin.u1ke":0,"Shin.u2p":0.7,"Shin.u2a":180,"Shin.u2d":0,"Shin.u2wl":50,"Shin.u2wr":50,"Shin.u2ws":0.2,"Shin.u2we":0.2,"Shin.u2kl":0,"Shin.u2kr":0,"Shin.u2ks":0,"Shin.u2ke":0,"Thigh.len":44,"Thigh.dia":19.9,"Thigh.depth":1,"Thigh.peak":0.41,"Thigh.tS":0.43,"Thigh.tE":0.52,"Thigh.cS":2.85,"Thigh.cE":1.15,"Thigh.u1p":0.3,"Thigh.u1a":0,"Thigh.u1d":0,"Thigh.u1wl":50,"Thigh.u1wr":50,"Thigh.u1ws":0.2,"Thigh.u1we":0.2,"Thigh.u1kl":0,"Thigh.u1kr":0,"Thigh.u1ks":0,"Thigh.u1ke":0,"Thigh.u2p":0.7,"Thigh.u2a":180,"Thigh.u2d":0,"Thigh.u2wl":50,"Thigh.u2wr":50,"Thigh.u2ws":0.2,"Thigh.u2we":0.2,"Thigh.u2kl":0,"Thigh.u2kr":0,"Thigh.u2ks":0,"Thigh.u2ke":0,"LowerTorso.len":28.5,"LowerTorso.dia":33.4,"LowerTorso.depth":0.64,"LowerTorso.peak":0.37,"LowerTorso.tS":0.68,"LowerTorso.tE":0.61,"LowerTorso.cS":5,"LowerTorso.cE":1.4,"LowerTorso.bandA":17,"LowerTorso.bandL":8.5,"LowerTorso.u1p":0.38,"LowerTorso.u1a":152,"LowerTorso.u1d":4.2,"LowerTorso.u1wl":43,"LowerTorso.u1wr":37,"LowerTorso.u1ws":0.36,"LowerTorso.u1we":0.54,"LowerTorso.u1kl":-0.35,"LowerTorso.u1kr":-0.2,"LowerTorso.u1ks":1,"LowerTorso.u1ke":0.3,"LowerTorso.u2p":0.38,"LowerTorso.u2a":-152,"LowerTorso.u2d":4.2,"LowerTorso.u2wl":37,"LowerTorso.u2wr":43,"LowerTorso.u2ws":0.36,"LowerTorso.u2we":0.54,"LowerTorso.u2kl":-0.2,"LowerTorso.u2kr":-0.35,"LowerTorso.u2ks":1,"LowerTorso.u2ke":0.3,"UpperTorso.len":34.5,"UpperTorso.dia":26.4,"UpperTorso.depth":0.87,"UpperTorso.peak":0.56,"UpperTorso.tS":0.56,"UpperTorso.tE":0.3,"UpperTorso.cS":1,"UpperTorso.cE":1.7,"UpperTorso.u1p":0.6,"UpperTorso.u1a":21,"UpperTorso.u1d":5,"UpperTorso.u1wl":30,"UpperTorso.u1wr":25,"UpperTorso.u1ws":0.16,"UpperTorso.u1we":0.31,"UpperTorso.u1kl":-0.7,"UpperTorso.u1kr":-0.1,"UpperTorso.u1ks":1,"UpperTorso.u1ke":-0.8,"UpperTorso.u2p":0.6,"UpperTorso.u2a":-21,"UpperTorso.u2d":5,"UpperTorso.u2wl":25,"UpperTorso.u2wr":30,"UpperTorso.u2ws":0.2,"UpperTorso.u2we":0.2,"UpperTorso.u2kl":-0.1,"UpperTorso.u2kr":-0.7,"UpperTorso.u2ks":1,"UpperTorso.u2ke":-0.8,"Neck.len":14,"Neck.dia":7.5,"Neck.depth":0.96,"Neck.peak":0.5,"Neck.tS":1,"Neck.tE":0.88,"Neck.cS":0.4,"Neck.cE":1,"Neck.u1p":0.3,"Neck.u1a":0,"Neck.u1d":0,"Neck.u1wl":50,"Neck.u1wr":50,"Neck.u1ws":0.2,"Neck.u1we":0.2,"Neck.u1kl":0,"Neck.u1kr":0,"Neck.u1ks":0,"Neck.u1ke":0,"Neck.u2p":0.7,"Neck.u2a":180,"Neck.u2d":0,"Neck.u2wl":50,"Neck.u2wr":50,"Neck.u2ws":0.2,"Neck.u2we":0.2,"Neck.u2kl":0,"Neck.u2kr":0,"Neck.u2ks":0,"Neck.u2ke":0,"Head.len":21,"Head.dia":18.5,"Head.depth":0.97,"Head.peak":0.38,"Head.tS":0.5,"Head.tE":0.34,"Head.cS":5,"Head.cE":2.3,"Head.u1p":0.3,"Head.u1a":0,"Head.u1d":0,"Head.u1wl":50,"Head.u1wr":50,"Head.u1ws":0.2,"Head.u1we":0.2,"Head.u1kl":0,"Head.u1kr":0,"Head.u1ks":0,"Head.u1ke":0,"Head.u2p":0.7,"Head.u2a":180,"Head.u2d":0,"Head.u2wl":50,"Head.u2wr":50,"Head.u2ws":0.2,"Head.u2we":0.2,"Head.u2kl":0,"Head.u2kr":0,"Head.u2ks":0,"Head.u2ke":0,"UpperArm.len":28,"UpperArm.dia":11.6,"UpperArm.depth":0.99,"UpperArm.peak":0.28,"UpperArm.tS":0.52,"UpperArm.tE":0.68,"UpperArm.cS":1,"UpperArm.cE":0.67,"UpperArm.bandA":19,"UpperArm.bandL":6.5,"UpperArm.u1p":0.3,"UpperArm.u1a":0,"UpperArm.u1d":0,"UpperArm.u1wl":50,"UpperArm.u1wr":50,"UpperArm.u1ws":0.2,"UpperArm.u1we":0.2,"UpperArm.u1kl":0,"UpperArm.u1kr":0,"UpperArm.u1ks":0,"UpperArm.u1ke":0,"UpperArm.u2p":0.7,"UpperArm.u2a":180,"UpperArm.u2d":0,"UpperArm.u2wl":50,"UpperArm.u2wr":50,"UpperArm.u2ws":0.2,"UpperArm.u2we":0.2,"UpperArm.u2kl":0,"UpperArm.u2kr":0,"UpperArm.u2ks":0,"UpperArm.u2ke":0,"Forearm.len":23,"Forearm.dia":7.3,"Forearm.depth":1.29,"Forearm.peak":0.38,"Forearm.tS":0.59,"Forearm.tE":0.5,"Forearm.cS":3.95,"Forearm.cE":0.86,"Forearm.bandA":13.5,"Forearm.bandL":4.5,"Forearm.u1p":0.3,"Forearm.u1a":0,"Forearm.u1d":0,"Forearm.u1wl":50,"Forearm.u1wr":50,"Forearm.u1ws":0.2,"Forearm.u1we":0.2,"Forearm.u1kl":0,"Forearm.u1kr":0,"Forearm.u1ks":0,"Forearm.u1ke":0,"Forearm.u2p":0.7,"Forearm.u2a":180,"Forearm.u2d":0,"Forearm.u2wl":50,"Forearm.u2wr":50,"Forearm.u2ws":0.2,"Forearm.u2we":0.2,"Forearm.u2kl":0,"Forearm.u2kr":0,"Forearm.u2ks":0,"Forearm.u2ke":0,"Hand.len":10,"Hand.dia":9.4,"Hand.depth":1,"Hand.peak":0.69,"Hand.tS":0.44,"Hand.tE":0.37,"Hand.cS":1.9,"Hand.cE":5,"Hand.u1p":0.3,"Hand.u1a":0,"Hand.u1d":0,"Hand.u1wl":50,"Hand.u1wr":50,"Hand.u1ws":0.2,"Hand.u1we":0.2,"Hand.u1kl":0,"Hand.u1kr":0,"Hand.u1ks":0,"Hand.u1ke":0,"Hand.u2p":0.7,"Hand.u2a":180,"Hand.u2d":0,"Hand.u2wl":50,"Hand.u2wr":50,"Hand.u2ws":0.2,"Hand.u2we":0.2,"Hand.u2kl":0,"Hand.u2kr":0,"Hand.u2ks":0,"Hand.u2ke":0,"Pony1.len":8.5,"Pony1.dia":14.8,"Pony1.depth":0.86,"Pony1.peak":0.54,"Pony1.tS":0.1,"Pony1.tE":0.87,"Pony1.cS":1.2,"Pony1.cE":3.65,"Pony1.u1p":0.3,"Pony1.u1a":0,"Pony1.u1d":0,"Pony1.u1wl":50,"Pony1.u1wr":50,"Pony1.u1ws":0.2,"Pony1.u1we":0.2,"Pony1.u1kl":0,"Pony1.u1kr":0,"Pony1.u1ks":0,"Pony1.u1ke":0,"Pony1.u2p":0.7,"Pony1.u2a":180,"Pony1.u2d":0,"Pony1.u2wl":50,"Pony1.u2wr":50,"Pony1.u2ws":0.2,"Pony1.u2we":0.2,"Pony1.u2kl":0,"Pony1.u2kr":0,"Pony1.u2ks":0,"Pony1.u2ke":0,"Pony2.len":24.5,"Pony2.dia":18,"Pony2.depth":0.58,"Pony2.peak":0.4,"Pony2.tS":0.39,"Pony2.tE":0.74,"Pony2.cS":1.6,"Pony2.cE":1,"Pony2.u1p":0.3,"Pony2.u1a":0,"Pony2.u1d":0,"Pony2.u1wl":50,"Pony2.u1wr":50,"Pony2.u1ws":0.2,"Pony2.u1we":0.2,"Pony2.u1kl":0,"Pony2.u1kr":0,"Pony2.u1ks":0,"Pony2.u1ke":0,"Pony2.u2p":0.7,"Pony2.u2a":180,"Pony2.u2d":0,"Pony2.u2wl":50,"Pony2.u2wr":50,"Pony2.u2ws":0.2,"Pony2.u2we":0.2,"Pony2.u2kl":0,"Pony2.u2kr":0,"Pony2.u2ks":0,"Pony2.u2ke":0,"Pony3.len":17,"Pony3.dia":14,"Pony3.depth":0.64,"Pony3.peak":0.1,"Pony3.tS":1,"Pony3.tE":0.05,"Pony3.cS":1,"Pony3.cE":2,"Pony3.u1p":0.3,"Pony3.u1a":0,"Pony3.u1d":0,"Pony3.u1wl":50,"Pony3.u1wr":50,"Pony3.u1ws":0.2,"Pony3.u1we":0.2,"Pony3.u1kl":0,"Pony3.u1kr":0,"Pony3.u1ks":0,"Pony3.u1ke":0,"Pony3.u2p":0.7,"Pony3.u2a":180,"Pony3.u2d":0,"Pony3.u2wl":50,"Pony3.u2wr":50,"Pony3.u2ws":0.2,"Pony3.u2we":0.2,"Pony3.u2kl":0,"Pony3.u2kr":0,"Pony3.u2ks":0,"Pony3.u2ke":0};
+function tcLabel(s){var sm={a:1,an:1,the:1,and:1,but:1,or:1,nor:1,for:1,so:1,yet:1,as:1,at:1,by:1,in:1,of:1,on:1,to:1,per:1,via:1,vs:1};return s.replace(/[A-Za-z][A-Za-z']*/g,function(w,i){return i>0&&sm[w]?w:w.charAt(0).toUpperCase()+w.slice(1);});}   /* a label made from pieces (part names like heel, toe) in Title Case */
 var RB={stride:32,knee:75,arm:40,elbow:80,lean:11,bounce:3};
 if(USERDEF.stride!==undefined)RB.stride=USERDEF.stride;if(USERDEF.kneeLift!==undefined)RB.knee=USERDEF.kneeLift;if(USERDEF.armSwing!==undefined)RB.arm=USERDEF.armSwing;if(USERDEF.elbow!==undefined)RB.elbow=USERDEF.elbow;if(USERDEF.lean!==undefined)RB.lean=USERDEF.lean;if(USERDEF.bounce!==undefined)RB.bounce=USERDEF.bounce;
 var RMUL={S:{stride:.7,knee:.6,arm:.7,elbow:1.05,lean:.45,bounce:.75},M:{stride:1,knee:1,arm:1,elbow:1,lean:1,bounce:1},F:{stride:1.45,knee:1.45,arm:1.55,elbow:1.1,lean:1.9,bounce:1.3}},RDUR={S:1.0,M:.8,F:.55};
@@ -5453,14 +5454,14 @@ var MSC={slope:20,dir:90,speed:80,mode:'run'};
 function moveRefresh(scenOnly){var b=SR.querySelector('#moveBox');if(!b||!b.open)return;var a=SR.querySelector('#moveLive'),o=SR.querySelector('#moveOut');
   try{if(a&&!scenOnly&&window.__moveStatsHTML)a.innerHTML=window.__moveStatsHTML(P);if(o&&window.__moveScenHTML)o.innerHTML=window.__moveScenHTML(P,MSC);}catch(e){}}
 function moveScenBuild(){var host=SR.querySelector('#moveScen');if(!host||host.firstChild)return;
-  [['slope','Slope','°',0,60,1],['dir','Her heading, from straight downhill','°',0,180,1],['speed','Her speed','Zips',0,160,1]].forEach(function(c){
+  [['slope','Slope','°',0,60,1],['dir','Her Heading, From Straight Downhill','°',0,180,1],['speed','Her Speed','Zips',0,160,1]].forEach(function(c){
     var row=document.createElement('div'),id='ms_'+c[0];row.className='row';
     row.innerHTML='<label for="'+id+'">'+c[1]+'</label><span class="numbox"><input type="number" class="num" step="any" aria-label="'+c[1]+' (type any value)"><span class="mono unit">'+c[2]+'</span></span><input type="range" id="'+id+'" min="'+c[3]+'" max="'+c[4]+'" step="'+c[5]+'">';
     host.appendChild(row);var inp=row.querySelector('input[type=range]'),nb=row.querySelector('input.num');inp.value=MSC[c[0]];nb.value=MSC[c[0]];
     inp.addEventListener('input',function(){MSC[c[0]]=parseFloat(inp.value);nb.value=MSC[c[0]];moveRefresh(true);});
     nb.addEventListener('change',function(){var v=parseFloat(nb.value);if(!isFinite(v)){nb.value=MSC[c[0]];return;}if(c[0]==='slope')v=Math.max(0,Math.min(89,v));else if(c[0]==='dir')v=Math.max(0,Math.min(180,v));else v=Math.max(0,v);MSC[c[0]]=v;nb.value=v;inp.value=v;moveRefresh(true);});
   });
-  var sg=document.createElement('div');sg.className='seg';sg.setAttribute('role','group');sg.setAttribute('aria-label','What she is doing');sg.style.marginBottom='6px';
+  var sg=document.createElement('div');sg.className='seg';sg.setAttribute('role','group');sg.setAttribute('aria-label','What She Is Doing');sg.style.marginBottom='6px';
   [['run','Running (W)'],['coast','Coasting'],['brake','Braking (S)']].forEach(function(o){var bt=document.createElement('button');bt.textContent=o[1];bt.dataset.ms=o[0];bt.setAttribute('aria-pressed',String(MSC.mode===o[0]));
     bt.addEventListener('click',function(){MSC.mode=o[0];sg.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x.dataset.ms===o[0]));});moveRefresh(true);});sg.appendChild(bt);});
   host.appendChild(sg);}
@@ -5489,18 +5490,18 @@ function bulgeRows(seg,n){
   var e=seg.ends,b=seg.id+'.u'+n,k=seg.kind,sN=e[0],eN=e[1],ls,le,fw=k==='fwd';
   ls=fw?'toward the '+sN:k==='up'?'bottom ('+sN+')':'top ('+sN+')';
   le=fw?'toward the '+eN:k==='up'?'top ('+eN+')':'bottom ('+eN+')';
-  return [[b+'p','Position along length (0% = '+sN+' end)','pct',0,1,.01],[b+'a','Direction around the part (0 = '+(fw?'top':'front')+', 90 = '+(seg.pair?'outside':'right')+', 180 = '+(fw?'underside':'back')+')','deg',-180,180,1],
+  return [[b+'p','Position Along Length (0% = '+sN+' end)','pct',0,1,.01],[b+'a','Direction Around the Part (0 = '+(fw?'top':'front')+', 90 = '+(seg.pair?'outside':'right')+', 180 = '+(fw?'underside':'back')+')','deg',-180,180,1],
    [b+'d','Depth (above 0 bulges out, below 0 dents in)','cm',-8,8,.1],
-   [b+'wl','Width: radial left','deg',5,180,1],[b+'wr','Width: radial right','deg',5,180,1],[b+'ws','Width: '+ls,'pct',.02,1,.01],[b+'we','Width: '+le,'pct',.02,1,.01],
-   [b+'kl','Curvature: radial left (concave to convex)','x',-1,1,.05],[b+'kr','Curvature: radial right','x',-1,1,.05],[b+'ks','Curvature: '+ls,'x',-1,1,.05],[b+'ke','Curvature: '+le,'x',-1,1,.05]];
+   [b+'wl','Width: Radial Left','deg',5,180,1],[b+'wr','Width: Radial Right','deg',5,180,1],[b+'ws','Width: '+tcLabel(ls),'pct',.02,1,.01],[b+'we','Width: '+tcLabel(le),'pct',.02,1,.01],
+   [b+'kl','Curvature: Radial Left (concave to convex)','x',-1,1,.05],[b+'kr','Curvature: Radial Right','x',-1,1,.05],[b+'ks','Curvature: '+tcLabel(ls),'x',-1,1,.05],[b+'ke','Curvature: '+tcLabel(le),'x',-1,1,.05]];
 }
 function coreRows(seg){
   var id=seg.id,e=seg.ends,pre=id+'.';
   return {
-   size:[[pre+'len','Length','cm',2,70,.5],[pre+'dia','Max diameter (width)','cm',1,60,.1],[pre+'depth','Depth as a fraction of width','x',.3,2,.01]],
-   center:[[pre+'peak','Position along length (0% = '+e[0]+' end)','pct',.02,.98,.01]],
-   start:[[pre+'tS','Taper at the '+e[0]+' end','pct',.03,1,.01],[pre+'cS','Curve from '+e[0]+' end to max','x',.4,5,.05]],
-   end:[[pre+'tE','Taper at the '+e[1]+' end','pct',.03,1,.01],[pre+'cE','Curve from max to '+e[1]+' end','x',.4,5,.05]],
+   size:[[pre+'len','Length','cm',2,70,.5],[pre+'dia','Max Diameter (width)','cm',1,60,.1],[pre+'depth','Depth as a Fraction of Width','x',.3,2,.01]],
+   center:[[pre+'peak','Position Along Length (0% = '+e[0]+' end)','pct',.02,.98,.01]],
+   start:[[pre+'tS','Taper at the '+tcLabel(e[0])+' End','pct',.03,1,.01],[pre+'cS','Curve From '+tcLabel(e[0])+' End to Max','x',.4,5,.05]],
+   end:[[pre+'tE','Taper at the '+tcLabel(e[1])+' End','pct',.03,1,.01],[pre+'cE','Curve From Max to '+tcLabel(e[1])+' End','x',.4,5,.05]],
    b1:bulgeRows(seg,1),b2:bulgeRows(seg,2)
   };
 }
@@ -5508,9 +5509,9 @@ function renderPart(){
   var seg=SEGBY[ui.sel],r=coreRows(seg);
   $('#partTitle').textContent=seg.label;
   $('#partNote').textContent=(seg.pair?'Left and right match. ':'')+'Runs from the '+seg.ends[0]+' to the '+seg.ends[1]+'.';
-  $('#hStart').textContent='Start taper and curve ('+seg.ends[0]+')';
-  $('#hEnd').textContent='End taper and curve ('+seg.ends[1]+')';
-  $('#pvAcap').textContent=seg.lat?seg.lat[0]:'Front view';$('#pvBcap').textContent=seg.lat?seg.lat[1]:'Side view';
+  $('#hStart').textContent='Start Taper and Curve ('+seg.ends[0]+')';
+  $('#hEnd').textContent='End Taper and Curve ('+seg.ends[1]+')';
+  $('#pvAcap').textContent=seg.lat?seg.lat[0]:'Front View';$('#pvBcap').textContent=seg.lat?seg.lat[1]:'Side View';
   [['#rSize',r.size],['#rCenter',r.center],['#rStart',r.start],['#rEnd',r.end],['#rB1',r.b1],['#rB2',r.b2]].forEach(function(p){var h=$(p[0]);h.innerHTML='';addRows(h,p[1]);});
   var ex=EXTRA[seg.id],xh=$('#rExtra');xh.innerHTML='';$('#xWrap').hidden=!ex;
   if(ex)addRows(xh,ex);
@@ -5628,12 +5629,12 @@ $('#resetAll').addEventListener('click',function(){P=JSON.parse(JSON.stringify(D
 
 
 /* ================= animation stats ================= */
-var STAGES={jump:['Ready','Crouch','Takeoff','Peak','Fall','Land','Recover'],slide:['Run in','Drop','Slide','Get up'],fall:['Run','Trip','Fall','Impact','Bounce','Settle'],set:['Pose'],drift:['Pose']};
-var MOVELABEL={jump:'Jump',slide:'Slide',fall:'Faceplant',set:"Runner's pose",drift:'Drift',barrier:'Barrier',cThrow:'Star throw',cHover:'Hover',cFly:'Fly'};
+var STAGES={jump:['Ready','Crouch','Takeoff','Peak','Fall','Land','Recover'],slide:['Run in','Drop','Slide','Get Up'],fall:['Run','Trip','Fall','Impact','Bounce','Settle'],set:['Pose'],drift:['Pose']};
+var MOVELABEL={jump:'Jump',slide:'Slide',fall:'Faceplant',set:"Runner's Pose",drift:'Drift',barrier:'Barrier',cThrow:'Star Throw',cHover:'Hover',cFly:'Fly'};
 var KEYGROUPS=[
- ['Body',[['hyf','Hips height (1 = standing)','x',.1,1.7,.01],['hz','Hips forward (m)','x',-1,1,.01],['hp','Body lean (+ forward)','deg',-110,110,1],['sp','Spine bend','deg',-60,60,1],['hd','Head tilt','deg',-70,70,1]]],
- ['Arms',[['aLp','Left arm raise','deg',-120,180,1],['aLr','Left arm out','deg',-20,120,1],['aLe','Left elbow bend','deg',0,150,1],['aRp','Right arm raise','deg',-120,180,1],['aRr','Right arm out','deg',-20,120,1],['aRe','Right elbow bend','deg',0,150,1]]],
- ['Legs',[['hL','Left thigh forward','deg',-80,130,1],['kL','Left knee bend','deg',0,150,1],['dL','Left toes up','deg',-60,60,1],['hR','Right thigh forward','deg',-80,130,1],['kR','Right knee bend','deg',0,150,1],['dR','Right toes up','deg',-60,60,1],['fl','Keep feet flat','pct',0,1,.01]]],
+ ['Body',[['hyf','Hips Height (1 = standing)','x',.1,1.7,.01],['hz','Hips Forward (m)','x',-1,1,.01],['hp','Body Lean (+ forward)','deg',-110,110,1],['sp','Spine Bend','deg',-60,60,1],['hd','Head Tilt','deg',-70,70,1]]],
+ ['Arms',[['aLp','Left Arm Raise','deg',-120,180,1],['aLr','Left Arm Out','deg',-20,120,1],['aLe','Left Elbow Bend','deg',0,150,1],['aRp','Right Arm Raise','deg',-120,180,1],['aRr','Right Arm Out','deg',-20,120,1],['aRe','Right Elbow Bend','deg',0,150,1]]],
+ ['Legs',[['hL','Left Thigh Forward','deg',-80,130,1],['kL','Left Knee Bend','deg',0,150,1],['dL','Left Toes Up','deg',-60,60,1],['hR','Right Thigh Forward','deg',-80,130,1],['kR','Right Knee Bend','deg',0,150,1],['dR','Right Toes Up','deg',-60,60,1],['fl','Keep Feet Flat','pct',0,1,.01]]],
  ['Ponytail',[['p1','Ponytail 1','deg',-90,90,1],['p2','Ponytail 2','deg',-90,90,1],['p3','Ponytail 3','deg',-90,90,1]]]
 ];
 var animKey={jump:0,slide:0,fall:0,set:0,drift:0};
@@ -5645,53 +5646,53 @@ function renderAnim(){
   if(m==='rest'){sec.hidden=true;return;}
   sec.hidden=false;
   var isRun=(m==='runS'||m==='run'||m==='runF'),pre=animPrefix(m);
-  var title=m==='idle'?'Idle':m==='runS'?'Slow run':m==='run'?'Mid run':m==='runF'?'Fast run':MOVELABEL[m];
+  var title=m==='idle'?'Idle':m==='runS'?'Slow Run':m==='run'?'Mid Run':m==='runF'?'Fast Run':MOVELABEL[m];
   $('#animTitle').textContent=title+' animation';
   if(m==='idle'){
     $('#animNote').textContent='A gentle standing loop.';
-    addRows(rows,[[pre+'dur','Loop length','s',1,6,.05],[pre+'breath','Breathing bob','cm',0,2,.1],[pre+'sway','Torso sway','deg',0,6,.1],[pre+'arm','Arm sway','deg',0,8,.1],[pre+'pony','Ponytail sway','x',0,3,.05]],{anim:1});
+    addRows(rows,[[pre+'dur','Loop Length','s',1,6,.05],[pre+'breath','Breathing Bob','cm',0,2,.1],[pre+'sway','Torso Sway','deg',0,6,.1],[pre+'arm','Arm Sway','deg',0,8,.1],[pre+'pony','Ponytail Sway','x',0,3,.05]],{anim:1});
   }else if(isRun){
     $('#animNote').textContent='A run cycle. Each of the three speeds has its own stats.';
-    addRows(rows,[[pre+'dur','Time per stride cycle','s',.25,2,.01],[pre+'stride','Stride','deg',5,62,1],[pre+'knee','Knee lift','deg',20,125,1],[pre+'arm','Arm swing','deg',0,78,1],[pre+'elbow','Elbow bend','deg',20,125,1],[pre+'lean','Forward lean','deg',0,30,1],[pre+'bounce','Bounce','cm',0,8,.5]],{anim:1});
+    addRows(rows,[[pre+'dur','Time per Stride Cycle','s',.25,2,.01],[pre+'stride','Stride','deg',5,62,1],[pre+'knee','Knee Lift','deg',20,125,1],[pre+'arm','Arm Swing','deg',0,78,1],[pre+'elbow','Elbow Bend','deg',20,125,1],[pre+'lean','Forward Lean','deg',0,30,1],[pre+'bounce','Bounce','cm',0,8,.5]],{anim:1});
   }else if(m==='barrier'){
     $('#animNote').textContent='The red dodecahedron she rolls inside. It stays a dodecahedron when slow, turns into a dashed sphere at speed, then squeezes along its axle and stretches round the spin. Use the preview speed to watch each stage; save closes the loop in the game when you close the editor.';
-    addRows(rows,[['barrier.preview','Preview speed','Zips',0,120,1],['barrier.radius','Size (radius)','units',1.2,2.6,.02],['barrier.height','Height of its centre','units',1,3,.02],['barrier.spin','Rolling speed','x',.2,3,.05],
-      ['barrier.sphereAt','Turns into a sphere at','Zips',5,100,1],['barrier.squeezeAt','Starts to squeeze at','Zips',20,119,1],['barrier.squeezeLen','Squeeze reaches full over','Zips',1,40,1],['barrier.squeeze','Squeeze along the axle','pct',0,.6,.01],['barrier.stretch','Stretch round the spin','pct',0,.5,.01],
-      ['barrier.chargeSphere','Dodecadash: sphere after charging','s',0,6,.1],['barrier.chargeSqueeze','Dodecadash: squeeze starts at','s',0,6,.1],
-      ['barrier.glow','Glow strength','x',0,.8,.01],['barrier.glowSize','Glow size','x',1,1.6,.01],['barrier.dashLen','Dash length','units',.05,1,.01],['barrier.dashGap','Gap between dashes','units',.05,1,.01]],{anim:1,barrier:1});
+    addRows(rows,[['barrier.preview','Preview Speed','Zips',0,120,1],['barrier.radius','Size (radius)','units',1.2,2.6,.02],['barrier.height','Height of Its Centre','units',1,3,.02],['barrier.spin','Rolling Speed','x',.2,3,.05],
+      ['barrier.sphereAt','Turns Into a Sphere at','Zips',5,100,1],['barrier.squeezeAt','Starts to Squeeze at','Zips',20,119,1],['barrier.squeezeLen','Squeeze Reaches Full Over','Zips',1,40,1],['barrier.squeeze','Squeeze Along the Axle','pct',0,.6,.01],['barrier.stretch','Stretch Round the Spin','pct',0,.5,.01],
+      ['barrier.chargeSphere','Dodecadash: Sphere After Charging','s',0,6,.1],['barrier.chargeSqueeze','Dodecadash: Squeeze Starts at','s',0,6,.1],
+      ['barrier.glow','Glow Strength','x',0,.8,.01],['barrier.glowSize','Glow Size','x',1,1.6,.01],['barrier.dashLen','Dash Length','units',.05,1,.01],['barrier.dashGap','Gap Between Dashes','units',.05,1,.01]],{anim:1,barrier:1});
     var ch=document.createElement('div');ch.className='row';ch.style.cssText='display:flex;flex-wrap:wrap;gap:10px;margin-top:8px';
-    [['barrier.cBody','Body'],['barrier.cEmis','Inner glow'],['barrier.cEdge','Edge lines'],['barrier.cDash','Dashes'],['barrier.cGlow','Halo']].forEach(function(c){
+    [['barrier.cBody','Body'],['barrier.cEmis','Inner Glow'],['barrier.cEdge','Edge Lines'],['barrier.cDash','Dashes'],['barrier.cGlow','Halo']].forEach(function(c){
       var l=document.createElement('label');l.style.cssText='display:flex;gap:6px;align-items:center;font-size:12px';l.textContent=c[1];
       var i=document.createElement('input');i.type='color';i.value=P[c[0]];i.addEventListener('input',function(){P[c[0]]=i.value;save();barrierDirty=true;});l.appendChild(i);ch.appendChild(l);});
     rows.appendChild(ch);
   }else if(/^c[A-Z]/.test(m)){
-    var UBR=[['sp','Spine bend (+ forward)'],['hd','Head tilt'],['aLp','Left arm raise'],['aLr','Left arm out'],['aLe','Left elbow bend'],['aRp','Right arm raise'],['aRr','Right arm out'],['aRe','Right elbow bend']];
+    var UBR=[['sp','Spine Bend (+ forward)'],['hd','Head Tilt'],['aLp','Left Arm Raise'],['aLr','Left Arm Out'],['aLe','Left Elbow Bend'],['aRp','Right Arm Raise'],['aRr','Right Arm Out'],['aRe','Right Elbow Bend']];
     var poseRows=function(pre,list){return list.map(function(r){return [pre+r[0],r[1],'deg',-180,180,1];});};
     var grp=function(title,list){var h3=document.createElement('h3');h3.textContent=title;kh.appendChild(h3);var d=document.createElement('div');kh.appendChild(d);addRows(d,list,{anim:1});};
     if(m==='cThrow'){
       $('#animNote').textContent='Star Throw. Holding Q or E she leans in with a star in her hand behind her (it grows as she charges); letting go, her arm swings through and the star leaves her hand part way. Her legs keep running. E throws with her right hand, Q mirrors it to her left. The preview charges for 1 s.';
-      addRows(rows,[['comet.throw.in','Into the charging pose','s',.02,1,.01],['comet.throw.swing','The swing','s',.02,1,.01],['comet.throw.rel','Star leaves her hand at (% of the swing)','pct',0,1,.01],['comet.throw.hold','Follow-through held','s',0,1,.01],['comet.throw.out','Back to running','s',.02,2,.01],['comet.hold.scale','Star in her hand (× the star she will throw)','x',.1,2,.05],['comet.hold.out','Star in her hand: out from her wrist','units',-1,1,.01]],{anim:1});
-      grp('Charging pose (holding the star behind her)',poseRows('comet.pc.',UBR));grp('Throw pose (the arm swung through)',poseRows('comet.pt.',UBR));
+      addRows(rows,[['comet.throw.in','Into the Charging Pose','s',.02,1,.01],['comet.throw.swing','The Swing','s',.02,1,.01],['comet.throw.rel','Star Leaves Her Hand at (% of the swing)','pct',0,1,.01],['comet.throw.hold','Follow-Through Held','s',0,1,.01],['comet.throw.out','Back to Running','s',.02,2,.01],['comet.hold.scale','Star in Her Hand (× the star she will throw)','x',.1,2,.05],['comet.hold.out','Star in her hand: out from her wrist','units',-1,1,.01]],{anim:1});
+      grp('Charging Pose (holding the star behind her)',poseRows('comet.pc.',UBR));grp('Throw Pose (the arm swung through)',poseRows('comet.pt.',UBR));
     }else if(m==='cHover'){
       $('#animNote').textContent='Hover. She floats over the ground doing whatever she would be doing; the changes below are laid over it (all 0: just her run). Two stars at her ankles and a bigger one behind her back.';
-      addRows(rows,[['comet.hov.height','Floats above the ground by','units',0,3,.05],['comet.hov.bob','Bob','units',0,1,.01],['comet.hov.bobT','Bob: seconds a cycle','s',.2,6,.05],['comet.hov.spinS','Stars: turns a second','x',0,6,.1],['comet.hov.ankle','Ankle stars: size','units',.05,2,.01],['comet.hov.ankleY','Ankle stars: up or down','units',-1,1,.01],['comet.hov.ankleTilt','Ankle stars: tilt','deg',-90,90,1],['comet.hov.back','Back star: size','units',.1,3,.01],['comet.hov.backD','Back star: behind her by','units',0,2,.01],['comet.hov.backY','Back star: up or down','units',-2,2,.01],['comet.hov.backTilt','Back star: tilt','deg',-90,90,1]],{anim:1});
+      addRows(rows,[['comet.hov.height','Floats Above the Ground by','units',0,3,.05],['comet.hov.bob','Bob','units',0,1,.01],['comet.hov.bobT','Bob: Seconds a Cycle','s',.2,6,.05],['comet.hov.spinS','Stars: Turns a Second','x',0,6,.1],['comet.hov.ankle','Ankle Stars: Size','units',.05,2,.01],['comet.hov.ankleY','Ankle Stars: Up or Down','units',-1,1,.01],['comet.hov.ankleTilt','Ankle Stars: Tilt','deg',-90,90,1],['comet.hov.back','Back Star: Size','units',.1,3,.01],['comet.hov.backD','Back Star: Behind Her by','units',0,2,.01],['comet.hov.backY','Back Star: Up or Down','units',-2,2,.01],['comet.hov.backTilt','Back Star: Tilt','deg',-90,90,1]],{anim:1});
       KEYGROUPS.forEach(function(g){grp(g[0]+' (changes while hovering)',g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['comet.ho.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}));});
     }else{
       $('#animNote').textContent='Fly (Space held in the air while hovering). This pose takes over her arms, spine and head; the leg stats are changes to her jump. The star from her back goes up to her hands.';
-      addRows(rows,[['comet.fly.arms','How fast she goes into it','x',1,30,.5],['comet.fly.starY','Star above her hands','units',-1,2,.01],['comet.fly.starS','Star size there (× the back star)','x',.2,3,.05]],{anim:1});
-      grp('Arms, spine and head',poseRows('comet.pf.',UBR));
-      grp('Legs (changes to her jump)',[['hL','Left thigh forward'],['kL','Left knee bend'],['dL','Left toes up'],['hR','Right thigh forward'],['kR','Right knee bend'],['dR','Right toes up']].map(function(r){return ['comet.fl.'+r[0],r[1],'deg',-120,120,1];}));
+      addRows(rows,[['comet.fly.arms','How Fast She Goes Into It','x',1,30,.5],['comet.fly.starY','Star Above Her Hands','units',-1,2,.01],['comet.fly.starS','Star Size There (× the back star)','x',.2,3,.05]],{anim:1});
+      grp('Arms, Spine and Head',poseRows('comet.pf.',UBR));
+      grp('Legs (changes to her jump)',[['hL','Left Thigh Forward'],['kL','Left Knee Bend'],['dL','Left Toes Up'],['hR','Right Thigh Forward'],['kR','Right Knee Bend'],['dR','Right Toes Up']].map(function(r){return ['comet.fl.'+r[0],r[1],'deg',-120,120,1];}));
     }
   }else if(m==='drift'){
     $('#animNote').textContent='What she does while drifting left (A held); drifting right is the same, mirrored. In the game she keeps running, stride for stride, and leans into the corner from her feet. The changes below are added on top of her Fast run (all 0: just the run). Save to game to use them.';
-    addRows(rows,[[pre+'lean','Lean into the corner','deg',0,60,.5],[pre+'angle','Momentum shift when it starts','deg',0,45,.5],[pre+'time','Time to make the shift','s',.03,.6,.01],[pre+'minZips','Needs at least','Zips',0,80,1],[pre+'cool','Cooldown after release','s',0,5,.1],[pre+'rate','How fast she settles into it','x',2,20,.5],['slope.side','Tilt to sideways slopes (all running)','x',0,1.2,.05]],{anim:1});
+    addRows(rows,[[pre+'lean','Lean Into the Corner','deg',0,60,.5],[pre+'angle','Momentum Shift When It Starts','deg',0,45,.5],[pre+'time','Time to Make the Shift','s',.03,.6,.01],[pre+'minZips','Needs at Least','Zips',0,80,1],[pre+'cool','Cooldown After Release','s',0,5,.1],[pre+'rate','How Fast She Settles Into It','x',2,20,.5],['slope.side','Tilt to Sideways Slopes (all running)','x',0,1.2,.05]],{anim:1});
     KEYGROUPS.forEach(function(g){var h3=document.createElement('h3');h3.textContent=g[0]+' (added to her run)';kh.appendChild(h3);var d=document.createElement('div');kh.appendChild(d);
       addRows(d,g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['dA.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}),{anim:1});});
   }else{
     $('#animNote').textContent=m==='drift'?'Her pose while drifting left (A held, camera to her left); drifting right is this pose mirrored. Pose is for the Molly model; lean and turn stats below are live in the game.':'A one-shot move that loops here so you can watch it. Pick a stage to jump to it and edit its pose; the moves in between are blended for you.';
-    var extra=[[pre+'dur','Total length','s',.5,5,.05]];
-    if(m==='set')extra.push([pre+'bob','Breathing bob','cm',0,4,.1],[pre+'rock','Breathing rock','deg',0,6,.1],[pre+'nod','Head nod','deg',0,6,.1]);
-    if(m==='drift')extra.push([pre+'lean','Lean into the corner','deg',0,60,.5],[pre+'angle','Momentum shift when it starts','deg',0,45,.5],[pre+'time','Time to make the shift','s',.03,.6,.01],[pre+'minZips','Needs at least','Zips',0,80,1],[pre+'cool','Cooldown after release','s',0,5,.1],[pre+'rate','How fast she settles into it','x',2,20,.5],['slope.side','Tilt to sideways slopes (all running)','x',0,1.2,.05]);
+    var extra=[[pre+'dur','Total Length','s',.5,5,.05]];
+    if(m==='set')extra.push([pre+'bob','Breathing Bob','cm',0,4,.1],[pre+'rock','Breathing Rock','deg',0,6,.1],[pre+'nod','Head Nod','deg',0,6,.1]);
+    if(m==='drift')extra.push([pre+'lean','Lean Into the Corner','deg',0,60,.5],[pre+'angle','Momentum Shift When It Starts','deg',0,45,.5],[pre+'time','Time to Make the Shift','s',.03,.6,.01],[pre+'minZips','Needs at Least','Zips',0,80,1],[pre+'cool','Cooldown After Release','s',0,5,.1],[pre+'rate','How Fast She Settles Into It','x',2,20,.5],['slope.side','Tilt to Sideways Slopes (all running)','x',0,1.2,.05]);
     var hk=HOLDKEY[m];
     if(hk)extra.push([pre+hk[0]+'.t',hk[1],'pct',P[pre+(hk[0]-1)+'.t']+.02,P[pre+(hk[0]+1)+'.t']-.02,.01]);
     addRows(rows,extra,{anim:1});
@@ -5700,20 +5701,20 @@ function renderAnim(){
       b.addEventListener('click',function(){animKey[m]=i;ui.phase=P[pre+ks[i]+'.t']||0;pausePlay();renderAnim();});st.appendChild(b);});
     var kk=ks[sel],kp=pre+kk+'.',lo=kk===0?0:P[pre+(kk-1)+'.t']+.01,hi=(kk+1>=MOVEX[m].length-1?1:P[pre+(kk+1)+'.t'])-.01;
     var th=document.createElement('h3');th.textContent='Stage: '+names[sel];kh.appendChild(th);
-    if(kk>0){var tr=document.createElement('div');kh.appendChild(tr);addRows(tr,[[kp+'t','When it happens (% of the move)','pct',Math.max(0,lo),Math.max(lo+.01,hi),.01]],{anim:1,then:function(){if(!ui.playing){ui.phase=P[kp+'t'];$('#phase').value=ui.phase;}}});}   /* paused on this stage, the preview moves with its time, so the pose on screen is still this stage's */
+    if(kk>0){var tr=document.createElement('div');kh.appendChild(tr);addRows(tr,[[kp+'t','When It Happens (% of the move)','pct',Math.max(0,lo),Math.max(lo+.01,hi),.01]],{anim:1,then:function(){if(!ui.playing){ui.phase=P[kp+'t'];$('#phase').value=ui.phase;}}});}   /* paused on this stage, the preview moves with its time, so the pose on screen is still this stage's */
     KEYGROUPS.forEach(function(g){var h3=document.createElement('h3');h3.textContent=g[0];kh.appendChild(h3);var d=document.createElement('div');kh.appendChild(d);
       addRows(d,g[1].map(function(r){return [kp+r[0]].concat(r.slice(1));}),{anim:1});});
   }
 }
-var STAT_ROWS=[['stat.top','Top speed','Zips',20,160,1],['stat.accelT','Time from 0 to top speed','s',1,20,.1],['stat.brake','Braking strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip fades on slopes (× the cosine of the slope)','tog'],['stat.driftGrip','Grip while drifting (x her grip)','x',0,3,.05],['stat.fall','Max fall speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision box height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision box width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier slam: top speed','Zips',10,200,1],['stat.strafe','Strafe distance (Q/E sidestep; 2 = one tile)','units',0.5,12,.1]];
+var STAT_ROWS=[['stat.top','Top Speed','Zips',20,160,1],['stat.accelT','Time From 0 to Top Speed','s',1,20,.1],['stat.brake','Braking Strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump Height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways Grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip Fades on Slopes (× the cosine of the slope)','tog'],['stat.driftGrip','Grip While Drifting (x her grip)','x',0,3,.05],['stat.fall','Max Fall Speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision Box Height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision Box Width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall Grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier Slam: Top Speed','Zips',10,200,1],['stat.strafe','Strafe Distance (Q/E sidestep; 2 = one tile)','units',0.5,12,.1]];
 function renderStats(){var h=$('#statRows');if(!h)return;h.innerHTML='';addRows(h,STAT_ROWS,{anim:1,stat:1});var sc=document.createElement('div');sc.id='statLive';sc.style.cssText='margin-top:10px;max-width:460px';h.appendChild(sc);statCardRefresh();}   /* the Stats menu at the top of the panel */
 try{renderStats();}catch(e){}
-var COMET_HOV=[['comet.hov.cost','Power to switch it on','n',0,50,1],['comet.hov.drain','Power a second while on','n',0,20,.1],['comet.hov.height','Floats above the ground by','units',0,3,.05],
- ['comet.hov.top','Top speed','Zips',10,200,1],['comet.hov.accelT','Time from 0 to top speed','s',.5,20,.1],['comet.hov.brake','Braking strength (x coasting)','x',0,8,.1],['comet.hov.fric','Friction (coasting)','Zips/s²',0,40,.1],['comet.hov.gripZ','Sideways grip (turning)','Zips/s²',1,80,.5],['comet.hov.jumpH','Jump height','units',0,30,.1],
+var COMET_HOV=[['comet.hov.cost','Power to Switch It on','n',0,50,1],['comet.hov.drain','Power a Second While on','n',0,20,.1],['comet.hov.height','Floats Above the Ground by','units',0,3,.05],
+ ['comet.hov.top','Top Speed','Zips',10,200,1],['comet.hov.accelT','Time From 0 to Top Speed','s',.5,20,.1],['comet.hov.brake','Braking Strength (x coasting)','x',0,8,.1],['comet.hov.fric','Friction (coasting)','Zips/s²',0,40,.1],['comet.hov.gripZ','Sideways Grip (turning)','Zips/s²',1,80,.5],['comet.hov.jumpH','Jump Height','units',0,30,.1],
 ];
-var COMET_FLY=[['comet.fly.drain','Extra power a second while flying','n',0,40,.1],['comet.fly.lift','Lift (× gravity: 1 cancels it)','x',0,3,.01]];
-var COMET_STAR=[['comet.star.cost','Power per throw (needs more than 0)','n',0,20,1],['comet.star.range','Range','units',5,400,1],['comet.star.dmg','Damage','hearts',0,10,.5],['comet.star.cool','Cooldown','s',0,10,.1],['comet.star.speed','Speed','Zips',5,400,1],['comet.star.size','Size (across)','units',.1,5,.05],['comet.star.spin','Spin (turns a second)','x',0,20,.1],
- ['comet.star.cMax','Charge: most seconds','s',0,6,1],['comet.star.cCost','Charge: power per second','n',0,20,1],['comet.star.cSize','Charge: size per second (+ × its size)','x',0,3,.05],['comet.star.cDmg','Charge: damage per second','hearts',0,5,.5],['comet.star.cRange','Charge: range per second','units',0,400,1]];
+var COMET_FLY=[['comet.fly.drain','Extra Power a Second While Flying','n',0,40,.1],['comet.fly.lift','Lift (× gravity: 1 cancels it)','x',0,3,.01]];
+var COMET_STAR=[['comet.star.cost','Power per Throw (needs more than 0)','n',0,20,1],['comet.star.range','Range','units',5,400,1],['comet.star.dmg','Damage','hearts',0,10,.5],['comet.star.cool','Cooldown','s',0,10,.1],['comet.star.speed','Speed','Zips',5,400,1],['comet.star.size','Size (across)','units',.1,5,.05],['comet.star.spin','Spin (turns a second)','x',0,20,.1],
+ ['comet.star.cMax','Charge: Most Seconds','s',0,6,1],['comet.star.cCost','Charge: Power per Second','n',0,20,1],['comet.star.cSize','Charge: Size per Second (+ × its size)','x',0,3,.05],['comet.star.cDmg','Charge: Damage per Second','hearts',0,5,.5],['comet.star.cRange','Charge: Range per Second','units',0,400,1]];
 function renderComet(){if(PAGE!=='comet')return;['#cHov','#cFly','#cStar','#cCols'].forEach(function(q){$(q).innerHTML='';});
   addRows($('#cHov'),COMET_HOV,{anim:1});addRows($('#cFly'),COMET_FLY,{anim:1});addRows($('#cStar'),COMET_STAR,{anim:1});
   [['comet.cStar','Star'],['comet.cGlow','Glow']].forEach(function(c){var l=document.createElement('label');l.innerHTML='<input type="color" value="'+P[c[0]]+'"><span>'+c[1]+'</span>';$('#cCols').appendChild(l);l.querySelector('input').addEventListener('input',function(){P[c[0]]=this.value;save();});});}
@@ -5724,13 +5725,13 @@ $('#resetStats').addEventListener('click',function(){STAT_ROWS.forEach(function(
 var MOB_KINDS=[['min','Minions','Minion'],['big','Big Minions','Big Minion'],['gaz','Roost Gazers','Roost Gazer']];   /* [key, tab, one of them]: a new kind of mob is one more line here (and its defaults under mn.<key>.) */
 function mobName(t){for(var i=0;i<MOB_KINDS.length;i++)if(MOB_KINDS[i][0]===t)return MOB_KINDS[i][2];return t;}
 var minTab='min',minDirty=true,minGroup=null,minModel=null,minPhase=0;
-var MIN_LOOK=[['scale','Overall size (× the blocks below)','x',.2,8,.05],['radius','Collision radius (how close it gets to her)','units',.2,20,.05],['headW','Head width','units',.1,3,.01],['headH','Head height','units',.1,3,.01],['headD','Head depth','units',.1,3,.01],['torsoW','Body width','units',.1,3,.01],['torsoH','Body height','units',.1,4,.01],['torsoD','Body depth','units',.1,3,.01],['armW','Arm thickness','units',.05,2,.01],['armL','Arm length','units',.1,4,.01],['legW','Leg width','units',.05,2,.01],['legD','Leg depth','units',.05,2,.01],['legL','Leg length','units',.1,4,.01]];
-var MIN_WALK=[['stride','Stride rate (swings per unit it moves)','x',.05,4,.01],['legSwing','Leg swing','°',0,90,.5],['armSwing','Arm swing','°',0,90,.5],['armRaise','Arms raised forward while chasing','°',-30,180,.5],['bob','Bob (lift at each step)','units',0,1.5,.01]];
-var MIN_STATS=[['top','Top speed','Zips',1,60,.5],['acc','Acceleration','Zips/s²',.5,60,.5],['see','Sight range (chases her within)','units',5,400,1],['hearts','Hearts','n',1,20,1],['dmg','Damage to Molly per touch (hearts)','n',0,12,1],['cool','Time before it can hurt her again','s',.1,5,.05],['k1','Barrier speed for 1 heart of damage (0 = never)','Zips',0,200,1],['k2','Barrier speed for 2 hearts (0 = never)','Zips',0,200,1],['k3','Barrier speed for 3 hearts (0 = never)','Zips',0,200,1],['stomp','Bounce off its head (a stomp on the top quarter)','Zips',0,60,.5]];
-var MIN_COLS=[['cHead','Head'],['cBody','Body'],['cLimb','Arms and legs'],['cEye','Eyes']];
-var GAZ_LOOK=[['scale','Overall size (× the blocks below)','x',.2,8,.05],['radius','Collision radius (how close it gets to her)','units',.2,20,.05],['headW','Head width','units',.1,3,.01],['headH','Head height','units',.1,3,.01],['headD','Head depth','units',.1,3,.01],['wing','Wing length','units',.2,6,.05],['legW','Leg width','units',.05,2,.01],['legD','Leg depth','units',.05,2,.01],['legL','Leg length','units',.05,4,.01]];
-var GAZ_WALK=[['flap','Wing beats a second','n',.5,20,.1],['legSwing','Leg swing','°',0,90,.5],['bob','Bob (lift and drop)','units',0,1.5,.01]];
-var GAZ_STATS=[['top','Top speed','Zips',1,60,.5],['acc','Acceleration','Zips/s²',.5,60,.5],['see','Sight range (chases her within)','units',5,400,1],['orbit','Chase: how far it buzzes round her head','units',1,60,.5],['range','Laser range','units',2,200,1],['fire','Seconds between laser shots','s',.2,20,.1],['bolt','Laser speed','Zips',1,300,1],['bdmg','Laser damage to Molly (hearts)','hearts',0,12,.5],['hearts','Hearts','n',1,20,1],['k1','Barrier speed for 1 heart of damage (0 = never)','Zips',0,200,1],['k2','Barrier speed for 2 hearts (0 = never)','Zips',0,200,1],['k3','Barrier speed for 3 hearts (0 = never)','Zips',0,200,1],['stomp','Bounce off its head (a stomp on the top quarter)','Zips',0,60,.5]];
+var MIN_LOOK=[['scale','Overall Size (× the blocks below)','x',.2,8,.05],['radius','Collision Radius (how close it gets to her)','units',.2,20,.05],['headW','Head Width','units',.1,3,.01],['headH','Head Height','units',.1,3,.01],['headD','Head Depth','units',.1,3,.01],['torsoW','Body Width','units',.1,3,.01],['torsoH','Body Height','units',.1,4,.01],['torsoD','Body Depth','units',.1,3,.01],['armW','Arm Thickness','units',.05,2,.01],['armL','Arm Length','units',.1,4,.01],['legW','Leg Width','units',.05,2,.01],['legD','Leg Depth','units',.05,2,.01],['legL','Leg Length','units',.1,4,.01]];
+var MIN_WALK=[['stride','Stride Rate (swings per unit it moves)','x',.05,4,.01],['legSwing','Leg Swing','°',0,90,.5],['armSwing','Arm Swing','°',0,90,.5],['armRaise','Arms Raised Forward While Chasing','°',-30,180,.5],['bob','Bob (lift at each step)','units',0,1.5,.01]];
+var MIN_STATS=[['top','Top Speed','Zips',1,60,.5],['acc','Acceleration','Zips/s²',.5,60,.5],['see','Sight Range (chases her within)','units',5,400,1],['hearts','Hearts','n',1,20,1],['dmg','Damage to Molly per Touch (hearts)','n',0,12,1],['cool','Time Before It Can Hurt Her Again','s',.1,5,.05],['k1','Barrier Speed for 1 Heart of Damage (0 = never)','Zips',0,200,1],['k2','Barrier Speed for 2 Hearts (0 = never)','Zips',0,200,1],['k3','Barrier Speed for 3 Hearts (0 = never)','Zips',0,200,1],['stomp','Bounce Off Its Head (a stomp on the top quarter)','Zips',0,60,.5]];
+var MIN_COLS=[['cHead','Head'],['cBody','Body'],['cLimb','Arms and Legs'],['cEye','Eyes']];
+var GAZ_LOOK=[['scale','Overall Size (× the blocks below)','x',.2,8,.05],['radius','Collision Radius (how close it gets to her)','units',.2,20,.05],['headW','Head Width','units',.1,3,.01],['headH','Head Height','units',.1,3,.01],['headD','Head Depth','units',.1,3,.01],['wing','Wing Length','units',.2,6,.05],['legW','Leg Width','units',.05,2,.01],['legD','Leg Depth','units',.05,2,.01],['legL','Leg Length','units',.05,4,.01]];
+var GAZ_WALK=[['flap','Wing Beats a Second','n',.5,20,.1],['legSwing','Leg Swing','°',0,90,.5],['bob','Bob (lift and drop)','units',0,1.5,.01]];
+var GAZ_STATS=[['top','Top Speed','Zips',1,60,.5],['acc','Acceleration','Zips/s²',.5,60,.5],['see','Sight Range (chases her within)','units',5,400,1],['orbit','Chase: how far it buzzes round her head','units',1,60,.5],['range','Laser Range','units',2,200,1],['fire','Seconds Between Laser Shots','s',.2,20,.1],['bolt','Laser Speed','Zips',1,300,1],['bdmg','Laser Damage to Molly (hearts)','hearts',0,12,.5],['hearts','Hearts','n',1,20,1],['k1','Barrier Speed for 1 Heart of Damage (0 = never)','Zips',0,200,1],['k2','Barrier Speed for 2 Hearts (0 = never)','Zips',0,200,1],['k3','Barrier Speed for 3 Hearts (0 = never)','Zips',0,200,1],['stomp','Bounce Off Its Head (a stomp on the top quarter)','Zips',0,60,.5]];
 var GAZ_COLS=[['cHead','Head'],['cLimb','Legs'],['cWing','Wings'],['cEye','Eye (the colored ring round the pupil)']];
 function minCfgP(t){var c={};for(var k in MNE){var v=P['mn.'+t+'.'+k];c[k]=v===undefined?DEF['mn.'+t+'.'+k]:v;}c.gz=t==='gaz';return c;}
 function renderMinions(){
@@ -5904,9 +5905,9 @@ requestAnimationFrame(tick);
   var GRAV = 40;           // downward acceleration (units/s^2), so the jump takes about 1.2 s. Set by the Gravity stat (kept in Zips/s^2: 20)
   var JUMP_V = Math.sqrt(2 * GRAV * JUMP_H);
   var WALL_GRIP = 1;       // how much of her grip survives on a wall: her grip times this times the cosine of the wall's angle, so a vertical wall gives none at all
-  var WALL_FADE = 1;       // that cosine can be switched off (the 'Wall grip fades with the bank' stat): then a wall of any angle leaves her grip x Wall grip
-  var SLOPE_FADE = 0;      // the same fade on ordinary ground (the 'Grip fades on slopes' stat): off, her grip is the same on any slope; on, it is her grip x the cosine of the slope under her
-  var DRIFT_GRIP = 1;      // her grip while a Drift is held, as a multiple of her grip (the 'Grip while drifting' stat): 1 = the same as always
+  var WALL_FADE = 1;       // that cosine can be switched off (the 'Wall Grip Fades With the Bank' stat): then a wall of any angle leaves her grip x Wall grip
+  var SLOPE_FADE = 0;      // the same fade on ordinary ground (the 'Grip Fades on Slopes' stat): off, her grip is the same on any slope; on, it is her grip x the cosine of the slope under her
+  var DRIFT_GRIP = 1;      // her grip while a Drift is held, as a multiple of her grip (the 'Grip While Drifting' stat): 1 = the same as always
   var AIR_GRIP = 0.35;     // how much of her steering is left once her feet are off the ground
   var STEP_UP = 1;          // a ledge this small or smaller she just steps up, with no loss of speed
   var CLIMB_SLOPE = 1.05;   // ground steeper than this (rise per unit run, a little over 45 degrees) stops her like a wall
@@ -8769,14 +8770,14 @@ requestAnimationFrame(tick);
     var top = Math.max(1, g('stat.top', 80)), aT = Math.max(0.5, g('stat.accelT', 7)), br = Math.max(0, g('stat.brake', 3)), jh = Math.max(0, g('stat.jumpH', 7.2)), gz = Math.max(0.5, g('stat.gripZ', 20)), gv = Math.max(1, g('stat.grav', 20)), fl = Math.max(1, g('stat.fall', 50)), hh = Math.max(1, Math.min(12, Math.round(g('stat.hearts', 3))));   // the same limits the game applies (grip and gravity are kept in Zips/s²: 1 Zip = 2 units)
     var acc = top / aT, fr = Math.max(0, g('stat.fric', 11.4)), wgp = Math.max(0, g('stat.wallGrip', 1)), air = 2 * Math.sqrt(2 * gv * 2 * jh) / (gv * 2), brk = fr * br, f1 = function (v) { return isFinite(v) ? (Math.round(v * 10) / 10).toString() : '—'; };
     var scl = Math.max(0.05, Math.min(20, g('scale', 1)));       // her Overall scale: the collision box is the two stats times this
-    var tiles = [['Height', f1(Math.max(1.2, g('stat.colH', 3.6)) * scl), 'units'], ['Width', f1(Math.max(0.2, g('stat.colW', 1)) * scl), 'units'], ['Hearts', String(hh), ''], ['Top speed', f1(top), 'Zips'], ['Acceleration', f1(acc), 'Zips/s²'], ['Braking', f1(brk), 'Zips/s²'], ['Jump height', f1(jh), 'units'], ['Gravity', f1(gv), 'Zips/s²'], ['Max fall speed', f1(fl), 'Zips'], ['Sideways grip', f1(gz), 'Zips/s²'], ['Wall grip', '×' + f1(wgp), g('stat.fadeWall', 1) ? 'fades with the bank' : 'at any bank'], ['Friction', f1(fr), 'Zips/s²']];
+    var tiles = [['Height', f1(Math.max(1.2, g('stat.colH', 3.6)) * scl), 'units'], ['Width', f1(Math.max(0.2, g('stat.colW', 1)) * scl), 'units'], ['Hearts', String(hh), ''], ['Top speed', f1(top), 'Zips'], ['Acceleration', f1(acc), 'Zips/s²'], ['Braking', f1(brk), 'Zips/s²'], ['Jump Height', f1(jh), 'units'], ['Gravity', f1(gv), 'Zips/s²'], ['Max Fall Speed', f1(fl), 'Zips'], ['Sideways Grip', f1(gz), 'Zips/s²'], ['Wall Grip', '×' + f1(wgp), g('stat.fadeWall', 1) ? 'fades with the bank' : 'at any bank'], ['Friction', f1(fr), 'Zips/s²']];
     var h = '<div style="background:#f6ecdd;color:#3a2616;border-radius:14px;padding:12px 14px;font-family:inherit;text-align:left;box-sizing:border-box">';
     h += '<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px solid #3a2616;padding-bottom:4px;margin-bottom:8px"><b style="font-size:' + (compact ? 17 : 22) + 'px;letter-spacing:.08em">' + (c.__who === 'comet' ? 'COMET' : 'MOLLY') + '</b><span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.7">Runner</span></div>';
     h += '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">';
     tiles.forEach(function (t) { h += '<div style="background:#ecdcc3;border-radius:8px;padding:5px 7px;min-width:0"><div style="font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;opacity:.7">' + t[0] + '</div><div style="font:600 ' + (compact ? 15 : 19) + 'px/1.15 monospace">' + t[1] + '</div><div style="font-size:10px;opacity:.7">' + t[2] + '</div></div>'; });
     h += '</div>';
     if (!compact) {
-      var rows = [['Time to top speed', f1(aT) + ' s over ' + f1(top * 2 * aT / 2) + ' units'], ['Top speed to a stop (braking)', f1(top / brk) + ' s over ' + f1(top * 2 * (top / brk) / 2) + ' units'], ['Friction', f1(fr) + ' Zips/s² · hills steeper than ' + f1(Math.asin(Math.min(1, fr / gv)) * 57.29578) + '° speed her up'], ['Turn radius at top speed', f1(top * 2 * top / gz) + ' units'], ['Grip on slopes', g('stat.fadeSlope', 0) ? 'fades with the slope (× its cosine)' : 'the same on any slope'], ['Jump', f1(air) + ' s in the air · ' + f1(top * 2 * air) + ' units at top speed'],
+      var rows = [['Time to Top Speed', f1(aT) + ' s over ' + f1(top * 2 * aT / 2) + ' units'], ['Top Speed to a Stop (braking)', f1(top / brk) + ' s over ' + f1(top * 2 * (top / brk) / 2) + ' units'], ['Friction', f1(fr) + ' Zips/s² · hills steeper than ' + f1(Math.asin(Math.min(1, fr / gv)) * 57.29578) + '° speed her up'], ['Turn Radius at Top Speed', f1(top * 2 * top / gz) + ' units'], ['Grip on Slopes', g('stat.fadeSlope', 0) ? 'fades with the slope (× its cosine)' : 'the same on any slope'], ['Jump', f1(air) + ' s in the air · ' + f1(top * 2 * air) + ' units at top speed'],
         ['Drift', f1(g('m.drift.angle', 15)) + '° shift · needs ' + f1(g('m.drift.minZips', 30)) + ' Zips · ' + f1(g('m.drift.cool', 1)) + ' s cooldown'], ['Barrier', 'costs 12 Power to start · half acceleration · no strafe or drift']];
       if (c.__who === 'comet') rows.splice(rows.length - 1, 1, ['Star Throw (Q / E)', f1(g('comet.star.dmg', 0.5)) + ' heart · ' + f1(g('comet.star.range', 50)) + ' units · ' + f1(g('comet.star.cool', 2)) + ' s cooldown · costs ' + f1(g('comet.star.cost', 1)) + ' Power; hold to charge'],
         ['Hover (2)', 'costs ' + f1(g('comet.hov.cost', 6)) + ' Power to start, ' + f1(g('comet.hov.drain', 1)) + ' a second · top speed ' + f1(g('comet.hov.top', 80)) + ' Zips'], ['Fly (Space, hovering)', f1(g('comet.fly.drain', 4)) + ' more Power a second'], ['No Strafe or Barrier', '']);
@@ -8826,20 +8827,20 @@ requestAnimationFrame(tick);
       '<li><b>Gravity</b> is ' + msF(G) + ' Zips/s² straight down. On a slope the part that lies along the surface is ' + msF(G) + ' × sin(slope), pointing down the fall line.</li>' +
       '<li>The part of that <b>along her heading</b> speeds her up or slows her. The part <b>across her heading</b> turns her direction toward downhill (a vector sum of her velocity and the pull).</li>' +
       '<li><b>Her drive</b> (' + msF(m.acc) + ' Zips/s²) works while W is held and she is below top speed. <b>Friction</b> (' + msF(m.fr) + ') acts whenever she is not driving: coasting, braking (× ' + msF(m.br) + '), or past top speed.</li>' +
-      '<li><b>Her grip</b> (' + msF(m.grip) + ' Zips/s²) is the most sideways acceleration her steering can make, so her turn radius is speed² ÷ grip.' + (m.fs ? ' On a slope it is her grip × the cosine of the slope ("Grip fades on slopes" is on).' : ' It is the same on any slope ("Grip fades on slopes" is off).') + '</li></ul></div>';
+      '<li><b>Her grip</b> (' + msF(m.grip) + ' Zips/s²) is the most sideways acceleration her steering can make, so her turn radius is speed² ÷ grip.' + (m.fs ? ' On a slope it is her grip × the cosine of the slope ("Grip Fades on Slopes" is on).' : ' It is the same on any slope ("Grip Fades on Slopes" is off).') + '</li></ul></div>';
     // flat ground
     rows = [['0 to top speed (W held)', msS(m.acc), msF(m.aT) + ' s', msF(top * m.aT, 0)],
-      ['Coasting, top speed to a stop', msS(-m.fr), msF(top / m.fr) + ' s', msF(top * top / m.fr, 0)],
-      ['Braking (S), top speed to a stop', msS(-brk), msF(top / brk) + ' s', msF(top * top / brk, 0)],
+      ['Coasting, Top Speed to a Stop', msS(-m.fr), msF(top / m.fr) + ' s', msF(top * top / m.fr, 0)],
+      ['Braking (S), Top Speed to a Stop', msS(-brk), msF(top / brk) + ' s', msF(top * top / brk, 0)],
       ['Dodecadash (' + m.dash + ' Zips) back down to top speed', msS(-m.fr / 2), msF(Math.max(0, m.dash - top) / (m.fr / 2)) + ' s', msF(Math.max(0, m.dash * m.dash - top * top) / (m.fr / 2), 0)]];
-    h += msTable('Flat ground, straight line', ['', 'Zips/s²', 'Time', 'Units'], rows, 'In the Barrier her drive and her friction are both halved.');
+    h += msTable('Flat Ground, Straight Line', ['', 'Zips/s²', 'Time', 'Units'], rows, 'In the Barrier her drive and her friction are both halved.');
     // straight down and straight up a slope
     rows = [5, 10, 15, 20, 30, 45, 60].map(function (a) {
       var gs = G * Math.sin(a * D), dn = gs - m.fr, up = m.acc - gs, steep = a > m.climb;
       return [a + '°', msF(gs), dn > 0.05 ? msS(dn) : 'holds', msS(dn), steep ? '—' : up >= 0 ? msS(up) : msS(up) + ' ↓' + msF(Math.min(m.flo, top), 0), steep ? '—' : msS(-gs - m.fr)];
     });
     var aGain = Math.asin(Math.min(1, m.fr / G)) / D, aHold = Math.asin(Math.min(1, m.acc / G)) / D;
-    h += msTable('Slopes: straight down and straight up', ['Slope', 'Gravity along it', 'Down, W held', 'Down, coasting', 'Up, W held', 'Up, coasting'], rows,
+    h += msTable('Slopes: Straight Down and Straight Up', ['Slope', 'Gravity Along It', 'Down, W Held', 'Down, Coasting', 'Up, W Held', 'Up, Coasting'], rows,
       'How fast her speed changes, in Zips/s². <b>Down, W held</b> is at top speed: there her drive has stopped and friction takes its place, so only hills steeper than <b>' + msF(aGain) + '°</b> carry her past ' + msF(top, 0) + ' Zips ("holds" = she stays at top speed). Past that angle there is no upper limit: her speed builds for as long as the hill lasts. Below top speed she gains her drive + gravity. ' +
       '<b>Down, coasting:</b> a minus means she slows to a stop, and from a standstill friction holds her on anything gentler than ' + msF(aGain) + '°. ' +
       '<b>Up, W held:</b> a plus is what she still gains on the way to top speed, which she reaches on climbs up to <b>' + msF(aHold) + '°</b>. Steeper than that she loses speed down to the ' + msF(m.flo, 0) + '-Zip floor (↓' + msF(m.flo, 0) + ') and no further. ' +
@@ -8849,7 +8850,7 @@ requestAnimationFrame(tick);
       var gs = G * Math.sin(a * D), ge = m.grip * (m.fs ? Math.cos(a * D) : 1), left = ge - gs;   // ge: her grip on this slope
       return [a + '°', msF(gs)].concat(m.fs ? [msF(ge)] : [], [msF(gs / ge * 100, 0) + '%', left >= 0 ? '0' : msF(-left / top / D, 0) + '°/s', left > 0.01 ? msF(2 * top * top / left, 0) : 'cannot', msF(2 * top * top / (ge + gs), 0), msS(-m.scrub * Math.min(gs, ge))]);
     });
-    h += msTable('Slopes: running straight across (a banked path is this too)', ['Slope', 'Pull across her'].concat(m.fs ? ['Her grip there'] : [], ['Grip used', 'Heading drift', 'Radius turning uphill', 'Radius turning downhill', 'Speed cost']), rows,
+    h += msTable('Slopes: Running Straight Across (a banked path is this too)', ['Slope', 'Pull Across Her'].concat(m.fs ? ['Her Grip There'] : [], ['Grip Used', 'Heading Drift', 'Radius Turning Uphill', 'Radius Turning Downhill', 'Speed Cost']), rows,
       'At top speed (' + msF(top, 0) + ' Zips) with the camera held still. The pull across her heading turns her toward downhill at pull ÷ speed; her steering turns her back at up to grip ÷ speed. ' +
       'While the pull is less than her grip she holds her line and has the rest of her grip left for turning uphill; the pull adds to her grip when she turns downhill. Radii are in units, pull and speed cost in Zips/s². ' +
       'Speed cost is the scrub from steering against the pull (' + msF(m.scrub * 100, 0) + '% of the angle turned); her drive covers it below top speed. ' + (m.fs ? 'Her grip fades with the slope (grip × its cosine): past <b>' + msF(Math.atan(m.grip / G) / D) + '°</b> the pull beats what is left and she cannot hold a line across the slope.' : m.grip >= G ? 'Her grip is at least gravity itself, so she can hold a line across any slope.' : 'Past <b>' + msF(Math.asin(m.grip / G) / D) + '°</b> the pull beats her grip and she cannot hold a line across the slope.'));
@@ -8859,22 +8860,22 @@ requestAnimationFrame(tick);
       var rate = Math.min(m.maxTurn, m.grip / Math.max(v, 0.5));
       return [msF(v, 0) + (v === top ? ' (top)' : v === m.dash ? ' (dash)' : ''), msF(rate / D, 0) + '°/s', msF(2 * v / rate, 0), msF(Math.PI / 2 / rate, 2) + ' s', msS(-v * (1 - Math.exp(-m.scrub * Math.PI / 2)))];
     });
-    h += msTable('Turning on flat ground', ['Speed (Zips)', 'Turn rate', 'Radius (units)', '90° turn takes', 'Zips lost in 90°'], rows,
+    h += msTable('Turning on Flat Ground', ['Speed (Zips)', 'Turn Rate', 'Radius (units)', '90° turn takes', 'Zips Lost in 90°'], rows,
       'Radius = speed² ÷ grip, so double the speed makes the turn four times as wide. Turning costs ' + msF(m.scrub * 100, 0) + '% of her speed for every radian turned (' + msF((1 - Math.exp(-m.scrub * Math.PI / 2)) * 100) + '% for 90°). In the air she keeps ' + msF(m.air * 100, 0) + '% of her grip, so every radius is ' + msF(1 / m.air) + ' times wider. A drift (A or D) swings her ' + msF(typeof c['m.drift.angle'] === 'number' ? c['m.drift.angle'] : 15, 0) + '° at once on top of this.');
     // walls
     rows = [80, 81, 85, 88, 90].map(function (a) {
       var pull = G * Math.sin(a * D), gl = m.grip * m.wg * (m.fw ? Math.max(0, Math.cos(a * D)) : 1), net = pull - gl, t = net > 0.01 ? Math.sqrt(10 / net) : Infinity;
       return [a + '°', msF(pull), msF(gl), net > 0.01 ? msF(net) : 'holds', isFinite(t) ? msF(t, 2) + ' s' : 'never', isFinite(t) ? msF(top * 2 * t, 0) : '∞', isFinite(t) ? msF(m.dash * 2 * t, 0) : '∞'];
     });
-    h += msTable('Wall running (a path banked past 80°)', ['Bank', 'Pull down the face', 'Grip left', 'Net slide', 'Slides 10 units in', 'Units covered at top speed', 'Units at Dodecadash'], rows,
-      (m.fw ? 'On a wall her grip is grip × Wall grip (' + msF(m.wg, 2) + ') × cos(bank), so it fades to nothing on a vertical one.' : 'On a wall her grip is grip × Wall grip (' + msF(m.wg, 2) + ') at any bank ("Wall grip fades with the bank" is off), so a wall holds her wherever that is at least the pull down its face.') + ' The slide time does not depend on her speed; only the distance she covers in that time does. 10 units is the fall from the middle of a 20-wide wall to its low edge. ' +
+    h += msTable('Wall Running (a path banked past 80°)', ['Bank', 'Pull Down the Face', 'Grip Left', 'Net Slide', 'Slides 10 Units in', 'Units Covered at Top Speed', 'Units at Dodecadash'], rows,
+      (m.fw ? 'On a wall her grip is grip × Wall grip (' + msF(m.wg, 2) + ') × cos(bank), so it fades to nothing on a vertical one.' : 'On a wall her grip is grip × Wall grip (' + msF(m.wg, 2) + ') at any bank ("Wall Grip Fades With the Bank" is off), so a wall holds her wherever that is at least the pull down its face.') + ' The slide time does not depend on her speed; only the distance she covers in that time does. 10 units is the fall from the middle of a 20-wide wall to its low edge. ' +
       'Where a wall climbs or falls along its length, gravity along it is scaled by cos²(bank) (next to nothing on a steep wall), but the wall rises away from her line or drops with it, which is what makes a climbing wall short-lived and a falling one long.');
     return h + '</div>';
   };
   // One situation worked through: a slope, the way she is heading across it, her speed, and what she is doing. sc = { slope (deg), dir (deg from straight downhill, on the surface), speed (Zips), mode: 'run' | 'coast' | 'brake' }
   window.__moveScenHTML = function (c, sc) {
     var m = moveVals(c), D = Math.PI / 180, th = Math.max(0, Math.min(89, +sc.slope || 0)) * D, ph0 = Math.max(0, Math.min(180, +sc.dir || 0)) * D, v0 = Math.max(0, +sc.speed || 0), mode = sc.mode || 'run';
-    var gs = m.G * Math.sin(th), along = gs * Math.cos(ph0), across = gs * Math.sin(ph0), own, ownTxt, net, rule = '', gf = m.fs ? Math.cos(th) : 1, ge = m.grip * gf;   // gf: how much of her grip this slope leaves her (all of it unless "Grip fades on slopes" is on)
+    var gs = m.G * Math.sin(th), along = gs * Math.cos(ph0), across = gs * Math.sin(ph0), own, ownTxt, net, rule = '', gf = m.fs ? Math.cos(th) : 1, ge = m.grip * gf;   // gf: how much of her grip this slope leaves her (all of it unless "Grip Fades on Slopes" is on)
     function step(v, pull) {                                    // one frame of the game's own speed rule, in Zips
       var dt = 1 / 60, s0 = v;
       if (mode === 'run') { v += pull * dt; if (v < m.top) v = Math.min(m.top, v + m.acc * dt); else v = Math.max(m.top, v - m.fr * dt); if (pull < 0) v = s0 >= m.flo ? Math.max(v, m.flo) : Math.max(v, s0); }
@@ -8926,17 +8927,17 @@ requestAnimationFrame(tick);
     h += '<div style="background:#f6ecdd;color:#3a2616;border-radius:14px;padding:12px 14px;font-family:inherit;text-align:left;box-sizing:border-box;margin-top:8px">';
     h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">' + svg + key + '</div>';
     h += '<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:12px">';
-    h += row('Gravity along the surface', msF(gs) + ' Zips/s²', msF(m.G) + ' × sin(' + msF(th / D) + '°), down the fall line');
-    h += row('Its part along her heading', msS(along) + ' Zips/s²', along > 0.05 ? 'speeds her up' : along < -0.05 ? 'slows her' : 'none: she is running level across the slope');
-    h += row('Its part across her heading', msF(across) + ' Zips/s²', across > 0.05 ? 'turns her toward downhill at ' + msF(across / vv / D, 0) + '°/s unless her steering holds it' : 'none: she is on the fall line');
-    if (m.fs) h += row('Her grip on this slope', msF(ge) + ' Zips/s²', msF(m.grip) + ' × cos(' + msF(th / D) + '°): "Grip fades on slopes" is on');
-    h += row('Her own part', msS(own) + ' Zips/s²', ownTxt);
+    h += row('Gravity Along the Surface', msF(gs) + ' Zips/s²', msF(m.G) + ' × sin(' + msF(th / D) + '°), down the fall line');
+    h += row('Its Part Along Her Heading', msS(along) + ' Zips/s²', along > 0.05 ? 'speeds her up' : along < -0.05 ? 'slows her' : 'none: she is running level across the slope');
+    h += row('Its Part Across Her Heading', msF(across) + ' Zips/s²', across > 0.05 ? 'turns her toward downhill at ' + msF(across / vv / D, 0) + '°/s unless her steering holds it' : 'none: she is on the fall line');
+    if (m.fs) h += row('Her Grip on This Slope', msF(ge) + ' Zips/s²', msF(m.grip) + ' × cos(' + msF(th / D) + '°): "Grip fades on slopes" is on');
+    h += row('Her Own Part', msS(own) + ' Zips/s²', ownTxt);
     h += row('<b>Speed change</b>', '<b>' + msS(net) + ' Zips/s²</b>', rule);
-    h += row('Speed after 1 s / 3 s', msF(a1[0]) + ' / ' + msF(a3[0]) + ' Zips', 'camera held still');
-    h += row('Heading after 1 s / 3 s', Math.abs(a3[1]) < 0.05 ? 'unchanged' : msF(a1[1]) + '° / ' + msF(a3[1]) + '° downhill', mode === 'brake' ? 'while braking the slope does not turn her' : across < 0.05 ? 'nothing pulls her off her line' : left >= 0 ? 'she holds her line, using ' + msF(across / ge * 100, 0) + '% of her grip' : 'the pull beats her grip by ' + msF(-left) + ' Zips/s², so she cannot hold her line');
-    h += row('Turn radius, toward uphill', left > 0.01 && v0 > 0 ? msF(2 * v0 * v0 / left, 0) + ' units' : v0 > 0 ? 'cannot' : '—', 'speed² ÷ (grip − the pull across her)');
-    h += row('Turn radius, toward downhill', v0 > 0 ? msF(2 * v0 * v0 / (ge + across), 0) + ' units' : '—', 'speed² ÷ (grip + the pull across her)');
-    h += row('Ground covered on the map', msF(v0 * cf) + ' Zips', 'her ' + msF(v0) + ' Zips along the surface, seen from above; she ' + (Math.cos(ph0) > 0.001 ? 'drops' : Math.cos(ph0) < -0.001 ? 'climbs' : 'neither climbs nor drops') + (Math.abs(Math.cos(ph0)) > 0.001 ? ' at ' + msF(Math.abs(v0 * Math.cos(ph0) * Math.sin(th))) + ' Zips' : ''));
+    h += row('Speed After 1 s / 3 s', msF(a1[0]) + ' / ' + msF(a3[0]) + ' Zips', 'camera held still');
+    h += row('Heading After 1 s / 3 s', Math.abs(a3[1]) < 0.05 ? 'unchanged' : msF(a1[1]) + '° / ' + msF(a3[1]) + '° downhill', mode === 'brake' ? 'while braking the slope does not turn her' : across < 0.05 ? 'nothing pulls her off her line' : left >= 0 ? 'she holds her line, using ' + msF(across / ge * 100, 0) + '% of her grip' : 'the pull beats her grip by ' + msF(-left) + ' Zips/s², so she cannot hold her line');
+    h += row('Turn Radius, Toward Uphill', left > 0.01 && v0 > 0 ? msF(2 * v0 * v0 / left, 0) + ' units' : v0 > 0 ? 'cannot' : '—', 'speed² ÷ (grip − the pull across her)');
+    h += row('Turn Radius, Toward Downhill', v0 > 0 ? msF(2 * v0 * v0 / (ge + across), 0) + ' units' : '—', 'speed² ÷ (grip + the pull across her)');
+    h += row('Ground Covered on the Map', msF(v0 * cf) + ' Zips', 'her ' + msF(v0) + ' Zips along the surface, seen from above; she ' + (Math.cos(ph0) > 0.001 ? 'drops' : Math.cos(ph0) < -0.001 ? 'climbs' : 'neither climbs nor drops') + (Math.abs(Math.cos(ph0)) > 0.001 ? ' at ' + msF(Math.abs(v0 * Math.cos(ph0) * Math.sin(th))) + ' Zips' : ''));
     return h + '</table></div>';
   };
   window.__makeBarrier = function (c, parent) {                  // the dodecahedron, its smooth fast form with dashed rings, and its glow, built into parent (the game and the Rig Editor's preview share this)
@@ -10629,7 +10630,7 @@ requestAnimationFrame(tick);
     function cpFill(dyn) {                                   // the Sandbox: every checkpoint in the layout, in order, to start from
     dyn.innerHTML = ''; if (level !== 3 || !SB) return;
     SB.cps.forEach(function (cg) {
-      var b = document.createElement('button'); b.className = 'go2'; b.type = 'button'; b.textContent = 'Start from Checkpoint ' + cg.n;
+      var b = document.createElement('button'); b.className = 'go2'; b.type = 'button'; b.textContent = 'Start From Checkpoint ' + cg.n;
       b.addEventListener('click', function () { spawnAt(L3_X + cg.x, cg.z, cg.n, 'Back at checkpoint ' + cg.n, -cg.th); begin(); });
       dyn.appendChild(b);
     });
@@ -11093,7 +11094,7 @@ function showScreen(name) {                                // the menu shows one
   function gfxSave() { try { localStorage.setItem('pr_gfx', JSON.stringify(GFX)); } catch (e) {} }
   function gfxShow() {
     document.getElementById('gAA').textContent = 'Antialiasing: ' + (GFX.aa ? 'On' : 'Off') + '  (restarts the game)';
-    document.getElementById('gSoft').textContent = 'Soft shadows: ' + (GFX.soft ? 'On' : 'Off');
+    document.getElementById('gSoft').textContent = 'Soft Shadows: ' + (GFX.soft ? 'On' : 'Off');
     document.getElementById('gFogV').textContent = Math.round(GFX.fog * 100) + '%';
     document.getElementById('gFog').value = Math.round(GFX.fog * 100);
   }

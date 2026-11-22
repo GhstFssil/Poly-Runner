@@ -26,9 +26,9 @@
   var GRAV = 40;           // downward acceleration (units/s^2), so the jump takes about 1.2 s. Set by the Gravity stat (kept in Zips/s^2: 20)
   var JUMP_V = Math.sqrt(2 * GRAV * JUMP_H);
   var WALL_GRIP = 1;       // how much of her grip survives on a wall: her grip times this times the cosine of the wall's angle, so a vertical wall gives none at all
-  var WALL_FADE = 1;       // that cosine can be switched off (the 'Wall grip fades with the bank' stat): then a wall of any angle leaves her grip x Wall grip
-  var SLOPE_FADE = 0;      // the same fade on ordinary ground (the 'Grip fades on slopes' stat): off, her grip is the same on any slope; on, it is her grip x the cosine of the slope under her
-  var DRIFT_GRIP = 1;      // her grip while a Drift is held, as a multiple of her grip (the 'Grip while drifting' stat): 1 = the same as always
+  var WALL_FADE = 1;       // that cosine can be switched off (the 'Wall Grip Fades With the Bank' stat): then a wall of any angle leaves her grip x Wall grip
+  var SLOPE_FADE = 0;      // the same fade on ordinary ground (the 'Grip Fades on Slopes' stat): off, her grip is the same on any slope; on, it is her grip x the cosine of the slope under her
+  var DRIFT_GRIP = 1;      // her grip while a Drift is held, as a multiple of her grip (the 'Grip While Drifting' stat): 1 = the same as always
   var AIR_GRIP = 0.35;     // how much of her steering is left once her feet are off the ground
   var STEP_UP = 1;          // a ledge this small or smaller she just steps up, with no loss of speed
   var CLIMB_SLOPE = 1.05;   // ground steeper than this (rise per unit run, a little over 45 degrees) stops her like a wall
@@ -2891,14 +2891,14 @@
     var top = Math.max(1, g('stat.top', 80)), aT = Math.max(0.5, g('stat.accelT', 7)), br = Math.max(0, g('stat.brake', 3)), jh = Math.max(0, g('stat.jumpH', 7.2)), gz = Math.max(0.5, g('stat.gripZ', 20)), gv = Math.max(1, g('stat.grav', 20)), fl = Math.max(1, g('stat.fall', 50)), hh = Math.max(1, Math.min(12, Math.round(g('stat.hearts', 3))));   // the same limits the game applies (grip and gravity are kept in Zips/s²: 1 Zip = 2 units)
     var acc = top / aT, fr = Math.max(0, g('stat.fric', 11.4)), wgp = Math.max(0, g('stat.wallGrip', 1)), air = 2 * Math.sqrt(2 * gv * 2 * jh) / (gv * 2), brk = fr * br, f1 = function (v) { return isFinite(v) ? (Math.round(v * 10) / 10).toString() : '—'; };
     var scl = Math.max(0.05, Math.min(20, g('scale', 1)));       // her Overall scale: the collision box is the two stats times this
-    var tiles = [['Height', f1(Math.max(1.2, g('stat.colH', 3.6)) * scl), 'units'], ['Width', f1(Math.max(0.2, g('stat.colW', 1)) * scl), 'units'], ['Hearts', String(hh), ''], ['Top speed', f1(top), 'Zips'], ['Acceleration', f1(acc), 'Zips/s²'], ['Braking', f1(brk), 'Zips/s²'], ['Jump height', f1(jh), 'units'], ['Gravity', f1(gv), 'Zips/s²'], ['Max fall speed', f1(fl), 'Zips'], ['Sideways grip', f1(gz), 'Zips/s²'], ['Wall grip', '×' + f1(wgp), g('stat.fadeWall', 1) ? 'fades with the bank' : 'at any bank'], ['Friction', f1(fr), 'Zips/s²']];
+    var tiles = [['Height', f1(Math.max(1.2, g('stat.colH', 3.6)) * scl), 'units'], ['Width', f1(Math.max(0.2, g('stat.colW', 1)) * scl), 'units'], ['Hearts', String(hh), ''], ['Top speed', f1(top), 'Zips'], ['Acceleration', f1(acc), 'Zips/s²'], ['Braking', f1(brk), 'Zips/s²'], ['Jump Height', f1(jh), 'units'], ['Gravity', f1(gv), 'Zips/s²'], ['Max Fall Speed', f1(fl), 'Zips'], ['Sideways Grip', f1(gz), 'Zips/s²'], ['Wall Grip', '×' + f1(wgp), g('stat.fadeWall', 1) ? 'fades with the bank' : 'at any bank'], ['Friction', f1(fr), 'Zips/s²']];
     var h = '<div style="background:#f6ecdd;color:#3a2616;border-radius:14px;padding:12px 14px;font-family:inherit;text-align:left;box-sizing:border-box">';
     h += '<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px solid #3a2616;padding-bottom:4px;margin-bottom:8px"><b style="font-size:' + (compact ? 17 : 22) + 'px;letter-spacing:.08em">' + (c.__who === 'comet' ? 'COMET' : 'MOLLY') + '</b><span style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.7">Runner</span></div>';
     h += '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">';
     tiles.forEach(function (t) { h += '<div style="background:#ecdcc3;border-radius:8px;padding:5px 7px;min-width:0"><div style="font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;opacity:.7">' + t[0] + '</div><div style="font:600 ' + (compact ? 15 : 19) + 'px/1.15 monospace">' + t[1] + '</div><div style="font-size:10px;opacity:.7">' + t[2] + '</div></div>'; });
     h += '</div>';
     if (!compact) {
-      var rows = [['Time to top speed', f1(aT) + ' s over ' + f1(top * 2 * aT / 2) + ' units'], ['Top speed to a stop (braking)', f1(top / brk) + ' s over ' + f1(top * 2 * (top / brk) / 2) + ' units'], ['Friction', f1(fr) + ' Zips/s² · hills steeper than ' + f1(Math.asin(Math.min(1, fr / gv)) * 57.29578) + '° speed her up'], ['Turn radius at top speed', f1(top * 2 * top / gz) + ' units'], ['Grip on slopes', g('stat.fadeSlope', 0) ? 'fades with the slope (× its cosine)' : 'the same on any slope'], ['Jump', f1(air) + ' s in the air · ' + f1(top * 2 * air) + ' units at top speed'],
+      var rows = [['Time to Top Speed', f1(aT) + ' s over ' + f1(top * 2 * aT / 2) + ' units'], ['Top Speed to a Stop (braking)', f1(top / brk) + ' s over ' + f1(top * 2 * (top / brk) / 2) + ' units'], ['Friction', f1(fr) + ' Zips/s² · hills steeper than ' + f1(Math.asin(Math.min(1, fr / gv)) * 57.29578) + '° speed her up'], ['Turn Radius at Top Speed', f1(top * 2 * top / gz) + ' units'], ['Grip on Slopes', g('stat.fadeSlope', 0) ? 'fades with the slope (× its cosine)' : 'the same on any slope'], ['Jump', f1(air) + ' s in the air · ' + f1(top * 2 * air) + ' units at top speed'],
         ['Drift', f1(g('m.drift.angle', 15)) + '° shift · needs ' + f1(g('m.drift.minZips', 30)) + ' Zips · ' + f1(g('m.drift.cool', 1)) + ' s cooldown'], ['Barrier', 'costs 12 Power to start · half acceleration · no strafe or drift']];
       if (c.__who === 'comet') rows.splice(rows.length - 1, 1, ['Star Throw (Q / E)', f1(g('comet.star.dmg', 0.5)) + ' heart · ' + f1(g('comet.star.range', 50)) + ' units · ' + f1(g('comet.star.cool', 2)) + ' s cooldown · costs ' + f1(g('comet.star.cost', 1)) + ' Power; hold to charge'],
         ['Hover (2)', 'costs ' + f1(g('comet.hov.cost', 6)) + ' Power to start, ' + f1(g('comet.hov.drain', 1)) + ' a second · top speed ' + f1(g('comet.hov.top', 80)) + ' Zips'], ['Fly (Space, hovering)', f1(g('comet.fly.drain', 4)) + ' more Power a second'], ['No Strafe or Barrier', '']);
@@ -2948,20 +2948,20 @@
       '<li><b>Gravity</b> is ' + msF(G) + ' Zips/s² straight down. On a slope the part that lies along the surface is ' + msF(G) + ' × sin(slope), pointing down the fall line.</li>' +
       '<li>The part of that <b>along her heading</b> speeds her up or slows her. The part <b>across her heading</b> turns her direction toward downhill (a vector sum of her velocity and the pull).</li>' +
       '<li><b>Her drive</b> (' + msF(m.acc) + ' Zips/s²) works while W is held and she is below top speed. <b>Friction</b> (' + msF(m.fr) + ') acts whenever she is not driving: coasting, braking (× ' + msF(m.br) + '), or past top speed.</li>' +
-      '<li><b>Her grip</b> (' + msF(m.grip) + ' Zips/s²) is the most sideways acceleration her steering can make, so her turn radius is speed² ÷ grip.' + (m.fs ? ' On a slope it is her grip × the cosine of the slope ("Grip fades on slopes" is on).' : ' It is the same on any slope ("Grip fades on slopes" is off).') + '</li></ul></div>';
+      '<li><b>Her grip</b> (' + msF(m.grip) + ' Zips/s²) is the most sideways acceleration her steering can make, so her turn radius is speed² ÷ grip.' + (m.fs ? ' On a slope it is her grip × the cosine of the slope ("Grip Fades on Slopes" is on).' : ' It is the same on any slope ("Grip Fades on Slopes" is off).') + '</li></ul></div>';
     // flat ground
     rows = [['0 to top speed (W held)', msS(m.acc), msF(m.aT) + ' s', msF(top * m.aT, 0)],
-      ['Coasting, top speed to a stop', msS(-m.fr), msF(top / m.fr) + ' s', msF(top * top / m.fr, 0)],
-      ['Braking (S), top speed to a stop', msS(-brk), msF(top / brk) + ' s', msF(top * top / brk, 0)],
+      ['Coasting, Top Speed to a Stop', msS(-m.fr), msF(top / m.fr) + ' s', msF(top * top / m.fr, 0)],
+      ['Braking (S), Top Speed to a Stop', msS(-brk), msF(top / brk) + ' s', msF(top * top / brk, 0)],
       ['Dodecadash (' + m.dash + ' Zips) back down to top speed', msS(-m.fr / 2), msF(Math.max(0, m.dash - top) / (m.fr / 2)) + ' s', msF(Math.max(0, m.dash * m.dash - top * top) / (m.fr / 2), 0)]];
-    h += msTable('Flat ground, straight line', ['', 'Zips/s²', 'Time', 'Units'], rows, 'In the Barrier her drive and her friction are both halved.');
+    h += msTable('Flat Ground, Straight Line', ['', 'Zips/s²', 'Time', 'Units'], rows, 'In the Barrier her drive and her friction are both halved.');
     // straight down and straight up a slope
     rows = [5, 10, 15, 20, 30, 45, 60].map(function (a) {
       var gs = G * Math.sin(a * D), dn = gs - m.fr, up = m.acc - gs, steep = a > m.climb;
       return [a + '°', msF(gs), dn > 0.05 ? msS(dn) : 'holds', msS(dn), steep ? '—' : up >= 0 ? msS(up) : msS(up) + ' ↓' + msF(Math.min(m.flo, top), 0), steep ? '—' : msS(-gs - m.fr)];
     });
     var aGain = Math.asin(Math.min(1, m.fr / G)) / D, aHold = Math.asin(Math.min(1, m.acc / G)) / D;
-    h += msTable('Slopes: straight down and straight up', ['Slope', 'Gravity along it', 'Down, W held', 'Down, coasting', 'Up, W held', 'Up, coasting'], rows,
+    h += msTable('Slopes: Straight Down and Straight Up', ['Slope', 'Gravity Along It', 'Down, W Held', 'Down, Coasting', 'Up, W Held', 'Up, Coasting'], rows,
       'How fast her speed changes, in Zips/s². <b>Down, W held</b> is at top speed: there her drive has stopped and friction takes its place, so only hills steeper than <b>' + msF(aGain) + '°</b> carry her past ' + msF(top, 0) + ' Zips ("holds" = she stays at top speed). Past that angle there is no upper limit: her speed builds for as long as the hill lasts. Below top speed she gains her drive + gravity. ' +
       '<b>Down, coasting:</b> a minus means she slows to a stop, and from a standstill friction holds her on anything gentler than ' + msF(aGain) + '°. ' +
       '<b>Up, W held:</b> a plus is what she still gains on the way to top speed, which she reaches on climbs up to <b>' + msF(aHold) + '°</b>. Steeper than that she loses speed down to the ' + msF(m.flo, 0) + '-Zip floor (↓' + msF(m.flo, 0) + ') and no further. ' +
@@ -2971,7 +2971,7 @@
       var gs = G * Math.sin(a * D), ge = m.grip * (m.fs ? Math.cos(a * D) : 1), left = ge - gs;   // ge: her grip on this slope
       return [a + '°', msF(gs)].concat(m.fs ? [msF(ge)] : [], [msF(gs / ge * 100, 0) + '%', left >= 0 ? '0' : msF(-left / top / D, 0) + '°/s', left > 0.01 ? msF(2 * top * top / left, 0) : 'cannot', msF(2 * top * top / (ge + gs), 0), msS(-m.scrub * Math.min(gs, ge))]);
     });
-    h += msTable('Slopes: running straight across (a banked path is this too)', ['Slope', 'Pull across her'].concat(m.fs ? ['Her grip there'] : [], ['Grip used', 'Heading drift', 'Radius turning uphill', 'Radius turning downhill', 'Speed cost']), rows,
+    h += msTable('Slopes: Running Straight Across (a banked path is this too)', ['Slope', 'Pull Across Her'].concat(m.fs ? ['Her Grip There'] : [], ['Grip Used', 'Heading Drift', 'Radius Turning Uphill', 'Radius Turning Downhill', 'Speed Cost']), rows,
       'At top speed (' + msF(top, 0) + ' Zips) with the camera held still. The pull across her heading turns her toward downhill at pull ÷ speed; her steering turns her back at up to grip ÷ speed. ' +
       'While the pull is less than her grip she holds her line and has the rest of her grip left for turning uphill; the pull adds to her grip when she turns downhill. Radii are in units, pull and speed cost in Zips/s². ' +
       'Speed cost is the scrub from steering against the pull (' + msF(m.scrub * 100, 0) + '% of the angle turned); her drive covers it below top speed. ' + (m.fs ? 'Her grip fades with the slope (grip × its cosine): past <b>' + msF(Math.atan(m.grip / G) / D) + '°</b> the pull beats what is left and she cannot hold a line across the slope.' : m.grip >= G ? 'Her grip is at least gravity itself, so she can hold a line across any slope.' : 'Past <b>' + msF(Math.asin(m.grip / G) / D) + '°</b> the pull beats her grip and she cannot hold a line across the slope.'));
@@ -2981,22 +2981,22 @@
       var rate = Math.min(m.maxTurn, m.grip / Math.max(v, 0.5));
       return [msF(v, 0) + (v === top ? ' (top)' : v === m.dash ? ' (dash)' : ''), msF(rate / D, 0) + '°/s', msF(2 * v / rate, 0), msF(Math.PI / 2 / rate, 2) + ' s', msS(-v * (1 - Math.exp(-m.scrub * Math.PI / 2)))];
     });
-    h += msTable('Turning on flat ground', ['Speed (Zips)', 'Turn rate', 'Radius (units)', '90° turn takes', 'Zips lost in 90°'], rows,
+    h += msTable('Turning on Flat Ground', ['Speed (Zips)', 'Turn Rate', 'Radius (units)', '90° turn takes', 'Zips Lost in 90°'], rows,
       'Radius = speed² ÷ grip, so double the speed makes the turn four times as wide. Turning costs ' + msF(m.scrub * 100, 0) + '% of her speed for every radian turned (' + msF((1 - Math.exp(-m.scrub * Math.PI / 2)) * 100) + '% for 90°). In the air she keeps ' + msF(m.air * 100, 0) + '% of her grip, so every radius is ' + msF(1 / m.air) + ' times wider. A drift (A or D) swings her ' + msF(typeof c['m.drift.angle'] === 'number' ? c['m.drift.angle'] : 15, 0) + '° at once on top of this.');
     // walls
     rows = [80, 81, 85, 88, 90].map(function (a) {
       var pull = G * Math.sin(a * D), gl = m.grip * m.wg * (m.fw ? Math.max(0, Math.cos(a * D)) : 1), net = pull - gl, t = net > 0.01 ? Math.sqrt(10 / net) : Infinity;
       return [a + '°', msF(pull), msF(gl), net > 0.01 ? msF(net) : 'holds', isFinite(t) ? msF(t, 2) + ' s' : 'never', isFinite(t) ? msF(top * 2 * t, 0) : '∞', isFinite(t) ? msF(m.dash * 2 * t, 0) : '∞'];
     });
-    h += msTable('Wall running (a path banked past 80°)', ['Bank', 'Pull down the face', 'Grip left', 'Net slide', 'Slides 10 units in', 'Units covered at top speed', 'Units at Dodecadash'], rows,
-      (m.fw ? 'On a wall her grip is grip × Wall grip (' + msF(m.wg, 2) + ') × cos(bank), so it fades to nothing on a vertical one.' : 'On a wall her grip is grip × Wall grip (' + msF(m.wg, 2) + ') at any bank ("Wall grip fades with the bank" is off), so a wall holds her wherever that is at least the pull down its face.') + ' The slide time does not depend on her speed; only the distance she covers in that time does. 10 units is the fall from the middle of a 20-wide wall to its low edge. ' +
+    h += msTable('Wall Running (a path banked past 80°)', ['Bank', 'Pull Down the Face', 'Grip Left', 'Net Slide', 'Slides 10 Units in', 'Units Covered at Top Speed', 'Units at Dodecadash'], rows,
+      (m.fw ? 'On a wall her grip is grip × Wall grip (' + msF(m.wg, 2) + ') × cos(bank), so it fades to nothing on a vertical one.' : 'On a wall her grip is grip × Wall grip (' + msF(m.wg, 2) + ') at any bank ("Wall Grip Fades With the Bank" is off), so a wall holds her wherever that is at least the pull down its face.') + ' The slide time does not depend on her speed; only the distance she covers in that time does. 10 units is the fall from the middle of a 20-wide wall to its low edge. ' +
       'Where a wall climbs or falls along its length, gravity along it is scaled by cos²(bank) (next to nothing on a steep wall), but the wall rises away from her line or drops with it, which is what makes a climbing wall short-lived and a falling one long.');
     return h + '</div>';
   };
   // One situation worked through: a slope, the way she is heading across it, her speed, and what she is doing. sc = { slope (deg), dir (deg from straight downhill, on the surface), speed (Zips), mode: 'run' | 'coast' | 'brake' }
   window.__moveScenHTML = function (c, sc) {
     var m = moveVals(c), D = Math.PI / 180, th = Math.max(0, Math.min(89, +sc.slope || 0)) * D, ph0 = Math.max(0, Math.min(180, +sc.dir || 0)) * D, v0 = Math.max(0, +sc.speed || 0), mode = sc.mode || 'run';
-    var gs = m.G * Math.sin(th), along = gs * Math.cos(ph0), across = gs * Math.sin(ph0), own, ownTxt, net, rule = '', gf = m.fs ? Math.cos(th) : 1, ge = m.grip * gf;   // gf: how much of her grip this slope leaves her (all of it unless "Grip fades on slopes" is on)
+    var gs = m.G * Math.sin(th), along = gs * Math.cos(ph0), across = gs * Math.sin(ph0), own, ownTxt, net, rule = '', gf = m.fs ? Math.cos(th) : 1, ge = m.grip * gf;   // gf: how much of her grip this slope leaves her (all of it unless "Grip Fades on Slopes" is on)
     function step(v, pull) {                                    // one frame of the game's own speed rule, in Zips
       var dt = 1 / 60, s0 = v;
       if (mode === 'run') { v += pull * dt; if (v < m.top) v = Math.min(m.top, v + m.acc * dt); else v = Math.max(m.top, v - m.fr * dt); if (pull < 0) v = s0 >= m.flo ? Math.max(v, m.flo) : Math.max(v, s0); }
@@ -3048,17 +3048,17 @@
     h += '<div style="background:#f6ecdd;color:#3a2616;border-radius:14px;padding:12px 14px;font-family:inherit;text-align:left;box-sizing:border-box;margin-top:8px">';
     h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">' + svg + key + '</div>';
     h += '<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:12px">';
-    h += row('Gravity along the surface', msF(gs) + ' Zips/s²', msF(m.G) + ' × sin(' + msF(th / D) + '°), down the fall line');
-    h += row('Its part along her heading', msS(along) + ' Zips/s²', along > 0.05 ? 'speeds her up' : along < -0.05 ? 'slows her' : 'none: she is running level across the slope');
-    h += row('Its part across her heading', msF(across) + ' Zips/s²', across > 0.05 ? 'turns her toward downhill at ' + msF(across / vv / D, 0) + '°/s unless her steering holds it' : 'none: she is on the fall line');
-    if (m.fs) h += row('Her grip on this slope', msF(ge) + ' Zips/s²', msF(m.grip) + ' × cos(' + msF(th / D) + '°): "Grip fades on slopes" is on');
-    h += row('Her own part', msS(own) + ' Zips/s²', ownTxt);
+    h += row('Gravity Along the Surface', msF(gs) + ' Zips/s²', msF(m.G) + ' × sin(' + msF(th / D) + '°), down the fall line');
+    h += row('Its Part Along Her Heading', msS(along) + ' Zips/s²', along > 0.05 ? 'speeds her up' : along < -0.05 ? 'slows her' : 'none: she is running level across the slope');
+    h += row('Its Part Across Her Heading', msF(across) + ' Zips/s²', across > 0.05 ? 'turns her toward downhill at ' + msF(across / vv / D, 0) + '°/s unless her steering holds it' : 'none: she is on the fall line');
+    if (m.fs) h += row('Her Grip on This Slope', msF(ge) + ' Zips/s²', msF(m.grip) + ' × cos(' + msF(th / D) + '°): "Grip fades on slopes" is on');
+    h += row('Her Own Part', msS(own) + ' Zips/s²', ownTxt);
     h += row('<b>Speed change</b>', '<b>' + msS(net) + ' Zips/s²</b>', rule);
-    h += row('Speed after 1 s / 3 s', msF(a1[0]) + ' / ' + msF(a3[0]) + ' Zips', 'camera held still');
-    h += row('Heading after 1 s / 3 s', Math.abs(a3[1]) < 0.05 ? 'unchanged' : msF(a1[1]) + '° / ' + msF(a3[1]) + '° downhill', mode === 'brake' ? 'while braking the slope does not turn her' : across < 0.05 ? 'nothing pulls her off her line' : left >= 0 ? 'she holds her line, using ' + msF(across / ge * 100, 0) + '% of her grip' : 'the pull beats her grip by ' + msF(-left) + ' Zips/s², so she cannot hold her line');
-    h += row('Turn radius, toward uphill', left > 0.01 && v0 > 0 ? msF(2 * v0 * v0 / left, 0) + ' units' : v0 > 0 ? 'cannot' : '—', 'speed² ÷ (grip − the pull across her)');
-    h += row('Turn radius, toward downhill', v0 > 0 ? msF(2 * v0 * v0 / (ge + across), 0) + ' units' : '—', 'speed² ÷ (grip + the pull across her)');
-    h += row('Ground covered on the map', msF(v0 * cf) + ' Zips', 'her ' + msF(v0) + ' Zips along the surface, seen from above; she ' + (Math.cos(ph0) > 0.001 ? 'drops' : Math.cos(ph0) < -0.001 ? 'climbs' : 'neither climbs nor drops') + (Math.abs(Math.cos(ph0)) > 0.001 ? ' at ' + msF(Math.abs(v0 * Math.cos(ph0) * Math.sin(th))) + ' Zips' : ''));
+    h += row('Speed After 1 s / 3 s', msF(a1[0]) + ' / ' + msF(a3[0]) + ' Zips', 'camera held still');
+    h += row('Heading After 1 s / 3 s', Math.abs(a3[1]) < 0.05 ? 'unchanged' : msF(a1[1]) + '° / ' + msF(a3[1]) + '° downhill', mode === 'brake' ? 'while braking the slope does not turn her' : across < 0.05 ? 'nothing pulls her off her line' : left >= 0 ? 'she holds her line, using ' + msF(across / ge * 100, 0) + '% of her grip' : 'the pull beats her grip by ' + msF(-left) + ' Zips/s², so she cannot hold her line');
+    h += row('Turn Radius, Toward Uphill', left > 0.01 && v0 > 0 ? msF(2 * v0 * v0 / left, 0) + ' units' : v0 > 0 ? 'cannot' : '—', 'speed² ÷ (grip − the pull across her)');
+    h += row('Turn Radius, Toward Downhill', v0 > 0 ? msF(2 * v0 * v0 / (ge + across), 0) + ' units' : '—', 'speed² ÷ (grip + the pull across her)');
+    h += row('Ground Covered on the Map', msF(v0 * cf) + ' Zips', 'her ' + msF(v0) + ' Zips along the surface, seen from above; she ' + (Math.cos(ph0) > 0.001 ? 'drops' : Math.cos(ph0) < -0.001 ? 'climbs' : 'neither climbs nor drops') + (Math.abs(Math.cos(ph0)) > 0.001 ? ' at ' + msF(Math.abs(v0 * Math.cos(ph0) * Math.sin(th))) + ' Zips' : ''));
     return h + '</table></div>';
   };
   window.__makeBarrier = function (c, parent) {                  // the dodecahedron, its smooth fast form with dashed rings, and its glow, built into parent (the game and the Rig Editor's preview share this)
@@ -4751,7 +4751,7 @@
     function cpFill(dyn) {                                   // the Sandbox: every checkpoint in the layout, in order, to start from
     dyn.innerHTML = ''; if (level !== 3 || !SB) return;
     SB.cps.forEach(function (cg) {
-      var b = document.createElement('button'); b.className = 'go2'; b.type = 'button'; b.textContent = 'Start from Checkpoint ' + cg.n;
+      var b = document.createElement('button'); b.className = 'go2'; b.type = 'button'; b.textContent = 'Start From Checkpoint ' + cg.n;
       b.addEventListener('click', function () { spawnAt(L3_X + cg.x, cg.z, cg.n, 'Back at checkpoint ' + cg.n, -cg.th); begin(); });
       dyn.appendChild(b);
     });

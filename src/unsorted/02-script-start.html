@@ -8,14 +8,14 @@ var rad=Math.PI/180;
 /* ================= part table ================= */
 /* kind: which way the part runs from its joint. up and down run along Y, fwd runs along Z (feet). */
 var SEGS=[
- {id:'Foot',label:'Feet',bone:'Ankle',pair:1,kind:'fwd',ends:['heel','toe'],lat:['Top view','Side view']},
+ {id:'Foot',label:'Feet',bone:'Ankle',pair:1,kind:'fwd',ends:['heel','toe'],lat:['Top View','Side View']},
  {id:'Shin',label:'Calves',bone:'Knee',pair:1,kind:'down',ends:['knee','ankle']},
  {id:'Thigh',label:'Thighs',bone:'Hip',pair:1,kind:'down',ends:['hip','knee']},
- {id:'LowerTorso',label:'Lower torso',bone:'Hips',kind:'up',ends:['crotch','waist']},
- {id:'UpperTorso',label:'Upper torso',bone:'Spine',kind:'up',ends:['waist','shoulder line']},
+ {id:'LowerTorso',label:'Lower Torso',bone:'Hips',kind:'up',ends:['crotch','waist']},
+ {id:'UpperTorso',label:'Upper Torso',bone:'Spine',kind:'up',ends:['waist','shoulder line']},
  {id:'Neck',label:'Neck',bone:'Spine',kind:'up',ends:['base','top']},
  {id:'Head',label:'Head',bone:'Head',kind:'up',ends:['chin','crown']},
- {id:'UpperArm',label:'Upper arms',bone:'Shoulder',pair:1,kind:'down',ends:['shoulder','elbow']},
+ {id:'UpperArm',label:'Upper Arms',bone:'Shoulder',pair:1,kind:'down',ends:['shoulder','elbow']},
  {id:'Forearm',label:'Forearms',bone:'Elbow',pair:1,kind:'down',ends:['elbow','wrist']},
  {id:'Hand',label:'Hands',bone:'Wrist',pair:1,kind:'down',ends:['wrist','fingertips']},
  {id:'Pony1',label:'Ponytail 1',bone:'Pony1',kind:'down',ends:['hair tie','first bend']},
@@ -89,7 +89,7 @@ var MOVES={
 };
 var TIEK={jump:{7:0},slide:{3:2,5:0},fall:{6:5,7:5},set:{1:0},drift:{1:0}};
 var STAGEKEYS={jump:[0,1,2,3,4,5,6],slide:[0,1,2,4],fall:[0,1,2,3,4,5],set:[0],drift:[0]};
-var HOLDKEY={slide:[3,'Slide held until'],fall:[6,'Settle held until']};
+var HOLDKEY={slide:[3,'Slide Held Until'],fall:[6,'Settle Held Until']};
 var MOVEDUR={jump:1.7,slide:2.0,fall:2.8,set:3.0,drift:3.0};
 var MOVEX={};
 Object.keys(MOVES).forEach(function(n){var cur={},k;for(k in KD)cur[k]=KD[k];
@@ -114,23 +114,23 @@ var INLP={},INLC={};
 INLINE.forEach(function(j){INLC[j[0]]=[j[1],j[2]];INLP[j[1]]=[j[0],j[2]];});
 
 /* slider meta: [key, label, unit, min, max, step] */
-function band(id){return [[id+'.bandA','Trim band start','cm',0,70,.5],[id+'.bandL','Trim band length','cm',0,40,.5]];}
+function band(id){return [[id+'.bandA','Trim Band Start','cm',0,70,.5],[id+'.bandL','Trim Band Length','cm',0,40,.5]];}
 var EXTRA={
- Foot:[['Foot.heel','Heel behind the ankle','cm',0,16,.5],['Foot.sole','Sole thickness','cm',0,8,.25],['Foot.ankleH','Ankle height above floor','cm',4,18,.5],['Foot.flat','Toe flattening','pct',0,.9,.01]],
- Shin:[['Shin.pad','Knee pad size (0 = none)','cm',0,16,.2]].concat(band('Shin')),
+ Foot:[['Foot.heel','Heel Behind the Ankle','cm',0,16,.5],['Foot.sole','Sole Thickness','cm',0,8,.25],['Foot.ankleH','Ankle Height Above Floor','cm',4,18,.5],['Foot.flat','Toe Flattening','pct',0,.9,.01]],
+ Shin:[['Shin.pad','Knee Pad Size (0 = none)','cm',0,16,.2]].concat(band('Shin')),
  LowerTorso:band('LowerTorso'),
- Head:[['hairVol','Hair volume','x',.9,1.5,.01],['bangL','Bang length','x',.3,2,.05]],
+ Head:[['hairVol','Hair Volume','x',.9,1.5,.01],['bangL','Bang Length','x',.3,2,.05]],
  UpperArm:band('UpperArm'),
  Forearm:band('Forearm')
 };
 var GROUPS=[
- ['Joint smoothing',[
-   ['jShoulder','Shoulder blend into torso','cm',0,12,.5],['jHip','Hip blend into torso','cm',0,12,.5],['jAnkle','Ankle blend into foot','cm',0,8,.5],['jPony','Hair blend (head and ponytail)','cm',0,6,.5],
-   ['jElbow','Elbow blend length','cm',0,16,.5],['jWrist','Wrist blend length','cm',0,8,.5],['jKnee','Knee blend length','cm',0,16,.5],
-   ['jWaist','Waist blend length','cm',0,14,.5],['jNeckBase','Neck base blend length','cm',0,10,.5],['jNeckTop','Neck top blend length','cm',0,10,.5]]],
- ['Skeleton and joints',[['scale','Overall scale (her size in the game too, after Save to game)','x',.8,1.25,.01],['pelvisDrop','Pelvis below hip joint','cm',0,30,.5],['shoulderX','Shoulder joint X','cm',8,40,.5],['shoulderY','Shoulder joint height on torso','cm',15,42,.5],['hipX','Hip joint X','cm',4,16,.5],['shoulderOver','Shoulder overlap into torso','cm',-3,5,.5],['armSpread','Arm spread','deg',0,40,1]]],
- ['Ponytail pose',[['ponyAng','Rise angle','deg',70,150,1],['ponyCurl','Droop per bend','deg',0,90,1]]],
- ['Faceting',[['sides','Sides per ring','n',5,20,1],['rings','Rings per side of the max','n',1,4,1],['ringGap','Thinnest strip of facets (rings closer than this are merged)','cm',0,3,.05],['jit','Shading variation','x',0,.5,.01],['irr','Irregularity of the ring sides','x',0,1,.01],['irrC','Contour shift (up/down along the form)','x',0,1.5,.01]]],
+ ['Joint Smoothing',[
+   ['jShoulder','Shoulder Blend Into Torso','cm',0,12,.5],['jHip','Hip Blend Into Torso','cm',0,12,.5],['jAnkle','Ankle Blend Into Foot','cm',0,8,.5],['jPony','Hair Blend (head and ponytail)','cm',0,6,.5],
+   ['jElbow','Elbow Blend Length','cm',0,16,.5],['jWrist','Wrist Blend Length','cm',0,8,.5],['jKnee','Knee Blend Length','cm',0,16,.5],
+   ['jWaist','Waist Blend Length','cm',0,14,.5],['jNeckBase','Neck Base Blend Length','cm',0,10,.5],['jNeckTop','Neck Top Blend Length','cm',0,10,.5]]],
+ ['Skeleton and Joints',[['scale','Overall Scale (her size in the game too, after Save to game)','x',.8,1.25,.01],['pelvisDrop','Pelvis Below Hip Joint','cm',0,30,.5],['shoulderX','Shoulder Joint X','cm',8,40,.5],['shoulderY','Shoulder Joint Height on Torso','cm',15,42,.5],['hipX','Hip Joint X','cm',4,16,.5],['shoulderOver','Shoulder Overlap Into Torso','cm',-3,5,.5],['armSpread','Arm Spread','deg',0,40,1]]],
+ ['Ponytail Pose',[['ponyAng','Rise Angle','deg',70,150,1],['ponyCurl','Droop per Bend','deg',0,90,1]]],
+ ['Faceting',[['sides','Sides per Ring','n',5,20,1],['rings','Rings per Side of the Max','n',1,4,1],['ringGap','Thinnest Strip of Facets (rings closer than this are merged)','cm',0,3,.05],['jit','Shading Variation','x',0,.5,.01],['irr','Irregularity of the Ring Sides','x',0,1,.01],['irrC','Contour Shift (up/down along the form)','x',0,1.5,.01]]],
 
 ];
-var COLORS=[['cSuit','Jumpsuit'],['cHair','Hair'],['cSkin','Skin'],['cBlk','Belt, gloves, pads'],['cWht','Arm bands, soles'],['cEye','Eyes']];
+var COLORS=[['cSuit','Jumpsuit'],['cHair','Hair'],['cSkin','Skin'],['cBlk','Belt, Gloves, Pads'],['cWht','Arm Bands, Soles'],['cEye','Eyes']];

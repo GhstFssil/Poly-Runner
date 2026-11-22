@@ -21,7 +21,7 @@ Nothing half-done. `next` has this batch committed (see HISTORY.md).
 
 ## Open (Ricky decides)
 - Done 2026-11-21: Rotation (`rot`; old `heading` still read; test `tests/fu/rot1.py`), dials->stats, "Hedron Barrier"->Barrier (also in the level hints), tile-meaning "square"->tile/cell (`LENGTH_TILES`, `VALLEY_TILES`, `LEDGE_FREE_TILES`).
-- Open: Title Case for ~250 sentence-case UI labels (Ricky to confirm scope first); labels are Title Case.
+- Done 2026-11-21: Title Case for 444 labels (script-converted; rule in GLOSSARY.md; `tcLabel` helper in `src/unsorted/03-script-a.html`). Tests and `tools/bake_models.py` text updated. `rg1.py` and `rig2.py` need comparison builds (aud_old.html, live.html) that are missing.
 
 ## Next steps
 1. Step 2: carve `src/unsorted/` into areas (one area per task, cut in place, byte-identical check), starting with a leaf (mobs or ui).

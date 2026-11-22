@@ -1,10 +1,10 @@
-# Rig Editor: Comet's Star throw, Hover and Fly modes show her pose and stars and their stats change them
+# Rig Editor: Comet's Star Throw, Hover and Fly modes show her pose and stars and their stats change them
 import sys; sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
 SP=sys.argv[1] if len(sys.argv)>1 else '/tmp'
 g=Rig(w=1100,h=760); g.open(); pg=g.pg
 vis=lambda sel: g.ev("s=>{var e=document.getElementById('rigHost').shadowRoot.querySelector(s);return !!e&&getComputedStyle(e).display!=='none'}",sel)
-print('on Molly page, Star throw button shown:',vis('[data-m=cThrow]'))
+print('on Molly page, Star Throw button shown:',vis('[data-m=cThrow]'))
 g.click('#pages button[data-pg="comet"]',1500); print('on Comet page:',vis('[data-m=cThrow]'),vis('[data-m=cHover]'),vis('[data-m=cFly]'))
 g.click('#views button[data-v="tq"]',300)
 for m,ph in [('cThrow',0.3),('cThrow',0.62),('cHover',0.25),('cFly',0.3)]:

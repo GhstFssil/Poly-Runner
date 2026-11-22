@@ -1,3 +1,4 @@
+function tcLabel(s){var sm={a:1,an:1,the:1,and:1,but:1,or:1,nor:1,for:1,so:1,yet:1,as:1,at:1,by:1,in:1,of:1,on:1,to:1,per:1,via:1,vs:1};return s.replace(/[A-Za-z][A-Za-z']*/g,function(w,i){return i>0&&sm[w]?w:w.charAt(0).toUpperCase()+w.slice(1);});}   /* a label made from pieces (part names like heel, toe) in Title Case */
 var RB={stride:32,knee:75,arm:40,elbow:80,lean:11,bounce:3};
 if(USERDEF.stride!==undefined)RB.stride=USERDEF.stride;if(USERDEF.kneeLift!==undefined)RB.knee=USERDEF.kneeLift;if(USERDEF.armSwing!==undefined)RB.arm=USERDEF.armSwing;if(USERDEF.elbow!==undefined)RB.elbow=USERDEF.elbow;if(USERDEF.lean!==undefined)RB.lean=USERDEF.lean;if(USERDEF.bounce!==undefined)RB.bounce=USERDEF.bounce;
 var RMUL={S:{stride:.7,knee:.6,arm:.7,elbow:1.05,lean:.45,bounce:.75},M:{stride:1,knee:1,arm:1,elbow:1,lean:1,bounce:1},F:{stride:1.45,knee:1.45,arm:1.55,elbow:1.1,lean:1.9,bounce:1.3}},RDUR={S:1.0,M:.8,F:.55};
@@ -803,14 +804,14 @@ var MSC={slope:20,dir:90,speed:80,mode:'run'};
 function moveRefresh(scenOnly){var b=SR.querySelector('#moveBox');if(!b||!b.open)return;var a=SR.querySelector('#moveLive'),o=SR.querySelector('#moveOut');
   try{if(a&&!scenOnly&&window.__moveStatsHTML)a.innerHTML=window.__moveStatsHTML(P);if(o&&window.__moveScenHTML)o.innerHTML=window.__moveScenHTML(P,MSC);}catch(e){}}
 function moveScenBuild(){var host=SR.querySelector('#moveScen');if(!host||host.firstChild)return;
-  [['slope','Slope','°',0,60,1],['dir','Her heading, from straight downhill','°',0,180,1],['speed','Her speed','Zips',0,160,1]].forEach(function(c){
+  [['slope','Slope','°',0,60,1],['dir','Her Heading, From Straight Downhill','°',0,180,1],['speed','Her Speed','Zips',0,160,1]].forEach(function(c){
     var row=document.createElement('div'),id='ms_'+c[0];row.className='row';
     row.innerHTML='<label for="'+id+'">'+c[1]+'</label><span class="numbox"><input type="number" class="num" step="any" aria-label="'+c[1]+' (type any value)"><span class="mono unit">'+c[2]+'</span></span><input type="range" id="'+id+'" min="'+c[3]+'" max="'+c[4]+'" step="'+c[5]+'">';
     host.appendChild(row);var inp=row.querySelector('input[type=range]'),nb=row.querySelector('input.num');inp.value=MSC[c[0]];nb.value=MSC[c[0]];
     inp.addEventListener('input',function(){MSC[c[0]]=parseFloat(inp.value);nb.value=MSC[c[0]];moveRefresh(true);});
     nb.addEventListener('change',function(){var v=parseFloat(nb.value);if(!isFinite(v)){nb.value=MSC[c[0]];return;}if(c[0]==='slope')v=Math.max(0,Math.min(89,v));else if(c[0]==='dir')v=Math.max(0,Math.min(180,v));else v=Math.max(0,v);MSC[c[0]]=v;nb.value=v;inp.value=v;moveRefresh(true);});
   });
-  var sg=document.createElement('div');sg.className='seg';sg.setAttribute('role','group');sg.setAttribute('aria-label','What she is doing');sg.style.marginBottom='6px';
+  var sg=document.createElement('div');sg.className='seg';sg.setAttribute('role','group');sg.setAttribute('aria-label','What She Is Doing');sg.style.marginBottom='6px';
   [['run','Running (W)'],['coast','Coasting'],['brake','Braking (S)']].forEach(function(o){var bt=document.createElement('button');bt.textContent=o[1];bt.dataset.ms=o[0];bt.setAttribute('aria-pressed',String(MSC.mode===o[0]));
     bt.addEventListener('click',function(){MSC.mode=o[0];sg.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x.dataset.ms===o[0]));});moveRefresh(true);});sg.appendChild(bt);});
   host.appendChild(sg);}
@@ -839,18 +840,18 @@ function bulgeRows(seg,n){
   var e=seg.ends,b=seg.id+'.u'+n,k=seg.kind,sN=e[0],eN=e[1],ls,le,fw=k==='fwd';
   ls=fw?'toward the '+sN:k==='up'?'bottom ('+sN+')':'top ('+sN+')';
   le=fw?'toward the '+eN:k==='up'?'top ('+eN+')':'bottom ('+eN+')';
-  return [[b+'p','Position along length (0% = '+sN+' end)','pct',0,1,.01],[b+'a','Direction around the part (0 = '+(fw?'top':'front')+', 90 = '+(seg.pair?'outside':'right')+', 180 = '+(fw?'underside':'back')+')','deg',-180,180,1],
+  return [[b+'p','Position Along Length (0% = '+sN+' end)','pct',0,1,.01],[b+'a','Direction Around the Part (0 = '+(fw?'top':'front')+', 90 = '+(seg.pair?'outside':'right')+', 180 = '+(fw?'underside':'back')+')','deg',-180,180,1],
    [b+'d','Depth (above 0 bulges out, below 0 dents in)','cm',-8,8,.1],
-   [b+'wl','Width: radial left','deg',5,180,1],[b+'wr','Width: radial right','deg',5,180,1],[b+'ws','Width: '+ls,'pct',.02,1,.01],[b+'we','Width: '+le,'pct',.02,1,.01],
-   [b+'kl','Curvature: radial left (concave to convex)','x',-1,1,.05],[b+'kr','Curvature: radial right','x',-1,1,.05],[b+'ks','Curvature: '+ls,'x',-1,1,.05],[b+'ke','Curvature: '+le,'x',-1,1,.05]];
+   [b+'wl','Width: Radial Left','deg',5,180,1],[b+'wr','Width: Radial Right','deg',5,180,1],[b+'ws','Width: '+tcLabel(ls),'pct',.02,1,.01],[b+'we','Width: '+tcLabel(le),'pct',.02,1,.01],
+   [b+'kl','Curvature: Radial Left (concave to convex)','x',-1,1,.05],[b+'kr','Curvature: Radial Right','x',-1,1,.05],[b+'ks','Curvature: '+tcLabel(ls),'x',-1,1,.05],[b+'ke','Curvature: '+tcLabel(le),'x',-1,1,.05]];
 }
 function coreRows(seg){
   var id=seg.id,e=seg.ends,pre=id+'.';
   return {
-   size:[[pre+'len','Length','cm',2,70,.5],[pre+'dia','Max diameter (width)','cm',1,60,.1],[pre+'depth','Depth as a fraction of width','x',.3,2,.01]],
-   center:[[pre+'peak','Position along length (0% = '+e[0]+' end)','pct',.02,.98,.01]],
-   start:[[pre+'tS','Taper at the '+e[0]+' end','pct',.03,1,.01],[pre+'cS','Curve from '+e[0]+' end to max','x',.4,5,.05]],
-   end:[[pre+'tE','Taper at the '+e[1]+' end','pct',.03,1,.01],[pre+'cE','Curve from max to '+e[1]+' end','x',.4,5,.05]],
+   size:[[pre+'len','Length','cm',2,70,.5],[pre+'dia','Max Diameter (width)','cm',1,60,.1],[pre+'depth','Depth as a Fraction of Width','x',.3,2,.01]],
+   center:[[pre+'peak','Position Along Length (0% = '+e[0]+' end)','pct',.02,.98,.01]],
+   start:[[pre+'tS','Taper at the '+tcLabel(e[0])+' End','pct',.03,1,.01],[pre+'cS','Curve From '+tcLabel(e[0])+' End to Max','x',.4,5,.05]],
+   end:[[pre+'tE','Taper at the '+tcLabel(e[1])+' End','pct',.03,1,.01],[pre+'cE','Curve From Max to '+tcLabel(e[1])+' End','x',.4,5,.05]],
    b1:bulgeRows(seg,1),b2:bulgeRows(seg,2)
   };
 }
@@ -858,9 +859,9 @@ function renderPart(){
   var seg=SEGBY[ui.sel],r=coreRows(seg);
   $('#partTitle').textContent=seg.label;
   $('#partNote').textContent=(seg.pair?'Left and right match. ':'')+'Runs from the '+seg.ends[0]+' to the '+seg.ends[1]+'.';
-  $('#hStart').textContent='Start taper and curve ('+seg.ends[0]+')';
-  $('#hEnd').textContent='End taper and curve ('+seg.ends[1]+')';
-  $('#pvAcap').textContent=seg.lat?seg.lat[0]:'Front view';$('#pvBcap').textContent=seg.lat?seg.lat[1]:'Side view';
+  $('#hStart').textContent='Start Taper and Curve ('+seg.ends[0]+')';
+  $('#hEnd').textContent='End Taper and Curve ('+seg.ends[1]+')';
+  $('#pvAcap').textContent=seg.lat?seg.lat[0]:'Front View';$('#pvBcap').textContent=seg.lat?seg.lat[1]:'Side View';
   [['#rSize',r.size],['#rCenter',r.center],['#rStart',r.start],['#rEnd',r.end],['#rB1',r.b1],['#rB2',r.b2]].forEach(function(p){var h=$(p[0]);h.innerHTML='';addRows(h,p[1]);});
   var ex=EXTRA[seg.id],xh=$('#rExtra');xh.innerHTML='';$('#xWrap').hidden=!ex;
   if(ex)addRows(xh,ex);
@@ -978,12 +979,12 @@ $('#resetAll').addEventListener('click',function(){P=JSON.parse(JSON.stringify(D
 
 
 /* ================= animation stats ================= */
-var STAGES={jump:['Ready','Crouch','Takeoff','Peak','Fall','Land','Recover'],slide:['Run in','Drop','Slide','Get up'],fall:['Run','Trip','Fall','Impact','Bounce','Settle'],set:['Pose'],drift:['Pose']};
-var MOVELABEL={jump:'Jump',slide:'Slide',fall:'Faceplant',set:"Runner's pose",drift:'Drift',barrier:'Barrier',cThrow:'Star throw',cHover:'Hover',cFly:'Fly'};
+var STAGES={jump:['Ready','Crouch','Takeoff','Peak','Fall','Land','Recover'],slide:['Run in','Drop','Slide','Get Up'],fall:['Run','Trip','Fall','Impact','Bounce','Settle'],set:['Pose'],drift:['Pose']};
+var MOVELABEL={jump:'Jump',slide:'Slide',fall:'Faceplant',set:"Runner's Pose",drift:'Drift',barrier:'Barrier',cThrow:'Star Throw',cHover:'Hover',cFly:'Fly'};
 var KEYGROUPS=[
- ['Body',[['hyf','Hips height (1 = standing)','x',.1,1.7,.01],['hz','Hips forward (m)','x',-1,1,.01],['hp','Body lean (+ forward)','deg',-110,110,1],['sp','Spine bend','deg',-60,60,1],['hd','Head tilt','deg',-70,70,1]]],
- ['Arms',[['aLp','Left arm raise','deg',-120,180,1],['aLr','Left arm out','deg',-20,120,1],['aLe','Left elbow bend','deg',0,150,1],['aRp','Right arm raise','deg',-120,180,1],['aRr','Right arm out','deg',-20,120,1],['aRe','Right elbow bend','deg',0,150,1]]],
- ['Legs',[['hL','Left thigh forward','deg',-80,130,1],['kL','Left knee bend','deg',0,150,1],['dL','Left toes up','deg',-60,60,1],['hR','Right thigh forward','deg',-80,130,1],['kR','Right knee bend','deg',0,150,1],['dR','Right toes up','deg',-60,60,1],['fl','Keep feet flat','pct',0,1,.01]]],
+ ['Body',[['hyf','Hips Height (1 = standing)','x',.1,1.7,.01],['hz','Hips Forward (m)','x',-1,1,.01],['hp','Body Lean (+ forward)','deg',-110,110,1],['sp','Spine Bend','deg',-60,60,1],['hd','Head Tilt','deg',-70,70,1]]],
+ ['Arms',[['aLp','Left Arm Raise','deg',-120,180,1],['aLr','Left Arm Out','deg',-20,120,1],['aLe','Left Elbow Bend','deg',0,150,1],['aRp','Right Arm Raise','deg',-120,180,1],['aRr','Right Arm Out','deg',-20,120,1],['aRe','Right Elbow Bend','deg',0,150,1]]],
+ ['Legs',[['hL','Left Thigh Forward','deg',-80,130,1],['kL','Left Knee Bend','deg',0,150,1],['dL','Left Toes Up','deg',-60,60,1],['hR','Right Thigh Forward','deg',-80,130,1],['kR','Right Knee Bend','deg',0,150,1],['dR','Right Toes Up','deg',-60,60,1],['fl','Keep Feet Flat','pct',0,1,.01]]],
  ['Ponytail',[['p1','Ponytail 1','deg',-90,90,1],['p2','Ponytail 2','deg',-90,90,1],['p3','Ponytail 3','deg',-90,90,1]]]
 ];
 var animKey={jump:0,slide:0,fall:0,set:0,drift:0};
@@ -995,53 +996,53 @@ function renderAnim(){
   if(m==='rest'){sec.hidden=true;return;}
   sec.hidden=false;
   var isRun=(m==='runS'||m==='run'||m==='runF'),pre=animPrefix(m);
-  var title=m==='idle'?'Idle':m==='runS'?'Slow run':m==='run'?'Mid run':m==='runF'?'Fast run':MOVELABEL[m];
+  var title=m==='idle'?'Idle':m==='runS'?'Slow Run':m==='run'?'Mid Run':m==='runF'?'Fast Run':MOVELABEL[m];
   $('#animTitle').textContent=title+' animation';
   if(m==='idle'){
     $('#animNote').textContent='A gentle standing loop.';
-    addRows(rows,[[pre+'dur','Loop length','s',1,6,.05],[pre+'breath','Breathing bob','cm',0,2,.1],[pre+'sway','Torso sway','deg',0,6,.1],[pre+'arm','Arm sway','deg',0,8,.1],[pre+'pony','Ponytail sway','x',0,3,.05]],{anim:1});
+    addRows(rows,[[pre+'dur','Loop Length','s',1,6,.05],[pre+'breath','Breathing Bob','cm',0,2,.1],[pre+'sway','Torso Sway','deg',0,6,.1],[pre+'arm','Arm Sway','deg',0,8,.1],[pre+'pony','Ponytail Sway','x',0,3,.05]],{anim:1});
   }else if(isRun){
     $('#animNote').textContent='A run cycle. Each of the three speeds has its own stats.';
-    addRows(rows,[[pre+'dur','Time per stride cycle','s',.25,2,.01],[pre+'stride','Stride','deg',5,62,1],[pre+'knee','Knee lift','deg',20,125,1],[pre+'arm','Arm swing','deg',0,78,1],[pre+'elbow','Elbow bend','deg',20,125,1],[pre+'lean','Forward lean','deg',0,30,1],[pre+'bounce','Bounce','cm',0,8,.5]],{anim:1});
+    addRows(rows,[[pre+'dur','Time per Stride Cycle','s',.25,2,.01],[pre+'stride','Stride','deg',5,62,1],[pre+'knee','Knee Lift','deg',20,125,1],[pre+'arm','Arm Swing','deg',0,78,1],[pre+'elbow','Elbow Bend','deg',20,125,1],[pre+'lean','Forward Lean','deg',0,30,1],[pre+'bounce','Bounce','cm',0,8,.5]],{anim:1});
   }else if(m==='barrier'){
     $('#animNote').textContent='The red dodecahedron she rolls inside. It stays a dodecahedron when slow, turns into a dashed sphere at speed, then squeezes along its axle and stretches round the spin. Use the preview speed to watch each stage; save closes the loop in the game when you close the editor.';
-    addRows(rows,[['barrier.preview','Preview speed','Zips',0,120,1],['barrier.radius','Size (radius)','units',1.2,2.6,.02],['barrier.height','Height of its centre','units',1,3,.02],['barrier.spin','Rolling speed','x',.2,3,.05],
-      ['barrier.sphereAt','Turns into a sphere at','Zips',5,100,1],['barrier.squeezeAt','Starts to squeeze at','Zips',20,119,1],['barrier.squeezeLen','Squeeze reaches full over','Zips',1,40,1],['barrier.squeeze','Squeeze along the axle','pct',0,.6,.01],['barrier.stretch','Stretch round the spin','pct',0,.5,.01],
-      ['barrier.chargeSphere','Dodecadash: sphere after charging','s',0,6,.1],['barrier.chargeSqueeze','Dodecadash: squeeze starts at','s',0,6,.1],
-      ['barrier.glow','Glow strength','x',0,.8,.01],['barrier.glowSize','Glow size','x',1,1.6,.01],['barrier.dashLen','Dash length','units',.05,1,.01],['barrier.dashGap','Gap between dashes','units',.05,1,.01]],{anim:1,barrier:1});
+    addRows(rows,[['barrier.preview','Preview Speed','Zips',0,120,1],['barrier.radius','Size (radius)','units',1.2,2.6,.02],['barrier.height','Height of Its Centre','units',1,3,.02],['barrier.spin','Rolling Speed','x',.2,3,.05],
+      ['barrier.sphereAt','Turns Into a Sphere at','Zips',5,100,1],['barrier.squeezeAt','Starts to Squeeze at','Zips',20,119,1],['barrier.squeezeLen','Squeeze Reaches Full Over','Zips',1,40,1],['barrier.squeeze','Squeeze Along the Axle','pct',0,.6,.01],['barrier.stretch','Stretch Round the Spin','pct',0,.5,.01],
+      ['barrier.chargeSphere','Dodecadash: Sphere After Charging','s',0,6,.1],['barrier.chargeSqueeze','Dodecadash: Squeeze Starts at','s',0,6,.1],
+      ['barrier.glow','Glow Strength','x',0,.8,.01],['barrier.glowSize','Glow Size','x',1,1.6,.01],['barrier.dashLen','Dash Length','units',.05,1,.01],['barrier.dashGap','Gap Between Dashes','units',.05,1,.01]],{anim:1,barrier:1});
     var ch=document.createElement('div');ch.className='row';ch.style.cssText='display:flex;flex-wrap:wrap;gap:10px;margin-top:8px';
-    [['barrier.cBody','Body'],['barrier.cEmis','Inner glow'],['barrier.cEdge','Edge lines'],['barrier.cDash','Dashes'],['barrier.cGlow','Halo']].forEach(function(c){
+    [['barrier.cBody','Body'],['barrier.cEmis','Inner Glow'],['barrier.cEdge','Edge Lines'],['barrier.cDash','Dashes'],['barrier.cGlow','Halo']].forEach(function(c){
       var l=document.createElement('label');l.style.cssText='display:flex;gap:6px;align-items:center;font-size:12px';l.textContent=c[1];
       var i=document.createElement('input');i.type='color';i.value=P[c[0]];i.addEventListener('input',function(){P[c[0]]=i.value;save();barrierDirty=true;});l.appendChild(i);ch.appendChild(l);});
     rows.appendChild(ch);
   }else if(/^c[A-Z]/.test(m)){
-    var UBR=[['sp','Spine bend (+ forward)'],['hd','Head tilt'],['aLp','Left arm raise'],['aLr','Left arm out'],['aLe','Left elbow bend'],['aRp','Right arm raise'],['aRr','Right arm out'],['aRe','Right elbow bend']];
+    var UBR=[['sp','Spine Bend (+ forward)'],['hd','Head Tilt'],['aLp','Left Arm Raise'],['aLr','Left Arm Out'],['aLe','Left Elbow Bend'],['aRp','Right Arm Raise'],['aRr','Right Arm Out'],['aRe','Right Elbow Bend']];
     var poseRows=function(pre,list){return list.map(function(r){return [pre+r[0],r[1],'deg',-180,180,1];});};
     var grp=function(title,list){var h3=document.createElement('h3');h3.textContent=title;kh.appendChild(h3);var d=document.createElement('div');kh.appendChild(d);addRows(d,list,{anim:1});};
     if(m==='cThrow'){
       $('#animNote').textContent='Star Throw. Holding Q or E she leans in with a star in her hand behind her (it grows as she charges); letting go, her arm swings through and the star leaves her hand part way. Her legs keep running. E throws with her right hand, Q mirrors it to her left. The preview charges for 1 s.';
-      addRows(rows,[['comet.throw.in','Into the charging pose','s',.02,1,.01],['comet.throw.swing','The swing','s',.02,1,.01],['comet.throw.rel','Star leaves her hand at (% of the swing)','pct',0,1,.01],['comet.throw.hold','Follow-through held','s',0,1,.01],['comet.throw.out','Back to running','s',.02,2,.01],['comet.hold.scale','Star in her hand (× the star she will throw)','x',.1,2,.05],['comet.hold.out','Star in her hand: out from her wrist','units',-1,1,.01]],{anim:1});
-      grp('Charging pose (holding the star behind her)',poseRows('comet.pc.',UBR));grp('Throw pose (the arm swung through)',poseRows('comet.pt.',UBR));
+      addRows(rows,[['comet.throw.in','Into the Charging Pose','s',.02,1,.01],['comet.throw.swing','The Swing','s',.02,1,.01],['comet.throw.rel','Star Leaves Her Hand at (% of the swing)','pct',0,1,.01],['comet.throw.hold','Follow-Through Held','s',0,1,.01],['comet.throw.out','Back to Running','s',.02,2,.01],['comet.hold.scale','Star in Her Hand (× the star she will throw)','x',.1,2,.05],['comet.hold.out','Star in her hand: out from her wrist','units',-1,1,.01]],{anim:1});
+      grp('Charging Pose (holding the star behind her)',poseRows('comet.pc.',UBR));grp('Throw Pose (the arm swung through)',poseRows('comet.pt.',UBR));
     }else if(m==='cHover'){
       $('#animNote').textContent='Hover. She floats over the ground doing whatever she would be doing; the changes below are laid over it (all 0: just her run). Two stars at her ankles and a bigger one behind her back.';
-      addRows(rows,[['comet.hov.height','Floats above the ground by','units',0,3,.05],['comet.hov.bob','Bob','units',0,1,.01],['comet.hov.bobT','Bob: seconds a cycle','s',.2,6,.05],['comet.hov.spinS','Stars: turns a second','x',0,6,.1],['comet.hov.ankle','Ankle stars: size','units',.05,2,.01],['comet.hov.ankleY','Ankle stars: up or down','units',-1,1,.01],['comet.hov.ankleTilt','Ankle stars: tilt','deg',-90,90,1],['comet.hov.back','Back star: size','units',.1,3,.01],['comet.hov.backD','Back star: behind her by','units',0,2,.01],['comet.hov.backY','Back star: up or down','units',-2,2,.01],['comet.hov.backTilt','Back star: tilt','deg',-90,90,1]],{anim:1});
+      addRows(rows,[['comet.hov.height','Floats Above the Ground by','units',0,3,.05],['comet.hov.bob','Bob','units',0,1,.01],['comet.hov.bobT','Bob: Seconds a Cycle','s',.2,6,.05],['comet.hov.spinS','Stars: Turns a Second','x',0,6,.1],['comet.hov.ankle','Ankle Stars: Size','units',.05,2,.01],['comet.hov.ankleY','Ankle Stars: Up or Down','units',-1,1,.01],['comet.hov.ankleTilt','Ankle Stars: Tilt','deg',-90,90,1],['comet.hov.back','Back Star: Size','units',.1,3,.01],['comet.hov.backD','Back Star: Behind Her by','units',0,2,.01],['comet.hov.backY','Back Star: Up or Down','units',-2,2,.01],['comet.hov.backTilt','Back Star: Tilt','deg',-90,90,1]],{anim:1});
       KEYGROUPS.forEach(function(g){grp(g[0]+' (changes while hovering)',g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['comet.ho.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}));});
     }else{
       $('#animNote').textContent='Fly (Space held in the air while hovering). This pose takes over her arms, spine and head; the leg stats are changes to her jump. The star from her back goes up to her hands.';
-      addRows(rows,[['comet.fly.arms','How fast she goes into it','x',1,30,.5],['comet.fly.starY','Star above her hands','units',-1,2,.01],['comet.fly.starS','Star size there (× the back star)','x',.2,3,.05]],{anim:1});
-      grp('Arms, spine and head',poseRows('comet.pf.',UBR));
-      grp('Legs (changes to her jump)',[['hL','Left thigh forward'],['kL','Left knee bend'],['dL','Left toes up'],['hR','Right thigh forward'],['kR','Right knee bend'],['dR','Right toes up']].map(function(r){return ['comet.fl.'+r[0],r[1],'deg',-120,120,1];}));
+      addRows(rows,[['comet.fly.arms','How Fast She Goes Into It','x',1,30,.5],['comet.fly.starY','Star Above Her Hands','units',-1,2,.01],['comet.fly.starS','Star Size There (× the back star)','x',.2,3,.05]],{anim:1});
+      grp('Arms, Spine and Head',poseRows('comet.pf.',UBR));
+      grp('Legs (changes to her jump)',[['hL','Left Thigh Forward'],['kL','Left Knee Bend'],['dL','Left Toes Up'],['hR','Right Thigh Forward'],['kR','Right Knee Bend'],['dR','Right Toes Up']].map(function(r){return ['comet.fl.'+r[0],r[1],'deg',-120,120,1];}));
     }
   }else if(m==='drift'){
     $('#animNote').textContent='What she does while drifting left (A held); drifting right is the same, mirrored. In the game she keeps running, stride for stride, and leans into the corner from her feet. The changes below are added on top of her Fast run (all 0: just the run). Save to game to use them.';
-    addRows(rows,[[pre+'lean','Lean into the corner','deg',0,60,.5],[pre+'angle','Momentum shift when it starts','deg',0,45,.5],[pre+'time','Time to make the shift','s',.03,.6,.01],[pre+'minZips','Needs at least','Zips',0,80,1],[pre+'cool','Cooldown after release','s',0,5,.1],[pre+'rate','How fast she settles into it','x',2,20,.5],['slope.side','Tilt to sideways slopes (all running)','x',0,1.2,.05]],{anim:1});
+    addRows(rows,[[pre+'lean','Lean Into the Corner','deg',0,60,.5],[pre+'angle','Momentum Shift When It Starts','deg',0,45,.5],[pre+'time','Time to Make the Shift','s',.03,.6,.01],[pre+'minZips','Needs at Least','Zips',0,80,1],[pre+'cool','Cooldown After Release','s',0,5,.1],[pre+'rate','How Fast She Settles Into It','x',2,20,.5],['slope.side','Tilt to Sideways Slopes (all running)','x',0,1.2,.05]],{anim:1});
     KEYGROUPS.forEach(function(g){var h3=document.createElement('h3');h3.textContent=g[0]+' (added to her run)';kh.appendChild(h3);var d=document.createElement('div');kh.appendChild(d);
       addRows(d,g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['dA.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}),{anim:1});});
   }else{
     $('#animNote').textContent=m==='drift'?'Her pose while drifting left (A held, camera to her left); drifting right is this pose mirrored. Pose is for the Molly model; lean and turn stats below are live in the game.':'A one-shot move that loops here so you can watch it. Pick a stage to jump to it and edit its pose; the moves in between are blended for you.';
-    var extra=[[pre+'dur','Total length','s',.5,5,.05]];
-    if(m==='set')extra.push([pre+'bob','Breathing bob','cm',0,4,.1],[pre+'rock','Breathing rock','deg',0,6,.1],[pre+'nod','Head nod','deg',0,6,.1]);
-    if(m==='drift')extra.push([pre+'lean','Lean into the corner','deg',0,60,.5],[pre+'angle','Momentum shift when it starts','deg',0,45,.5],[pre+'time','Time to make the shift','s',.03,.6,.01],[pre+'minZips','Needs at least','Zips',0,80,1],[pre+'cool','Cooldown after release','s',0,5,.1],[pre+'rate','How fast she settles into it','x',2,20,.5],['slope.side','Tilt to sideways slopes (all running)','x',0,1.2,.05]);
+    var extra=[[pre+'dur','Total Length','s',.5,5,.05]];
+    if(m==='set')extra.push([pre+'bob','Breathing Bob','cm',0,4,.1],[pre+'rock','Breathing Rock','deg',0,6,.1],[pre+'nod','Head Nod','deg',0,6,.1]);
+    if(m==='drift')extra.push([pre+'lean','Lean Into the Corner','deg',0,60,.5],[pre+'angle','Momentum Shift When It Starts','deg',0,45,.5],[pre+'time','Time to Make the Shift','s',.03,.6,.01],[pre+'minZips','Needs at Least','Zips',0,80,1],[pre+'cool','Cooldown After Release','s',0,5,.1],[pre+'rate','How Fast She Settles Into It','x',2,20,.5],['slope.side','Tilt to Sideways Slopes (all running)','x',0,1.2,.05]);
     var hk=HOLDKEY[m];
     if(hk)extra.push([pre+hk[0]+'.t',hk[1],'pct',P[pre+(hk[0]-1)+'.t']+.02,P[pre+(hk[0]+1)+'.t']-.02,.01]);
     addRows(rows,extra,{anim:1});
@@ -1050,20 +1051,20 @@ function renderAnim(){
       b.addEventListener('click',function(){animKey[m]=i;ui.phase=P[pre+ks[i]+'.t']||0;pausePlay();renderAnim();});st.appendChild(b);});
     var kk=ks[sel],kp=pre+kk+'.',lo=kk===0?0:P[pre+(kk-1)+'.t']+.01,hi=(kk+1>=MOVEX[m].length-1?1:P[pre+(kk+1)+'.t'])-.01;
     var th=document.createElement('h3');th.textContent='Stage: '+names[sel];kh.appendChild(th);
-    if(kk>0){var tr=document.createElement('div');kh.appendChild(tr);addRows(tr,[[kp+'t','When it happens (% of the move)','pct',Math.max(0,lo),Math.max(lo+.01,hi),.01]],{anim:1,then:function(){if(!ui.playing){ui.phase=P[kp+'t'];$('#phase').value=ui.phase;}}});}   /* paused on this stage, the preview moves with its time, so the pose on screen is still this stage's */
+    if(kk>0){var tr=document.createElement('div');kh.appendChild(tr);addRows(tr,[[kp+'t','When It Happens (% of the move)','pct',Math.max(0,lo),Math.max(lo+.01,hi),.01]],{anim:1,then:function(){if(!ui.playing){ui.phase=P[kp+'t'];$('#phase').value=ui.phase;}}});}   /* paused on this stage, the preview moves with its time, so the pose on screen is still this stage's */
     KEYGROUPS.forEach(function(g){var h3=document.createElement('h3');h3.textContent=g[0];kh.appendChild(h3);var d=document.createElement('div');kh.appendChild(d);
       addRows(d,g[1].map(function(r){return [kp+r[0]].concat(r.slice(1));}),{anim:1});});
   }
 }
-var STAT_ROWS=[['stat.top','Top speed','Zips',20,160,1],['stat.accelT','Time from 0 to top speed','s',1,20,.1],['stat.brake','Braking strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip fades on slopes (× the cosine of the slope)','tog'],['stat.driftGrip','Grip while drifting (x her grip)','x',0,3,.05],['stat.fall','Max fall speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision box height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision box width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier slam: top speed','Zips',10,200,1],['stat.strafe','Strafe distance (Q/E sidestep; 2 = one tile)','units',0.5,12,.1]];
+var STAT_ROWS=[['stat.top','Top Speed','Zips',20,160,1],['stat.accelT','Time From 0 to Top Speed','s',1,20,.1],['stat.brake','Braking Strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump Height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways Grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip Fades on Slopes (× the cosine of the slope)','tog'],['stat.driftGrip','Grip While Drifting (x her grip)','x',0,3,.05],['stat.fall','Max Fall Speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision Box Height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision Box Width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall Grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier Slam: Top Speed','Zips',10,200,1],['stat.strafe','Strafe Distance (Q/E sidestep; 2 = one tile)','units',0.5,12,.1]];
 function renderStats(){var h=$('#statRows');if(!h)return;h.innerHTML='';addRows(h,STAT_ROWS,{anim:1,stat:1});var sc=document.createElement('div');sc.id='statLive';sc.style.cssText='margin-top:10px;max-width:460px';h.appendChild(sc);statCardRefresh();}   /* the Stats menu at the top of the panel */
 try{renderStats();}catch(e){}
-var COMET_HOV=[['comet.hov.cost','Power to switch it on','n',0,50,1],['comet.hov.drain','Power a second while on','n',0,20,.1],['comet.hov.height','Floats above the ground by','units',0,3,.05],
- ['comet.hov.top','Top speed','Zips',10,200,1],['comet.hov.accelT','Time from 0 to top speed','s',.5,20,.1],['comet.hov.brake','Braking strength (x coasting)','x',0,8,.1],['comet.hov.fric','Friction (coasting)','Zips/s²',0,40,.1],['comet.hov.gripZ','Sideways grip (turning)','Zips/s²',1,80,.5],['comet.hov.jumpH','Jump height','units',0,30,.1],
+var COMET_HOV=[['comet.hov.cost','Power to Switch It on','n',0,50,1],['comet.hov.drain','Power a Second While on','n',0,20,.1],['comet.hov.height','Floats Above the Ground by','units',0,3,.05],
+ ['comet.hov.top','Top Speed','Zips',10,200,1],['comet.hov.accelT','Time From 0 to Top Speed','s',.5,20,.1],['comet.hov.brake','Braking Strength (x coasting)','x',0,8,.1],['comet.hov.fric','Friction (coasting)','Zips/s²',0,40,.1],['comet.hov.gripZ','Sideways Grip (turning)','Zips/s²',1,80,.5],['comet.hov.jumpH','Jump Height','units',0,30,.1],
 ];
-var COMET_FLY=[['comet.fly.drain','Extra power a second while flying','n',0,40,.1],['comet.fly.lift','Lift (× gravity: 1 cancels it)','x',0,3,.01]];
-var COMET_STAR=[['comet.star.cost','Power per throw (needs more than 0)','n',0,20,1],['comet.star.range','Range','units',5,400,1],['comet.star.dmg','Damage','hearts',0,10,.5],['comet.star.cool','Cooldown','s',0,10,.1],['comet.star.speed','Speed','Zips',5,400,1],['comet.star.size','Size (across)','units',.1,5,.05],['comet.star.spin','Spin (turns a second)','x',0,20,.1],
- ['comet.star.cMax','Charge: most seconds','s',0,6,1],['comet.star.cCost','Charge: power per second','n',0,20,1],['comet.star.cSize','Charge: size per second (+ × its size)','x',0,3,.05],['comet.star.cDmg','Charge: damage per second','hearts',0,5,.5],['comet.star.cRange','Charge: range per second','units',0,400,1]];
+var COMET_FLY=[['comet.fly.drain','Extra Power a Second While Flying','n',0,40,.1],['comet.fly.lift','Lift (× gravity: 1 cancels it)','x',0,3,.01]];
+var COMET_STAR=[['comet.star.cost','Power per Throw (needs more than 0)','n',0,20,1],['comet.star.range','Range','units',5,400,1],['comet.star.dmg','Damage','hearts',0,10,.5],['comet.star.cool','Cooldown','s',0,10,.1],['comet.star.speed','Speed','Zips',5,400,1],['comet.star.size','Size (across)','units',.1,5,.05],['comet.star.spin','Spin (turns a second)','x',0,20,.1],
+ ['comet.star.cMax','Charge: Most Seconds','s',0,6,1],['comet.star.cCost','Charge: Power per Second','n',0,20,1],['comet.star.cSize','Charge: Size per Second (+ × its size)','x',0,3,.05],['comet.star.cDmg','Charge: Damage per Second','hearts',0,5,.5],['comet.star.cRange','Charge: Range per Second','units',0,400,1]];
 function renderComet(){if(PAGE!=='comet')return;['#cHov','#cFly','#cStar','#cCols'].forEach(function(q){$(q).innerHTML='';});
   addRows($('#cHov'),COMET_HOV,{anim:1});addRows($('#cFly'),COMET_FLY,{anim:1});addRows($('#cStar'),COMET_STAR,{anim:1});
   [['comet.cStar','Star'],['comet.cGlow','Glow']].forEach(function(c){var l=document.createElement('label');l.innerHTML='<input type="color" value="'+P[c[0]]+'"><span>'+c[1]+'</span>';$('#cCols').appendChild(l);l.querySelector('input').addEventListener('input',function(){P[c[0]]=this.value;save();});});}
@@ -1074,13 +1075,13 @@ $('#resetStats').addEventListener('click',function(){STAT_ROWS.forEach(function(
 var MOB_KINDS=[['min','Minions','Minion'],['big','Big Minions','Big Minion'],['gaz','Roost Gazers','Roost Gazer']];   /* [key, tab, one of them]: a new kind of mob is one more line here (and its defaults under mn.<key>.) */
 function mobName(t){for(var i=0;i<MOB_KINDS.length;i++)if(MOB_KINDS[i][0]===t)return MOB_KINDS[i][2];return t;}
 var minTab='min',minDirty=true,minGroup=null,minModel=null,minPhase=0;
-var MIN_LOOK=[['scale','Overall size (× the blocks below)','x',.2,8,.05],['radius','Collision radius (how close it gets to her)','units',.2,20,.05],['headW','Head width','units',.1,3,.01],['headH','Head height','units',.1,3,.01],['headD','Head depth','units',.1,3,.01],['torsoW','Body width','units',.1,3,.01],['torsoH','Body height','units',.1,4,.01],['torsoD','Body depth','units',.1,3,.01],['armW','Arm thickness','units',.05,2,.01],['armL','Arm length','units',.1,4,.01],['legW','Leg width','units',.05,2,.01],['legD','Leg depth','units',.05,2,.01],['legL','Leg length','units',.1,4,.01]];
-var MIN_WALK=[['stride','Stride rate (swings per unit it moves)','x',.05,4,.01],['legSwing','Leg swing','°',0,90,.5],['armSwing','Arm swing','°',0,90,.5],['armRaise','Arms raised forward while chasing','°',-30,180,.5],['bob','Bob (lift at each step)','units',0,1.5,.01]];
-var MIN_STATS=[['top','Top speed','Zips',1,60,.5],['acc','Acceleration','Zips/s²',.5,60,.5],['see','Sight range (chases her within)','units',5,400,1],['hearts','Hearts','n',1,20,1],['dmg','Damage to Molly per touch (hearts)','n',0,12,1],['cool','Time before it can hurt her again','s',.1,5,.05],['k1','Barrier speed for 1 heart of damage (0 = never)','Zips',0,200,1],['k2','Barrier speed for 2 hearts (0 = never)','Zips',0,200,1],['k3','Barrier speed for 3 hearts (0 = never)','Zips',0,200,1],['stomp','Bounce off its head (a stomp on the top quarter)','Zips',0,60,.5]];
-var MIN_COLS=[['cHead','Head'],['cBody','Body'],['cLimb','Arms and legs'],['cEye','Eyes']];
-var GAZ_LOOK=[['scale','Overall size (× the blocks below)','x',.2,8,.05],['radius','Collision radius (how close it gets to her)','units',.2,20,.05],['headW','Head width','units',.1,3,.01],['headH','Head height','units',.1,3,.01],['headD','Head depth','units',.1,3,.01],['wing','Wing length','units',.2,6,.05],['legW','Leg width','units',.05,2,.01],['legD','Leg depth','units',.05,2,.01],['legL','Leg length','units',.05,4,.01]];
-var GAZ_WALK=[['flap','Wing beats a second','n',.5,20,.1],['legSwing','Leg swing','°',0,90,.5],['bob','Bob (lift and drop)','units',0,1.5,.01]];
-var GAZ_STATS=[['top','Top speed','Zips',1,60,.5],['acc','Acceleration','Zips/s²',.5,60,.5],['see','Sight range (chases her within)','units',5,400,1],['orbit','Chase: how far it buzzes round her head','units',1,60,.5],['range','Laser range','units',2,200,1],['fire','Seconds between laser shots','s',.2,20,.1],['bolt','Laser speed','Zips',1,300,1],['bdmg','Laser damage to Molly (hearts)','hearts',0,12,.5],['hearts','Hearts','n',1,20,1],['k1','Barrier speed for 1 heart of damage (0 = never)','Zips',0,200,1],['k2','Barrier speed for 2 hearts (0 = never)','Zips',0,200,1],['k3','Barrier speed for 3 hearts (0 = never)','Zips',0,200,1],['stomp','Bounce off its head (a stomp on the top quarter)','Zips',0,60,.5]];
+var MIN_LOOK=[['scale','Overall Size (× the blocks below)','x',.2,8,.05],['radius','Collision Radius (how close it gets to her)','units',.2,20,.05],['headW','Head Width','units',.1,3,.01],['headH','Head Height','units',.1,3,.01],['headD','Head Depth','units',.1,3,.01],['torsoW','Body Width','units',.1,3,.01],['torsoH','Body Height','units',.1,4,.01],['torsoD','Body Depth','units',.1,3,.01],['armW','Arm Thickness','units',.05,2,.01],['armL','Arm Length','units',.1,4,.01],['legW','Leg Width','units',.05,2,.01],['legD','Leg Depth','units',.05,2,.01],['legL','Leg Length','units',.1,4,.01]];
+var MIN_WALK=[['stride','Stride Rate (swings per unit it moves)','x',.05,4,.01],['legSwing','Leg Swing','°',0,90,.5],['armSwing','Arm Swing','°',0,90,.5],['armRaise','Arms Raised Forward While Chasing','°',-30,180,.5],['bob','Bob (lift at each step)','units',0,1.5,.01]];
+var MIN_STATS=[['top','Top Speed','Zips',1,60,.5],['acc','Acceleration','Zips/s²',.5,60,.5],['see','Sight Range (chases her within)','units',5,400,1],['hearts','Hearts','n',1,20,1],['dmg','Damage to Molly per Touch (hearts)','n',0,12,1],['cool','Time Before It Can Hurt Her Again','s',.1,5,.05],['k1','Barrier Speed for 1 Heart of Damage (0 = never)','Zips',0,200,1],['k2','Barrier Speed for 2 Hearts (0 = never)','Zips',0,200,1],['k3','Barrier Speed for 3 Hearts (0 = never)','Zips',0,200,1],['stomp','Bounce Off Its Head (a stomp on the top quarter)','Zips',0,60,.5]];
+var MIN_COLS=[['cHead','Head'],['cBody','Body'],['cLimb','Arms and Legs'],['cEye','Eyes']];
+var GAZ_LOOK=[['scale','Overall Size (× the blocks below)','x',.2,8,.05],['radius','Collision Radius (how close it gets to her)','units',.2,20,.05],['headW','Head Width','units',.1,3,.01],['headH','Head Height','units',.1,3,.01],['headD','Head Depth','units',.1,3,.01],['wing','Wing Length','units',.2,6,.05],['legW','Leg Width','units',.05,2,.01],['legD','Leg Depth','units',.05,2,.01],['legL','Leg Length','units',.05,4,.01]];
+var GAZ_WALK=[['flap','Wing Beats a Second','n',.5,20,.1],['legSwing','Leg Swing','°',0,90,.5],['bob','Bob (lift and drop)','units',0,1.5,.01]];
+var GAZ_STATS=[['top','Top Speed','Zips',1,60,.5],['acc','Acceleration','Zips/s²',.5,60,.5],['see','Sight Range (chases her within)','units',5,400,1],['orbit','Chase: how far it buzzes round her head','units',1,60,.5],['range','Laser Range','units',2,200,1],['fire','Seconds Between Laser Shots','s',.2,20,.1],['bolt','Laser Speed','Zips',1,300,1],['bdmg','Laser Damage to Molly (hearts)','hearts',0,12,.5],['hearts','Hearts','n',1,20,1],['k1','Barrier Speed for 1 Heart of Damage (0 = never)','Zips',0,200,1],['k2','Barrier Speed for 2 Hearts (0 = never)','Zips',0,200,1],['k3','Barrier Speed for 3 Hearts (0 = never)','Zips',0,200,1],['stomp','Bounce Off Its Head (a stomp on the top quarter)','Zips',0,60,.5]];
 var GAZ_COLS=[['cHead','Head'],['cLimb','Legs'],['cWing','Wings'],['cEye','Eye (the colored ring round the pupil)']];
 function minCfgP(t){var c={};for(var k in MNE){var v=P['mn.'+t+'.'+k];c[k]=v===undefined?DEF['mn.'+t+'.'+k]:v;}c.gz=t==='gaz';return c;}
 function renderMinions(){

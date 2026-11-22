@@ -119,7 +119,7 @@ function showScreen(name) {                                // the menu shows one
   function gfxSave() { try { localStorage.setItem('pr_gfx', JSON.stringify(GFX)); } catch (e) {} }
   function gfxShow() {
     document.getElementById('gAA').textContent = 'Antialiasing: ' + (GFX.aa ? 'On' : 'Off') + '  (restarts the game)';
-    document.getElementById('gSoft').textContent = 'Soft shadows: ' + (GFX.soft ? 'On' : 'Off');
+    document.getElementById('gSoft').textContent = 'Soft Shadows: ' + (GFX.soft ? 'On' : 'Off');
     document.getElementById('gFogV').textContent = Math.round(GFX.fog * 100) + '%';
     document.getElementById('gFog').value = Math.round(GFX.fog * 100);
   }

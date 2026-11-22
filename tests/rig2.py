@@ -18,7 +18,7 @@ with sync_playwright() as p:
         t=pg.evaluate(R+".querySelector('#moveOut').innerText")
         rows=[l for l in t.split('\n') if l.strip()]
         d={}
-        for k in ['Its part along her heading','Its part across her heading','Her own part','Speed change','Speed after 1 s / 3 s','Heading after 1 s / 3 s','Turn radius, toward uphill','Ground covered on the map']:
+        for k in ['Its Part Along Her Heading','Its Part Across Her Heading','Her Own Part','Speed change','Speed After 1 s / 3 s','Heading After 1 s / 3 s','Turn Radius, Toward Uphill','Ground Covered on the Map']:
             for i,l in enumerate(rows):
                 if l.startswith(k): d[k]=l[len(k):].strip()+' | '+(rows[i+1] if i+1<len(rows) else ''); break
         return d

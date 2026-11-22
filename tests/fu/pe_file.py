@@ -1,4 +1,4 @@
-# Save to file / Open from file: standalone editor and the editor inside the game
+# Save to File / Open From File: standalone editor and the editor inside the game
 import json,sys,os,tempfile
 from playwright.sync_api import sync_playwright
 J={"version":2,"width":9,"pieces":[{"len":300}],"objects":[{"type":"tree","id":1,"x":10,"z":-20},{"type":"gap","id":2,"x":30,"z":-40,"heading":0,"bend":0,"length":30,"width":15,"ends":"square"},{"type":"ledge","id":3,"x":-30,"z":-20,"heading":0,"bend":0,"length":30,"thickness":4,"height":5,"ends":"round"}]}
@@ -13,7 +13,7 @@ with sync_playwright() as p:
     with pg.expect_download() as d: pg.click('#saveFile')
     dl=d.value; path=os.path.join(tempfile.mkdtemp(),dl.suggested_filename); dl.save_as(path)
     print('1 saved file name:',dl.suggested_filename,'| same text as the box:',open(path).read()==box,'| msg:',pg.evaluate("document.getElementById('msg').textContent")[:60])
-    pg.click('#reset'); pg.wait_for_timeout(200); print('  after Start over objects:',len(json.loads(pg.evaluate("document.getElementById('json').value"))['objects']))
+    pg.click('#reset'); pg.wait_for_timeout(200); print('  after Start Over objects:',len(json.loads(pg.evaluate("document.getElementById('json').value"))['objects']))
     pg.set_input_files('#fileIn',path); pg.wait_for_timeout(500)
     print('  after opening the file:',objs(pg.evaluate("document.getElementById('json').value")),'| msg:',pg.evaluate("document.getElementById('msg').textContent"))
     bad=os.path.join(os.path.dirname(path),'notes.txt'); open(bad,'w').write('hello, not a layout')

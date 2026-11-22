@@ -1,4 +1,4 @@
-# Rig Editor pages: Molly / Comet / Mobs. Comet's stats are her own (cometRig), start as Molly's, and her Save to game keeps her model apart; Mobs has the minion tabs
+# Rig Editor pages: Molly / Comet / Mobs. Comet's stats are her own (cometRig), start as Molly's, and her Save to Game keeps her model apart; Mobs has the minion tabs
 import sys; sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
 SP=sys.argv[1] if len(sys.argv)>1 else '/tmp'

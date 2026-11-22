@@ -13,7 +13,7 @@ with sync_playwright() as p:
     pg.evaluate("j=>{document.getElementById('json').value=j;document.getElementById('load').click()}",json.dumps(J)); pg.wait_for_timeout(200)
     pg.evaluate("document.getElementById('reset').click()"); pg.wait_for_timeout(200)
     pg.evaluate("document.getElementById('restoreBk').click()"); pg.wait_for_timeout(500)
-    v=json.loads(pg.evaluate("document.getElementById('json').value")); print('after Open latest backup: objects',len(v['objects']),'| msg:',pg.evaluate("document.getElementById('msg').textContent"))
+    v=json.loads(pg.evaluate("document.getElementById('json').value")); print('after Open Latest Backup: objects',len(v['objects']),'| msg:',pg.evaluate("document.getElementById('msg').textContent"))
     print('backups sent so far (should be none yet, first fires after 20 s):',pg.evaluate("window.__calls.length"))
     pg.wait_for_timeout(21000); print('after 21 s of idle with changes:',pg.evaluate("window.__calls"))
     # no bridge (a plain browser): the button stays hidden and nothing breaks

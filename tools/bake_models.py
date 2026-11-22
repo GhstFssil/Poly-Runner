@@ -1,5 +1,5 @@
 # Bakes the built-in runner models from the shipped settings (the molly-settings and comet-settings script tags), using the Rig Editor's own
-# Save to game export in a headless browser with empty storage, and writes them into the source part that holds them (see src/manifest.json) as molly-glb and comet-glb, then rebuilds the game file.
+# Save to Game export in a headless browser with empty storage, and writes them into the source part that holds them (see src/manifest.json) as molly-glb and comet-glb, then rebuilds the game file.
 # Needs the test harness (sh tests/setup.sh once). Run from the repo root:  python3 tools/bake_models.py
 import os, re, subprocess, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

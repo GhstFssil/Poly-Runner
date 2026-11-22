@@ -21,7 +21,7 @@ card=g.ev(g.q('#statLive')+".innerText"); print('  card:',card.replace('\n',' | 
 g.ev(g.q('#moveBox')+".open=true"); g.pg.wait_for_timeout(500)
 mv=g.ev(g.q('#moveBox')+".innerText"); 
 import re
-for key in ['Gravity is','Her grip','Past ','On a wall','Her grip on this slope','units a second','u/s']:
+for key in ['Gravity is','Her grip','Past ','On a wall','Her Grip on This Slope','units a second','u/s']:
     i=mv.find(key); print('   movement text [%s]:'%key, mv[i:i+260].replace('\n',' ') if i>=0 else None)
 # the across-a-slope table
 i=mv.find('SLOPES: RUNNING STRAIGHT ACROSS'); print('   table:',mv[i:i+700].replace('\n',' ~ ') if i>=0 else mv[:300])
