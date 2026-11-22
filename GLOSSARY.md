@@ -75,7 +75,7 @@ Each is a stamp. The first column is the exact label, as the Path Editor shows i
 | Mud | `mud` | not "Mud stretch" |
 | Crags, Terrain Patch | `crag`, `patch` | Crags, not "Crag patch" |
 
-Path Editor panel words: inspector, next-stamp panel, presets (`polyrun-pe-presets`), Snap, Layer, Bend, Rise, Length, Width, Height, Rotation, Heading.
+Path Editor panel words: inspector, next-stamp panel, presets (`polyrun-pe-presets`), Snap, Layer, Bend, Rise, Length, Width, Height, Rotation.
 
 ## Moves and the HUD
 | Term | Meaning | Code / notes |
@@ -141,11 +141,9 @@ The rows for src, part, build and the game file describe the source split, which
 | HISTORY, HANDOFF, BACKLOG | the change record (append-only), the state of the work, the list of bugs and ideas | |
 | audit-notes | the old log, frozen at v184 | |
 
-## Open conflicts (Ricky decides)
-- Rotation (`rot`) and Heading (`heading`) name the same thing on different stamps: free stamps turn with `rot`, strip stamps (ledges, mud, platforms, gaps, Seg Chains) with `heading`. Saved layouts hold these keys, so the old name must still be read on load.
-
 ## Frozen names (they look old but hold players' saved data)
 Renaming any of these loses saved layouts, settings and models unless the game reads the old name first and writes the new one. The rename task must decide each one; until then they stay as they are.
 
 - Browser storage: IndexedDB `polyrun` (store `kv`, keys `mollyGlb`, `cometGlb`); localStorage `runnerRig2`, `cometRig`, `pr_char`, `pr_gfx`, `pr_mouse2`, `polyrun-sandboxes`, `polyrun-pe-presets`, `polyrun-pe-clip`, `polyrun-last-export`, `polyrun-path-editor-v1`.
 - Desktop app: the bridge `window.polyrun` and its `polyrun-backup`/`polyrun-restore` messages, the folders `~/PolyRun` and `~/.config/PolyRun/game`, the package name `polyrun` and the app id `com.ricky.polyrun`.
+- Saved layouts: a stamp's angle is `rot` (Rotation). Layouts saved before 2026-11-21 hold `heading` on gaps, ledges, platforms, mud and Seg Chains: both loaders (the game's and the Path Editor's) still read it, and the Path Editor writes `rot`. The shipped levels (`src/data/level1.js`, `level2.js`) still say `heading`; they load fine. `heading` also stays as the name for a path's own start angle (`extraPaths`) and for the direction the player faces in the game.

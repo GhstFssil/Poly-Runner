@@ -990,7 +990,7 @@
       o.tox = (r.type === 'ledge' || r.type === 'platform') && !!r.toxic;   // a toxic top: it hurts to stand on, like a toxic patch
       if (r.type === 'mud') { o.len = r.length || 150; o.follow = r.s !== undefined; if (!o.follow) o.w = r.width || 12; }   // mud on the path follows it and is as wide as it; mud anywhere else has its own curve and width
       if (r.type === 'ledge' || r.type === 'platform' || r.type === 'gap') { o.len = r.length || 40; o.follow = r.s !== undefined; }
-      if (STRIPT[r.type] && !o.follow) { o.th = r.heading || 0; o.bend = r.bend || 0; }
+      if (STRIPT[r.type] && !o.follow) { o.th = r.rot !== undefined ? r.rot : r.heading || 0;  /* old saves say heading */ o.bend = r.bend || 0; }
       if (typeof r.after === 'number' && r.type !== 'door') { o.after = r.after; o.turn = r.turn || 0; o.follow = false; o.bend = r.bend || 0; }   // starts from the end of another piece (a door's "after" is its mode once what it is linked to is beaten, not this)
       if (r.type === 'crag') { o.r = r.radius || 60; o.count = r.count || 25; o.seed = r.seed || ((r.id || 0) * 7919 + 13); if (r.heightVar !== undefined) { o.base = r.baseRadius || 5.5; o.baseV = r.baseRadiusVar || 0; o.hgt = r.height || 4; o.hgtV = r.heightVar || 0; o.gap = r.spacing || 0; o.gapV = r.spacingVar || 0; } else { o.base = 5.5; o.baseV = 2; o.hgt = 0.675 * (r.height || 6); o.hgtV = 0.325 * (r.height || 6); o.gap = 0; o.gapV = 0; } }
       if (r.type === 'patch') { o.shape = r.shape || 'ellipse'; o.w = r.width || 200; o.d = r.length || 150; o.ground = r.ground || 'grass'; o.hard = r.edge === 'hard'; o.soft = r.soften === undefined ? 30 : r.soften; }

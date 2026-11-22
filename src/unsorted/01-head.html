@@ -1475,7 +1475,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (o.t === 'segchain') h += num('h', 'Height above the ground (at the start)', -1, 500, 0.5, o.h || 0) + num('rise', 'Rise by the end of the chain', -500, 500, 0.5, o.rise || 0) + num('arc', 'Vertical arc (extra height in the middle)', -500, 500, 0.5, o.arc || 0);
     if (o.t === 'mud') {
       if (!ghost) h += '<label class="f">Shape<select data-ok="follow"><option value="1"' + (o.follow === false ? '' : ' selected') + '>On the path (as wide as the path)</option><option value="0"' + (o.follow === false ? ' selected' : '') + '>Anywhere, on its own curve</option></select></label>';
-      if (o.follow === false) h += (ghost ? '' : num('th', 'Heading ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10)) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10) + num('w', 'Width', 1, 300, 1, mudW(o));   // the next mud takes its heading from where it is placed, so no Heading box
+      if (o.follow === false) h += (ghost ? '' : num('th', 'Rotation ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10)) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10) + num('w', 'Width', 1, 300, 1, mudW(o));   // the next mud takes its heading from where it is placed, so no Heading box
       else h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10);
       h += num('len', 'Length', 1, 5000, 1, o.len) + num('slow', 'Slowdown %', 0, 95, 1, o.slow) + endsF(o);
     }
@@ -1488,7 +1488,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         h += '<label class="f">Shape<select data-ok="follow"><option value="1"' + (o.follow === false ? '' : ' selected') + '>Follows the path</option><option value="0"' + (o.follow === false ? ' selected' : '') + '>Its own curve</option></select></label>';
         }
         if (ghost) { if (o.follow === false) h += num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round((o.bend || 0) * 10) / 10); }
-        else if (o.follow === false) h += num('th', 'Heading ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10);
+        else if (o.follow === false) h += num('th', 'Rotation ° (0 = north, 90 = east)', -360, 360, 1, Math.round(o.th * 10) / 10) + num('bend', 'Bend ° (+ right, − left)', -720, 720, 1, Math.round(o.bend * 10) / 10);
         else h += num('s', 'Starts at (along path)', 0, Math.round(total), 1, Math.round(o.s * 10) / 10) + num('u', 'Across (− left, + right)', -200, 200, 0.5, Math.round(o.u * 10) / 10);
       }
       h += num('len', o.t === 'segchain' ? 'Chain length' : 'Length', 1, 5000, 1, o.len);
@@ -1651,7 +1651,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (o.t === 'checkpoint') { r.width = o.w; r.number = cpNumber(o); }
       if (o.t === 'plate') { r.shape = o.shape; if (o.shape === 'circle') r.radius = o.r; else { r.width = o.w; r.length = o.d; } r.look = o.look; if (o.whl) r.onlyWhileStanding = true; }
       if (o.t === 'target') { r.size = o.size; if (!o.post) r.post = false; r.height = o.h; if (o.tilt) r.tilt = o.tilt; if (o.spin) r.spin = o.spin; if (o.hb !== 1) r.hitbox = o.hb; r.breakSpeed = o.k; if (o.sd) { r.sideTravel = o.sd; r.sidePeriod = o.sp; } if (o.vd) { r.upTravel = o.vd; r.upPeriod = o.vp; } if ((o.sd || o.vd) && o.phase) r.phase = o.phase; }
-      if (STRIPS[o.t] && o.t !== 'segchain') { r.length = o.len; if (o.follow === false) { r.heading = R(o.th); r.bend = R(o.bend); } }
+      if (STRIPS[o.t] && o.t !== 'segchain') { r.length = o.len; if (o.follow === false) { r.rot = R(o.th); r.bend = R(o.bend); } }
       if (o.t === 'ledge') { r.thickness = o.w; r.height = o.hgt; }
       if (o.t === 'platform') { r.width = o.w; r.height = o.hgt; r.thick = o.thick === undefined ? 2 : o.thick; r.move = o.move; if (o.move !== 'none') { r.travel = o.dist; r.period = o.period; r.phase = o.phase || 0; if (o.group) r.group = o.group; } }
       if (o.t === 'gap') r.width = o.w;
@@ -1668,9 +1668,9 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (o.t === 'lake') { r.radius = o.r; r.depth = o.depth; if (o.wl) r.waterAdjust = o.wl; }
       if (o.t === 'goal') { r.kind = o.kind; r.style = o.style; r.width = o.w; }
       if (o.t === 'seg') { r.big = !!o.big; if (o.h) r.height = o.h; }
-      if (o.t === 'segchain') { r.big = !!o.big; if (o.h) r.height = o.h; if (o.rise) r.rise = o.rise; if (o.arc) r.arc = o.arc; r.length = o.len; r.spacing = o.gap; r.count = chainPts(o).length; if (o.follow === false) { r.follow = false; r.heading = R(o.th); r.bend = R(o.bend); } }
+      if (o.t === 'segchain') { r.big = !!o.big; if (o.h) r.height = o.h; if (o.rise) r.rise = o.rise; if (o.arc) r.arc = o.arc; r.length = o.len; r.spacing = o.gap; r.count = chainPts(o).length; if (o.follow === false) { r.follow = false; r.rot = R(o.th); r.bend = R(o.bend); } }
       if (o.t === 'tip') { r.shape = o.shape; if (o.shape === 'circle') r.radius = o.r; else { r.width = o.w; r.length = o.d; } r.text = o.text; if (o.up) r.above = o.up; if (o.dn) r.below = o.dn; }
-      if (o.after !== undefined && o.t !== 'door') { delete r.x; delete r.z; delete r.s; delete r.u; delete r.heading; r.after = o.after; r.turn = o.turn || 0; }
+      if (o.after !== undefined && o.t !== 'door') { delete r.x; delete r.z; delete r.s; delete r.u; if (STRIPS[o.t]) delete r.rot; r.after = o.after; r.turn = o.turn || 0; }
       return r; }) }, null, 1);
     save(); terEnsure(); terNote(); draw(); if (SR.activeElement && SR.activeElement.closest && !SR.activeElement.closest('#insp')) renderInsp();
     if (!(SR.activeElement && SR.activeElement.closest && SR.activeElement.closest('#layers'))) renderLayers();
@@ -1847,8 +1847,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         if (r.type === 'gap') o.w = r.width || 15;
         if (r.type === 'gap' || r.type === 'ledge' || r.type === 'mud') o.ends = r.ends === 'square' ? 'square' : 'round';
         if (r.type === 'ledge' || r.type === 'platform') o.tox = !!r.toxic;
-        if (r.type === 'mud') { o.slow = r.slowdown === undefined ? 50 : r.slowdown; o.len = r.length || 150; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.heading || 0; o.bend = r.bend || 0; o.w = r.width || 12; } }
-        if (r.type === 'ledge' || r.type === 'platform' || r.type === 'gap') { o.len = r.length || 40; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.heading || 0; o.bend = r.bend || 0; } }
+        if (r.type === 'mud') { o.slow = r.slowdown === undefined ? 50 : r.slowdown; o.len = r.length || 150; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.rot !== undefined ? r.rot : r.heading || 0; o.bend = r.bend || 0; o.w = r.width || 12; } }
+        if (r.type === 'ledge' || r.type === 'platform' || r.type === 'gap') { o.len = r.length || 40; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.rot !== undefined ? r.rot : r.heading || 0; o.bend = r.bend || 0; } }
         if (r.id !== undefined) o.id = r.id; if (r.layer !== undefined) o.layer = r.layer; if (r.heightMode === 'independent') o.hm = 'ind';
         if (typeof r.after === 'number' && r.type !== 'door') { o.after = r.after; o.turn = r.turn || 0; o.follow = false; }   // starts from the end of another piece (a door's "after" is its mode once beaten, not this)
         if (r.type === 'tree' && r.exact) { o.ex = true; o.tH = r.trunkHeight || 15.5; o.tW = r.trunkWidth || 1.6; o.cH = r.canopyHeight || 14.9; o.cW = r.canopyWidth || 7.4; }
@@ -1861,7 +1861,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         if (r.type === 'spawner') { o.r = r.radius || 40; o.every = r.every || 3; o.max = r.max || 6; }
         if (r.type === 'goal') { o.kind = r.kind || 'regular'; o.style = r.style || 'banner'; o.w = r.width || 16; }
         if (r.type === 'seg') { o.big = !!r.big; o.h = r.height || 0; }
-        if (r.type === 'segchain') { o.big = !!r.big; o.h = r.height || 0; o.rise = r.rise || 0; o.arc = r.arc || 0; o.len = r.length || 120; o.gap = r.spacing || 12; if (r.follow === false) { o.follow = false; o.th = r.heading || 0; o.bend = r.bend || 0; } }
+        if (r.type === 'segchain') { o.big = !!r.big; o.h = r.height || 0; o.rise = r.rise || 0; o.arc = r.arc || 0; o.len = r.length || 120; o.gap = r.spacing || 12; if (r.follow === false) { o.follow = false; o.th = r.rot !== undefined ? r.rot : r.heading || 0; o.bend = r.bend || 0; } }
         if (r.type === 'tip') { o.shape = r.shape || 'circle'; o.r = r.radius || 40; o.w = r.width || 80; o.d = r.length || 60; o.text = r.text || ''; o.up = r.above || 0; o.dn = r.below || 0; }
         return o; }) };
       S.objs.forEach(function (o) {                              // a file whose joined pieces loop round (A starts from B, B from A) would crash the editor on every redraw: the piece that closes the loop stands on its own instead
