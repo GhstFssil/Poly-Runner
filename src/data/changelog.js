@@ -1,3 +1,4 @@
+// ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
   { v: 'v185', d: 'Nov 22, 2026', t: 'Tunnel floors, Roost Gazer, clearer names', g: [
     ['Fixes', [

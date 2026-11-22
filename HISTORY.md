@@ -23,3 +23,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-21 18:49 | next | Title Case for 444 UI labels (Rig Editor stats, menus, Path Editor fields); tcLabel helper; test/tool label text updated
 - 2026-11-21 20:35 | next | removed 13 stale tests: g_ends/pe_ends/rep (one-shot patch scripts, already applied), along/cmp173/crash/crash2/prof/scan/scan2/rw2/rw5/rw6/gc_new (inputs missing from the repo)
 - 2026-11-22 08:05 | next | mobs area carved out of 04-script-b into src/mobs/mobs.js (byte-identical build); tools/check_deps.py added (warning only); v185 label and CHANGELOG entry (Next renamed, Names and wording group added)
+- 2026-11-22 08:14 | next | carved ui area (first cut): src/ui/speedometer.js, health.js, menu.js; b1 split into b1/b1b/b1c; b2 tail comment moved to data/changelog.js; build byte-identical
