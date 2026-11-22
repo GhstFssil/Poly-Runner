@@ -1,5 +1,10 @@
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v187', d: 'Nov 22, 2026', t: 'Behind the scenes', g: [
+    ['Under the hood', [
+      'The game\'s source is split into still more files (the Rig Editor and Path Editor openers, the menu buttons, and Level 2 each have their own). Nothing in the game changes.'
+    ]]
+  ] },
   { v: 'v186', d: 'Nov 22, 2026', t: 'Behind the scenes', g: [
     ['Under the hood', [
       'The game\'s source is now split into more files (the Speedometer, hearts and breath, the menus and screens, and Dev Mode each have their own). Nothing in the game changes.'
