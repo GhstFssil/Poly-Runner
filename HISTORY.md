@@ -21,3 +21,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-21 18:14 | next | split step 1: src/index.html cut in place into src/data/* and src/unsorted/*; build byte-identical
 - 2026-11-21 18:31 | next | Rotation: strips save rot, old heading still loads (commit 9962738; line missed then); dials->stats, Hedron Barrier->Barrier (hints too), tile names/wording; tests/fu/rot1.py
 - 2026-11-21 18:49 | next | Title Case for 444 UI labels (Rig Editor stats, menus, Path Editor fields); tcLabel helper; test/tool label text updated
+- 2026-11-21 20:35 | next | removed 13 stale tests: g_ends/pe_ends/rep (one-shot patch scripts, already applied), along/cmp173/crash/crash2/prof/scan/scan2/rw2/rw5/rw6/gc_new (inputs missing from the repo)

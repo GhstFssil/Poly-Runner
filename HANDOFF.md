@@ -11,6 +11,8 @@ Split the single-file game into `src/` parts by function (areas: core, level1, l
 - CLAUDE.md `src/` rules, BACKLOG.md and GLOSSARY.md updates on `next`.
 - Step 1 (2026-11-21): `src/index.html` cut in place into `src/data/*` (settings, user-def, models, changelog, level1, level2) and `src/unsorted/01..06` (code, in game order). Build byte-identical to before.
 
+- 2026-11-21: nightly check (newest branch 2026-11-17, report already on main, nothing for Ricky). Full test run on main's build; removed 13 stale tests on `next` (see HISTORY.md).
+
 ## In progress
 Nothing half-done. `next` has this batch committed (see HISTORY.md).
 
