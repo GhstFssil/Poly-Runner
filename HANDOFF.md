@@ -9,6 +9,7 @@ Split the single-file game into `src/` parts by function (areas: core, level1, l
 - GLOSSARY.md written; docs-only push to main (7104d93), merged into `next`.
 - On `next`: Enemy -> Mob rename in the game (`MOBS`, `killMob`, `updateMobs`; Path Editor's own list is `MOB_KINDS`); Path Editor labels in Title Case (Big Minion, Toxic Patch, Caution Sign, Seg Chain, Mud, Crags, ...).
 - CLAUDE.md `src/` rules, BACKLOG.md and GLOSSARY.md updates on `next`.
+- Step 1 (2026-11-21): `src/index.html` cut in place into `src/data/*` (settings, user-def, models, changelog, level1, level2) and `src/unsorted/01..06` (code, in game order). Build byte-identical to before.
 
 ## In progress
 Nothing half-done. `next` has this batch committed (see HISTORY.md).
@@ -19,14 +20,11 @@ Nothing half-done. `next` has this batch committed (see HISTORY.md).
 - Cut in place first (byte-identical), reorder later.
 
 ## Open (Ricky decides)
-- Rotation (`rot`) vs Heading (`heading`).
-- Sweep existing text for dials (~50), squares (~50), "Hedron Barrier", sentence-case labels outside the stamp tools?
-- IIFE isolation for leaf files?
-- Is "capitalized" meant as Title Case? (assumed yes)
+- Decided 2026-11-21, not yet done: use Rotation (`rot`; keep reading `heading` in old saves); sweep dials/squares/"Hedron Barrier"/sentence-case labels to the glossary terms; labels are Title Case.
 
 ## Next steps
-1. Step 1: move data (settings JSON, glb blobs, CHANGELOG, OFFICIAL_L1) into `src/data/`.
-2. Steps 2-5 as planned; add `tools/check_deps.py`.
+1. Step 2: carve `src/unsorted/` into areas (one area per task, cut in place, byte-identical check), starting with a leaf (mobs or ui).
+2. Add `tools/check_deps.py` (warning only; plain split, no IIFEs for now: Ricky's call 2026-11-21).
 3. At release: v185 bump + CHANGELOG entry (Mob wording, Path Editor labels); `tools/mk_sweep_docs.py` is behind the SWEEP docs, never regenerate it blindly.
 
 ## Gotchas

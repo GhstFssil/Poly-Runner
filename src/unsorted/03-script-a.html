@@ -1,0 +1,1226 @@
+var RB={stride:32,knee:75,arm:40,elbow:80,lean:11,bounce:3};
+if(USERDEF.stride!==undefined)RB.stride=USERDEF.stride;if(USERDEF.kneeLift!==undefined)RB.knee=USERDEF.kneeLift;if(USERDEF.armSwing!==undefined)RB.arm=USERDEF.armSwing;if(USERDEF.elbow!==undefined)RB.elbow=USERDEF.elbow;if(USERDEF.lean!==undefined)RB.lean=USERDEF.lean;if(USERDEF.bounce!==undefined)RB.bounce=USERDEF.bounce;
+var RMUL={S:{stride:.7,knee:.6,arm:.7,elbow:1.05,lean:.45,bounce:.75},M:{stride:1,knee:1,arm:1,elbow:1,lean:1,bounce:1},F:{stride:1.45,knee:1.45,arm:1.55,elbow:1.1,lean:1.9,bounce:1.3}},RDUR={S:1.0,M:.8,F:.55};
+['S','M','F'].forEach(function(kd){for(var f in RB)DEF['run'+kd+'.'+f]=Math.round(RB[f]*RMUL[kd][f]*10)/10;DEF['run'+kd+'.dur']=RDUR[kd];});
+for(k in USERDEF){if(DEF[k]!==undefined&&typeof DEF[k]===typeof USERDEF[k])DEF[k]=USERDEF[k];}
+/* Settings written by an older build are brought up to this one's meanings before they are read (the shipped Molly's, this browser's saved dials, anything pasted in). */
+function upgrade(o){
+  if(!o||typeof o!=='object')return {};
+  if(o['stat.gripZ']===undefined&&typeof o['stat.grip']==='number')o['stat.gripZ']=o['stat.grip']/2;   /* her grip used to be kept in units/s²: 1 Zip = 2 units */
+  return o;
+}
+var defOld=true;                                                    /* the defaults' arm band dials are in the old meaning (see bandLegacy) until the shipped settings say otherwise */
+var bandOld=false,bandReady=false;                                  /* bandOld: the arm band dials in P are still in the old meaning (they are converted as soon as the part tables exist) */
+try{var gs=upgrade(JSON.parse(HOST.__init||'{}'));for(k in DEF){if(gs[k]!==undefined&&typeof gs[k]===typeof DEF[k])DEF[k]=gs[k];}defOld=!(gs.fmt>=2);}catch(e){}   /* the settings the shipped Molly was built from are the defaults, so every Reset button goes back to her and not to an older build */
+DEF.fmt=2;
+var DEFM=DEF,DEFC=JSON.parse(JSON.stringify(DEF));   /* Molly's defaults, and Comet's (hers over Molly's); every Reset on a page goes back to that runner's */
+try{var gc=upgrade(JSON.parse(HOST.__initC||'{}'));for(k in DEFC){if(gc[k]!==undefined&&typeof gc[k]===typeof DEFC[k])DEFC[k]=gc[k];}}catch(e){}
+var P=JSON.parse(JSON.stringify(DEF));
+/* A typed or pasted value can go past its slider, but not to where the build breaks (a part with no length, a loop with no time, a million sides): each dial is held to the nearest value that still works. [pattern, least, most, whole numbers only] */
+var HOLDS=[[/\.len$/,.5,400],[/\.dia$/,.2,400],[/\.depth$/,.02,20],[/\.peak$/,.005,.995],[/\.t[SE]$/,.005,20],[/\.c[SE]$/,.05,50],
+ [/\.u[12]w[lr]$/,.5,360],[/\.u[12]w[se]$/,.002,5],[/\.u[12]d$/,-100,100],[/\.u[12]p$/,-1,2],[/\.u[12]k[lrse]$/,-4,4],[/^Foot\.flat$/,0,.98],[/\.band[AL]$|^Shin\.pad$|^Foot\.(heel|sole|ankleH)$/,0,400],
+ [/^scale$/,.05,20],[/^sides$/,5,48,1],[/^rings$/,1,8,1],[/^ringGap$/,0,20],[/^fmt$/,2,2],[/^hairVol$/,.05,10],[/^bangL$/,0,10],[/^j[A-Z]/,0,100],[/^(jit|irr|irrC)$/,0,5],
+ [/\.dur$/,.05,600],[/^comet\.(pc|pt|pf|fl|ho)\.(hyf|hz)$/,-2,2],[/^comet\.(pc|pt|pf|fl|ho)\./,-180,180],[/^comet\.hov\.(ankleY|backY)$/,-5,5],[/^comet\.hov\.(ankleTilt|backTilt)$/,-180,180],[/^comet\./,0,1e4],[/^dA\.(hyf|hz)$/,-1,1],[/^dA\./,-180,180],[/^m\.drift\.time$/,.02,10],[/^m\.drift\.rate$/,.1,200],[/^m\.drift\.(cool|minZips)$/,0,1000],
+ [/^barrier\.radius$/,.2,20],[/^barrier\.squeezeLen$/,.5,1e4],[/^barrier\.squeeze$/,-2,.95],[/^barrier\.stretch$/,-.95,10],[/^barrier\.glow$/,0,1],[/^barrier\.glowSize$/,.1,10],[/^barrier\.dash(Len|Gap)$/,.005,20],
+ [/^stat\.top$/,1,1e4],[/^stat\.accelT$/,.5,1e4],[/^stat\.(brake|jumpH|wallGrip|fric)$/,0,1e4],[/^stat\.gripZ$/,.5,5e5],[/^stat\.grav$/,1,1e4],[/^stat\.fade(Wall|Slope)$/,0,1,1],[/^stat\.driftGrip$/,0,10],[/^stat\.fall$/,1,1e4],[/^stat\.slam(Acc|Max)$/,1,1e4],[/^mn\.\w+\.(scale|head[WHD]|torso[WHD]|arm[WL]|leg[WDL])$/,.05,100],[/^mn\.\w+\.hearts$/,1,99,1],[/^mn\.\w+\.dmg$/,0,99,1],[/^mn\.\w+\.(radius|top|acc|see|cool|k[123]|stomp|stride|bob)$/,0,1e4],[/^mn\.\w+\.(wing|flap|orbit|range|fire|bolt|bdmg)$/,0,1e4],[/^mn\.\w+\.(legSwing|armSwing|armRaise)$/,-180,180],[/^stat\.hearts$/,1,12,1],[/^stat\.colH$/,1.2,100],[/^stat\.colW$/,.2,100]];
+function hold(key,v){
+  if(typeof DEF[key]==='string')return typeof v==='string'&&/^#[0-9a-f]{6}$/i.test(v)?v:DEF[key];   /* a colour */
+  if(typeof v!=='number'||!isFinite(v))return DEF[key];
+  for(var i=0;i<HOLDS.length;i++){var h=HOLDS[i];if(h[0].test(key)){if(h[3])v=Math.round(v);return v<h[1]?h[1]:v>h[2]?h[2]:v;}}
+  return v<-1e4?-1e4:v>1e4?1e4:v;
+}
+/* the keys of a move stay in order: a key's time is held between the keys either side of it (as they are now, not as they were when its slider was drawn) */
+function holdT(key,v){
+  var m=/^m\.(\w+)\.(\d+)\.t$/.exec(key);if(!m||!MOVEX[m[1]])return v;
+  var n=MOVEX[m[1]].length,i=+m[2],pre='m.'+m[1]+'.';if(i<=0)return 0;if(i>=n-1)return 1;
+  var lo=(i-1<=0?0:P[pre+(i-1)+'.t'])+.01,hi=(i+1>=n-1?1:P[pre+(i+1)+'.t'])-.01;
+  return hi<lo?P[key]:v<lo?lo:v>hi?hi:v;
+}
+function orderTimes(){Object.keys(MOVEX).forEach(function(name){var n=MOVEX[name].length,pre='m.'+name+'.',i;P[pre+'0.t']=0;P[pre+(n-1)+'.t']=1;
+  for(i=1;i<n-1;i++){var lo=(i===1?0:P[pre+(i-1)+'.t'])+.01,hi=1-.01*(n-1-i);P[pre+i+'.t']=Math.min(hi,Math.max(lo,P[pre+i+'.t']));}});}
+function takeSettings(o){var n=0,key;o=upgrade(o);for(key in DEF){if(o[key]!==undefined&&typeof o[key]===typeof DEF[key]){P[key]=hold(key,o[key]);n++;}}
+  if(o['UpperArm.bandA']!==undefined||o['UpperArm.bandL']!==undefined)bandOld=!(o.fmt>=2);   /* arm band numbers from a build up to v173: changed to where that build drew the band */
+  if(bandOld&&bandReady){bandFix();bandOld=false;}
+  P.fmt=2;orderTimes();return n;}   /* settings from outside (this browser's saved dials, pasted JSON): only the dials that exist, each held to a working value */
+var ui={mode:'run',playing:true,phase:.25,wire:false,sel:'UpperArm'};
+bandOld=defOld;                                                     /* P starts as a copy of the defaults */
+var hadSaved=false;
+try{var sv=localStorage.getItem('runnerRig2');if(sv){var o=JSON.parse(sv);hadSaved=true;
+  [['stride','stride'],['kneeLift','knee'],['armSwing','arm'],['elbow','elbow'],['lean','lean'],['bounce','bounce']].forEach(function(p){if(typeof o[p[0]]==='number'&&o['runM.'+p[1]]===undefined)P['runM.'+p[1]]=hold('runM.'+p[1],o[p[0]]);});
+  takeSettings(o);}}catch(e){}
+
+/* ================= profile math ================= */
+function smooth(x){x=x<0?0:x>1?1:x;return x*x*(3-2*x);}
+function profR(id,t){
+  var pk=P[id+'.peak'],tS=P[id+'.tS'],tE=P[id+'.tE'],cS=P[id+'.cS'],cE=P[id+'.cE'],u,v;
+  if(t<=pk){u=Math.min(1,Math.max(0,t/pk));return tS+(1-tS)*(1-Math.pow(1-u,cS));}
+  v=Math.min(1,Math.max(0,(t-pk)/(1-pk)));return tE+(1-tE)*(1-Math.pow(v,cE));
+}
+function shoulderInset(){
+  var Lt=P['UpperTorso.len'],th=Math.min(1,P.shoulderY/Lt),tw=Math.max(ringRawBase('UpperTorso',th).rb,ringRawBase('UpperTorso',Math.min(1,th+.12)).rb),ra=ringRawBase('UpperArm',0).rb;
+  return Math.max(0,P.shoulderX/100-tw-ra+P.shoulderOver/100);
+}
+function ringRawBase(id,t){var r=profR(id,t),rb=P[id+'.dia']/200*r;return {rb:rb,rc:rb*P[id+'.depth'],cb:0,cc:0};}
+function ringRaw(id,t,g){
+  var r=profR(id,t),rb=P[id+'.dia']/200*r,rc=rb*P[id+'.depth'],cb=0,cc=0;
+  if(id==='UpperArm'){var K=Math.max(.5,P.jShoulder)/100,aa=t*P[id+'.len']/100,u=(aa-.2*K)/(1.6*K);cb=-g*shoulderInset()*(u<=0?1:u>=1?0:1-smooth(u));}
+  if(id==='Foot'){rc*=1-P['Foot.flat']*Math.pow(t,1.5);cc=-P['Foot.ankleH']/100+rc+cc;}
+  return {rb:rb,rc:rc,cb:cb,cc:cc};
+}
+/* two bulges per part: a depth (cm, + out / - in) shaped by independent width and curvature in four directions */
+function bShape(u,k){if(u>=1)return 0;var e=2*Math.pow(3,k);return 1-Math.pow(u<0?-u:u,e);}
+function bulgeOff(id,t,alpha){
+  var tot=0,n,b,d,dv,da,ws,we,wl,wr,kk;
+  for(n=1;n<=2;n++){b=id+'.u'+n;d=P[b+'d'];if(d>-.005&&d<.005)continue;
+    dv=t-P[b+'p'];ws=P[b+'ws'];we=P[b+'we'];
+    var fv=dv<0?bShape(-dv/ws,P[b+'ks']):bShape(dv/we,P[b+'ke']);
+    da=alpha-P[b+'a'];da=da-360*Math.round(da/360);
+    var fa=da<0?bShape(-da/P[b+'wl'],P[b+'kl']):bShape(da/P[b+'wr'],P[b+'kr']);
+    tot+=d/100*fv*fa;}
+  return tot;
+}
+function blendLen(id,end){var j=end?INLC[id]:INLP[id];if(!j)return 0;var B=Math.min(P[j[1]],P[id+'.len']*.45);return B>.05?B:0;}
+/* the ring at parameter t, with the shared joint cross-section eased in near any in-line joint */
+function ringAt(id,t,g){
+  var s=ringRaw(id,t,g),L=P[id+'.len'],a=t*L,B,o,m,k2,mb,mc;
+  B=blendLen(id,0);
+  if(B&&a<B){o=ringRaw(id,0,g);m=ringRaw(INLP[id][0],1,g);k2=smooth(a/B);mb=(o.rb+m.rb)/2;mc=(o.rc+m.rc)/2;
+    s.rb=mb+(s.rb-mb)*k2;s.rc=mc+(s.rc-mc)*k2;}
+  B=blendLen(id,1);
+  if(B&&L-a<B){o=ringRaw(id,1,g);m=ringRaw(INLC[id][0],0,g);k2=smooth((L-a)/B);mb=(o.rb+m.rb)/2;mc=(o.rc+m.rc)/2;
+    s.rb=mb+(s.rb-mb)*k2;s.rc=mc+(s.rc-mc)*k2;}
+  return s;
+}
+function ringPt(s,th,g,id,t){var cs=Math.cos(th),sn=Math.sin(th),o=0;
+  if(id){o=bulgeOff(id,t,Math.atan2(cs*g,sn)/rad);}
+  if(o){var nx=cs/s.rb,ny=sn/s.rc,nl=Math.sqrt(nx*nx+ny*ny)||1;return [s.cb+s.rb*cs+o*nx/nl,s.cc+s.rc*sn+o*ny/nl];}
+  return [s.cb+s.rb*cs,s.cc+s.rc*sn];}
+function tList(id){
+  var n=Math.round(P.rings),pk=P[id+'.peak'],L=P[id+'.len'],c=[],i,B;
+  function add(t,pri){if(t>.004&&t<.996)c.push([t,pri]);}           /* pri 3: must be there (the max diameter, the edges of a trim band); 2: shapes the part (where a blend or a bulge begins and ends); 1: fills in */
+  for(i=1;i<=n;i++){add(pk*i/(n+1),1);add(pk+(1-pk)*i/(n+1),1);}
+  add(pk,3);
+  var br=bandRange(id);
+  if(br){add(br[0]/L,3);add(br[1]/L,3);}
+  [1,2].forEach(function(nn){var bb=id+'.u'+nn,dd=P[bb+'d'];if(dd>-.005&&dd<.005)return;var pp=P[bb+'p'],ws2=P[bb+'ws'],we2=P[bb+'we'];
+    add(pp,2);add(pp-ws2,2);add(pp+we2,2);add(pp-ws2*.5,1);add(pp+we2*.5,1);});
+  if(id==='UpperTorso'){[-6,-3,0,3,6].forEach(function(dd){add((P.shoulderY+dd)/L,dd?1:2);});}
+  if(id==='UpperArm'){var Kk=Math.max(.5,P.jShoulder);[.25,.6,1,1.5].forEach(function(f){add(Kk*f/L,1);});}
+  B=blendLen(id,0);if(B){add(B/L,2);add(B/L/2,1);}
+  B=blendLen(id,1);if(B){add(1-B/L,2);add(1-B/L/2,1);}
+  /* a ring that would land within a few millimetres of a more important one is left out: a strip that thin does not read as a facet, it shows as a scratch across the part (the upper torso had 25 rings, some 1.5 mm apart) */
+  var gap=Math.max(.004,Math.min(P.ringGap,.06*L)/L),out=[0,1];
+  c.sort(function(a,b){return b[1]-a[1]||a[0]-b[0];});
+  c.forEach(function(e){var t=e[0],g=e[1]<3?gap:.004,k;for(k=0;k<out.length;k++)if(Math.abs(out[k]-t)<g)return;out.push(t);});
+  out.sort(function(a,b){return a-b;});return out;
+}
+var DOMED={UpperArm:1,Thigh:1,Foot:1,Pony1:1,Pony2:1,Pony3:1};   /* parts whose start is rounded off with a small dome */
+/* Where a part's trim band is drawn, in cm from its start: exactly where its two dials say. Up to v173 that was not true of a domed part (the upper arm): its band was
+   drawn two rings nearer the start than the dials said, because the dome's two extra rings were not counted. Settings saved by those builds (they carry no fmt, or one
+   below 2) have their two arm band numbers changed, once, to where the band really was, so nothing moves: the old ring list is worked out only to find those two rings. */
+function tListOld(id){
+  var n=Math.round(P.rings),pk=P[id+'.peak'],L=P[id+'.len'],ts=[],i,B;
+  for(i=0;i<=n;i++)ts.push(pk*i/(n+1));
+  ts.push(pk);
+  for(i=1;i<=n;i++)ts.push(pk+(1-pk)*i/(n+1));
+  ts.push(1);
+  var bA=P[id+'.bandA'],bL=P[id+'.bandL'];
+  if(bA!==undefined&&bL>0){[bA/L,(bA+bL)/L].forEach(function(t){if(t>.001&&t<.999)ts.push(t);});}
+  [1,2].forEach(function(nn){var bb=id+'.u'+nn,dd=P[bb+'d'];if(dd>-.005&&dd<.005)return;var pp=P[bb+'p'],ws2=P[bb+'ws'],we2=P[bb+'we'];
+    [pp,pp-ws2*.5,pp-ws2,pp+we2*.5,pp+we2].forEach(function(tt){if(tt>.004&&tt<.996)ts.push(tt);});});
+  if(id==='UpperTorso'){[-6,-3,0,3,6].forEach(function(dd){var tt=(P.shoulderY+dd)/L;if(tt>.004&&tt<.996)ts.push(tt);});}
+  if(id==='UpperArm'){var Kk=Math.max(.5,P.jShoulder);[.25,.6,1,1.5].forEach(function(f){var tt=Kk*f/L;if(tt>.004&&tt<.996)ts.push(tt);});}
+  B=blendLen(id,0);if(B)ts.push(B/L,B/L/2);
+  B=blendLen(id,1);if(B)ts.push(1-B/L,1-B/L/2);
+  ts.sort(function(a,b){return a-b;});
+  var out=[0];
+  for(i=1;i<ts.length-1;i++)if(ts[i]-out[out.length-1]>.004&&1-ts[i]>.004)out.push(ts[i]);
+  out.push(1);return out;
+}
+function bandRange(id){var bA=P[id+'.bandA'],bL=P[id+'.bandL'];if(bA===undefined||!(bL>0))return null;return [bA,bA+bL];}
+function bandLegacy(id){                                            /* where a build up to v173 drew this part's band, from the dials as they are now */
+  var bA=P[id+'.bandA'],bL=P[id+'.bandL'];if(bA===undefined||!(bL>0))return null;
+  if(!DOMED[id])return [bA,bA+bL];
+  var L=P[id+'.len'],o=tListOld(id),k,k0=-1,k1=-1;
+  for(k=0;k+1<o.length;k++){var mt=(o[k]+o[k+1])/2*L;if(mt>=bA&&mt<=bA+bL){if(k0<0)k0=k;k1=k;}}
+  return k0<0?null:[o[Math.max(0,k0-2)]*L,o[Math.max(0,k1-1)]*L];
+}
+function bandFix(){var r=bandLegacy('UpperArm');if(r){P['UpperArm.bandA']=Math.round(r[0]*1e4)/1e4;P['UpperArm.bandL']=Math.round((r[1]-r[0])*1e4)/1e4;}}
+/* (the thinnest strip of facets a part may have is the Faceting dial ringGap, in cm; on a short part it is never more than 6% of the part's length) */
+var MAP={up:function(a,b,c){return [b,a,c];},down:function(a,b,c){return [b,-a,c];},fwd:function(a,b,c){return [b,c,a];}};
+
+/* ================= mesh helpers ================= */
+function sub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]]}
+function cross(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]}
+function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]}
+function avg(a,b){return [(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2]}
+function Part(){this.t=[]}
+Part.prototype.add=function(a,b,c,col,ctr,dir){
+  var n=cross(sub(b,a),sub(c,a));
+  if(ctr){var f=[(a[0]+b[0]+c[0])/3,(a[1]+b[1]+c[1])/3,(a[2]+b[2]+c[2])/3];if(dot(n,sub(f,ctr))<0){var t=b;b=c;c=t;n=cross(sub(b,a),sub(c,a));}}
+  if(dir&&dot(n,dir)<0){var u=b;b=c;c=u;}
+  this.t.push([a,b,c,col]);
+};
+Part.prototype.add2=function(a,b,c,col,ctr){this.add(a,b,c,col,ctr);var t=this.t[this.t.length-1];this.t.push([t[0],t[2],t[1],col]);};   /* both faces of a shell that can be seen from its inside too (her hair, from the front): without the inner face the far side of it simply is not there */
+function sphere(Pt,c,r,col,lat,lon){
+  var rings=[],off=Math.PI/lon,i,k,ph,s,ring,a,cx=c[0],cy=c[1],cz=c[2];
+  for(k=0;k<=lat;k++){ph=Math.PI*k/lat;s=Math.max(Math.sin(ph),.001);ring=[];
+    for(i=0;i<lon;i++){a=2*Math.PI*i/lon+off;ring.push([cx+r[0]*s*Math.cos(a),cy+r[1]*Math.cos(ph),cz+r[2]*s*Math.sin(a)]);}
+    rings.push(ring);}
+  for(k=0;k<lat;k++)for(i=0;i<lon;i++){var j=(i+1)%lon,A=rings[k],B=rings[k+1];
+    Pt.add(A[i],A[j],B[j],col,c);Pt.add(A[i],B[j],B[i],col,c);}
+}
+function spike(Pt,b,tip,col){
+  var p=[b[0],b[1],b[2],tip],c=[0,0,0];p.forEach(function(v){c[0]+=v[0]/4;c[1]+=v[1]/4;c[2]+=v[2]/4;});
+  [[0,1,2],[0,1,3],[1,2,3],[0,2,3]].forEach(function(f){Pt.add(p[f[0]],p[f[1]],p[f[2]],col,c);});
+}
+function tieLoft(Pt,s){
+  var n=6,rings=[[.012,.034,.04],[-.022,.04,.046]].map(function(r){var o=[],i,a;
+    for(i=0;i<n;i++){a=2*Math.PI*i/n+Math.PI/n;o.push([r[1]*s*Math.cos(a),r[0],r[2]*s*Math.sin(a)]);}return o;});
+  var c0=[0,.012,0],c1=[0,-.022,0],mid=[0,-.005,0],i,j;
+  for(i=0;i<n;i++){j=(i+1)%n;
+    Pt.add(rings[0][i],rings[0][j],rings[1][j],'blk',mid);Pt.add(rings[0][i],rings[1][j],rings[1][i],'blk',mid);
+    Pt.add(c0,rings[0][i],rings[0][j],'blk',mid);Pt.add(c1,rings[1][i],rings[1][j],'blk',mid);}
+}
+function zAt(id,x,y,off){
+  var L=P[id+'.len']/100,t=Math.min(1,Math.max(0,y/L)),s=ringAt(id,t,1),u=(x-s.cb)/(s.rb||1e-6);
+  return s.cc+s.rc*Math.sqrt(Math.max(0,1-u*u))*.95+(off===undefined?.004:off);
+}
+function headFeatures(Pt){
+  var L=P['Head.len']/100,D=P['Head.dia']/100,dep=P['Head.depth'],sx=D/.172,sy=L/.235,sz=sx*dep/1.04;
+  function fq(pts,col){var v=pts.map(function(p){return [p[0],p[1],zAt('Head',p[0],p[1])];});
+    Pt.add(v[0],v[1],v[2],col,null,[0,0,1]);Pt.add(v[0],v[2],v[3],col,null,[0,0,1]);}
+  [1,-1].forEach(function(s){
+    var x=s*.036*sx,y=.115*sy,inn=x-s*.016*sx,out=x+s*.016*sx,h=sy;
+    fq([[inn,y-.012*h],[out,y-.012*h],[out,y+.013*h],[inn,y+.005*h]],'eye');
+    fq([[inn,y+.018*h],[out,y+.028*h],[out,y+.035*h],[inn,y+.025*h]],'blk');
+    var er=ringAt('Head',.105*sy/L,1);
+    sphere(Pt,[er.cb+s*(er.rb+.003),.105*sy,-.005*sz+er.cc],[.012*sx,.022*sy,.016*sx],'skin',2,4);
+  });
+  fq([[-.016*sx,.050*sy],[.016*sx,.048*sy],[.022*sx,.058*sy],[.016*sx,.054*sy]],'mouth');
+  var nz=zAt('Head',0,.084*sy,-.004);
+  spike(Pt,[[-.009*sx,.084*sy,nz],[.009*sx,.084*sy,nz],[0,.094*sy,nz+.002]],[0,.092*sy,nz+.02*sz],'skin');
+  var hv=P.hairVol,cen=[0,.10,-.008],rd=[.108*hv,.15*hv,.115*hv],lat=7,lon=12,hs=ringAt('Head',.43,1);
+  function mp(p){return [p[0]*sx+hs.cb,p[1]*sy,p[2]*sz+hs.cc];}
+  function hp(a,b){return [cen[0]+rd[0]*Math.sin(a)*Math.cos(b),cen[1]+rd[1]*Math.cos(a),cen[2]+rd[2]*Math.sin(a)*Math.sin(b)];}
+  var i,j,cm=mp(cen);
+  for(i=0;i<lat;i++)for(j=0;j<lon;j++){
+    var a0=Math.PI*i/lat,a1=Math.PI*(i+1)/lat,b0=2*Math.PI*j/lon+Math.PI/lon,b1=2*Math.PI*(j+1)/lon+Math.PI/lon;
+    var qd=[hp(a0,b0),hp(a0,b1),hp(a1,b1),hp(a1,b0)],x=0,y=0,z=0;qd.forEach(function(v){x+=v[0]/4;y+=v[1]/4;z+=v[2]/4;});
+    if(y>.175||(z<.02&&y>.03)||(Math.abs(x)>.065&&y>.085&&z<.06)){
+      Pt.add2(mp(qd[0]),mp(qd[1]),mp(qd[2]),'hair',cm);Pt.add2(mp(qd[0]),mp(qd[2]),mp(qd[3]),'hair',cm);}
+  }
+  [[-.065,-.02,-.058,.128,.10],[-.025,.028,0,.142,.108],[.022,.067,.062,.125,.10]].forEach(function(s){
+    var ty=.19-(.19-s[3])*P.bangL,tz=.082+(s[4]-.082)*Math.min(1,P.bangL);
+    spike(Pt,[mp([s[0],.19,.082]),mp([s[1],.19,.082]),mp([(s[0]+s[1])/2,.18,.098])],mp([s[2],ty,tz]),'hair');});
+}
+function chestPatch(Pt){
+  var L=P['UpperTorso.len']/100,sc=P['UpperTorso.dia']/37.6,pts=[[-.045*sc,.895*L],[.045*sc,.895*L],[0,.465*L]];
+  var v=pts.map(function(p){return [p[0],p[1],zAt('UpperTorso',p[0],p[1],.006)];});
+  Pt.add(v[0],v[1],v[2],'blk',null,[0,0,1]);
+}
+
+/* one lofted part from its profile, in the part's own local space */
+function buildSeg(seg,g){
+  var id=seg.id,n=Math.max(5,Math.round(P.sides)),Pt=new Part(),m=MAP[seg.kind],L=P[id+'.len'],ts=tList(id),i,j,k;
+  var irr=P.irr||0,irrC=P.irrC||0,hseed=hashStr(id)%1000;                    /* irregularity: vertices slide round their ring and along the part, but always along the real contour (the profile is re-read at the new position), so the surface never bulges out or in; the slides are mirrored left-to-right about the centre line */
+  function ihr(a,b,w){var x=Math.sin(a*127.1+b*311.7+w*74.7+hseed*.37)*43758.5453;return x-Math.floor(x);}
+  var rings=ts.map(function(t,ki){
+    var s=ringAt(id,t,g),a=t*L/100,pts=[],th,fw=2*Math.PI/n,end=ki===0||ki===ts.length-1,dTf=ts.length>2?(ts[Math.min(ts.length-1,ki+1)]-ts[Math.max(0,ki-1)])/2:0,ev=n%2===0;
+    for(i=0;i<n;i++){th=fw*i+fw/2;var tt=t,sI=s,im=ev?n/2-1-i:n-1-i,pr=Math.min(i,im),sgn=i<=im?1:-1;
+      if(irr||irrC){if(irr)th+=g*sgn*(i===im?0:(ihr(ki,pr,1)-.5)*.5*fw*irr);
+        if(!end){var sh=irr?(ihr(ki,pr,2)-.5)*.8*dTf*irr:0;
+          if(irrC){var dd=Math.max(dTf,.01),rA=ringAt(id,Math.max(0,t-dd),g),rB=ringAt(id,Math.min(1,t+dd),g),rad=function(q){return (q.rb+q.rc)/2;},kn=Math.min(1,Math.abs(rad(rA)-2*rad(s)+rad(rB))/(.06*rad(s)+1e-6));   /* how sharply the profile bends here: 0 on a straight run, 1 at a shoulder, knee or ankle */
+            sh+=irrC*dTf*(((pr+ki)%2)?1:-1)*(.3+.7*kn)*(.6+.8*ihr(ki,pr,3));}   /* neighbouring vertices go opposite ways, more where the form bends, so the side edges zigzag with the contour; mirrored left to right like the rest */
+          var lim=.46*dTf;sh=Math.max(-lim,Math.min(lim,sh));tt=t+sh;sI=ringAt(id,tt,g);}}
+      var q2=ringPt(sI,th,g,id,tt);pts.push(m(tt*L/100,q2[0],q2[1]));}
+    return {pts:pts,c:m(a,s.cb,s.cc)};});
+  if(DOMED[id]){
+    var s0d=ringAt(id,0,g),hd=(id==='UpperArm'?.1:.4)*Math.min(s0d.rb,s0d.rc),dm=[];
+    [[.866,.5],[.5,.866]].forEach(function(q){var sc=q[0],a2=-hd*q[1],pts2=[],th2;
+      for(i=0;i<n;i++){th2=2*Math.PI*i/n+Math.PI/n;pts2.push(m(a2,s0d.cb+s0d.rb*sc*Math.cos(th2),s0d.cc+s0d.rc*sc*Math.sin(th2)));}
+      dm.push({pts:pts2,c:m(a2,s0d.cb,s0d.cc)});});
+    var capc=m(-hd,s0d.cb,s0d.cc);
+    rings=dm.reverse().concat(rings);rings[0].c=capc;
+  }
+  var base=BASECOL[id],bc=BANDCOL[id],br=bc?bandRange(id):null,off=rings.length-ts.length,sk=[],vote=0;   /* off: the dome's rings come before the part's own first ring */
+  function vt(a,b,c,ctr){var u=sub(b,a),v=sub(c,a),nn=cross(u,v);return dot(nn,sub([(a[0]+b[0]+c[0])/3,(a[1]+b[1]+c[1])/3,(a[2]+b[2]+c[2])/3],ctr));}
+  for(k=0;k<rings.length-1;k++){
+    var A=rings[k].pts,B=rings[k+1].pts,ctr=avg(rings[k].c,rings[k+1].c),ka=k-off,mt=ka>=0?(ts[ka]+ts[ka+1])/2*L:-1;
+    var bandCol=(br&&mt>=br[0]&&mt<=br[1])?bc:base;
+    for(i=0;i<n;i++){j=(i+1)%n;var col=bandCol;
+      if(id==='Foot'&&(A[i][1]+A[j][1]+B[i][1]+B[j][1])/4<(-P['Foot.ankleH']+P['Foot.sole'])/100)col='wht';
+      sk.push([A[i],A[j],B[j],col],[A[i],B[j],B[i],col]);vote+=vt(A[i],A[j],B[j],ctr)+vt(A[i],B[j],B[i],ctr);}
+  }
+  /* Which way round the skin's triangles face is settled once for the whole part (by all of them together), not one by one: tested singly, a triangle that
+     Irregularity or Contour shift had tipped past edge-on to its ring's centre came out facing inward, and an inward face is not drawn: a hole in her. */
+  var flip=vote<0;sk.forEach(function(q){Pt.t.push(flip?[q[0],q[2],q[1],q[3]]:q);});
+  var f=rings[0],l=rings[rings.length-1];
+  for(i=0;i<n;i++){j=(i+1)%n;
+    Pt.t.push(flip?[f.c,f.pts[i],f.pts[j],base]:[f.c,f.pts[j],f.pts[i],base],flip?[l.c,l.pts[j],l.pts[i],base]:[l.c,l.pts[i],l.pts[j],base]);
+    /* every end is closed, blended joints too: where two parts do not meet ring to ring (the neck sits 7 cm down inside the torso, the chin 2 cm over the neck) an open end let you see into the body round the neck and under the chin */
+  }
+  if(id==='Shin'&&P['Shin.pad']>0){var r=P['Shin.pad']/200,s0=ringAt('Shin',0,1),t0p=Pt.t.length,hy=r*1.43;sphere(Pt,[0,0,s0.rc+s0.cc],[r,hy,r*.48],'blk',2,4);
+    /* the knee pad sits across the knee, half on the thigh: its top follows the thigh, its bottom the shin, its middle both (kp = the thigh's share). Following the shin alone, its top stood out from a bent knee as a spike */
+    for(k=t0p;k<Pt.t.length;k++)for(i=0;i<3;i++){var pv=Pt.t[k][i];pv.kp=smooth((pv[1]/hy+1)/2);}}
+  if(id==='UpperTorso')chestPatch(Pt);
+  if(id==='Head')headFeatures(Pt);
+  if(id==='Pony1')tieLoft(Pt,P['Pony1.dia']/18);
+  return Pt;
+}
+
+/* ================= rig ================= */
+var AX=new THREE.Vector3(1,0,0),AY=new THREE.Vector3(0,1,0),AZ=new THREE.Vector3(0,0,1);
+function qx(a){return new THREE.Quaternion().setFromAxisAngle(AX,a)}
+function qy(a){return new THREE.Quaternion().setFromAxisAngle(AY,a)}
+function qz(a){return new THREE.Quaternion().setFromAxisAngle(AZ,a)}
+var NAMES=['Hips','Spine','Head','Pony1','Pony2','Pony3','ShoulderL','ElbowL','WristL','HipL','KneeL','AnkleL','ShoulderR','ElbowR','WristR','HipR','KneeR','AnkleR'];
+function rigDef(){
+  var c=function(key){return P[key]/100;},Id=function(){return new THREE.Quaternion();};
+  var hipsY=c('Thigh.len')+c('Shin.len')+c('Foot.ankleH'),neckStart=c('UpperTorso.len')-.07,headY=neckStart+c('Neck.len')-.02;
+  var hsy=c('Head.len')/.235,hsz=c('Head.dia')*P['Head.depth']/(.172*1.04),sp=P.armSpread*rad;
+  var d=[['Hips',null,[0,hipsY,0],Id()],['Spine','Hips',[0,c('LowerTorso.len')-c('pelvisDrop'),0],Id()],['Head','Spine',[0,headY,0],Id()],
+   ['Pony1','Head',[0,.18*hsy,-.095*hsz],qx(P.ponyAng*rad)],['Pony2','Pony1',[0,-c('Pony1.len'),0],qx(-P.ponyCurl*rad)],['Pony3','Pony2',[0,-c('Pony2.len'),0],qx(-P.ponyCurl*rad)]];
+  [['L',1],['R',-1]].forEach(function(s){var S=s[0],g=s[1];
+    d.push(['Shoulder'+S,'Spine',[g*c('shoulderX'),c('shoulderY'),0],qz(g*sp)]);
+    d.push(['Elbow'+S,'Shoulder'+S,[0,-c('UpperArm.len'),0],Id()]);
+    d.push(['Wrist'+S,'Elbow'+S,[0,-c('Forearm.len'),0],Id()]);
+    d.push(['Hip'+S,'Hips',[g*c('hipX'),0,0],Id()]);
+    d.push(['Knee'+S,'Hip'+S,[0,-c('Thigh.len'),0],Id()]);
+    d.push(['Ankle'+S,'Knee'+S,[0,-c('Shin.len'),0],Id()]);});
+  return {bones:d,neckStart:neckStart};
+}
+function segOffset(seg,rg){
+  if(seg.id==='LowerTorso')return [0,-P.pelvisDrop/100,0];
+  if(seg.id==='Neck')return [0,rg.neckStart,0];
+  if(seg.id==='Foot')return [0,0,-P['Foot.heel']/100];
+  return [0,0,0];
+}
+
+/* ---- implicit field of each part, used to blend side joints and to weight vertices ---- */
+var TN=48;
+function makePrim(seg,s,M){
+  var pr={id:seg.id,s:s.s,g:s.g,bone:seg.bone+s.s,kind:seg.kind,key:seg.id+s.s,M:M,inv:M.clone().invert(),L:P[seg.id+'.len']/100,
+    lat:[],inP:null,inC:null,tb:{rb:new Float32Array(TN+1),rc:new Float32Array(TN+1),cb:new Float32Array(TN+1),cc:new Float32Array(TN+1)}};
+  for(var i=0;i<=TN;i++){var r=ringAt(seg.id,i/TN,s.g);pr.tb.rb[i]=r.rb;pr.tb.rc[i]=r.rc;pr.tb.cb[i]=r.cb;pr.tb.cc[i]=r.cc;}
+  return pr;
+}
+function primLocal(pr,x,y,z){
+  var e=pr.inv.elements,lx=e[0]*x+e[4]*y+e[8]*z+e[12],ly=e[1]*x+e[5]*y+e[9]*z+e[13],lz=e[2]*x+e[6]*y+e[10]*z+e[14];
+  return pr.kind==='up'?[ly,lx,lz]:pr.kind==='down'?[-ly,lx,lz]:[lz,lx,ly];
+}
+function primF(pr,x,y,z){
+  var e=pr.inv.elements,lx=e[0]*x+e[4]*y+e[8]*z+e[12],ly=e[1]*x+e[5]*y+e[9]*z+e[13],lz=e[2]*x+e[6]*y+e[10]*z+e[14],a,b,c;
+  if(pr.kind==='up'){a=ly;b=lx;c=lz;}else if(pr.kind==='down'){a=-ly;b=lx;c=lz;}else{a=lz;b=lx;c=ly;}
+  var t=a/pr.L,ta=t<0?0:t>1?1:t,f=ta*TN,i0=Math.min(TN-1,Math.floor(f)),w=f-i0,T=pr.tb;
+  var rb=T.rb[i0]+(T.rb[i0+1]-T.rb[i0])*w,rc=T.rc[i0]+(T.rc[i0+1]-T.rc[i0])*w,cb=T.cb[i0]+(T.cb[i0+1]-T.cb[i0])*w,cc=T.cc[i0]+(T.cc[i0+1]-T.cc[i0])*w;
+  var u=(b-cb)/rb,v=(c-cc)/rc,qq=Math.sqrt(u*u+v*v),dl;
+  if(qq<1e-4)dl=-Math.min(rb,rc);else{var k1=Math.sqrt((u/rb)*(u/rb)+(v/rc)*(v/rc));dl=qq*(qq-1)/k1;}
+  var ex=a<0?-a:a>pr.L?a-pr.L:0;
+  if(dl>0||ex>0){var d0=dl>0?dl:0;return Math.sqrt(d0*d0+ex*ex);}
+  return Math.max(dl,-Math.min(a,pr.L-a));
+}
+function Fb(pr,x,y,z){
+  var fi=primF(pr,x,y,z),G=0,n=pr.lat.length,i,d,nb;
+  for(i=0;i<n;i++){nb=pr.lat[i];d=(fi-primF(nb.pr,x,y,z))/nb.K;if(d>-30)G-=nb.K*Math.log(1+Math.exp(d>30?30:d));}
+  return fi+G;
+}
+function gateOf(nb,x,y,z){if(!nb.ch)return 1;var a=primLocal(nb.ch,x,y,z)[0],t=(a-.2*nb.K)/(1.6*nb.K);return t<=0?1:t>=1?0:1-smooth(t);}
+/* pull a vertex of part pr onto the surface of its blend with the neighbours it meets side-on */
+function displace(pr,p){
+  var nb=pr.lat,n=nb.length,i,near=false,bur=1,maxMove=0;
+  if(!n)return;
+  var target=primF(pr,p.x,p.y,p.z);
+  for(i=0;i<n;i++){var f=primF(nb[i].pr,p.x,p.y,p.z),m=1.5*nb[i].K,b=smooth((f+m)/m);
+    if(f<5*nb[i].K)near=true;b*=gateOf(nb[i],p.x,p.y,p.z);if(b<bur)bur=b;if(nb[i].K*1.2>maxMove)maxMove=nb[i].K*1.2;}
+  if(!near||bur<.01)return;
+  var x0=p.x,y0=p.y,z0=p.z,it,h=.004;
+  for(it=0;it<2;it++){
+    var H=Fb(pr,p.x,p.y,p.z)-target;if(H>-1e-4)break;
+    var gx=(Fb(pr,p.x+h,p.y,p.z)-Fb(pr,p.x-h,p.y,p.z))/(2*h),gy=(Fb(pr,p.x,p.y+h,p.z)-Fb(pr,p.x,p.y-h,p.z))/(2*h),gz=(Fb(pr,p.x,p.y,p.z+h)-Fb(pr,p.x,p.y,p.z-h))/(2*h);
+    var gl=Math.sqrt(gx*gx+gy*gy+gz*gz);if(gl<.25)break;
+    var mv=-H/gl*bur;p.x+=gx/gl*mv;p.y+=gy/gl*mv;p.z+=gz/gl*mv;
+    var dx=p.x-x0,dy=p.y-y0,dz=p.z-z0,dl=Math.sqrt(dx*dx+dy*dy+dz*dz);
+    if(dl>maxMove){var sc=maxMove/dl;p.x=x0+dx*sc;p.y=y0+dy*sc;p.z=z0+dz*sc;break;}
+  }
+}
+var BIDX={};NAMES.forEach(function(n,i){BIDX[n]=i;});
+function weightsFor(pr,x,y,z,outI,outW,o){
+  var acc={},rest=1,i,w,loc=primLocal(pr,x,y,z),a=loc[0];
+  function add(bn,wt){if(wt<.004)return;acc[bn]=(acc[bn]||0)+wt;rest-=wt;}
+  if(pr.inP&&a<pr.inP.B){w=.5*(1-smooth(a/pr.inP.B));add(pr.inP.pr.bone,w);}
+  if(pr.inC&&pr.L-a<pr.inC.B){w=.5*(1-smooth((pr.L-a)/pr.inC.B));add(pr.inC.pr.bone,w);}
+  for(i=0;i<pr.lat.length;i++){var nb=pr.lat[i],f=primF(nb.pr,x,y,z),R=1.5*nb.K;
+    if(f<R){w=.5*(1-smooth(f<0?0:f/R))*gateOf(nb,x,y,z);add(nb.pr.bone,w);}}
+  if(rest<0){var tot=1-rest;for(var kk in acc)acc[kk]/=tot;rest=0;}
+  acc[pr.bone]=(acc[pr.bone]||0)+rest;
+  var list=Object.keys(acc).map(function(kk){return [kk,acc[kk]];}).sort(function(a2,b2){return b2[1]-a2[1];}).slice(0,4),sum=0;
+  list.forEach(function(e){sum+=e[1];});
+  for(i=0;i<4;i++){outI[o+i]=list[i]?BIDX[list[i][0]]:0;outW[o+i]=list[i]?list[i][1]/sum:0;}
+}
+
+var scene,camera,renderer,controls,grid,rigRoot,bones={},rest={},hipsBase=[0,1,0],dirty=true,skMesh=null,hlMesh=null,wireMesh=null,skeleton=null,ranges={},raycaster=new THREE.Raycaster();
+var mat=new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:.85,metalness:0,skinning:true,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
+var hlMat=new THREE.MeshBasicMaterial({color:0xffd23f,wireframe:true,transparent:true,opacity:.95,skinning:true});
+var wireMat=new THREE.MeshBasicMaterial({color:0x111111,wireframe:true,transparent:true,opacity:.5,skinning:true});
+function hex2lin(h){var c=new THREE.Color(h);c.convertSRGBToLinear();return [c.r,c.g,c.b];}
+function hashStr(s){var h=7,i;for(i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return h;}
+function rngFor(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function disposeRig(){
+  if(!rigRoot)return;
+  [skMesh,wireMesh,hlMesh].forEach(function(m){if(m&&m.geometry)m.geometry.dispose();});
+  if(skeleton)skeleton.dispose();
+  scene.remove(rigRoot);bones={};rest={};skMesh=hlMesh=wireMesh=skeleton=null;
+}
+function sidesOf(seg){return seg.pair?[{s:'L',g:1},{s:'R',g:-1}]:[{s:'',g:1}];}
+/* ================= welded joints =================
+   Where a limb comes out of the body (a thigh out of the pelvis, an arm out of the torso) the two parts used to pass through each other, and the line where two
+   faceted surfaces cross is ragged: the corners of one poke through the flats of the other. Here the two are joined into one skin instead. Each part is cut a
+   little short of the other (by a margin the joint's blend dial sets), whatever lay inside or under the other part is dropped, and the two cut edges are
+   bridged with a strip of facets. Everything works on plain lists of triangles [a,b,c,colour] in the figure's own space, a point being [x,y,z]. */
+function wKey(p){return Math.round(p[0]*2e5)+','+Math.round(p[1]*2e5)+','+Math.round(p[2]*2e5);}
+function wLess(a,b){return a[0]<b[0]||(a[0]===b[0]&&(a[1]<b[1]||(a[1]===b[1]&&a[2]<b[2])));}
+/* the distance from a point to the surface a list of triangles makes: below 0 inside it. far: points further than this outside the whole thing just report "far" */
+function soupField(T,far){
+  var n=0,D=[],i,b0=[1e9,1e9,1e9],b1=[-1e9,-1e9,-1e9];
+  T.forEach(function(t){var a=t[0],b=t[1],c=t[2],ab=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],ac=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];
+    var nx=ab[1]*ac[2]-ab[2]*ac[1],ny=ab[2]*ac[0]-ab[0]*ac[2],nz=ab[0]*ac[1]-ab[1]*ac[0],nl=Math.sqrt(nx*nx+ny*ny+nz*nz);if(nl<1e-12)return;
+    var cx=(a[0]+b[0]+c[0])/3,cy=(a[1]+b[1]+c[1])/3,cz=(a[2]+b[2]+c[2])/3,r=0;
+    [a,b,c].forEach(function(p){var d=Math.sqrt((p[0]-cx)*(p[0]-cx)+(p[1]-cy)*(p[1]-cy)+(p[2]-cz)*(p[2]-cz));if(d>r)r=d;for(var k=0;k<3;k++){if(p[k]<b0[k])b0[k]=p[k];if(p[k]>b1[k])b1[k]=p[k];}});
+    D.push(a[0],a[1],a[2],ab[0],ab[1],ab[2],ac[0],ac[1],ac[2],nx/nl,ny/nl,nz/nl,cx,cy,cz,r);n++;});
+  return function(px,py,pz){
+    var ox=Math.max(b0[0]-px,0,px-b1[0]),oy=Math.max(b0[1]-py,0,py-b1[1]),oz=Math.max(b0[2]-pz,0,pz-b1[2]);
+    if(ox*ox+oy*oy+oz*oz>far*far)return far+1;
+    var best=1e18,bside=0,bsign=1,o,k;
+    for(k=0;k<n;k++){o=k*16;
+      var ex=px-D[o+12],ey=py-D[o+13],ez=pz-D[o+14],rr=D[o+15],ce=Math.sqrt(ex*ex+ey*ey+ez*ez)-rr;
+      if(ce>0&&ce*ce>best)continue;
+      var ax=D[o],ay=D[o+1],az=D[o+2],abx=D[o+3],aby=D[o+4],abz=D[o+5],acx=D[o+6],acy=D[o+7],acz=D[o+8];
+      var apx=px-ax,apy=py-ay,apz=pz-az,d1=abx*apx+aby*apy+abz*apz,d2=acx*apx+acy*apy+acz*apz,qx,qy,qz,v,w;
+      if(d1<=0&&d2<=0){qx=ax;qy=ay;qz=az;}
+      else{var bpx=apx-abx,bpy=apy-aby,bpz=apz-abz,d3=abx*bpx+aby*bpy+abz*bpz,d4=acx*bpx+acy*bpy+acz*bpz;
+        if(d3>=0&&d4<=d3){qx=ax+abx;qy=ay+aby;qz=az+abz;}
+        else{var vc=d1*d4-d3*d2;
+          if(vc<=0&&d1>=0&&d3<=0){v=d1/(d1-d3);qx=ax+abx*v;qy=ay+aby*v;qz=az+abz*v;}
+          else{var cpx=apx-acx,cpy=apy-acy,cpz=apz-acz,d5=abx*cpx+aby*cpy+abz*cpz,d6=acx*cpx+acy*cpy+acz*cpz;
+            if(d6>=0&&d5<=d6){qx=ax+acx;qy=ay+acy;qz=az+acz;}
+            else{var vb=d5*d2-d1*d6;
+              if(vb<=0&&d2>=0&&d6<=0){w=d2/(d2-d6);qx=ax+acx*w;qy=ay+acy*w;qz=az+acz*w;}
+              else{var va=d3*d6-d5*d4;
+                if(va<=0&&(d4-d3)>=0&&(d5-d6)>=0){w=(d4-d3)/((d4-d3)+(d5-d6));qx=ax+abx+(acx-abx)*w;qy=ay+aby+(acy-aby)*w;qz=az+abz+(acz-abz)*w;}
+                else{var dn=1/(va+vb+vc);v=vb*dn;w=vc*dn;qx=ax+abx*v+acx*w;qy=ay+aby*v+acy*w;qz=az+abz*v+acz*w;}}}}}}
+      var dx=px-qx,dy=py-qy,dz=pz-qz,dd=dx*dx+dy*dy+dz*dz,side=apx*D[o+9]+apy*D[o+10]+apz*D[o+11],as=side<0?-side:side;
+      if(dd<best-1e-13||(dd<best+1e-13&&as>bside)){best=dd;bside=as;bsign=side<0?-1:1;}   /* where two triangles are equally near (the point is off a shared edge or corner) the one it stands furthest off the plane of tells inside from outside */
+    }
+    return bsign*Math.sqrt(best);
+  };
+}
+/* Cut a list of triangles back to where field(p) >= thr(p). sx (+1 or -1): only the half of space on that side of the figure's centre plane (x = 0) is cut at all,
+   so a left limb and a right limb each take their own half and the two cuts meet exactly on the centre line. Gives the triangles kept and the cut edges. */
+function clipSoup(T,field,thr,sx,fieldMid){
+  var out=[],segs=[],gc={},xc={};
+  function fv(p){return fieldMid&&p[0]>-1e-9&&p[0]<1e-9?fieldMid(p[0],p[1],p[2]):field(p[0],p[1],p[2]);}   /* on the centre plane itself the left cut and the right cut use one and the same measure (the nearer of the two limbs), so they end at the same points and the centre line has no loose ends */
+  function g(p){var k=wKey(p),v=gc[k];if(v===undefined){var th=thr(p);v=gc[k]=th===-Infinity?1:fv(p)-th;}return v;}
+  function mix(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];}
+  function cross(p,q){                                              /* the point on the edge where the field meets the threshold: the same point whichever of the two triangles sharing the edge asks */
+    var a=p,b=q;if(wLess(q,p)){a=q;b=p;}
+    var k=wKey(a)+'|'+wKey(b),v=xc[k];if(v)return v;
+    var neg=g(a)<0,lo=0,hi=1,i,t;
+    for(i=0;i<14;i++){t=(lo+hi)/2;var m=mix(a,b,t),th=thr(m),gm=th===-Infinity?1:fv(m)-th;if((gm<0)===neg)lo=t;else hi=t;}
+    v=xc[k]=mix(a,b,(lo+hi)/2);v.cut=1;gc[wKey(v)]=0;return v;
+  }
+  function onX(p){return p[0]>-1e-9&&p[0]<1e-9;}
+  function splitX(poly,s){                                           /* the part of a polygon on side s of the centre plane */
+    var o=[],n=poly.length,i;
+    for(i=0;i<n;i++){var p=poly[i],q=poly[(i+1)%n],pi=p[0]*s>=-1e-9,qi=q[0]*s>=-1e-9;
+      if(pi)o.push(p);
+      if(pi!==qi&&!onX(p)&&!onX(q)){var a=p,b=q;if(wLess(q,p)){a=q;b=p;}var x=mix(a,b,a[0]/(a[0]-b[0]));x[0]=0;o.push(x);}}
+    var bi=0;for(i=1;i<o.length;i++){var u=o[i],v=o[bi],ux=Math.abs(u[0]),vx=Math.abs(v[0]);if(ux>vx+1e-9||(ux>vx-1e-9&&(u[1]>v[1]+1e-9||(u[1]>v[1]-1e-9&&u[2]>v[2]))))bi=i;}   /* start each half at its corner furthest from the centre plane, so the left half and the right half are cut up as mirror images */
+    return o.slice(bi).concat(o.slice(0,bi));
+  }
+  function fan(poly,col,src){for(var i=1;i+1<poly.length;i++){var a=poly[0],b=poly[i],c=poly[i+1];
+    var ux=b[0]-a[0],uy=b[1]-a[1],uz=b[2]-a[2],vx=c[0]-a[0],vy=c[1]-a[1],vz=c[2]-a[2],nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx;
+    if(nx*nx+ny*ny+nz*nz>1e-20){var t=[a,b,c,col];if(src&&src.length>4)for(var k=4;k<src.length;k++)t[k]=src[k];out.push(t);}}}
+  var T2=[];
+  if(sx)T.forEach(function(tr){var a=tr[0],b=tr[1],c=tr[2],mn=Math.min(a[0]*sx,b[0]*sx,c[0]*sx),mx=Math.max(a[0]*sx,b[0]*sx,c[0]*sx);
+    if(mx<=1e-9){out.push(tr);return;}
+    if(mn>=-1e-9){T2.push(tr);return;}
+    var keep=out.length;fan(splitX([a,b,c],-sx),tr[3],tr);var mine=out.length;fan(splitX([a,b,c],sx),tr[3],tr);T2=T2.concat(out.splice(mine));void keep;});
+  else T2=T;
+  T2.forEach(function(tr){
+    var a=tr[0],b=tr[1],c=tr[2],col=tr[3],poly=[a,b,c];
+    var ux=b[0]-a[0],uy=b[1]-a[1],uz=b[2]-a[2],vx=c[0]-a[0],vy=c[1]-a[1],vz=c[2]-a[2],nrm=[uy*vz-uz*vy,uz*vx-ux*vz,ux*vy-uy*vx],nl=Math.sqrt(nrm[0]*nrm[0]+nrm[1]*nrm[1]+nrm[2]*nrm[2])||1;nrm=[nrm[0]/nl,nrm[1]/nl,nrm[2]/nl];
+    var n=poly.length,kept=[],rem=[],xo=null,xi=null,nc=0,i;
+    for(i=0;i<n;i++){var p=poly[i],q=poly[(i+1)%n],gp=g(p)>=0,gq=g(q)>=0;
+      if(gp)kept.push(p);else rem.push(p);
+      if(gp!==gq){var x=cross(p,q);kept.push(x);rem.push(x);nc++;if(gp)xo=x;else xi=x;}}
+    if(!rem.length){fan(poly,col,tr);return;}
+    if(kept.length>=3)fan(kept,col,tr);
+    if(nc===2)segs.push([xo,xi,nrm]);                               /* a cut edge runs the way the kept piece runs round it: from where the kept piece's outline leaves the kept side to where it comes back, so what is kept lies on its left */
+    if(sx)for(i=0;i<rem.length;i++){var r0=rem[i],r1=rem[(i+1)%rem.length];                 /* the removed piece's edges that lie on the centre plane are cut edges too (what is kept there is the other half, across the plane) */
+      if(r0!==r1&&onX(r0)&&onX(r1)&&!(nc===2&&((r0===xo&&r1===xi)||(r0===xi&&r1===xo)))&&rem.length>2)segs.push([r1,r0,nrm]);}
+  });
+  return {t:out,segs:segs};
+}
+/* join cut edges head to tail into loops */
+function chainLoops(segs){
+  var from={},used=[],loops=[],i;
+  segs=segs.filter(function(s){return wKey(s[0])!==wKey(s[1]);});
+  segs.forEach(function(s,i){var k=wKey(s[0]);(from[k]=from[k]||[]).push(i);});
+  for(i=0;i<segs.length;i++){if(used[i])continue;
+    var pts=[],nr=[],cur=i,start=wKey(segs[i][0]),open=false,guard=0;
+    while(guard++<100000){used[cur]=1;pts.push(segs[cur][0]);nr.push(segs[cur][2]);
+      var k=wKey(segs[cur][1]);if(k===start)break;
+      var nx=(from[k]||[]).filter(function(c){return !used[c];})[0];
+      if(nx===undefined){pts.push(segs[cur][1]);nr.push(segs[cur][2]);open=true;break;}
+      cur=nx;}
+    loops.push({pts:pts,nrm:nr,open:open});}
+  return loops;
+}
+/* a cut edge crosses the thin bands of a part in a cluster of points a few millimetres apart, and each would fan a sliver across the bridge: points closer than eps to the one before are drawn onto it (in the part's own triangles too). Points on the centre plane stay, since the other side's cut shares them. */
+function tidyLoop(L,T,eps){
+  var n=L.pts.length,map={},keep=[0],i,any=false;
+  function d(a,b){var x=a[0]-b[0],y=a[1]-b[1],z=a[2]-b[2];return Math.sqrt(x*x+y*y+z*z);}
+  function mid(p){return p[0]>-1e-9&&p[0]<1e-9;}
+  for(i=1;i<n;i++){var p=L.pts[i],q=L.pts[keep[keep.length-1]];
+    if(d(p,q)<eps&&!mid(p)&&keep.length+(n-i)>4){map[wKey(p)]=q;any=true;}else keep.push(i);}
+  if(!L.open&&keep.length>4){var l=L.pts[keep[keep.length-1]],f=L.pts[0];if(d(l,f)<eps&&!mid(l)){map[wKey(l)]=f;keep.pop();any=true;}}
+  if(!any)return T;
+  var out=[];T.forEach(function(t){var c=t.slice(),k;for(k=0;k<3;k++){var m=map[wKey(c[k])];if(m)c[k]=m;}
+    if(wKey(c[0])!==wKey(c[1])&&wKey(c[1])!==wKey(c[2])&&wKey(c[0])!==wKey(c[2]))out.push(c);});
+  L.pts=keep.map(function(k){return L.pts[k];});L.nrm=keep.map(function(k){return L.nrm[k];});
+  return out;
+}
+/* bridge two cut edges with a strip of triangles: walk the two together, always taking the shorter way across. Each edge has what is kept on its left, so the
+   two run opposite ways round the gap between them, and the second is walked backwards. Gives null if the two edges do not lie alongside each other. */
+function bridgeLoops(A,B,col){
+  function d2(a,b){var x=a[0]-b[0],y=a[1]-b[1],z=a[2]-b[2];return x*x+y*y+z*z;}
+  var P=A.pts.length,Q=B.pts.length,i,j,best=1e18,i0=0,j0=0,closed=!A.open&&!B.open;
+  if(closed){for(i=0;i<P;i++)for(j=0;j<Q;j++){var d=d2(A.pts[i],B.pts[j]);if(d<best){best=d;i0=i;j0=j;}}}
+  else if(d2(A.pts[0],B.pts[Q-1])+d2(A.pts[P-1],B.pts[0])>d2(A.pts[0],B.pts[0])+d2(A.pts[P-1],B.pts[Q-1]))return null;
+  var T=[],ia=0,jb=0,na=closed?P:P-1,nb=closed?Q:Q-1;
+  function ai(k){return closed?(i0+k)%P:k;}
+  function bi(k){return closed?(((j0-k)%Q)+Q)%Q:Q-1-k;}
+  while(ia<na||jb<nb){
+    var a=A.pts[ai(ia)],b=B.pts[bi(jb)],da=ia<na?d2(A.pts[ai(ia+1)],b):1e18,db=jb<nb?d2(a,B.pts[bi(jb+1)]):1e18,c;
+    if(da<=db){c=A.pts[ai(ia+1)];ia++;if(wKey(a)!==wKey(b)&&wKey(b)!==wKey(c))T.push([c,a,b,col]);}
+    else{c=B.pts[bi(jb+1)];jb++;if(wKey(a)!==wKey(b)&&wKey(a)!==wKey(c))T.push([b,c,a,col]);}}
+  return T;
+}
+/* which side joints are welded, and whether the weld is kept to the stretch of the joint near its pivot (an arm lies against the torso far below the shoulder: welded all the way down, raising it would stretch a web of skin from her ribs) */
+var WELDJ={'LowerTorso>Thigh':{gate:0,soft:3},'UpperTorso>UpperArm':{gate:1,soft:1.5}};   /* soft: how far, in blend sizes, the hand-over from body to limb reaches each side of the weld. Wide at the hip, where the leg swings far and her belt marks where the pelvis must stay rigid; tighter at the shoulder, so a raised arm does not drag the collar off the neck */
+function rebuild(){
+  var t0=performance.now();
+  disposeRig();
+  var pal={suit:hex2lin(P.cSuit),hair:hex2lin(P.cHair),skin:hex2lin(P.cSkin),blk:hex2lin(P.cBlk),wht:hex2lin(P.cWht),eye:hex2lin(P.cEye),mouth:hex2lin('#7a3a2c')};
+  rigRoot=new THREE.Group();rigRoot.name='Runner';
+  var rg=rigDef();
+  rg.bones.forEach(function(r){
+    var b=new THREE.Bone();b.name=r[0];b.position.set(r[2][0],r[2][1],r[2][2]);b.quaternion.copy(r[3]);
+    bones[r[0]]=b;rest[r[0]]=r[3].clone();
+    if(r[1])bones[r[1]].add(b);else rigRoot.add(b);
+  });
+  rigRoot.updateMatrixWorld(true);
+  var prims=[],byKey={};
+  SEGS.forEach(function(seg){sidesOf(seg).forEach(function(s){
+    var o=segOffset(seg,rg),M=bones[seg.bone+s.s].matrixWorld.clone().multiply(new THREE.Matrix4().makeTranslation(o[0],o[1],o[2]));
+    var pr=makePrim(seg,s,M);prims.push(pr);byKey[pr.key]=pr;});});
+  function compat(a,b){return !(a.s&&b.s&&a.s!==b.s);}
+  var welds=[];
+  LATERAL.forEach(function(j){var K=Math.max(0,P[j[2]])/100,wj=WELDJ[j[0]+'>'+j[1]];if(K<.0005&&!wj)return;
+    prims.forEach(function(a){if(a.id!==j[0])return;prims.forEach(function(b){if(b.id!==j[1]||!compat(a,b))return;var ch=(j[1]==='UpperArm'||j[1]==='Thigh')?b:null,la={pr:b,K:K,ch:ch},lb={pr:a,K:K,ch:ch};
+      if(wj)welds.push({par:a,ch:b,K:K,la:la,lb:lb,gate:wj.gate,soft:wj.soft});else{a.lat.push(la);b.lat.push(lb);}});});});
+  INLINE.forEach(function(j){
+    prims.forEach(function(a){if(a.id!==j[0])return;prims.forEach(function(b){if(b.id!==j[1]||!compat(a,b))return;
+      var Ba=blendLen(a.id,1)/100,Bb=blendLen(b.id,0)/100;if(Ba>0)a.inC={pr:b,B:Ba};if(Bb>0)b.inP={pr:a,B:Bb};});});});
+
+  /* every part as triangles in the figure's own space */
+  var tmp=new THREE.Vector3(),soups={};
+  function soupOf(pr){var part=buildSeg(SEGBY[pr.id],pr.g),L=[];
+    part.t.forEach(function(t){var tri=[null,null,null,t[3]];for(var i=0;i<3;i++){tmp.set(t[i][0],t[i][1],t[i][2]).applyMatrix4(pr.M);displace(pr,tmp);tri[i]=[tmp.x,tmp.y,tmp.z];if(t[i].kp!==undefined)tri[i].kp=t[i].kp;}L.push(tri);});
+    return L;}
+  prims.forEach(function(pr){soups[pr.key]=soupOf(pr);});
+  function bandGuard(pr){var br=BANDCOL[pr.id]?bandRange(pr.id):null;if(!br)return null;var a0=br[0]/100-1e-6;return function(q){return primLocal(pr,q[0],q[1],q[2])[0]>=a0;};}   /* from where a part's trim band starts, onward */
+  /* the welds: the body is cut back from each limb and the limb from the body, by half the joint's blend size, and the gap between the two cut edges is bridged */
+  var byPar={};welds.forEach(function(w){(byPar[w.par.key]=byPar[w.par.key]||[]).push(w);});
+  Object.keys(byPar).forEach(function(pk){
+    var ws=byPar[pk],par=ws[0].par,par0=soups[pk],work=par0,done=[],ok=true,fPar;
+    try{fPar=soupField(par0,.6);
+      var fKid={},fMid=null;ws.forEach(function(w){fKid[w.ch.key]=soupField(soups[w.ch.key],.6);});
+      if(ws.length===2)fMid=function(x,y,z){return Math.min(fKid[ws[0].ch.key](x,y,z),fKid[ws[1].ch.key](x,y,z));};
+      ws.forEach(function(w){if(!ok)return;                         /* first every cut is made */
+        var ch=w.ch,ch0=soups[ch.key],fCh=fKid[ch.key],m=Math.max(.0025,w.K/2),sx=ch.s==='L'?1:ch.s==='R'?-1:0,Kg=Math.max(.02,w.K);
+        function gate(p){if(!w.gate)return 1;var a=primLocal(ch,p[0],p[1],p[2])[0],t=(a-.2*Kg)/(1.6*Kg);return t<=0?1:t>=1?0:1-smooth(t);}
+        function thr(p){var G=gate(p);return G>=1?m:G<=1e-4?-Infinity:m-.01*(1-G)/G;}   /* away from the pivot the cut backs off, through the surface and then to nothing: there the two parts simply overlap as they always did */
+        var bp=bandGuard(par),bk=bandGuard(ch);                     /* a weld never cuts into a trim band (her belt): a wide blend stops at the band's edge instead of biting a ragged piece out of it */
+        var cp=clipSoup(work,fCh,bp?function(q){return bp(q)?-Infinity:thr(q);}:thr,sx,fMid),cc=clipSoup(ch0,fPar,bk?function(q){return bk(q)?-Infinity:thr(q);}:thr,0),la=chainLoops(cp.segs),lb=chainLoops(cc.segs);
+        if(la.length!==1||lb.length!==1||la[0].open||lb[0].open||la[0].pts.length<3||lb[0].pts.length<3){ok=false;return;}
+        work=cp.t;done.push({w:w,A:la[0],B:lb[0],ct:cc.t,gate:gate,fCh:fCh});});
+      if(ok){                                                       /* then the cut edges are tidied: the stretch of the centre line that the left and right welds share first, by one rule for both, so they still share it afterwards */
+        var seen={},mids=[],kept=[],mmap={},any=false;
+        done.forEach(function(d){d.A.pts.forEach(function(q){var k=wKey(q);if(q[0]>-1e-9&&q[0]<1e-9&&!seen[k]){seen[k]=1;mids.push(q);}});});
+        mids.sort(function(u,v){return u[1]-v[1]||u[2]-v[2];});
+        mids.forEach(function(q){var bq=null,bd=.015,i;for(i=0;i<kept.length;i++){var c=kept[i],dd=Math.sqrt((q[1]-c[1])*(q[1]-c[1])+(q[2]-c[2])*(q[2]-c[2]));if(dd<bd){bd=dd;bq=c;}}
+          if(bq){mmap[wKey(q)]=bq;any=true;}else kept.push(q);});
+        if(any){var w2=[];work.forEach(function(t){var c=t.slice(),k;for(k=0;k<3;k++){var mm=mmap[wKey(c[k])];if(mm)c[k]=mm;}
+            if(wKey(c[0])!==wKey(c[1])&&wKey(c[1])!==wKey(c[2])&&wKey(c[0])!==wKey(c[2]))w2.push(c);});work=w2;
+          done.forEach(function(d){var np=[],nn=[],last=null;d.A.pts.forEach(function(q,i){var r=mmap[wKey(q)]||q,k=wKey(r);if(k!==last){np.push(r);nn.push(d.A.nrm[i]);last=k;}});
+            if(np.length>1&&wKey(np[0])===wKey(np[np.length-1])){np.pop();nn.pop();}d.A.pts=np;d.A.nrm=nn;});}
+        done.forEach(function(d){if(!ok)return;                     /* and each gap is bridged: the whole of both cut edges, the stretch that lies hidden inside the other part too. When the limb swings away from the body that stretch is what closes the gap (her armpit) */
+          work=tidyLoop(d.A,work,.01);d.ct=tidyLoop(d.B,d.ct,.01);
+          var br=d.A.pts.length>2&&d.B.pts.length>2?bridgeLoops(d.A,d.B,BASECOL[d.w.ch.id]):null;if(!br){ok=false;return;}
+          d.A.pts.forEach(function(q){q.wp=1;});d.t=d.ct.concat(br);});}
+    }catch(e){ok=false;}
+    if(ok){soups[pk]=work;par.kidW=[];var bg0=BANDCOL[par.id]?bandRange(par.id):null;
+      done.forEach(function(d){var R=Math.max(.06,d.w.soft*d.w.K),ch=d.w.ch;soups[ch.key]=d.t;
+      /* how the weld bends: across it the skin goes over from the body's bones to the limb's, half and half where the two surfaces meet, all body by R outside the limb and all limb by R outside the body.
+         R is wide on purpose: the bridge itself is narrow, and if the hand-over happened inside it, it would buckle into a ruffle on the side the limb swings toward. The body's trim band (her belt) stays rigid: the limb's pull fades out over the 4 cm before it. */
+      par.kidW.push({bone:BIDX[ch.bone],w:function(x,y,z){var f=d.fCh(x,y,z);if(f>=R)return 0;var w=smooth((R-f)/(2*R))*d.gate([x,y,z]);
+        if(bg0){var a=primLocal(par,x,y,z)[0],u=(bg0[0]/100-a)/.04;w*=u<=0?0:u>=1?1:smooth(u);}return w;}});
+      ch.weld={par:par,w:function(x,y,z){var f=fPar(x,y,z);return 1-(f>=R?0:1-smooth((R+f)/(2*R)))*d.gate([x,y,z]);}};});}
+    else{ws.forEach(function(w){if(w.K>=.0005){w.par.lat.push(w.la);w.ch.lat.push(w.lb);}});soups[pk]=soupOf(par);ws.forEach(function(w){soups[w.ch.key]=soupOf(w.ch);});}   /* a joint that cannot be welded (the limb does not reach the body, or the cut does not come out as one loop) is built the old way */
+  });
+
+  var pos=[],col=[],si=[],sw=[],idx4=[0,0,0,0],w4=[0,0,0,0];ranges={};
+  function vertW(pr,v,e){                                        /* the four bones a point follows and how much of each */
+    var x=v[0],y=v[1],z=v[2],acc={},q,ks,tot=0;
+    if(v.kp!==undefined&&pr.id==='Shin'){e[0]=BIDX['Hip'+pr.s];e[1]=BIDX[pr.bone];e[2]=0;e[3]=0;e[4]=v.kp;e[5]=1-v.kp;e[6]=0;e[7]=0;return e;}   /* a knee pad point: so much thigh, the rest shin */
+    function base(prim,f){if(f<=0)return;weightsFor(prim,x,y,z,idx4,w4,0);for(var q2=0;q2<4;q2++)if(w4[q2]>0)acc[idx4[q2]]=(acc[idx4[q2]]||0)+w4[q2]*f;}
+    function body(par,f){if(f<=0)return;var pull=0;                 /* a point of the body: its welded limbs draw it along where it is near them */
+      (par.kidW||[]).forEach(function(kw){var wk=kw.w(x,y,z);if(wk>0){wk=Math.min(wk,1-pull);acc[kw.bone]=(acc[kw.bone]||0)+wk*f;pull+=wk;}});
+      base(par,f*(1-pull));}
+    if(pr.weld&&v.wp)body(pr.weld.par,1);                           /* the body's own cut edge, used by the bridge */
+    else if(pr.weld){var wl=pr.weld.w(x,y,z);base(pr,wl);body(pr.weld.par,1-wl);}
+    else body(pr,1);
+    ks=Object.keys(acc).sort(function(a2,b2){return acc[b2]-acc[a2];}).slice(0,4);ks.forEach(function(kk){tot+=acc[kk];});
+    for(q=0;q<4;q++){e[q]=q<ks.length?+ks[q]:0;e[4+q]=q<ks.length?acc[ks[q]]/tot:0;}
+    return e;
+  }
+  SEGS.forEach(function(seg){
+    var start=pos.length/3;
+    sidesOf(seg).forEach(function(s){
+      var pr=byKey[seg.id+s.s],rnd=rngFor(hashStr(pr.key)),wc={},slow=!!(pr.weld||pr.kidW),e8=[0,0,0,0,0,0,0,0];
+      soups[pr.key].forEach(function(t){
+        var f=1+(rnd()-.5)*P.jit,c=pal[t[3]];
+        for(var i=0;i<3;i++){var v=t[i],e=e8;
+          if(slow){var k=wKey(v)+(v.wp?'p':'');e=wc[k];if(!e)e=wc[k]=vertW(pr,v,[0,0,0,0,0,0,0,0]);}else vertW(pr,v,e);
+          si.push(e[0],e[1],e[2],e[3]);sw.push(e[4],e[5],e[6],e[7]);
+          pos.push(v[0],v[1],v[2]);
+          col.push(Math.min(1,c[0]*f),Math.min(1,c[1]*f),Math.min(1,c[2]*f));
+        }});
+    });
+    ranges[seg.id]=[start,pos.length/3-start];
+  });
+  var gm=new THREE.BufferGeometry();
+  gm.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  gm.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+  gm.setAttribute('skinIndex',new THREE.Uint16BufferAttribute(si,4));
+  gm.setAttribute('skinWeight',new THREE.Float32BufferAttribute(sw,4));
+  gm.computeVertexNormals();
+  skMesh=new THREE.SkinnedMesh(gm,mat);skMesh.name='Runner_body';skMesh.frustumCulled=false;
+  rigRoot.add(skMesh);rigRoot.updateMatrixWorld(true);
+  skeleton=new THREE.Skeleton(NAMES.map(function(n){return bones[n];}));
+  skMesh.bind(skeleton,new THREE.Matrix4());
+  function overlay(material,name){
+    var g2=new THREE.BufferGeometry();['position','color','skinIndex','skinWeight'].forEach(function(a){g2.setAttribute(a,gm.getAttribute(a));});
+    var m=new THREE.SkinnedMesh(g2,material);m.name=name;m.frustumCulled=false;rigRoot.add(m);m.bind(skeleton,new THREE.Matrix4());return m;}
+  wireMesh=overlay(wireMat,'wire');wireMesh.visible=ui.wire;
+  hlMesh=overlay(hlMat,'hl');
+  var r0=ranges[ui.sel];hlMesh.geometry.setDrawRange(r0[0],r0[1]);
+  hipsBase=[0,rg.bones[0][2][1],0];
+  rigRoot.scale.setScalar(P.scale);
+  scene.add(rigRoot);
+  $('#tri').textContent=(pos.length/9).toLocaleString()+' triangles';
+  dirty=false;
+  rebuild.ms=performance.now()-t0;
+}
+/* click picking runs on the skinned vertices, so it matches the pose on screen */
+function pickSeg(ray){
+  if(!skMesh)return null;
+  skMesh.updateMatrixWorld(true);
+  var inv=new THREE.Matrix4().copy(skMesh.matrixWorld).invert(),r=ray.clone().applyMatrix4(inv);
+  var n=skMesh.geometry.attributes.position.count,V=new Array(n),i,tv=new THREE.Vector3();
+  var best=1e9,hit=null,tgt=new THREE.Vector3(),A,B,C,id;
+  for(i=0;i<n;i++)V[i]=skMesh.boneTransform(i,new THREE.Vector3());
+  for(i=0;i<n;i+=3){
+    if(r.intersectTriangle(V[i],V[i+1],V[i+2],false,tgt)){var d=r.origin.distanceTo(tgt);if(d<best){best=d;hit=i;}}}
+  if(hit===null)return null;
+  for(id in ranges){if(hit>=ranges[id][0]&&hit<ranges[id][0]+ranges[id][1])return id;}
+  return null;
+}
+
+/* ================= poses ================= */
+function runP(kind){var p='run'+kind+'.';return {stride:P[p+'stride'],knee:P[p+'knee'],arm:P[p+'arm'],elbow:P[p+'elbow'],lean:P[p+'lean'],bounce:P[p+'bounce']};}
+function poseRun(ph,kind){
+  var o={},s=Math.sin(ph),hy=hipsBase[1],R=runP(kind);
+  o.Hips={pos:[0,hy-.025+R.bounce/100*Math.cos(2*ph),0],q:qy(-7*rad*s)};
+  o.Spine={q:qy(8*rad*s).multiply(qx(R.lean*rad))};
+  o.Head={q:qy(-4*rad*s).multiply(qx(-R.lean*.7*rad))};
+  [['L',0,1],['R',Math.PI,-1]].forEach(function(e){var S=e[0],f=ph+e[1],g=e[2];
+    var th=(-R.stride*Math.sin(f)-4)*rad,kn=(18+R.knee*Math.max(0,Math.cos(f)))*rad;
+    o['Hip'+S]={q:qx(th)};o['Knee'+S]={q:qx(kn)};o['Ankle'+S]={q:qx(-.7*(th+kn))};
+    o['Shoulder'+S]={q:qx(R.arm*rad*s*g)};o['Elbow'+S]={q:qx(-(R.elbow+10*s*g)*rad)};});
+  o.Pony1={q:qx((-14+4*Math.sin(2*ph))*rad)};o.Pony2={q:qx((12+10*Math.sin(2*ph-.6))*rad)};o.Pony3={q:qx((14+14*Math.sin(2*ph-1.2))*rad)};
+  return o;
+}
+function poseIdle(ph){
+  var o={},s=Math.sin(ph);
+  var pm=P['idle.pony'];
+  o.Hips={pos:[0,hipsBase[1]+P['idle.breath']/100*s,0],q:new THREE.Quaternion()};
+  o.Spine={q:qx(P['idle.sway']*rad*s)};o.Head={q:qx(-P['idle.sway']*.67*rad*s)};
+  [['L',1],['R',-1]].forEach(function(e){var S=e[0],g=e[1];
+    o['Shoulder'+S]={q:qx(P['idle.arm']*rad*Math.sin(ph+.5*g))};o['Elbow'+S]={q:qx(-(8+2*s)*rad)};});
+  o.Pony1={q:qx(4*pm*rad*s)};o.Pony2={q:qx(5*pm*rad*Math.sin(ph-.6))};o.Pony3={q:qx(7*pm*rad*Math.sin(ph-1.2))};
+  return o;
+}
+function poseRest(){return {Hips:{pos:hipsBase.slice(),q:new THREE.Quaternion()}};}
+
+function moveAt(name,u){
+  var n=MOVEX[name].length,pre='m.'+name+'.',i=0,w,v={},k,t0,t1,src0,src1;
+  u=u-Math.floor(u);
+  function T(j){return j===n-1?1:j===0?0:P[pre+j+'.t'];}
+  function S(j){var tk=TIEK[name];return tk&&tk[j]!==undefined?tk[j]:j;}
+  while(i<n-2&&u>T(i+1))i++;
+  t0=T(i);t1=T(i+1);w=smooth(t1>t0?(u-t0)/(t1-t0):1);src0=S(i);src1=S(i+1);
+  for(k in KD)v[k]=P[pre+src0+'.'+k]+(P[pre+src1+'.'+k]-P[pre+src0+'.'+k])*w;
+  return v;
+}
+function toPose(v){
+  var o={},H=hipsBase[1];
+  o.Hips={pos:[hipsBase[0],H*v.hyf,v.hz],q:qx(v.hp*rad)};
+  o.Spine={q:qx(v.sp*rad)};o.Head={q:qx(v.hd*rad)};
+  [['L',1],['R',-1]].forEach(function(e){var S=e[0],g=e[1],h=v['h'+S],k=v['k'+S];
+    o['Shoulder'+S]={q:qx(-v['a'+S+'p']*rad).multiply(qz(g*v['a'+S+'r']*rad))};
+    o['Elbow'+S]={q:qx(-v['a'+S+'e']*rad)};
+    o['Hip'+S]={q:qx(-h*rad)};o['Knee'+S]={q:qx(k*rad)};
+    o['Ankle'+S]={q:qx((v.fl*(h-k-v.hp)-v['d'+S])*rad)};});
+  o.Pony1={q:qx(v.p1*rad)};o.Pony2={q:qx(v.p2*rad)};o.Pony3={q:qx(v.p3*rad)};
+  return o;
+}
+function mirrorV(v){var o={},k;for(k in v)o[k]=v[k];[['aLp','aRp'],['aLr','aRr'],['aLe','aRe'],['hL','hR'],['kL','kR'],['dL','dR']].forEach(function(p){o[p[0]]=v[p[1]];o[p[1]]=v[p[0]];});return o;}
+function cThrowParts(){return [P['comet.throw.in'],1,P['comet.throw.swing'],P['comet.throw.hold'],P['comet.throw.out'],.45];}   /* in, charge (1 s here), swing, follow-through, ease back, rest */
+function modeDur(m){
+  if(m==='cThrow')return cThrowParts().reduce(function(a,b){return a+b;},0);
+  if(m==='cHover')return Math.max(.1,P['comet.hov.bobT']);
+  if(m==='cFly')return 2;
+  if(m==='drift')return P['runF.dur'];   /* a drift is her fast run with changes laid over it, stride for stride */
+  if(m==='idle')return P['idle.dur'];
+  if(m==='runS'||m==='run'||m==='runF')return P['run'+(m==='runS'?'S':m==='runF'?'F':'M')+'.dur'];
+  if(MOVEX[m])return P['m.'+m+'.dur'];
+  return 3;
+}
+function poseDrift(ph,right){   /* the game's drift: her fast run cycle, with the Drift dials added on top (right: mirrored, for drifting right) */
+  var o=poseRun(ph,'F'),v={},k;for(k in KD)if(k!=='fl')v[k]=P['dA.'+k]||0;if(right)v=mirrorV(v);
+  var H=hipsBase[1],mul=function(n,q){if(!o[n])o[n]={q:new THREE.Quaternion()};if(!o[n].q)o[n].q=new THREE.Quaternion();o[n].q.multiply(q);};
+  var hp=(o.Hips&&o.Hips.pos)||hipsBase;o.Hips=o.Hips||{};o.Hips.pos=[hp[0],hp[1]+H*v.hyf,hp[2]+v.hz];
+  mul('Hips',qx(v.hp*rad));mul('Spine',qx(v.sp*rad));mul('Head',qx(v.hd*rad));
+  [['L',1],['R',-1]].forEach(function(e){var S=e[0],g=e[1];
+    mul('Shoulder'+S,qx(-v['a'+S+'p']*rad).multiply(qz(g*v['a'+S+'r']*rad)));mul('Elbow'+S,qx(-v['a'+S+'e']*rad));
+    mul('Hip'+S,qx(-v['h'+S]*rad));mul('Knee'+S,qx(v['k'+S]*rad));mul('Ankle'+S,qx(-v['d'+S]*rad));});
+  mul('Pony1',qx(v.p1*rad));mul('Pony2',qx(v.p2*rad));mul('Pony3',qx(v.p3*rad));
+  return o;
+}
+/* Comet's poses, laid over her own clips the way the game does it (window.__cometQ is the game's) */
+function cqV(pre,mir){var v={};['hyf','hz','hp','sp','hd','aLp','aLr','aLe','aRp','aRr','aRe','hL','kL','dL','hR','kR','dR','p1','p2','p3'].forEach(function(k){v[k]=P[pre+k]||0;});return mir?window.__cometMirror(v):v;}
+var CQUB=['Spine','Head','ShoulderL','ElbowL','ShoulderR','ElbowR'],CQLEG=['HipL','KneeL','AnkleL','HipR','KneeR','AnkleR'],CQALL=['Hips','Spine','Head','ShoulderL','ElbowL','ShoulderR','ElbowR','HipL','KneeL','AnkleL','HipR','KneeR','AnkleR','Pony1','Pony2','Pony3'];
+function cqOv(o,names,v,w,v2,s2){names.forEach(function(n){var q=window.__cometQ(n,v);if(v2)q.slerp(window.__cometQ(n,v2),s2);o[n]=o[n]||{};var b=o[n].q?o[n].q.clone():new THREE.Quaternion();o[n].q=b.slerp(q,w);});}
+function cqAd(o,names,v,w){names.forEach(function(n){o[n]=o[n]||{};var b=o[n].q?o[n].q.clone():new THREE.Quaternion();o[n].q=b.multiply(new THREE.Quaternion().slerp(window.__cometQ(n,v),w));});}
+function cThrowAt(u){var p=cThrowParts(),T=p.reduce(function(a,b){return a+b;},0),t=(u-Math.floor(u))*T,a=p[0],c=a+p[1],sw=c+p[2],h=sw+p[3],ou=h+p[4];
+  if(t<a)return {w:smooth(t/Math.max(.01,p[0])),s:0,held:true};if(t<c)return {w:1,s:0,held:true};
+  if(t<sw){var f=(t-c)/Math.max(.01,p[2]);return {w:1,s:smooth(f),held:f<P['comet.throw.rel']};}
+  if(t<h)return {w:1,s:1,held:false};if(t<ou)return {w:1-smooth((t-h)/Math.max(.01,p[4])),s:1,held:false};return {w:0,s:1,held:false};}
+function poseComet(mode,ph){
+  if(!window.__cometQ)return poseRun(ph,'M');
+  var o,u=ph/(2*Math.PI);
+  if(mode==='cHover'){o=poseRun(2*Math.PI*((u*modeDur('cHover')/Math.max(.05,P['runM.dur']))%1),'M');var v=cqV('comet.ho.');cqAd(o,CQALL,v,1);var hp=(o.Hips&&o.Hips.pos)||hipsBase;o.Hips.pos=[hp[0],hp[1]+hipsBase[1]*v.hyf,hp[2]+v.hz];return o;}
+  if(mode==='cFly'){o=toPose(moveAt('jump',.45));o.Hips.pos=[hipsBase[0],hipsBase[1],0];cqOv(o,CQUB,cqV('comet.pf.'),1);cqAd(o,CQLEG,cqV('comet.fl.'),1);return o;}
+  var st=cThrowAt(u);o=poseRun(2*Math.PI*((u*modeDur('cThrow')/Math.max(.05,P['runM.dur']))%1),'M');if(st.w>0)cqOv(o,CQUB,cqV('comet.pc.'),st.w,cqV('comet.pt.'),st.s);return o;
+}
+function poseFor(mode,ph){
+  if(/^c[A-Z]/.test(mode))return poseComet(mode,ph);
+  if(mode==='drift')return poseDrift(ph,false);
+  if(mode==='run')return poseRun(ph,'M');if(mode==='runS')return poseRun(ph,'S');if(mode==='runF')return poseRun(ph,'F');
+  if(mode==='idle')return poseIdle(ph);
+  if(mode==='set'){var v=moveAt('set',ph/(2*Math.PI)),b=Math.sin(ph),rk=P['m.set.rock'];
+    v.hyf+=P['m.set.bob']/100/hipsBase[1]*b;v.hp+=rk*b;v.sp+=rk*b;v.hd-=P['m.set.nod']*b;v.p1-=2*rk*b;v.p2+=2*rk*b;v.p3+=2*rk*b;return toPose(v);}
+  if(MOVES[mode])return toPose(moveAt(mode,ph/(2*Math.PI)));
+  return poseRest();
+}
+function applyPose(o){
+  NAMES.forEach(function(n){var b=bones[n],e=o[n];if(!b)return;
+    b.quaternion.copy(rest[n]);if(e&&e.q)b.quaternion.multiply(e.q);
+    if(n==='Hips'){var pp=(e&&e.pos)||hipsBase;b.position.set(pp[0],pp[1],pp[2]);}});
+}
+
+/* ================= scene ================= */
+var stage=$('#stage');
+function css(n){return getComputedStyle(HOST).getPropertyValue(n).trim();}
+function initScene(){
+  scene=new THREE.Scene();
+  camera=new THREE.PerspectiveCamera(30,1,.1,50);
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.outputEncoding=THREE.sRGBEncoding;renderer.setClearColor(0x000000,0);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  stage.appendChild(renderer.domElement);
+  controls=new THREE.OrbitControls(camera,renderer.domElement);
+  controls.target.set(0,.9,0);controls.enableDamping=true;controls.dampingFactor=.12;controls.minDistance=1.2;controls.maxDistance=12;controls.maxPolarAngle=Math.PI*.52;
+  scene.add(new THREE.HemisphereLight(0xffffff,0x6a6468,.75));
+  var d=new THREE.DirectionalLight(0xffffff,1.05);d.position.set(2.5,4,3.5);scene.add(d);
+  var d2=new THREE.DirectionalLight(0xffffff,.35);d2.position.set(-3,2,-3);scene.add(d2);
+  grid=new THREE.GridHelper(4,16,0x888888,0x888888);grid.material.transparent=true;grid.material.opacity=.5;scene.add(grid);
+  setView('front');
+  function fit(){var w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  if(window.ResizeObserver)new ResizeObserver(fit).observe(stage);else window.addEventListener('resize',fit);fit();
+  var down=null;
+  renderer.domElement.addEventListener('pointerdown',function(e){down=[e.clientX,e.clientY];});
+  renderer.domElement.addEventListener('pointerup',function(e){
+    if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>5){down=null;return;}down=null;
+    if(ui.mode==='barrier')return;                              /* she is hidden behind the Barrier preview: a click must not pick a part nobody can see */
+    var r=renderer.domElement.getBoundingClientRect();
+    raycaster.setFromCamera(new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1),camera);
+    var id=pickSeg(raycaster.ray);if(id)select(id);
+  });
+}
+function applyTheme(){
+  if(!grid)return;grid.material.color.set(css('--line')||'#888');grid.material.needsUpdate=true;
+}
+var VIEWS={front:[0,1.05,4.6],side:[-4.6,1.05,0],back:[0,1.05,-4.6],tq:[3.2,1.5,3.6]};
+function setView(v){var p=VIEWS[v];camera.position.set(p[0],p[1],p[2]);controls.target.set(0,.9,0);controls.update();
+  SR.querySelectorAll('#views button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.v===v));});}
+
+/* ================= UI ================= */
+function fmt(v,u,step){
+  if(u==='cm')return v.toFixed(step<1?1:0)+' cm';
+  if(u==='pct')return Math.round(v*100)+'%';
+  if(u==='deg')return Math.round(v)+'°';
+  if(u==='s')return v.toFixed(2)+' s';
+  if(u==='n')return String(Math.round(v));
+  return v.toFixed(step>=.1?1:2);
+}
+function statCardRefresh(){var h=SR.querySelector('#statLive');if(h&&window.__statCardHTML){var c={},k;for(k in P)c[k]=P[k];c.__who=CHAR;h.innerHTML=window.__statCardHTML(c,false);}moveRefresh();}
+/* Movement details: the tables follow the stat sliders; the situation below them has three dials of its own (not saved: they are only a calculator) */
+var MSC={slope:20,dir:90,speed:80,mode:'run'};
+function moveRefresh(scenOnly){var b=SR.querySelector('#moveBox');if(!b||!b.open)return;var a=SR.querySelector('#moveLive'),o=SR.querySelector('#moveOut');
+  try{if(a&&!scenOnly&&window.__moveStatsHTML)a.innerHTML=window.__moveStatsHTML(P);if(o&&window.__moveScenHTML)o.innerHTML=window.__moveScenHTML(P,MSC);}catch(e){}}
+function moveScenBuild(){var host=SR.querySelector('#moveScen');if(!host||host.firstChild)return;
+  [['slope','Slope','°',0,60,1],['dir','Her heading, from straight downhill','°',0,180,1],['speed','Her speed','Zips',0,160,1]].forEach(function(c){
+    var row=document.createElement('div'),id='ms_'+c[0];row.className='row';
+    row.innerHTML='<label for="'+id+'">'+c[1]+'</label><span class="numbox"><input type="number" class="num" step="any" aria-label="'+c[1]+' (type any value)"><span class="mono unit">'+c[2]+'</span></span><input type="range" id="'+id+'" min="'+c[3]+'" max="'+c[4]+'" step="'+c[5]+'">';
+    host.appendChild(row);var inp=row.querySelector('input[type=range]'),nb=row.querySelector('input.num');inp.value=MSC[c[0]];nb.value=MSC[c[0]];
+    inp.addEventListener('input',function(){MSC[c[0]]=parseFloat(inp.value);nb.value=MSC[c[0]];moveRefresh(true);});
+    nb.addEventListener('change',function(){var v=parseFloat(nb.value);if(!isFinite(v)){nb.value=MSC[c[0]];return;}if(c[0]==='slope')v=Math.max(0,Math.min(89,v));else if(c[0]==='dir')v=Math.max(0,Math.min(180,v));else v=Math.max(0,v);MSC[c[0]]=v;nb.value=v;inp.value=v;moveRefresh(true);});
+  });
+  var sg=document.createElement('div');sg.className='seg';sg.setAttribute('role','group');sg.setAttribute('aria-label','What she is doing');sg.style.marginBottom='6px';
+  [['run','Running (W)'],['coast','Coasting'],['brake','Braking (S)']].forEach(function(o){var bt=document.createElement('button');bt.textContent=o[1];bt.dataset.ms=o[0];bt.setAttribute('aria-pressed',String(MSC.mode===o[0]));
+    bt.addEventListener('click',function(){MSC.mode=o[0];sg.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x.dataset.ms===o[0]));});moveRefresh(true);});sg.appendChild(bt);});
+  host.appendChild(sg);}
+
+function addRows(host,list,opts){   /* every dial: a slider over a sensible range, and a box to type any value at all (the slider simply sits at its end for a value past its range) */
+  list.forEach(function(c){
+    var key=c[0],id='s_'+key.replace(/\./g,'_'),row=document.createElement('div'),pc=c[2]==='pct',un=pc?'%':c[2]==='n'?'':c[2]==='x'?'×':c[2];row.className='row';
+    if(c[2]==='tog'){   /* an on / off dial (kept as 1 or 0) */
+      row.innerHTML='<label id="'+id+'">'+c[1]+'</label><span class="seg" role="group" aria-labelledby="'+id+'"><button type="button" data-v="1">On</button><button type="button" data-v="0">Off</button></span>';
+      host.appendChild(row);
+      var tb=row.querySelectorAll('button'),paint=function(){for(var i=0;i<tb.length;i++)tb[i].setAttribute('aria-pressed',String((P[key]?1:0)===+tb[i].getAttribute('data-v')));};
+      for(var ti=0;ti<tb.length;ti++)tb[ti].addEventListener('click',function(){P[key]=+this.getAttribute('data-v');paint();after();});
+      paint();return;
+    }
+    row.innerHTML='<label for="'+id+'">'+c[1]+'</label><span class="numbox"><input type="number" class="num" step="any" aria-label="'+c[1]+' (type any value)"><span class="mono unit">'+un+'</span></span><input type="range" id="'+id+'" min="'+c[3]+'" max="'+c[4]+'" step="'+c[5]+'">';
+    host.appendChild(row);
+    var inp=row.querySelector('input[type=range]'),nb=row.querySelector('input.num');
+    function shown(v){return pc?Math.round(v*10000)/100:Math.round(v*10000)/10000;}
+    function after(){save();if(opts&&opts.barrier&&key!=='barrier.preview')barrierDirty=true;if((opts&&opts.stat)||/^m\.drift\.|^slope\.side$|^scale$/.test(key))statCardRefresh();if(opts&&opts.then)opts.then(key);if(!(opts&&opts.anim)){dirty=true;drawPrev();}}
+    inp.value=P[key];nb.value=shown(P[key]);
+    inp.addEventListener('input',function(){var v=holdT(key,parseFloat(inp.value));P[key]=v;if(parseFloat(inp.value)!==v)inp.value=v;nb.value=shown(v);after();});
+    nb.addEventListener('change',function(){var v=parseFloat(nb.value);if(!isFinite(v)){nb.value=shown(P[key]);return;}P[key]=holdT(key,hold(key,pc?v/100:v));inp.value=P[key];nb.value=shown(P[key]);after();});
+  });
+}
+function bulgeRows(seg,n){
+  var e=seg.ends,b=seg.id+'.u'+n,k=seg.kind,sN=e[0],eN=e[1],ls,le,fw=k==='fwd';
+  ls=fw?'toward the '+sN:k==='up'?'bottom ('+sN+')':'top ('+sN+')';
+  le=fw?'toward the '+eN:k==='up'?'top ('+eN+')':'bottom ('+eN+')';
+  return [[b+'p','Position along length (0% = '+sN+' end)','pct',0,1,.01],[b+'a','Direction around the part (0 = '+(fw?'top':'front')+', 90 = '+(seg.pair?'outside':'right')+', 180 = '+(fw?'underside':'back')+')','deg',-180,180,1],
+   [b+'d','Depth (above 0 bulges out, below 0 dents in)','cm',-8,8,.1],
+   [b+'wl','Width: radial left','deg',5,180,1],[b+'wr','Width: radial right','deg',5,180,1],[b+'ws','Width: '+ls,'pct',.02,1,.01],[b+'we','Width: '+le,'pct',.02,1,.01],
+   [b+'kl','Curvature: radial left (concave to convex)','x',-1,1,.05],[b+'kr','Curvature: radial right','x',-1,1,.05],[b+'ks','Curvature: '+ls,'x',-1,1,.05],[b+'ke','Curvature: '+le,'x',-1,1,.05]];
+}
+function coreRows(seg){
+  var id=seg.id,e=seg.ends,pre=id+'.';
+  return {
+   size:[[pre+'len','Length','cm',2,70,.5],[pre+'dia','Max diameter (width)','cm',1,60,.1],[pre+'depth','Depth as a fraction of width','x',.3,2,.01]],
+   center:[[pre+'peak','Position along length (0% = '+e[0]+' end)','pct',.02,.98,.01]],
+   start:[[pre+'tS','Taper at the '+e[0]+' end','pct',.03,1,.01],[pre+'cS','Curve from '+e[0]+' end to max','x',.4,5,.05]],
+   end:[[pre+'tE','Taper at the '+e[1]+' end','pct',.03,1,.01],[pre+'cE','Curve from max to '+e[1]+' end','x',.4,5,.05]],
+   b1:bulgeRows(seg,1),b2:bulgeRows(seg,2)
+  };
+}
+function renderPart(){
+  var seg=SEGBY[ui.sel],r=coreRows(seg);
+  $('#partTitle').textContent=seg.label;
+  $('#partNote').textContent=(seg.pair?'Left and right match. ':'')+'Runs from the '+seg.ends[0]+' to the '+seg.ends[1]+'.';
+  $('#hStart').textContent='Start taper and curve ('+seg.ends[0]+')';
+  $('#hEnd').textContent='End taper and curve ('+seg.ends[1]+')';
+  $('#pvAcap').textContent=seg.lat?seg.lat[0]:'Front view';$('#pvBcap').textContent=seg.lat?seg.lat[1]:'Side view';
+  [['#rSize',r.size],['#rCenter',r.center],['#rStart',r.start],['#rEnd',r.end],['#rB1',r.b1],['#rB2',r.b2]].forEach(function(p){var h=$(p[0]);h.innerHTML='';addRows(h,p[1]);});
+  var ex=EXTRA[seg.id],xh=$('#rExtra');xh.innerHTML='';$('#xWrap').hidden=!ex;
+  if(ex)addRows(xh,ex);
+  drawPrev();
+}
+function drawPrev(){
+  var seg=SEGBY[ui.sel],id=seg.id,kind=seg.kind,N=36,pk=P[id+'.peak'],i,view;
+  function xy(a,lat){return kind==='up'?[lat,-a]:kind==='down'?[lat,a]:[a,-lat];}
+  [['A','#pvA'],['B','#pvB']].forEach(function(v){
+    view=v[0];var L=P[id+'.len']/100,left=[],right=[],pts;
+    for(i=0;i<=N;i++){var t=i/N,s=ringAt(id,t,1),a=t*L,c=view==='A'?s.cb:s.cc,r=view==='A'?s.rb:s.rc,oA=view==='A'?bulgeOff(id,t,-90):bulgeOff(id,t,180),oB=view==='A'?bulgeOff(id,t,90):bulgeOff(id,t,0);
+      left.push(xy(a,c-r-oA));right.push(xy(a,c+r+oB));}
+    pts=left.concat(right.reverse());
+    var s2=ringAt(id,pk,1),pc=view==='A'?s2.cb:s2.cc,pr=view==='A'?s2.rb:s2.rc,p1=xy(pk*L,pc-pr),p2=xy(pk*L,pc+pr);
+    var all=pts.concat([xy(0,0),xy(L,0)]),x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+    all.forEach(function(p){x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});
+    var W=150,pad=14,sc=Math.min((W-2*pad)/Math.max(1e-6,x1-x0),(W-2*pad)/Math.max(1e-6,y1-y0));
+    var ox=(W-(x1-x0)*sc)/2-x0*sc,oy=(W-(y1-y0)*sc)/2-y0*sc;
+    function T(p){return (p[0]*sc+ox).toFixed(1)+','+(p[1]*sc+oy).toFixed(1);}
+    var c0=xy(0,0),c1=xy(L,0);
+    $(v[1]).innerHTML='<polygon points="'+pts.map(T).join(' ')+'" style="fill:var(--chip);stroke:var(--accent);stroke-width:1.6;stroke-linejoin:round"/>'+
+      '<line x1="'+T(c0).split(',')[0]+'" y1="'+T(c0).split(',')[1]+'" x2="'+T(c1).split(',')[0]+'" y2="'+T(c1).split(',')[1]+'" style="stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3"/>'+
+      '<line x1="'+T(p1).split(',')[0]+'" y1="'+T(p1).split(',')[1]+'" x2="'+T(p2).split(',')[0]+'" y2="'+T(p2).split(',')[1]+'" style="stroke:var(--fg);stroke-width:1.2"/>';
+  });
+}
+function select(id){
+  ui.sel=id;
+  SR.querySelectorAll('#chips .chip').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.id===id));});
+  if(hlMesh&&ranges[id])hlMesh.geometry.setDrawRange(ranges[id][0],ranges[id][1]);
+  renderPart();
+}
+function buildGroups(){
+  var host=$('#groups');
+  GROUPS.forEach(function(g,gi){
+    var det=document.createElement('details');if(gi===0)det.open=true;
+    var sm=document.createElement('summary');sm.textContent=g[0];det.appendChild(sm);
+    if(gi===0){var nt=document.createElement('p');nt.className='note';nt.textContent='Blend lengths smooth the bend at in-line joints and ease two parts into a shared cross-section. Side blends fill the corner where an arm or leg meets the torso. Set any of them to 0 for a hard joint.';det.appendChild(nt);}
+    addRows(det,g[1]);host.appendChild(det);
+  });
+}
+function buildStatic(){
+  var ch=$('#chips');
+  SEGS.forEach(function(s){var b=document.createElement('button');b.className='chip';b.dataset.id=s.id;b.textContent=s.label;b.setAttribute('aria-pressed',String(s.id===ui.sel));
+    b.addEventListener('click',function(){select(s.id);});ch.appendChild(b);});
+  buildGroups();
+  var cl=$('#colors');
+  COLORS.forEach(function(c){
+    var l=document.createElement('label');l.innerHTML='<input type="color" id="c_'+c[0]+'" value="'+P[c[0]]+'"><span>'+c[1]+'</span>';
+    cl.appendChild(l);var inp=l.querySelector('input');
+    inp.addEventListener('input',function(){P[c[0]]=inp.value;dirty=true;save();});
+  });
+}
+function syncAll(){
+  SR.querySelectorAll('#groups details').forEach(function(d){d.remove();});
+  buildGroups();COLORS.forEach(function(c){$('#c_'+c[0]).value=P[c[0]];});renderPart();
+  try{renderStats();renderAnim();}catch(e){}barrierDirty=true;   /* the Stats menu, the animation dials and the Barrier preview show the new values too */
+}
+/* Pages: Molly and Comet each have their own copy of every dial (kept in runnerRig2 and cometRig); Mobs are kept with Molly's. Comet starts as a copy of Molly. */
+var PAGE='molly',CHAR='molly',CHARKEY={molly:'runnerRig2',comet:'cometRig'},CHARNAME={molly:'Molly',comet:'Comet'};HOST.__char='molly';
+function noMobs(o){var r={},k;for(k in o)if(k.indexOf('mn.')!==0)r[k]=o[k];return r;}   /* Comet's dials never carry the mobs' (they live with Molly's) */
+function save(){try{localStorage.setItem(CHARKEY[CHAR],JSON.stringify(CHAR==='comet'?noMobs(P):P));}catch(e){}}
+function loadChar(c){CHAR=c;HOST.__char=c;DEF=c==='comet'?DEFC:DEFM;P=JSON.parse(JSON.stringify(DEF));var sv=null;try{sv=localStorage.getItem(CHARKEY[c]);}catch(e){}
+  if(sv){try{takeSettings(c==='comet'?noMobs(JSON.parse(sv)):JSON.parse(sv));}catch(e){}}
+  if(c==='comet'){var m=pageOf('molly');for(var k in m)if(k.indexOf('mn.')===0)P[k]=m[k];}}   /* (the mob dials on Comet's page are Molly's, unused) */
+function pageOf(c){   /* a runner's dials as they stand: the page open now, or that runner's defaults with what this browser saved */
+  if(c===CHAR)return JSON.parse(JSON.stringify(P));
+  var d=c==='comet'?DEFC:DEFM,o=JSON.parse(JSON.stringify(d)),sv=null,k;try{sv=JSON.parse(localStorage.getItem(CHARKEY[c])||'null');}catch(e){}
+  if(sv)for(k in d)if(sv[k]!==undefined&&typeof sv[k]===typeof d[k])o[k]=hold(k,sv[k]);return o;}
+function setPage(pg){
+  var c=pg==='comet'?'comet':'molly';
+  if(c!==CHAR){save();loadChar(c);syncAll();dirty=true;}
+  PAGE=pg;$('aside').setAttribute('data-page',pg);$('#app').setAttribute('data-page',pg);
+  SR.querySelectorAll('#pages button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.pg===pg));});
+  $('#rigH1').textContent=pg==='mobs'?'Mobs':CHARNAME[c]+': rig editor';
+  if(pg==='comet'&&ui.mode==='barrier')setMode('run');
+  if(pg!=='comet'&&/^c[A-Z]/.test(ui.mode))setMode('run');
+  if(pg==='mobs'){minDirty=true;try{renderMinions();}catch(e){}}
+  try{renderComet();statCardRefresh();}catch(e){}
+}
+SR.querySelectorAll('#pages button').forEach(function(b){b.addEventListener('click',function(){setPage(b.dataset.pg);});});
+function status(t,ms){var s=$('#status');s.textContent=t;clearTimeout(status.t);status.t=setTimeout(function(){s.textContent='';},ms||4500);}
+
+SR.querySelectorAll('#views button').forEach(function(b){b.addEventListener('click',function(){setView(b.dataset.v);});});
+function setMode(m){ui.mode=m;try{renderAnim();}catch(e){}SR.querySelectorAll('#modes button,#modes2 button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.m===m));});
+  $('#play').disabled=(m==='rest');$('#phase').disabled=(m==='rest'||m==='barrier');}
+SR.querySelectorAll('#modes button,#modes2 button').forEach(function(b){b.addEventListener('click',function(){setMode(b.dataset.m);});});
+$('#play').addEventListener('click',function(){ui.playing=!ui.playing;this.textContent=ui.playing?'Pause':'Play';this.setAttribute('aria-pressed',String(!ui.playing));});
+$('#phase').addEventListener('input',function(){ui.phase=parseFloat(this.value);if(ui.playing){ui.playing=false;var p=$('#play');p.textContent='Play';p.setAttribute('aria-pressed','true');}});
+$('#wire').addEventListener('click',function(){ui.wire=!ui.wire;this.setAttribute('aria-pressed',String(ui.wire));if(wireMesh)wireMesh.visible=ui.wire;});
+$('#resetPart').addEventListener('click',function(){
+  var id=ui.sel,key;for(key in DEF){if(key.indexOf(id+'.')===0)P[key]=DEF[key];}
+  if(id==='Head'){P.hairVol=DEF.hairVol;P.bangL=DEF.bangL;}
+  dirty=true;save();renderPart();status('Part reset.');});
+
+function settingsJson(){   /* all three pages in one block: Molly, Comet and Mobs, each under its own name */
+  var m=pageOf('molly'),c=noMobs(pageOf('comet')),mob={},k;for(k in m)if(k.indexOf('mn.')===0){mob[k]=m[k];delete m[k];}
+  return JSON.stringify({'Poly Runner rig settings':2,molly:m,comet:c,mobs:mob},null,1);}
+function applyAll(o){   /* a block with molly / comet / mobs parts: each goes back to its own page */
+  var n=0,put=function(c,part,extra){if(!part&&!extra)return;var cur=pageOf(c),k;[part,extra].forEach(function(src){if(!src)return;src=upgrade(src);for(k in src){if(cur[k]!==undefined&&typeof src[k]===typeof cur[k]){cur[k]=hold(k,src[k]);n++;}}});
+    try{localStorage.setItem(CHARKEY[c],JSON.stringify(c==='comet'?noMobs(cur):cur));}catch(e){}};
+  put('molly',o.molly,o.mobs);put('comet',o.comet?noMobs(o.comet):null);loadChar(CHAR);return n;}
+$('#copyJson').addEventListener('click',function(){
+  var t=settingsJson(),ta=$('#json');ta.value=t;
+  var done=function(){status('All three pages copied (Molly, Comet and Mobs). Paste them into the chat to bake them into a new file.');};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){ta.select();status('Select and copy the text in the box below.');});}
+  else{ta.select();status('Select and copy the text in the box below.');}
+});
+$('#applyJson').addEventListener('click',function(){
+  try{var o=JSON.parse($('#json').value),all=o&&typeof o==='object'&&(o.molly||o.comet||o.mobs),n=all?applyAll(o):o&&typeof o==='object'?takeSettings(CHAR==='comet'?noMobs(o):o):0;
+    syncAll();dirty=true;if(!all)save();status(n?(all?'Applied Molly, Comet and Mobs settings ('+n+' dials).':'Applied '+n+' settings to '+CHARNAME[CHAR]+'.'):'No matching settings found.');}
+  catch(e){status('That is not valid settings JSON.');}
+});
+$('#rigClose').addEventListener('click',function(){HOST.__close();});
+$('#resetAll').addEventListener('click',function(){P=JSON.parse(JSON.stringify(DEF));syncAll();dirty=true;save();status(CHARNAME[CHAR]+' is back to her default build.');});
+
+
+/* ================= animation dials ================= */
+var STAGES={jump:['Ready','Crouch','Takeoff','Peak','Fall','Land','Recover'],slide:['Run in','Drop','Slide','Get up'],fall:['Run','Trip','Fall','Impact','Bounce','Settle'],set:['Pose'],drift:['Pose']};
+var MOVELABEL={jump:'Jump',slide:'Slide',fall:'Faceplant',set:"Runner's pose",drift:'Drift',barrier:'Hedron Barrier',cThrow:'Star throw',cHover:'Hover',cFly:'Fly'};
+var KEYGROUPS=[
+ ['Body',[['hyf','Hips height (1 = standing)','x',.1,1.7,.01],['hz','Hips forward (m)','x',-1,1,.01],['hp','Body lean (+ forward)','deg',-110,110,1],['sp','Spine bend','deg',-60,60,1],['hd','Head tilt','deg',-70,70,1]]],
+ ['Arms',[['aLp','Left arm raise','deg',-120,180,1],['aLr','Left arm out','deg',-20,120,1],['aLe','Left elbow bend','deg',0,150,1],['aRp','Right arm raise','deg',-120,180,1],['aRr','Right arm out','deg',-20,120,1],['aRe','Right elbow bend','deg',0,150,1]]],
+ ['Legs',[['hL','Left thigh forward','deg',-80,130,1],['kL','Left knee bend','deg',0,150,1],['dL','Left toes up','deg',-60,60,1],['hR','Right thigh forward','deg',-80,130,1],['kR','Right knee bend','deg',0,150,1],['dR','Right toes up','deg',-60,60,1],['fl','Keep feet flat','pct',0,1,.01]]],
+ ['Ponytail',[['p1','Ponytail 1','deg',-90,90,1],['p2','Ponytail 2','deg',-90,90,1],['p3','Ponytail 3','deg',-90,90,1]]]
+];
+var animKey={jump:0,slide:0,fall:0,set:0,drift:0};
+function pausePlay(){ui.playing=false;var p=$('#play');p.textContent='Play';p.setAttribute('aria-pressed','true');$('#phase').value=ui.phase;}
+function animPrefix(m){return m==='barrier'?'barrier.':m==='idle'?'idle.':m==='runS'?'runS.':m==='run'?'runM.':m==='runF'?'runF.':'m.'+m+'.';}
+function renderAnim(){
+  var m=ui.mode,sec=$('#animSec'),rows=$('#animRows'),st=$('#animStages'),kh=$('#animKey');
+  rows.innerHTML='';st.innerHTML='';kh.innerHTML='';
+  if(m==='rest'){sec.hidden=true;return;}
+  sec.hidden=false;
+  var isRun=(m==='runS'||m==='run'||m==='runF'),pre=animPrefix(m);
+  var title=m==='idle'?'Idle':m==='runS'?'Slow run':m==='run'?'Mid run':m==='runF'?'Fast run':MOVELABEL[m];
+  $('#animTitle').textContent=title+' animation';
+  if(m==='idle'){
+    $('#animNote').textContent='A gentle standing loop.';
+    addRows(rows,[[pre+'dur','Loop length','s',1,6,.05],[pre+'breath','Breathing bob','cm',0,2,.1],[pre+'sway','Torso sway','deg',0,6,.1],[pre+'arm','Arm sway','deg',0,8,.1],[pre+'pony','Ponytail sway','x',0,3,.05]],{anim:1});
+  }else if(isRun){
+    $('#animNote').textContent='A run cycle. Each of the three speeds has its own dials.';
+    addRows(rows,[[pre+'dur','Time per stride cycle','s',.25,2,.01],[pre+'stride','Stride','deg',5,62,1],[pre+'knee','Knee lift','deg',20,125,1],[pre+'arm','Arm swing','deg',0,78,1],[pre+'elbow','Elbow bend','deg',20,125,1],[pre+'lean','Forward lean','deg',0,30,1],[pre+'bounce','Bounce','cm',0,8,.5]],{anim:1});
+  }else if(m==='barrier'){
+    $('#animNote').textContent='The red dodecahedron she rolls inside. It stays a dodecahedron when slow, turns into a dashed sphere at speed, then squeezes along its axle and stretches round the spin. Use the preview speed to watch each stage; save closes the loop in the game when you close the editor.';
+    addRows(rows,[['barrier.preview','Preview speed','Zips',0,120,1],['barrier.radius','Size (radius)','units',1.2,2.6,.02],['barrier.height','Height of its centre','units',1,3,.02],['barrier.spin','Rolling speed','x',.2,3,.05],
+      ['barrier.sphereAt','Turns into a sphere at','Zips',5,100,1],['barrier.squeezeAt','Starts to squeeze at','Zips',20,119,1],['barrier.squeezeLen','Squeeze reaches full over','Zips',1,40,1],['barrier.squeeze','Squeeze along the axle','pct',0,.6,.01],['barrier.stretch','Stretch round the spin','pct',0,.5,.01],
+      ['barrier.chargeSphere','Dodecadash: sphere after charging','s',0,6,.1],['barrier.chargeSqueeze','Dodecadash: squeeze starts at','s',0,6,.1],
+      ['barrier.glow','Glow strength','x',0,.8,.01],['barrier.glowSize','Glow size','x',1,1.6,.01],['barrier.dashLen','Dash length','units',.05,1,.01],['barrier.dashGap','Gap between dashes','units',.05,1,.01]],{anim:1,barrier:1});
+    var ch=document.createElement('div');ch.className='row';ch.style.cssText='display:flex;flex-wrap:wrap;gap:10px;margin-top:8px';
+    [['barrier.cBody','Body'],['barrier.cEmis','Inner glow'],['barrier.cEdge','Edge lines'],['barrier.cDash','Dashes'],['barrier.cGlow','Halo']].forEach(function(c){
+      var l=document.createElement('label');l.style.cssText='display:flex;gap:6px;align-items:center;font-size:12px';l.textContent=c[1];
+      var i=document.createElement('input');i.type='color';i.value=P[c[0]];i.addEventListener('input',function(){P[c[0]]=i.value;save();barrierDirty=true;});l.appendChild(i);ch.appendChild(l);});
+    rows.appendChild(ch);
+  }else if(/^c[A-Z]/.test(m)){
+    var UBR=[['sp','Spine bend (+ forward)'],['hd','Head tilt'],['aLp','Left arm raise'],['aLr','Left arm out'],['aLe','Left elbow bend'],['aRp','Right arm raise'],['aRr','Right arm out'],['aRe','Right elbow bend']];
+    var poseRows=function(pre,list){return list.map(function(r){return [pre+r[0],r[1],'deg',-180,180,1];});};
+    var grp=function(title,list){var h3=document.createElement('h3');h3.textContent=title;kh.appendChild(h3);var d=document.createElement('div');kh.appendChild(d);addRows(d,list,{anim:1});};
+    if(m==='cThrow'){
+      $('#animNote').textContent='Star Throw. Holding Q or E she leans in with a star in her hand behind her (it grows as she charges); letting go, her arm swings through and the star leaves her hand part way. Her legs keep running. E throws with her right hand, Q mirrors it to her left. The preview charges for 1 s.';
+      addRows(rows,[['comet.throw.in','Into the charging pose','s',.02,1,.01],['comet.throw.swing','The swing','s',.02,1,.01],['comet.throw.rel','Star leaves her hand at (% of the swing)','pct',0,1,.01],['comet.throw.hold','Follow-through held','s',0,1,.01],['comet.throw.out','Back to running','s',.02,2,.01],['comet.hold.scale','Star in her hand (× the star she will throw)','x',.1,2,.05],['comet.hold.out','Star in her hand: out from her wrist','units',-1,1,.01]],{anim:1});
+      grp('Charging pose (holding the star behind her)',poseRows('comet.pc.',UBR));grp('Throw pose (the arm swung through)',poseRows('comet.pt.',UBR));
+    }else if(m==='cHover'){
+      $('#animNote').textContent='Hover. She floats over the ground doing whatever she would be doing; the changes below are laid over it (all 0: just her run). Two stars at her ankles and a bigger one behind her back.';
+      addRows(rows,[['comet.hov.height','Floats above the ground by','units',0,3,.05],['comet.hov.bob','Bob','units',0,1,.01],['comet.hov.bobT','Bob: seconds a cycle','s',.2,6,.05],['comet.hov.spinS','Stars: turns a second','x',0,6,.1],['comet.hov.ankle','Ankle stars: size','units',.05,2,.01],['comet.hov.ankleY','Ankle stars: up or down','units',-1,1,.01],['comet.hov.ankleTilt','Ankle stars: tilt','deg',-90,90,1],['comet.hov.back','Back star: size','units',.1,3,.01],['comet.hov.backD','Back star: behind her by','units',0,2,.01],['comet.hov.backY','Back star: up or down','units',-2,2,.01],['comet.hov.backTilt','Back star: tilt','deg',-90,90,1]],{anim:1});
+      KEYGROUPS.forEach(function(g){grp(g[0]+' (changes while hovering)',g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['comet.ho.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}));});
+    }else{
+      $('#animNote').textContent='Fly (Space held in the air while hovering). This pose takes over her arms, spine and head; the leg dials are changes to her jump. The star from her back goes up to her hands.';
+      addRows(rows,[['comet.fly.arms','How fast she goes into it','x',1,30,.5],['comet.fly.starY','Star above her hands','units',-1,2,.01],['comet.fly.starS','Star size there (× the back star)','x',.2,3,.05]],{anim:1});
+      grp('Arms, spine and head',poseRows('comet.pf.',UBR));
+      grp('Legs (changes to her jump)',[['hL','Left thigh forward'],['kL','Left knee bend'],['dL','Left toes up'],['hR','Right thigh forward'],['kR','Right knee bend'],['dR','Right toes up']].map(function(r){return ['comet.fl.'+r[0],r[1],'deg',-120,120,1];}));
+    }
+  }else if(m==='drift'){
+    $('#animNote').textContent='What she does while drifting left (A held); drifting right is the same, mirrored. In the game she keeps running, stride for stride, and leans into the corner from her feet. The changes below are added on top of her Fast run (all 0: just the run). Save to game to use them.';
+    addRows(rows,[[pre+'lean','Lean into the corner','deg',0,60,.5],[pre+'angle','Momentum shift when it starts','deg',0,45,.5],[pre+'time','Time to make the shift','s',.03,.6,.01],[pre+'minZips','Needs at least','Zips',0,80,1],[pre+'cool','Cooldown after release','s',0,5,.1],[pre+'rate','How fast she settles into it','x',2,20,.5],['slope.side','Tilt to sideways slopes (all running)','x',0,1.2,.05]],{anim:1});
+    KEYGROUPS.forEach(function(g){var h3=document.createElement('h3');h3.textContent=g[0]+' (added to her run)';kh.appendChild(h3);var d=document.createElement('div');kh.appendChild(d);
+      addRows(d,g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['dA.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}),{anim:1});});
+  }else{
+    $('#animNote').textContent=m==='drift'?'Her pose while drifting left (A held, camera to her left); drifting right is this pose mirrored. Pose is for the Molly model; lean and turn dials below are live in the game.':'A one-shot move that loops here so you can watch it. Pick a stage to jump to it and edit its pose; the moves in between are blended for you.';
+    var extra=[[pre+'dur','Total length','s',.5,5,.05]];
+    if(m==='set')extra.push([pre+'bob','Breathing bob','cm',0,4,.1],[pre+'rock','Breathing rock','deg',0,6,.1],[pre+'nod','Head nod','deg',0,6,.1]);
+    if(m==='drift')extra.push([pre+'lean','Lean into the corner','deg',0,60,.5],[pre+'angle','Momentum shift when it starts','deg',0,45,.5],[pre+'time','Time to make the shift','s',.03,.6,.01],[pre+'minZips','Needs at least','Zips',0,80,1],[pre+'cool','Cooldown after release','s',0,5,.1],[pre+'rate','How fast she settles into it','x',2,20,.5],['slope.side','Tilt to sideways slopes (all running)','x',0,1.2,.05]);
+    var hk=HOLDKEY[m];
+    if(hk)extra.push([pre+hk[0]+'.t',hk[1],'pct',P[pre+(hk[0]-1)+'.t']+.02,P[pre+(hk[0]+1)+'.t']-.02,.01]);
+    addRows(rows,extra,{anim:1});
+    var names=STAGES[m],ks=STAGEKEYS[m],n=names.length,sel=Math.min(animKey[m],n-1);
+    names.forEach(function(nm,i){var b=document.createElement('button');b.className='chip';b.textContent=nm;b.setAttribute('aria-pressed',String(i===sel));
+      b.addEventListener('click',function(){animKey[m]=i;ui.phase=P[pre+ks[i]+'.t']||0;pausePlay();renderAnim();});st.appendChild(b);});
+    var kk=ks[sel],kp=pre+kk+'.',lo=kk===0?0:P[pre+(kk-1)+'.t']+.01,hi=(kk+1>=MOVEX[m].length-1?1:P[pre+(kk+1)+'.t'])-.01;
+    var th=document.createElement('h3');th.textContent='Stage: '+names[sel];kh.appendChild(th);
+    if(kk>0){var tr=document.createElement('div');kh.appendChild(tr);addRows(tr,[[kp+'t','When it happens (% of the move)','pct',Math.max(0,lo),Math.max(lo+.01,hi),.01]],{anim:1,then:function(){if(!ui.playing){ui.phase=P[kp+'t'];$('#phase').value=ui.phase;}}});}   /* paused on this stage, the preview moves with its time, so the pose on screen is still this stage's */
+    KEYGROUPS.forEach(function(g){var h3=document.createElement('h3');h3.textContent=g[0];kh.appendChild(h3);var d=document.createElement('div');kh.appendChild(d);
+      addRows(d,g[1].map(function(r){return [kp+r[0]].concat(r.slice(1));}),{anim:1});});
+  }
+}
+var STAT_ROWS=[['stat.top','Top speed','Zips',20,160,1],['stat.accelT','Time from 0 to top speed','s',1,20,.1],['stat.brake','Braking strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip fades on slopes (× the cosine of the slope)','tog'],['stat.driftGrip','Grip while drifting (x her grip)','x',0,3,.05],['stat.fall','Max fall speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision box height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision box width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier slam: top speed','Zips',10,200,1],['stat.strafe','Strafe distance (Q/E sidestep; 2 = one square)','units',0.5,12,.1]];
+function renderStats(){var h=$('#statRows');if(!h)return;h.innerHTML='';addRows(h,STAT_ROWS,{anim:1,stat:1});var sc=document.createElement('div');sc.id='statLive';sc.style.cssText='margin-top:10px;max-width:460px';h.appendChild(sc);statCardRefresh();}   /* the Stats menu at the top of the panel */
+try{renderStats();}catch(e){}
+var COMET_HOV=[['comet.hov.cost','Power to switch it on','n',0,50,1],['comet.hov.drain','Power a second while on','n',0,20,.1],['comet.hov.height','Floats above the ground by','units',0,3,.05],
+ ['comet.hov.top','Top speed','Zips',10,200,1],['comet.hov.accelT','Time from 0 to top speed','s',.5,20,.1],['comet.hov.brake','Braking strength (x coasting)','x',0,8,.1],['comet.hov.fric','Friction (coasting)','Zips/s²',0,40,.1],['comet.hov.gripZ','Sideways grip (turning)','Zips/s²',1,80,.5],['comet.hov.jumpH','Jump height','units',0,30,.1],
+];
+var COMET_FLY=[['comet.fly.drain','Extra power a second while flying','n',0,40,.1],['comet.fly.lift','Lift (× gravity: 1 cancels it)','x',0,3,.01]];
+var COMET_STAR=[['comet.star.cost','Power per throw (needs more than 0)','n',0,20,1],['comet.star.range','Range','units',5,400,1],['comet.star.dmg','Damage','hearts',0,10,.5],['comet.star.cool','Cooldown','s',0,10,.1],['comet.star.speed','Speed','Zips',5,400,1],['comet.star.size','Size (across)','units',.1,5,.05],['comet.star.spin','Spin (turns a second)','x',0,20,.1],
+ ['comet.star.cMax','Charge: most seconds','s',0,6,1],['comet.star.cCost','Charge: power per second','n',0,20,1],['comet.star.cSize','Charge: size per second (+ × its size)','x',0,3,.05],['comet.star.cDmg','Charge: damage per second','hearts',0,5,.5],['comet.star.cRange','Charge: range per second','units',0,400,1]];
+function renderComet(){if(PAGE!=='comet')return;['#cHov','#cFly','#cStar','#cCols'].forEach(function(q){$(q).innerHTML='';});
+  addRows($('#cHov'),COMET_HOV,{anim:1});addRows($('#cFly'),COMET_FLY,{anim:1});addRows($('#cStar'),COMET_STAR,{anim:1});
+  [['comet.cStar','Star'],['comet.cGlow','Glow']].forEach(function(c){var l=document.createElement('label');l.innerHTML='<input type="color" value="'+P[c[0]]+'"><span>'+c[1]+'</span>';$('#cCols').appendChild(l);l.querySelector('input').addEventListener('input',function(){P[c[0]]=this.value;save();});});}
+$('#resetComet').addEventListener('click',function(){for(var k in DEF)if(k.indexOf('comet.')===0)P[k]=DEF[k];save();renderComet();status("Comet's moves reset.");});
+try{SR.querySelector('#moveBox').addEventListener('toggle',function(){moveScenBuild();moveRefresh();});}catch(e){}
+$('#resetStats').addEventListener('click',function(){STAT_ROWS.forEach(function(c){P[c[0]]=DEF[c[0]];});save();renderStats();status('Stats reset.');});
+/* ================= Minions panel: one kind at a time, with its own preview ================= */
+var MOB_KINDS=[['min','Minions','Minion'],['big','Big Minions','Big Minion'],['gaz','Roost Gazers','Roost Gazer']];   /* [key, tab, one of them]: a new kind of mob is one more line here (and its defaults under mn.<key>.) */
+function mobName(t){for(var i=0;i<MOB_KINDS.length;i++)if(MOB_KINDS[i][0]===t)return MOB_KINDS[i][2];return t;}
+var minTab='min',minDirty=true,minGroup=null,minModel=null,minPhase=0;
+var MIN_LOOK=[['scale','Overall size (× the blocks below)','x',.2,8,.05],['radius','Collision radius (how close it gets to her)','units',.2,20,.05],['headW','Head width','units',.1,3,.01],['headH','Head height','units',.1,3,.01],['headD','Head depth','units',.1,3,.01],['torsoW','Body width','units',.1,3,.01],['torsoH','Body height','units',.1,4,.01],['torsoD','Body depth','units',.1,3,.01],['armW','Arm thickness','units',.05,2,.01],['armL','Arm length','units',.1,4,.01],['legW','Leg width','units',.05,2,.01],['legD','Leg depth','units',.05,2,.01],['legL','Leg length','units',.1,4,.01]];
+var MIN_WALK=[['stride','Stride rate (swings per unit it moves)','x',.05,4,.01],['legSwing','Leg swing','°',0,90,.5],['armSwing','Arm swing','°',0,90,.5],['armRaise','Arms raised forward while chasing','°',-30,180,.5],['bob','Bob (lift at each step)','units',0,1.5,.01]];
+var MIN_STATS=[['top','Top speed','Zips',1,60,.5],['acc','Acceleration','Zips/s²',.5,60,.5],['see','Sight range (chases her within)','units',5,400,1],['hearts','Hearts','n',1,20,1],['dmg','Damage to Molly per touch (hearts)','n',0,12,1],['cool','Time before it can hurt her again','s',.1,5,.05],['k1','Barrier speed for 1 heart of damage (0 = never)','Zips',0,200,1],['k2','Barrier speed for 2 hearts (0 = never)','Zips',0,200,1],['k3','Barrier speed for 3 hearts (0 = never)','Zips',0,200,1],['stomp','Bounce off its head (a stomp on the top quarter)','Zips',0,60,.5]];
+var MIN_COLS=[['cHead','Head'],['cBody','Body'],['cLimb','Arms and legs'],['cEye','Eyes']];
+var GAZ_LOOK=[['scale','Overall size (× the blocks below)','x',.2,8,.05],['radius','Collision radius (how close it gets to her)','units',.2,20,.05],['headW','Head width','units',.1,3,.01],['headH','Head height','units',.1,3,.01],['headD','Head depth','units',.1,3,.01],['wing','Wing length','units',.2,6,.05],['legW','Leg width','units',.05,2,.01],['legD','Leg depth','units',.05,2,.01],['legL','Leg length','units',.05,4,.01]];
+var GAZ_WALK=[['flap','Wing beats a second','n',.5,20,.1],['legSwing','Leg swing','°',0,90,.5],['bob','Bob (lift and drop)','units',0,1.5,.01]];
+var GAZ_STATS=[['top','Top speed','Zips',1,60,.5],['acc','Acceleration','Zips/s²',.5,60,.5],['see','Sight range (chases her within)','units',5,400,1],['orbit','Chase: how far it buzzes round her head','units',1,60,.5],['range','Laser range','units',2,200,1],['fire','Seconds between laser shots','s',.2,20,.1],['bolt','Laser speed','Zips',1,300,1],['bdmg','Laser damage to Molly (hearts)','hearts',0,12,.5],['hearts','Hearts','n',1,20,1],['k1','Barrier speed for 1 heart of damage (0 = never)','Zips',0,200,1],['k2','Barrier speed for 2 hearts (0 = never)','Zips',0,200,1],['k3','Barrier speed for 3 hearts (0 = never)','Zips',0,200,1],['stomp','Bounce off its head (a stomp on the top quarter)','Zips',0,60,.5]];
+var GAZ_COLS=[['cHead','Head'],['cLimb','Legs'],['cWing','Wings'],['cEye','Eye (the colored ring round the pupil)']];
+function minCfgP(t){var c={};for(var k in MNE){var v=P['mn.'+t+'.'+k];c[k]=v===undefined?DEF['mn.'+t+'.'+k]:v;}c.gz=t==='gaz';return c;}
+function renderMinions(){
+  var pre='mn.'+minTab+'.',map=function(l){return l.map(function(r){return [pre+r[0]].concat(r.slice(1));});},then={anim:1,then:function(){minDirty=true;minNoteSet();}};
+  ['#minLook','#minWalk','#minStats','#minCols'].forEach(function(s){$(s).innerHTML='';});
+  var gzT=minTab==='gaz';addRows($('#minLook'),map(gzT?GAZ_LOOK:MIN_LOOK),then);addRows($('#minWalk'),map(gzT?GAZ_WALK:MIN_WALK),then);addRows($('#minStats'),map(gzT?GAZ_STATS:MIN_STATS),then);
+  (gzT?GAZ_COLS:MIN_COLS).forEach(function(c){var key=pre+c[0],l=document.createElement('label');l.innerHTML='<input type="color" value="'+P[key]+'"><span>'+c[1]+'</span>';$('#minCols').appendChild(l);var inp=l.querySelector('input');inp.addEventListener('input',function(){P[key]=inp.value;save();minDirty=true;});});
+  SR.querySelectorAll('#minTabs button').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-mt')===minTab));});
+  minDirty=true;minNoteSet();
+}
+function minNoteSet(){var c=minCfgP(minTab),h=(c.legL+(c.gz?0:c.torsoH)+c.headH)*c.scale;$('#minNote').textContent=mobName(minTab)+': '+(Math.round(h*100)/100)+' units tall in the game (Molly is 3.6). The preview is drawn at her height.';}
+MOB_KINDS.forEach(function(m){var b=document.createElement('button');b.type='button';b.setAttribute('data-mt',m[0]);b.setAttribute('aria-pressed',String(m[0]===minTab));b.textContent=m[1];b.addEventListener('click',function(){minTab=m[0];minDirty=true;renderMinions();});$('#minTabs').appendChild(b);});
+$('#resetMin').addEventListener('click',function(){for(var k in MNE)P['mn.'+minTab+'.'+k]=DEF['mn.'+minTab+'.'+k];save();minDirty=true;renderMinions();status(mobName(minTab)+' reset.');});
+try{renderMinions();}catch(e){}
+function minPreview(dt){
+  var on=PAGE==='mobs'&&!!window.__makeMinion;
+  if(!on){if(minGroup)minGroup.visible=false;return;}
+  if(rigRoot)rigRoot.visible=false;if(barrierGroup)barrierGroup.visible=false;
+  var c=minCfgP(minTab);
+  if(minDirty||!minGroup){
+    if(minGroup){scene.remove(minGroup);minGroup.traverse(function(o){if(o.geometry)o.geometry.dispose();});}
+    minGroup=new THREE.Group();scene.add(minGroup);minModel=window.__makeMinion(c,minGroup);minDirty=false;
+    var H=Math.max(.1,minModel.H),hm=3.6,y0=0;if(rigRoot){var bb=new THREE.Box3().setFromObject(rigRoot);if(isFinite(bb.max.y-bb.min.y)&&bb.max.y>bb.min.y){hm=bb.max.y-bb.min.y;y0=bb.min.y;}}
+    minGroup.scale.setScalar(hm/H);minGroup.position.y=y0;minGroup.rotation.y=Math.PI;   /* drawn at Molly's height, standing where she stands, facing the camera */
+  }
+  minGroup.visible=true;
+  if(c.gz){if(ui.playing)minPhase+=dt*c.flap*6.2832;window.__poseGazer(minModel,c,minPhase);return;}
+  var spd=c.top*2;if(ui.playing)minPhase+=spd*dt*c.stride;
+  window.__poseMinion(minModel,c,minPhase,Math.min(1,spd/12),true);
+}
+$('#resetAnim').addEventListener('click',function(){var pre=animPrefix(ui.mode),key;for(key in DEF){if(key.indexOf(pre)===0)P[key]=DEF[key];}
+  if(ui.mode==='drift'){P['slope.side']=DEF['slope.side'];for(key in DEF)if(key.indexOf('dA.')===0)P[key]=DEF[key];}
+  var CRS={cThrow:/^comet\.(pc\.|pt\.|throw\.|hold\.)/,cHover:/^comet\.(ho\.|hov\.(height|bob|bobT|spinS|ankle|ankleY|ankleTilt|back|backD|backY|backTilt)$)/,cFly:/^comet\.(pf\.|fl\.|fly\.(arms|starY|starS)$)/};
+  if(CRS[ui.mode])for(key in DEF)if(CRS[ui.mode].test(key))P[key]=DEF[key];   /* the sideways-slope tilt and the changes to her run sit with the drift dials */
+  barrierDirty=true;save();renderAnim();statCardRefresh();status('Animation reset.');});
+
+/* ================= export ================= */
+function clipFrom(name,fn,dur,n){
+  var times=[],tr={},k;NAMES.forEach(function(nm){tr[nm]=[];});var hp=[];
+  for(k=0;k<=n;k++){var t=dur*k/n;times.push(t);var o=fn(2*Math.PI*t/dur);
+    NAMES.forEach(function(nm){var q=rest[nm].clone();if(o[nm]&&o[nm].q)q.multiply(o[nm].q);tr[nm].push(q);});
+    var h=o.Hips&&o.Hips.pos||hipsBase;hp.push(h[0],h[1],h[2]);}
+  var tracks=[];
+  NAMES.forEach(function(nm){var v=[],prev=null;tr[nm].forEach(function(q){if(prev&&prev.dot(q)<0){q=new THREE.Quaternion(-q.x,-q.y,-q.z,-q.w);}v.push(q.x,q.y,q.z,q.w);prev=q;});
+    tracks.push(new THREE.QuaternionKeyframeTrack(nm+'.quaternion',times,v));});
+  tracks.push(new THREE.VectorKeyframeTrack('Hips.position',times,hp));
+  return new THREE.AnimationClip(name,dur,tracks);
+}
+$('#exportGlb').addEventListener('click',function(){
+  var btn=this;
+  if(!THREE.GLTFExporter){status('Export tools did not load. Reload and try again.');return;}
+  btn.disabled=true;
+  if(dirty){try{rebuild();}catch(e){dirty=false;}}
+  if(!skMesh){btn.disabled=false;status('These settings cannot be built, so there is nothing to save.',12000);return;}
+  rigRoot.userData={slideHold:P['m.slide.3.t'],fallHold:P['m.fall.6.t'],scale:P.scale,driftRun:1};   /* where the slide and the face-plant are held travels inside the model, so the game holds each clip at the place this build gave it. So does her Overall scale: the game stands every model 3.6 units tall, times this */
+  var hid=[wireMesh,hlMesh].map(function(m){var v=m.visible;m.visible=false;return [m,v];});
+  var cur=NAMES.map(function(n){return [bones[n].position.clone(),bones[n].quaternion.clone()];});
+  NAMES.forEach(function(n){bones[n].quaternion.copy(rest[n]);});bones.Hips.position.set(hipsBase[0],hipsBase[1],hipsBase[2]);
+  var clips=[clipFrom('Idle',poseIdle,modeDur('idle'),24),clipFrom('Run_Slow',function(p){return poseRun(p,'S');},modeDur('runS'),20),clipFrom('Run_Mid',function(p){return poseRun(p,'M');},modeDur('run'),16),clipFrom('Run',function(p){return poseRun(p,'M');},modeDur('run'),16),clipFrom('Run_Fast',function(p){return poseRun(p,'F');},modeDur('runF'),12),
+    clipFrom('Jump',function(p){return poseFor('jump',p);},modeDur('jump'),40),clipFrom('Slide',function(p){return poseFor('slide',p);},modeDur('slide'),40),clipFrom('Faceplant',function(p){return poseFor('fall',p);},modeDur('fall'),56),clipFrom('Drift_L',function(p){return poseDrift(p,false);},modeDur('drift'),16),clipFrom('Drift_R',function(p){return poseDrift(p,true);},modeDur('drift'),16),clipFrom('RunnersPose',function(p){return poseFor('set',p);},modeDur('set'),24)];
+  rigRoot.updateMatrixWorld(true);
+  var restore=function(){NAMES.forEach(function(n,i){bones[n].position.copy(cur[i][0]);bones[n].quaternion.copy(cur[i][1]);});
+    hid.forEach(function(h){h[0].visible=h[1];});btn.disabled=false;};
+  try{
+    new THREE.GLTFExporter().parse(rigRoot,function(buf){
+      restore();
+      var who=CHARNAME[CHAR];
+      try{HOST.__save(buf,settingsJson(),function(r){
+        if(r==='ok')status('Saved. '+who+' is updated in the game.');
+        else if(r==='big')status(who+' is updated for now, but this browser could not keep this build (its storage is full or blocked), so the one saved before it will be back next time. A smaller build (fewer Sides per ring or Rings per side, under Faceting) may fit.',20000);
+        else status('This build could not be loaded into the game, so the game keeps the '+who+' it had.',12000);});}catch(e){status('Could not save Molly.',12000);}
+    },{binary:true,animations:clips,onlyVisible:true,trs:true});
+  }catch(e){restore();status('Export failed.');}
+});
+
+/* ================= Hedron Barrier preview ================= */
+var barrierDirty=true,barrierObj=null,barrierGroup=null,barrierAng=0,barrierScale=.47;
+function barrierPreview(dt){
+  var on=ui.mode==='barrier';
+  if(rigRoot)rigRoot.visible=!on;
+  if(!on){if(barrierGroup)barrierGroup.visible=false;return;}
+  if(!window.__makeBarrier)return;
+  if(barrierDirty||!barrierGroup){
+    if(barrierGroup){scene.remove(barrierGroup);barrierGroup.traverse(function(o){if(o.geometry)o.geometry.dispose();});}
+    barrierGroup=new THREE.Group();scene.add(barrierGroup);barrierObj=window.__makeBarrier(P,barrierGroup);barrierDirty=false;
+  }
+  barrierGroup.visible=true;
+  var z=P['barrier.preview'],sp=z*2;               /* the game's own speed in units a second: 1 Zip = 2 units */
+  if(ui.playing)barrierAng=(barrierAng+sp*dt/Math.max(.2,P['barrier.radius'])*P['barrier.spin'])%(2*Math.PI);barrierObj.roll.rotation.x=-barrierAng;   /* Pause stops the roll */
+  var isS=z>=P['barrier.sphereAt'],dist=Math.max(0,Math.min(1,(z-P['barrier.squeezeAt'])/Math.max(.5,P['barrier.squeezeLen'])));
+  barrierObj.mesh.visible=barrierObj.edges.visible=!isS;barrierObj.fast.visible=isS;
+  var sc=barrierScale;barrierGroup.scale.set(sc*(1-P['barrier.squeeze']*dist),sc*(1+P['barrier.stretch']*dist),sc*(1+P['barrier.stretch']*dist));
+  barrierGroup.position.set(0,P['barrier.height']*barrierScale,0);
+}
+/* ================= Comet's stars in the preview ================= */
+var cpv=null,cpvA=0,cpvK=0,cpvBuilt=null;
+function cometPreview(dt){
+  var on=/^c[A-Z]/.test(ui.mode)&&PAGE==='comet'&&!!window.__cometStar&&!!rigRoot;
+  if(rigRoot&&!/^c[A-Z]/.test(ui.mode))rigRoot.position.y=0;
+  if(!cpv&&on){cpv={L:window.__cometStar(1,P['comet.cStar'],P['comet.cGlow']),R:window.__cometStar(1,P['comet.cStar'],P['comet.cGlow']),B:window.__cometStar(1,P['comet.cStar'],P['comet.cGlow']),H:window.__cometStar(1,P['comet.cStar'],P['comet.cGlow'])};[cpv.L,cpv.R,cpv.B,cpv.H].forEach(function(m){scene.add(m);});}
+  if(!cpv)return;
+  [cpv.L,cpv.R,cpv.B,cpv.H].forEach(function(m){m.visible=false;m.spin.children[0].material.color.set(P['comet.cStar']);m.glow.material.color.set(P['comet.cGlow']);});
+  if(!on)return;
+  if(cpvBuilt!==skMesh&&skMesh){skMesh.geometry.computeBoundingBox();var bb=skMesh.geometry.boundingBox;cpvK=(bb.max.y-bb.min.y)/3.6;cpvBuilt=skMesh;}   /* the game's units in this view: she is 3.6 of them tall */
+  var k=cpvK||.5,u=ui.phase,m=ui.mode;if(ui.playing)cpvA+=dt*2*Math.PI;
+  var wp=function(n){var b=bones[n];return b?b.getWorldPosition(new THREE.Vector3()):new THREE.Vector3();};
+  rigRoot.position.y=(m==='cHover'||m==='cFly')?(P['comet.hov.height']+(m==='cHover'?P['comet.hov.bob']*Math.sin(2*Math.PI*u):0))*k:0;
+  rigRoot.updateMatrixWorld(true);
+  if(m==='cHover'||m==='cFly'){
+    var aL=wp('AnkleL'),aR=wp('AnkleR'),spn=wp('Spine'),sA=P['comet.hov.ankle']*k,at=P['comet.hov.ankleTilt']*rad,ay=P['comet.hov.ankleY']*k;
+    [[cpv.L,aL,1],[cpv.R,aR,-1]].forEach(function(e){e[0].visible=true;e[0].position.set(e[1].x,e[1].y+ay,e[1].z);e[0].scale.setScalar(Math.max(.001,sA));e[0].spin.rotation.set(-Math.PI/2+at,0,e[2]*cpvA*P['comet.hov.spinS']);});
+    cpv.B.visible=true;
+    if(m==='cFly'){var wl=wp('WristL'),wr=wp('WristR');cpv.B.position.copy(wl.add(wr).multiplyScalar(.5)).add(new THREE.Vector3(0,P['comet.fly.starY']*k,0));cpv.B.scale.setScalar(Math.max(.001,P['comet.hov.back']*P['comet.fly.starS']*k));}
+    else{cpv.B.position.set(spn.x,spn.y+P['comet.hov.backY']*k,spn.z-P['comet.hov.backD']*k);cpv.B.scale.setScalar(Math.max(.001,P['comet.hov.back']*k));}
+    cpv.B.spin.rotation.set(P['comet.hov.backTilt']*rad,0,0);cpv.B.spin.children[0].rotation.z=cpvA*.7*P['comet.hov.spinS'];
+  }
+  if(m==='cThrow'&&cThrowAt(u).held){var w=wp('WristR'),e=wp('ElbowR'),hp=w.clone().add(w.clone().sub(e).normalize().multiplyScalar(P['comet.hold.out']*k));
+    cpv.H.visible=true;cpv.H.position.copy(hp);cpv.H.scale.setScalar(Math.max(.001,P['comet.star.size']*P['comet.hold.scale']*k));cpv.H.spin.children[0].rotation.z=cpvA*P['comet.star.spin']*.5;}
+}
+/* ================= loop ================= */
+var last=performance.now();
+function tick(now){
+  requestAnimationFrame(tick);
+  if(!HOST.__open){last=now;return;}
+  var dt=Math.min(.05,(now-last)/1000);last=now;
+  if(dirty){try{rebuild();}catch(e){dirty=false;$('#tri').textContent='These settings cannot be built';}}
+  if(!isFinite(ui.phase))ui.phase=0;
+  if(ui.mode!=='rest'&&ui.mode!=='barrier'&&ui.playing){
+    var dur=Math.max(.05,modeDur(ui.mode));ui.phase=(ui.phase+dt/dur)%1;$('#phase').value=ui.phase;}
+  applyPose(poseFor(ui.mode,2*Math.PI*ui.phase));
+  if(rigRoot)rigRoot.rotation.z=ui.mode==='drift'?-P['m.drift.lean']*rad:0;   /* the lean the game adds while drifting: the whole of her, tipped from her feet */
+  barrierPreview(dt);minPreview(dt);cometPreview(dt);
+  controls.update();renderer.render(scene,camera);
+}
+bandReady=true;                                                     /* the part tables exist now: any arm band numbers still in the old meaning are converted, the defaults' and the dials' each against their own other dials */
+try{if(defOld){var keepP=P;P=DEF;try{bandFix();}finally{P=keepP;}}if(bandOld){bandFix();bandOld=false;if(hadSaved)save();}}catch(e){}
+initScene();buildStatic();renderPart();setMode('run');applyTheme();$('aside').setAttribute('data-page','molly');$('#app').setAttribute('data-page','molly');
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);}catch(e){}
+
+
+requestAnimationFrame(tick);
+};
+</script>

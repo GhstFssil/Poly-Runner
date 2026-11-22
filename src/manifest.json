@@ -1,4 +1,18 @@
 {
   "output": "checker-run.html",
-  "parts": ["index.html"]
+  "parts": [
+    "unsorted/01-head.html",
+    "data/molly-settings.html",
+    "data/comet-settings.html",
+    "unsorted/02-script-start.html",
+    "data/user-def.js",
+    "unsorted/03-script-a.html",
+    "data/models.html",
+    "unsorted/04-script-b.html",
+    "data/changelog.js",
+    "unsorted/05-script-c.js",
+    "data/level1.js",
+    "data/level2.js",
+    "unsorted/06-script-d.html"
+  ]
 }

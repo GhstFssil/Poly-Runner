@@ -1,0 +1,136 @@
+<script>
+window.__rigBoot=function(SR,HOST){
+'use strict';
+var $=function(s,r){return (r||SR).querySelector(s)};
+if(!window.THREE||!THREE.OrbitControls){$('#msg').style.display='flex';return;}
+var rad=Math.PI/180;
+
+/* ================= part table ================= */
+/* kind: which way the part runs from its joint. up and down run along Y, fwd runs along Z (feet). */
+var SEGS=[
+ {id:'Foot',label:'Feet',bone:'Ankle',pair:1,kind:'fwd',ends:['heel','toe'],lat:['Top view','Side view']},
+ {id:'Shin',label:'Calves',bone:'Knee',pair:1,kind:'down',ends:['knee','ankle']},
+ {id:'Thigh',label:'Thighs',bone:'Hip',pair:1,kind:'down',ends:['hip','knee']},
+ {id:'LowerTorso',label:'Lower torso',bone:'Hips',kind:'up',ends:['crotch','waist']},
+ {id:'UpperTorso',label:'Upper torso',bone:'Spine',kind:'up',ends:['waist','shoulder line']},
+ {id:'Neck',label:'Neck',bone:'Spine',kind:'up',ends:['base','top']},
+ {id:'Head',label:'Head',bone:'Head',kind:'up',ends:['chin','crown']},
+ {id:'UpperArm',label:'Upper arms',bone:'Shoulder',pair:1,kind:'down',ends:['shoulder','elbow']},
+ {id:'Forearm',label:'Forearms',bone:'Elbow',pair:1,kind:'down',ends:['elbow','wrist']},
+ {id:'Hand',label:'Hands',bone:'Wrist',pair:1,kind:'down',ends:['wrist','fingertips']},
+ {id:'Pony1',label:'Ponytail 1',bone:'Pony1',kind:'down',ends:['hair tie','first bend']},
+ {id:'Pony2',label:'Ponytail 2',bone:'Pony2',kind:'down',ends:['first bend','second bend']},
+ {id:'Pony3',label:'Ponytail 3',bone:'Pony3',kind:'down',ends:['second bend','tip']}
+];
+var SEGBY={};SEGS.forEach(function(s){SEGBY[s.id]=s;});
+var BASECOL={Foot:'suit',Shin:'suit',Thigh:'suit',LowerTorso:'suit',UpperTorso:'suit',Neck:'skin',Head:'skin',UpperArm:'suit',Forearm:'suit',Hand:'blk',Pony1:'hair',Pony2:'hair',Pony3:'hair'};
+var BANDCOL={LowerTorso:'blk',UpperArm:'wht',Forearm:'blk',Shin:'blk'};
+var SD={
+ Foot:{len:27,dia:9.6,depth:1.2,peak:.55,tS:.77,tE:.55,cS:1.5,cE:2.8,heel:7.5,sole:3.5,ankleH:9,flat:.5},
+ Shin:{len:42,dia:11.6,depth:1,peak:.29,tS:.97,tE:.61,cS:1,cE:.67,pad:8.4,bandA:30,bandL:12},
+ Thigh:{len:44,dia:18,depth:1,peak:.21,tS:.92,tE:.62,cS:1,cE:.95},
+ LowerTorso:{len:21,dia:32,depth:.67,peak:.45,tS:.7,tE:.9,cS:1.1,cE:1.2,bandA:14.5,bandL:6},
+ UpperTorso:{len:43,dia:37,depth:.62,peak:.74,tS:.72,tE:.33,cS:1.2,cE:1.7},
+ Neck:{len:16,dia:10.4,depth:.96,peak:.5,tS:1,tE:.88,cS:1,cE:1},
+ Head:{len:23.5,dia:17.2,depth:1.04,peak:.6,tS:.37,tE:.41,cS:3,cE:2.3},
+ UpperArm:{len:28,dia:11.6,depth:.97,peak:.28,tS:1,tE:.68,cS:1,cE:.67,bandA:5,bandL:5},
+ Forearm:{len:20,dia:8.6,depth:1,peak:.32,tS:.93,tE:.73,cS:1.05,cE:.86,bandA:16,bandL:4},
+ Hand:{len:15.5,dia:9.4,depth:1,peak:.69,tS:.79,tE:.64,cS:2.4,cE:1.1},
+ Pony1:{len:14,dia:18,depth:.6,peak:.95,tS:.36,tE:1,cS:1.2,cE:1},
+ Pony2:{len:15,dia:19,depth:.58,peak:.47,tS:.95,tE:.74,cS:1,cE:1},
+ Pony3:{len:17,dia:14,depth:.64,peak:.1,tS:1,tE:.05,cS:1,cE:2}
+};
+var GLOBAL={scale:1,pelvisDrop:10,shoulderX:20,shoulderY:31,hipX:6.5,shoulderOver:4,armSpread:9,hairVol:1,bangL:1,ponyAng:118,ponyCurl:50,
+  jShoulder:5,jHip:4,jAnkle:3,jPony:2.5,jElbow:8,jWrist:3,jKnee:8,jWaist:6,jNeckBase:4,jNeckTop:4,
+  sides:8,rings:2,ringGap:.8,jit:.18,irr:0,irrC:0,fmt:2,
+  cSuit:'#d9232b',cHair:'#e0202a',cSkin:'#f2a978',cBlk:'#2a1f22',cWht:'#f4f1ee',cEye:'#2f8fd0'};
+/* ---- keyframed moves. Angles in degrees. Missing values carry over from the previous key.
+   hyf hips height (1 = standing), hz hips forward (m), hp body pitch (+ leans forward), sp spine, hd head,
+   aLp/aRp arm raise (+ forward and up), aLr/aRr arm out to the side, aLe/aRe elbow bend,
+   hL/hR thigh forward, kL/kR knee bend, dL/dR toes up, fl 1 keeps feet flat (auto ankle), p1-p3 ponytail */
+var KD={hyf:1,hz:0,hp:0,sp:0,hd:0,aLp:0,aLr:0,aLe:0,aRp:0,aRr:0,aRe:0,hL:0,kL:0,dL:0,hR:0,kR:0,dR:0,fl:1,p1:-14,p2:12,p3:14};
+var MOVES={
+ jump:[
+  [0,{hyf:.99,hp:6,sp:4,hd:-4,aLp:-35,aRp:-35,aLe:25,aRe:25,hL:10,hR:10,kL:12,kR:12}],
+  [.14,{hyf:.76,hp:30,sp:12,hd:-14,aLp:-70,aRp:-70,aLe:15,aRe:15,hL:58,hR:58,kL:105,kR:105,p1:-6,p2:16,p3:18}],
+  [.27,{hyf:1.04,hp:8,sp:2,hd:-6,aLp:120,aRp:120,aLe:20,aRe:20,aLr:10,aRr:10,hL:-8,hR:-8,kL:6,kR:6,fl:.35,dL:-38,dR:-38,p1:-28,p2:2,p3:-4}],
+  [.42,{hyf:1.5,hp:4,sp:-4,hd:-8,aLp:165,aRp:155,aLr:18,aRr:25,aLe:10,aRe:14,hL:78,hR:-18,kL:92,kR:78,fl:0,dL:-20,dR:-30,p1:-40,p2:-20,p3:-10}],
+  [.58,{hyf:1.4,hp:10,sp:2,hd:-6,aLp:80,aRp:80,aLr:60,aRr:60,aLe:10,aRe:10,hL:30,hR:12,kL:22,kR:34,fl:.6,dL:-10,dR:-10,p1:-20,p2:-6,p3:2}],
+  [.72,{hyf:.78,hp:26,sp:12,hd:-10,aLp:45,aRp:45,aLr:30,aRr:30,aLe:35,aRe:35,hL:60,hR:60,kL:104,kR:104,fl:1,dL:0,dR:0,p1:-8,p2:14,p3:16}],
+  [.88,{hyf:.93,hp:10,sp:5,hd:-6,aLp:-10,aRp:-10,aLr:8,aRr:8,aLe:25,aRe:25,hL:20,hR:20,kL:34,kR:34,p1:-12,p2:12,p3:14}],
+  [1,{hyf:.99,hp:6,sp:4,hd:-4,aLp:-35,aRp:-35,aLr:0,aRr:0,aLe:25,aRe:25,hL:10,hR:10,kL:12,kR:12,p1:-14,p2:12,p3:14}]
+ ],
+ slide:[
+  [0,{hyf:.98,hp:16,sp:6,hd:-8,aLp:45,aRp:-40,aLe:90,aRe:90,hL:35,kL:25,hR:-20,kR:55,fl:1}],
+  [.2,{hyf:.5,hp:-20,sp:14,hd:6,aLp:60,aRp:-30,aLr:20,aRr:30,aLe:60,aRe:60,hL:55,kL:50,hR:20,kR:95,fl:.5,p1:-30,p2:6,p3:6}],
+  [.36,{hyf:.2,hp:-66,sp:30,hd:30,aLp:70,aRp:-18,aLr:28,aRr:44,aLe:28,aRe:20,hL:12,kL:4,dL:22,hR:58,kR:112,fl:0,dR:-10,p1:-10,p2:-10,p3:-20}],
+  [.72,{hyf:.2,hp:-66,sp:30,hd:30,aLp:76,aRp:-14,aLr:30,aRr:46,aLe:30,aRe:20,hL:14,kL:4,dL:22,hR:58,kR:112,fl:0,dR:-10,p1:-12,p2:-12,p3:-22}],
+  [.88,{hyf:.62,hp:-14,sp:12,hd:0,aLp:50,aRp:-10,aLr:20,aRr:30,aLe:50,aRe:50,hL:50,kL:60,hR:30,kR:90,fl:.6,dL:0,dR:0,p1:-20,p2:8,p3:8}],
+  [1,{hyf:.98,hp:16,sp:6,hd:-8,aLp:45,aRp:-40,aLr:0,aRr:0,aLe:90,aRe:90,hL:35,kL:25,hR:-20,kR:55,fl:1,dL:0,dR:0,p1:-14,p2:12,p3:14}]
+ ],
+ fall:[
+  [0,{hyf:.98,hp:12,sp:6,hd:-8,aLp:40,aRp:-40,aLe:90,aRe:90,hL:30,kL:20,hR:-20,kR:50}],
+  [.14,{hyf:.96,hp:28,sp:10,hd:-22,aLp:85,aRp:70,aLe:30,aRe:34,hL:45,kL:20,hR:-28,kR:88,fl:.3}],
+  [.32,{hyf:.78,hz:.14,hp:62,sp:6,hd:-28,aLp:125,aRp:120,aLr:10,aRr:10,aLe:14,aRe:14,hL:-14,kL:14,hR:-30,kR:64,fl:0,dL:-30,dR:-30,p1:-36,p2:-8,p3:2}],
+  [.48,{hyf:.2,hz:.34,hp:92,sp:0,hd:-30,aLp:170,aRp:170,aLr:18,aRr:18,aLe:6,aRe:6,hL:-4,kL:6,hR:-6,kR:10,fl:0,dL:-35,dR:-35,p1:-48,p2:-16,p3:-6}],
+  [.58,{hyf:.215,hz:.38,hp:88,sp:0,hd:-22,aLp:160,aRp:160,aLr:36,aRr:36,aLe:12,aRe:12,hL:2,kL:18,hR:0,kR:30,fl:0,dL:-35,dR:-35,p1:-30,p2:6,p3:10}],
+  [.72,{hyf:.19,hz:.4,hp:92,sp:0,hd:-12,aLp:150,aRp:150,aLr:56,aRr:56,aLe:10,aRe:10,hL:0,kL:8,hR:6,kR:26,fl:0,dL:-35,dR:-35,p1:-40,p2:-8,p3:2}],
+  [.92,{hyf:.19,hz:.4,hp:92,sp:0,hd:-12,aLp:150,aRp:150,aLr:56,aRr:56,aLe:10,aRe:10,hL:0,kL:8,hR:6,kR:26,fl:0,dL:-35,dR:-35,p1:-40,p2:-8,p3:2}],
+  [1,{hyf:.19,hz:.4,hp:92,sp:0,hd:-12,aLp:150,aRp:150,aLr:56,aRr:56,aLe:10,aRe:10,hL:0,kL:8,hR:6,kR:26,fl:0,dL:-35,dR:-35,p1:-40,p2:-8,p3:2}]
+ ],
+ drift:[
+  [0,{hyf:.86,hz:.04,hp:16,sp:8,hd:-6,aLp:4,aLr:30,aLe:6,aRp:-34,aRr:14,aRe:62,hL:24,kL:50,hR:34,kR:62,fl:1,p1:-24,p2:4,p3:-2}],
+  [1,{}]
+ ],
+ set:[
+  [0,{hyf:.6,hz:.1,hp:44,sp:16,hd:-38,aLp:60,aRp:60,aLe:4,aRe:4,hL:92,kL:100,hR:40,kR:118,fl:1,p1:-4,p2:22,p3:20}],
+  [1,{}]
+ ]
+};
+var TIEK={jump:{7:0},slide:{3:2,5:0},fall:{6:5,7:5},set:{1:0},drift:{1:0}};
+var STAGEKEYS={jump:[0,1,2,3,4,5,6],slide:[0,1,2,4],fall:[0,1,2,3,4,5],set:[0],drift:[0]};
+var HOLDKEY={slide:[3,'Slide held until'],fall:[6,'Settle held until']};
+var MOVEDUR={jump:1.7,slide:2.0,fall:2.8,set:3.0,drift:3.0};
+var MOVEX={};
+Object.keys(MOVES).forEach(function(n){var cur={},k;for(k in KD)cur[k]=KD[k];
+  MOVEX[n]=MOVES[n].map(function(e){var v={};for(k in cur)v[k]=cur[k];for(k in e[1])v[k]=e[1][k];cur=v;return [e[0],v];});});
+var DEF={},k,q;
+for(k in GLOBAL)DEF[k]=GLOBAL[k];
+Object.keys(MOVEX).forEach(function(n){DEF['m.'+n+'.dur']=MOVEDUR[n];MOVEX[n].forEach(function(e,i){DEF['m.'+n+'.'+i+'.t']=e[0];for(var f in KD)DEF['m.'+n+'.'+i+'.'+f]=e[1][f];});});
+for(k in KD){if(k!=='fl')DEF['dA.'+k]=0;}   /* Drift: changes laid over her fast run while she drifts (all 0: just the run, as the game has done since v170) */
+DEF['stat.top']=80;DEF['stat.accelT']=7;DEF['stat.brake']=3;DEF['stat.jumpH']=7.2;DEF['stat.grav']=20;DEF['stat.gripZ']=20;DEF['stat.fadeSlope']=0;DEF['stat.fadeWall']=1;DEF['stat.driftGrip']=1;DEF['stat.fall']=50;DEF['stat.hearts']=3;DEF['stat.colH']=3.6;DEF['stat.colW']=1;DEF['stat.wallGrip']=1;DEF['stat.fric']=11.4;var MNE={scale:[1,5],radius:[1,3],headW:[.9,.9],headH:[.9,.9],headD:[.9,.9],torsoW:[.7,.7],torsoH:[1.35,1.35],torsoD:[.45,.45],armW:[.3,.3],armL:[1.35,1.35],legW:[.33,.33,.15],legD:[.4,.4,.2],legL:[1.35,1.35,.4],cHead:['#45484e','#45484e','#5b4b73'],cBody:['#2f3237','#2f3237'],cLimb:['#26282c','#26282c','#3a3148'],cEye:['#ff2a1a','#ff2a1a','#e8a020'],stride:[.9,.9],legSwing:[45.8,45.8,20],armSwing:[13.8,13.8],armRaise:[83.1,83.1],bob:[0,0,.12],top:[10,10,14],acc:[5,5,10],see:[100,100],hearts:[1,3],dmg:[1,2],cool:[1.2,1.2],k1:[20,20],k2:[0,0],k3:[0,0],stomp:[8,17],cWing:['#808080','#808080','#b8aed0'],wing:[1.5,1.5,1.5],flap:[5,5,5],orbit:[10,10,10],range:[30,30,30],fire:[2,2,2],bolt:[40,40,40],bdmg:[.5,.5,.5]};for(var mnk in MNE){DEF['mn.min.'+mnk]=MNE[mnk][0];DEF['mn.big.'+mnk]=MNE[mnk][1];DEF['mn.gaz.'+mnk]=MNE[mnk].length>2?MNE[mnk][2]:MNE[mnk][0];}   /* the minions' own dials (the game's MN_DEF) */DEF['stat.slamAcc']=40;DEF['stat.slamMax']=60;DEF['stat.strafe']=2;DEF['m.drift.lean']=28.6;DEF['m.drift.angle']=15;DEF['m.drift.time']=.15;DEF['m.drift.minZips']=30;DEF['m.drift.cool']=1;DEF['m.drift.rate']=9;DEF['slope.side']=.85;
+var BARRIER_DEF={'barrier.radius':1.76,'barrier.height':1.64,'barrier.spin':1,'barrier.sphereAt':40,'barrier.squeezeAt':75,'barrier.squeezeLen':5,'barrier.squeeze':.2,'barrier.stretch':.12,'barrier.chargeSphere':2,'barrier.chargeSqueeze':3.5,'barrier.glow':.2,'barrier.glowSize':1.14,'barrier.dashLen':.32,'barrier.dashGap':.22,
+  'barrier.cBody':'#ff2a1f','barrier.cEmis':'#b3140c','barrier.cEdge':'#ffc7b8','barrier.cDash':'#ff9a88','barrier.cGlow':'#ff3a2a','barrier.preview':0};
+for(k in BARRIER_DEF)DEF[k]=BARRIER_DEF[k];
+if(window.__COMET_DEF)for(k in window.__COMET_DEF)DEF[k]=window.__COMET_DEF[k];   /* Comet's moves (the game keeps their defaults); Molly's settings carry them too, unused */
+DEF['m.set.bob']=.5;DEF['m.set.rock']=1;DEF['m.set.nod']=1;DEF['idle.dur']=3;DEF['idle.breath']=.4;DEF['idle.sway']=1.2;DEF['idle.arm']=2;DEF['idle.pony']=1;
+SEGS.forEach(function(s){for(q in SD[s.id])DEF[s.id+'.'+q]=SD[s.id][q];
+  [1,2].forEach(function(n){var b=s.id+'.u'+n;DEF[b+'p']=n===1?.3:.7;DEF[b+'a']=n===1?0:180;DEF[b+'d']=0;DEF[b+'wl']=50;DEF[b+'wr']=50;DEF[b+'ws']=.2;DEF[b+'we']=.2;DEF[b+'kl']=0;DEF[b+'kr']=0;DEF[b+'ks']=0;DEF[b+'ke']=0;});});
+
+/* In-line joints share one cross-section and ease into it. Side joints blend like a fillet. */
+var INLINE=[['LowerTorso','UpperTorso','jWaist'],['UpperTorso','Neck','jNeckBase'],['Neck','Head','jNeckTop'],['UpperArm','Forearm','jElbow'],['Forearm','Hand','jWrist'],['Thigh','Shin','jKnee']];
+var LATERAL=[['UpperTorso','UpperArm','jShoulder'],['LowerTorso','Thigh','jHip'],['Shin','Foot','jAnkle'],['Head','Pony1','jPony'],['Pony1','Pony2','jPony'],['Pony2','Pony3','jPony']];
+var INLP={},INLC={};
+INLINE.forEach(function(j){INLC[j[0]]=[j[1],j[2]];INLP[j[1]]=[j[0],j[2]];});
+
+/* slider meta: [key, label, unit, min, max, step] */
+function band(id){return [[id+'.bandA','Trim band start','cm',0,70,.5],[id+'.bandL','Trim band length','cm',0,40,.5]];}
+var EXTRA={
+ Foot:[['Foot.heel','Heel behind the ankle','cm',0,16,.5],['Foot.sole','Sole thickness','cm',0,8,.25],['Foot.ankleH','Ankle height above floor','cm',4,18,.5],['Foot.flat','Toe flattening','pct',0,.9,.01]],
+ Shin:[['Shin.pad','Knee pad size (0 = none)','cm',0,16,.2]].concat(band('Shin')),
+ LowerTorso:band('LowerTorso'),
+ Head:[['hairVol','Hair volume','x',.9,1.5,.01],['bangL','Bang length','x',.3,2,.05]],
+ UpperArm:band('UpperArm'),
+ Forearm:band('Forearm')
+};
+var GROUPS=[
+ ['Joint smoothing',[
+   ['jShoulder','Shoulder blend into torso','cm',0,12,.5],['jHip','Hip blend into torso','cm',0,12,.5],['jAnkle','Ankle blend into foot','cm',0,8,.5],['jPony','Hair blend (head and ponytail)','cm',0,6,.5],
+   ['jElbow','Elbow blend length','cm',0,16,.5],['jWrist','Wrist blend length','cm',0,8,.5],['jKnee','Knee blend length','cm',0,16,.5],
+   ['jWaist','Waist blend length','cm',0,14,.5],['jNeckBase','Neck base blend length','cm',0,10,.5],['jNeckTop','Neck top blend length','cm',0,10,.5]]],
+ ['Skeleton and joints',[['scale','Overall scale (her size in the game too, after Save to game)','x',.8,1.25,.01],['pelvisDrop','Pelvis below hip joint','cm',0,30,.5],['shoulderX','Shoulder joint X','cm',8,40,.5],['shoulderY','Shoulder joint height on torso','cm',15,42,.5],['hipX','Hip joint X','cm',4,16,.5],['shoulderOver','Shoulder overlap into torso','cm',-3,5,.5],['armSpread','Arm spread','deg',0,40,1]]],
+ ['Ponytail pose',[['ponyAng','Rise angle','deg',70,150,1],['ponyCurl','Droop per bend','deg',0,90,1]]],
+ ['Faceting',[['sides','Sides per ring','n',5,20,1],['rings','Rings per side of the max','n',1,4,1],['ringGap','Thinnest strip of facets (rings closer than this are merged)','cm',0,3,.05],['jit','Shading variation','x',0,.5,.01],['irr','Irregularity of the ring sides','x',0,1,.01],['irrC','Contour shift (up/down along the form)','x',0,1.5,.01]]],
+
+];
+var COLORS=[['cSuit','Jumpsuit'],['cHair','Hair'],['cSkin','Skin'],['cBlk','Belt, gloves, pads'],['cWht','Arm bands, soles'],['cEye','Eyes']];
