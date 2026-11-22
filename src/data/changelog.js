@@ -1,5 +1,10 @@
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v186', d: 'Nov 22, 2026', t: 'Behind the scenes', g: [
+    ['Under the hood', [
+      'The game\'s source is now split into more files (the Speedometer, hearts and breath, the menus and screens, and Dev Mode each have their own). Nothing in the game changes.'
+    ]]
+  ] },
   { v: 'v185', d: 'Nov 22, 2026', t: 'Tunnel floors, Roost Gazer, clearer names', g: [
     ['Fixes', [
       'In a sloped tunnel Molly now stands on the floor as it is drawn. Before, she stood above it: about 0.5 at 20 degrees, 1.6 at 35. The roof, a tunnel mouth\'s height and the opening a tunnel cuts in a shaft wall match the drawing too.',

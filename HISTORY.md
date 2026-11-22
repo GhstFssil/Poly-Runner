@@ -25,3 +25,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-22 08:05 | next | mobs area carved out of 04-script-b into src/mobs/mobs.js (byte-identical build); tools/check_deps.py added (warning only); v185 label and CHANGELOG entry (Next renamed, Names and wording group added)
 - 2026-11-22 08:14 | next | carved ui area (first cut): src/ui/speedometer.js, health.js, menu.js; b1 split into b1/b1b/b1c; b2 tail comment moved to data/changelog.js; build byte-identical
 - 2026-11-22 08:19 | next | ui second cut: src/ui/screens.js (screen handlers, Dev Mode, level map, scoring) from 06-script-d; build byte-identical
+- 2026-11-22 08:25 | v186 | published next as v186: ui area cuts (src/ui), version label and CHANGELOG entry; no game change
