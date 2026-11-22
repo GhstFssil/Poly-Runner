@@ -30,3 +30,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-22 10:21 | next | ui cut: Path Editor host (openPE, live view, yInfo) from 04-script-b1b to src/ui/path-editor-host.js; tail of b1b is now 04-script-b1b2; build byte-identical
 - 2026-11-22 10:22 | next | ui cut: Rig Editor host (openRig) from 04-script-b1b to src/ui/rig-editor-host.js; build byte-identical
 - 2026-11-22 10:23 | next | ui cut: 05-script-c.js moved whole to src/ui/menu-wiring.js; build byte-identical
+- 2026-11-22 10:28 | next | BACKLOG: added Tavern and Update Buttons idea (Ricky)
