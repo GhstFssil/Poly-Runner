@@ -33,11 +33,11 @@ J={'width':40,'pieces':[{'t':'straight','len':600}],'terrain':'','objects':[
  {'type':'gazer','id':13,'x':0,'z':-300,'mode':'cycle','height':6,'move':'side','travel':40,'period':4}]}
 pg.evaluate("j=>__sbStart(j)",J); pg.wait_for_timeout(1500)
 def gz(): return [q for q in pg.evaluate("()=>__ens()") if q['gz'] and q['act']]
-G=gz(); print('gazers:',[(q['gm'],round(q['x']-60000,1),round(q['z'],1)) for q in G]); assert len(G)==3
+G=gz(); print('gazers:',[(q['gm'],round(q['x']-0,1),round(q['z'],1)) for q in G]); assert len(G)==3
 # idle: stays home, hovers 9 up
 pg.evaluate("()=>document.getElementById('dvinvBtn').click()")   # invulnerable on, so lasers don't muddy these checks
-pg.evaluate("()=>__put(60000, 0, -60)"); pg.wait_for_timeout(2500)
-I=[q for q in gz() if q['gm']=='idle'][0]; print('idle at',round(I['x']-60000,2),round(I['z'],2),'fy',round(I['fy'],2)); assert abs(I['x']-59980)<0.01 and abs(I['z']+100)<0.01 and abs(I['fy']-9)<0.6
+pg.evaluate("()=>__put(0, 0, -60)"); pg.wait_for_timeout(2500)
+I=[q for q in gz() if q['gm']=='idle'][0]; print('idle at',round(I['x']-0,2),round(I['z'],2),'fy',round(I['fy'],2)); assert abs(I['x']-59980)<0.01 and abs(I['z']+100)<0.01 and abs(I['fy']-9)<0.6
 # chase: within ~10-13 of her, above her head
 import math
 for i in range(60):
@@ -47,7 +47,7 @@ for i in range(60):
 print('chase: distance',round(dd,1),'height above her',round(C['fy']-s['y'],2)); assert dd<16 and C['fy']-s['y']>3
 # cycle: swings +-20 across the path
 xs=[]
-for i in range(16): pg.wait_for_timeout(250); xs.append([q for q in gz() if q['gm']=='cycle'][0]['x']-60000)
+for i in range(16): pg.wait_for_timeout(250); xs.append([q for q in gz() if q['gm']=='cycle'][0]['x']-0)
 print('cycle x range',round(min(xs),1),round(max(xs),1)); assert max(xs)-min(xs)>25
 pg.evaluate("()=>document.getElementById('dvinvBtn').click()")   # off again
 # touching it does no damage and still blocks her

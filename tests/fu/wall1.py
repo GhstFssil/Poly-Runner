@@ -6,8 +6,8 @@ g=Rig(w=480,h=320,draw=False); pg=g.pg
 J={'width':9,'pieces':[{'t':'straight','len':400}],'objects':[{'type':'ledge','id':1,'x':-30,'z':-60,'heading':90,'bend':0,'length':60,'thickness':20,'height':30}]}
 pg.click('#bDevT'); pg.click('#dtBlank'); pg.wait_for_timeout(2000)
 pg.evaluate("j=>__sbStart(j)",J); pg.wait_for_timeout(1500)
-print('ground across the face (z):',[(z,round(pg.evaluate("([x,z])=>__gH(x,z)",[60000,z]),1)) for z in (-44,-46,-47,-48,-49,-50,-52)])
-pg.evaluate("__put(60000,0,-42)"); pg.wait_for_timeout(300)
+print('ground across the face (z):',[(z,round(pg.evaluate("([x,z])=>__gH(x,z)",[0,z]),1)) for z in (-44,-46,-47,-48,-49,-50,-52)])
+pg.evaluate("__put(0,0,-42)"); pg.wait_for_timeout(300)
 pg.keyboard.down('KeyW'); ys=[]
 for i in range(16):
     pg.keyboard.press('Space'); pg.wait_for_timeout(450)

@@ -6,7 +6,7 @@ C=lambda: pg.evaluate("__comet()")
 pg.evaluate("document.getElementById('bDevT').click()"); pg.evaluate("document.getElementById('dtBlank').click()"); pg.wait_for_timeout(2500)
 c=C(); print('Molly: seg colour',c['segCol'],'line',repr(c['line']))
 pg.evaluate("__setChar('comet')"); pg.wait_for_timeout(1500); c=C(); print('Comet: seg colour',c['segCol'],'line',c['line'])
-pg.evaluate("()=>{__put(60000,__gH(60000,-10),-10);__hd(0);__spd(0);__setPower(50)}"); pg.wait_for_timeout(500)
+pg.evaluate("()=>{__put(0,__gH(0,-10),-10);__hd(0);__spd(0);__setPower(50)}"); pg.wait_for_timeout(500)
 pg.keyboard.down('KeyE'); seen=[]
 for i in range(12):
     pg.wait_for_timeout(120); c=C(); seen.append((c['thr'],c['held'],c['aim'],c['lvl']))

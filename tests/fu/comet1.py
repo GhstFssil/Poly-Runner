@@ -10,7 +10,7 @@ print('after Play as Comet:',pg.evaluate("[...document.querySelectorAll('#charSt
 J={'width':9,'pieces':[{'t':'straight','len':400}],'objects':[{'type':'minion','id':1,'x':0,'z':-390},{'type':'target','id':2,'x':0,'z':-80,'size':6,'height':3},{'type':'plate','id':3,'x':0,'z':-10,'width':8,'length':8}]}
 pg.evaluate("document.getElementById('chBack').click()"); pg.evaluate("document.getElementById('bDevT').click()"); pg.evaluate("document.getElementById('dtBlank').click()"); pg.wait_for_timeout(2000)
 pg.evaluate("j=>__sbStart(j)",J); pg.wait_for_timeout(2000)
-def put(x,z): pg.evaluate("([x,z])=>{__put(60000+x,__gH(60000+x,z),z);__hd(0);__spd(0)}",[x,z])
+def put(x,z): pg.evaluate("([x,z])=>{__put(0+x,__gH(0+x,z),z);__hd(0);__spd(0)}",[x,z])
 def wait_until(js,ms=15000):
     t=0
     while t<ms:

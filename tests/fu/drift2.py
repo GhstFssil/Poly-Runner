@@ -12,7 +12,7 @@ pg.screenshot(path=SP+'/drift_b.png')
 g.click('#exportGlb',200); pg.wait_for_timeout(9000); print('status:',g.ev(g.q('#status')+'.textContent'))
 g.click('#rigClose',300)
 pg.evaluate("document.getElementById('dtBlank').click()"); pg.wait_for_timeout(2500)
-pg.evaluate("()=>{__put(60000,__gH(60000,-10),-10);__hd(0)}"); pg.keyboard.down('KeyW')
+pg.evaluate("()=>{__put(0,__gH(0,-10),-10);__hd(0)}"); pg.keyboard.down('KeyW')
 for i in range(8): pg.evaluate("__spd(90)"); pg.wait_for_timeout(100)
 pg.keyboard.down('KeyA'); r=[]
 for i in range(8): pg.evaluate("__spd(90)"); pg.wait_for_timeout(150); r.append(pg.evaluate("__lean()")[2:])

@@ -3,7 +3,7 @@ import sys,json
 sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
 g=Rig(w=480,h=320,draw=False); pg=g.pg
-X=60000
+X=0
 J={'width':9,'pieces':[{'t':'straight','len':400}],'objects':[
  {'type':'hill','id':1,'x':60,'z':-80,'radius':40,'height':12},
  {'type':'sign','id':2,'x':60,'z':-80,'yAbs':20},

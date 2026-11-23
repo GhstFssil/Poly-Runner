@@ -62,8 +62,8 @@
     var t = (-z - END * 0.4) / (END * 0.2); t = t < 0 ? 0 : t > 1 ? 1 : t;   // in the second half of the valley every shelf grows to the full 3 units (and there are fewer of them, see ledgeH), so only a few big ridges are left
     return 0.5 * Math.round((hh + (3 - hh) * t) * 2);                      // in half-unit levels, so a shelf's top stays flat instead of stepping a hair every cell
   }
-  function ledgeH(x, z) {
-    if (x > L3_MIN) return sbLedge(x, z);
+  function ledgeH(x, z) { return level === 3 && SB ? sbLedge(x, z) : oldLedgeH(x, z); }   // the play world's ledges (see worldH0)
+  function oldLedgeH(x, z) {
     if (x > 20000) return ovLedge(x, z);                  // (level 2: only the Sink's maze has any)
     if (!GEN_LEDGES) return 0;                            // Grass Canyon's generated ledges are switched off: ledges are placed by hand now
     if (x > HALF || x < -HALF) return 0;                  // ledges belong to the first valley alone (cells are sampled at their centres, so the cut falls exactly on its walls): none in the cave, the second valley or on the plateau
@@ -400,7 +400,7 @@
   function drFloor(s) { return DR_Y0 + drRise(s - DR_CLIMB0); }
   var FIELD_Y = drFloor(1e9);
   function mudAt(x, z) {                           // on the mud ramp?
-    if (x > L3_MIN) return sbMudAt(x, z);
+    if (level === 3 && SB) return sbMudAt(x, z);
     if (x < DR_XE - DR_W || x > DR_XE + DR_W || z > DR_ZE + DR_CL1 + DR_CL2 + DR_CL3 + 2 || z < DR_ZE - 1) return false;
     var d = pathDist(DR_PIECES, x, z);
     return d < DR_W / 2 + 0.5 && PATH_S >= DR_CLIMB0 && PATH_S <= DR_LEN;

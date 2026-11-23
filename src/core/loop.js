@@ -179,9 +179,7 @@
         var hitSolid = collide();
         var gH = groundH(pp.x, pp.z);
         var bumpNX = 0, bumpNZ = 0, bumped = false, ledgeHit = false;
-        if (!hitSolid && gH > pp.y + CLIMB_SLOPE * stepLen + 0.03 && gH - pp.y <= STEP_UP && pp.x > -HALF && pp.x < HALF && pp.z > -END) {
-          pp.y = gH;                                   // a small ledge: she steps right up it and keeps her momentum
-        } else if (hitSolid) {
+        if (hitSolid) {
           bumpNX = pp.x - c0x; bumpNZ = pp.z - c0z; bumped = true;          // pushed out of a trunk or wall: the way she was pushed is its surface normal
         } else if (gH > pp.y + CLIMB_SLOPE * stepLen + 0.03) {
           bumpNX = groundH(c0x - 1.25, c0z) - groundH(c0x + 1.25, c0z) + 0.5 * (groundH(c0x - 3.5, c0z) - groundH(c0x + 3.5, c0z));     // a ledge face: it faces downhill (sampled wide, so a rough rock face cannot send her off at an odd angle)

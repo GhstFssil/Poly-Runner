@@ -2,7 +2,7 @@ import sys,json
 sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
 g=Rig(w=480,h=320,draw=False); pg=g.pg
-X=60000
+X=0
 J={'width':9,'pieces':[{'t':'straight','len':400}],'objects':[
  {'type':'ledge','id':3,'x':-60,'z':-50,'heading':0,'bend':0,'length':30,'thickness':10,'height':5,'toxic':True},
  {'type':'toxic','id':7,'x':-200,'z':-60,'width':20,'length':20},

@@ -7,7 +7,7 @@ def run(stats):
     g=Rig(w=480,h=320,draw=False,storage=({'runnerRig2':json.dumps(stats)} if stats else None)); pg=g.pg
     pg.click('#bDevT'); pg.click('#dtBlank'); pg.wait_for_timeout(2000)
     pg.evaluate("j=>__sbStart(j)",J); pg.wait_for_timeout(1500)
-    pg.evaluate("__put(60000,0,-30)"); pg.wait_for_timeout(300)
+    pg.evaluate("__put(0,0,-30)"); pg.wait_for_timeout(300)
     a=pg.evaluate("__state()"); pg.keyboard.press('KeyE'); pg.wait_for_timeout(400); b=pg.evaluate("__state()")
     pg.keyboard.press('KeyQ'); pg.wait_for_timeout(400); c=pg.evaluate("__state()")
     g.close()
