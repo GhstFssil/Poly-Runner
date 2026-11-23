@@ -39,3 +39,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-22 14:37 | v188 | published: version label v188 and CHANGELOG entry for the source split (next merged into main)
 - 2026-11-22 18:01 | next | split: Rig Editor cut into the characters area (rig-editor-panel.html, rig-editor-start.html, rig-editor.html); head part now 01-head + 01-head-b; game file byte-identical
 - 2026-11-22 18:06 | next | split: 04-script-b1c cut by section into ui/health.js (appended), characters/molly-moves.js, level1/props.js, characters/strafe-streaks.js, core/checkpoints.js, level1/goal.js, core/spawn.js; game file byte-identical
+- 2026-11-22 18:07 | next | split: page head cut into ui/page-head.html, ui/page-body.html and ui/path-editor-embed.html; game file byte-identical

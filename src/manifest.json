@@ -1,9 +1,10 @@
 {
   "output": "checker-run.html",
   "parts": [
-    "unsorted/01-head.html",
+    "ui/page-head.html",
+    "ui/page-body.html",
     "characters/rig-editor-panel.html",
-    "unsorted/01-head-b.html",
+    "ui/path-editor-embed.html",
     "data/molly-settings.html",
     "data/comet-settings.html",
     "characters/rig-editor-start.html",

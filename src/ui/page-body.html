@@ -1,0 +1,194 @@
+
+<div id="stage">
+  <canvas id="view" aria-label="3D view of a girl in a red jumpsuit with a ponytail running through a long grass valley with stone walls"></canvas>
+  <div id="start" class="splash">
+    <div class="ver">v188</div>
+    <button id="bClog" class="clogBtn" type="button" title="What changed in each version">Changes</button>
+    <section class="scr on" id="scr-main" aria-label="Main menu">
+      <h1 class="logo"><span>POLY</span><span>RUNNER</span></h1>
+      <div class="menu">
+        <button class="go" id="bControls" type="button">Controls</button>
+        <button class="go" id="bLevels" type="button">Level Select</button>
+        <button class="go" id="bChars" type="button">Characters</button>
+        <button class="go" id="bSettings" type="button">Graphics</button>
+        <button class="go" id="bDevT" type="button">Dev Mode</button>
+      </div>
+    </section>
+    <section class="scr" id="scr-devt" aria-label="Dev Mode">
+      <div class="card narrow">
+        <h1>Dev Mode</h1>
+        <div class="menu">
+          <button class="go2" id="dtPath" type="button">Path Editor</button>
+          <button class="go2" id="dtRig" type="button">Rig Editor</button>
+          <button class="go2" id="dtSandbox" type="button">Sandbox: Play My Last Layout</button>
+          <button class="go2" id="dtBlank" type="button">Sandbox: Blank Ground</button>
+          <button class="go2" id="dtSaves" type="button">Saved Sandboxes</button>
+        </div>
+        <button class="go2 back" id="dtBack" type="button">Back</button>
+      </div>
+    </section>
+    <section class="scr" id="scr-clog" aria-label="Version change log">
+      <div class="card narrow" style="width:min(640px,100%)">
+        <h1>Change Log</h1>
+        <div id="clogList"></div>
+        <button class="go2 back" id="clBack" type="button">Back</button>
+      </div>
+    </section>
+    <section class="scr" id="scr-chars" aria-label="Characters">
+      <div class="card narrow" style="width:min(560px,100%)">
+        <h1>Characters</h1>
+        <div id="charStats"></div>
+        <button class="go2 back" id="chBack" type="button">Back</button>
+      </div>
+    </section>
+    <section class="scr" id="scr-saves" aria-label="Saved Sandboxes">
+      <div class="card narrow">
+        <h1>Saved Sandboxes</h1>
+        <div class="menu" id="saveList"></div>
+        <button class="go2 back" id="svBack" type="button">Back</button>
+      </div>
+    </section>
+    <section class="scr" id="scr-settings" aria-label="Graphics settings">
+      <div class="card narrow">
+        <h1>Graphics</h1>
+        <div class="menu">
+          <button class="go2" id="gAA" type="button">Antialiasing: On</button>
+          <button class="go2" id="gSoft" type="button">Soft Shadows: On</button>
+          <label class="gfog">Fog Distance: <b id="gFogV">100%</b><input id="gFog" type="range" min="30" max="100" step="5" value="100"></label>
+        </div>
+        <button class="go2 back" id="bSetBack" type="button">Back</button>
+      </div>
+    </section>
+    <section class="scr" id="scr-controls" aria-label="Controls">
+      <div class="card">
+        <h1>Controls</h1>
+      <div class="keys">
+        <span><span class="key">Mouse</span></span><span>Aim; She Steers Toward It</span>
+        <span><span class="key">W</span></span><span>Run Forward</span>
+        <span><span class="key">S</span></span><span>Brake: Slide to a Stop</span>
+        <span><span class="key">Space</span></span><span>Jump: hold for full height, tap to hop</span>
+        <span><span class="key">Q</span> <span class="key">E</span></span><span>Molly: Sidestep Left / Right (not in the Barrier)</span>
+        <span><span class="key">2</span></span><span>Molly: Barrier on / off, an unhurtable red shell</span>
+        <span><span class="key">Q</span> <span class="key">E</span></span><span>Comet: Star Throw Where the Camera Faces (hold to charge, up to 3 s)</span>
+        <span><span class="key">2</span></span><span>Comet: Hover On / Off</span>
+        <span><span class="key">Space</span></span><span>Comet, Hovering, Held in the Air: Fly</span>
+        <span><span class="key">A</span> <span class="key">D</span></span><span>Drift: at 30 Zips or more, swing 15° that way (1 s cooldown; not in the Barrier)</span>
+        <span><span class="key">Hold S</span></span><span>Standing still: Runner's Pose. After 3 s, let go to launch at 50 Zips</span>
+        <span><span class="key">Hold S</span></span><span>Standing still in the Barrier: Dodecadash. Let go to launch, +20 Zips per second held (max 120), 4 power a second</span>
+        <span><span class="key">Esc</span></span><span>Pause</span>
+        <span><span class="key">F4</span></span><span>Mouse look mode: locked, locked with raw input, or hold and drag. Press Esc, then Play again, after changing it</span>
+      </div>
+        <button class="go2 back" data-back type="button">Back</button>
+      </div>
+    </section>
+    <section class="scr" id="scr-levels" aria-label="Level select">
+      <div class="card narrow">
+        <h1>Level Select</h1>
+        <div class="menu">
+          <div class="lvrow"><button class="lvl" id="bLevel1" type="button" style="flex:1"><b>Grass Canyon, Act 1</b></button><button class="go2 lvmapb" id="bMapL1" type="button">Map</button></div>
+          <div class="lvrow"><button class="lvl" id="bLevel2" type="button" style="flex:1"><b>Oceana Crags, Act 1</b></button><button class="go2 lvmapb" id="bMapL2" type="button">Map</button></div>
+        </div>
+        <button class="go2 back" id="bLevelsBack" type="button">Back</button>
+      </div>
+    </section>
+    <section class="scr" id="scr-pause" aria-label="Paused">
+      <div class="card narrow">
+        <h1>Paused</h1>
+        <div id="pauseStats" style="margin-bottom:12px"></div>
+        <div class="menu">
+          <button class="go" id="bResume" type="button">Resume</button>
+          <button class="go2" id="bPControls" type="button">Controls</button>
+          <button class="go2" id="bPSettings" type="button">Graphics</button>
+          <button class="go2" id="bCps" type="button">Checkpoints</button>
+          <button class="go2" id="bMap" type="button">View Map</button>
+          <button class="go2" id="bDev" type="button">Dev Mode</button>
+          <button class="go2" id="bPE" type="button" hidden>Back to Path Editor</button>
+          <button class="go2" id="bTitle" type="button">Return To Title</button>
+        </div>
+      </div>
+    </section>
+    <section class="scr" id="scr-dev" aria-label="Dev Mode">
+      <div class="card narrow">
+        <h1>Dev Mode</h1>
+        <div class="menu">
+          <button class="go2" id="dvstart" type="button">Start From the Beginning</button>
+          <div id="dvDyn" class="menu"></div>
+          <button class="go2" id="dv1" type="button">Start From Checkpoint 1</button>
+          <button class="go2" id="dv2" type="button">Start From Checkpoint 2</button>
+          <button class="go2" id="dv3" type="button">Start From Checkpoint 3</button>
+          <button class="go2" id="dvpower" type="button">Fill Power Line</button>
+          <button class="go2" id="dvcoordsBtn" type="button">Show Coordinates: Off</button>
+          <button class="go2" id="dvinvBtn" type="button">Invulnerable: Off</button>
+          <p id="dvcoords" hidden></p>
+        </div>
+        <button class="go2 back" id="bDevBack" type="button">Back</button>
+      </div>
+    </section>
+    <section class="scr" id="scr-cps" aria-label="Checkpoints">
+      <div class="card narrow">
+        <h1>Checkpoints</h1>
+        <div class="menu">
+          <button class="go2" id="gostart" type="button">Restart From the Beginning</button>
+          <button class="go2" id="gocp" type="button">Checkpoint 1</button>
+          <button class="go2" id="gocp2" type="button">Checkpoint 2</button>
+          <button class="go2" id="gocp3" type="button">Checkpoint 3</button>
+          <div id="cpDyn" class="menu"></div>
+        </div>
+        <button class="go2 back" id="bCpsBack" type="button">Back</button>
+      </div>
+    </section>
+    <section class="scr" id="scr-map" aria-label="Map">
+      <div class="mapbox" id="mapbox">
+        <div class="maphead"><span>WORLD MAP</span><span>forward runs left → right · ticks every 1,000 units</span></div>
+        <canvas id="mapc" width="725" height="500" aria-label="Map of the whole world, centred on her current location, with the start, the checkpoints, the goal and her heading"></canvas>
+        <button class="go2 back" id="bMapBack" type="button">Back</button>
+      </div>
+    </section>
+    <section class="scr" id="scr-lvmap" aria-label="Level map">
+      <div class="mapbox wide">
+        <div class="maphead"><span id="lvmapT">MAP</span><span>north is up · drawn from the level itself</span></div>
+        <canvas id="lvmapc" width="1450" height="1000" aria-label="A map of the whole level"></canvas>
+        <button class="go2 back" id="bLvMapBack" type="button">Back</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" hidden></div>
+  <div id="hint" hidden role="status"></div>
+  <div id="bonus" hidden><div class="ctitle">Bonus Goal Reached!</div></div>
+  <div id="clear" hidden><div class="ctitle">Level Cleared!</div><div class="csub" id="clearsub"></div>
+    <div id="scorebox" hidden>
+      <div class="srow"><span>TIME LEFT</span><b id="sc-time">0:00.0</b></div>
+      <div class="srow" id="sc-hrow" hidden><span>HEARTS</span><b id="sc-hearts"></b></div>
+      <div class="srow" id="sc-srow" hidden><span>SEGS</span><b id="sc-segs">0</b></div>
+      <div class="stotal"><span>SCORE</span><b id="sc-score">0</b></div>
+      <div id="sc-rate" hidden></div>
+      <button id="sc-go" type="button" hidden>Continue</button>
+    </div></div>
+  <div id="hurt"></div>
+  <div id="uw"></div>
+  <div id="hp" hidden role="status" aria-label="Health: 3 hearts"><span class="hlabel">HEALTH</span><span class="hearts" id="hearts"></span><span class="breath" id="breath" hidden></span></div>
+  <div id="segline" hidden aria-hidden="true"></div>
+  <div id="segs" hidden role="status" aria-label="Segs collected"><span class="slabel"><span class="gem"></span>SEGS</span><span class="sval" id="segval">0</span></div>
+  <div id="speedo" hidden role="img" aria-label="Speedometer in Zips, tile lengths per second, with the time left">
+    <div id="coords" hidden></div>
+    <div class="timer" id="timer"><span class="tlabel">TIME LEFT</span><span class="tval" id="timeval">5:00</span></div>
+    <svg viewBox="0 0 200 124" id="stat">
+      <path class="track" id="track"></path>
+      <path class="fill" id="fill"></path>
+      <path class="chtrack" id="chtrack" style="display:none"></path>
+      <path class="chfill" id="chfill"></path>
+      <g id="ticks"></g>
+      <g id="needle"><line class="needle" x1="100" y1="100" x2="38" y2="100"></line></g>
+      <circle class="hub" cx="100" cy="100" r="5"></circle>
+      <text class="readout" id="zipval" x="100" y="86">0.0</text>
+      <text class="unit" x="100" y="118">ZIPS</text>
+    </svg>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
