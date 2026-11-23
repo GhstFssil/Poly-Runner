@@ -47,3 +47,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-22 21:00 | v190 | published: next merged into main (data as real files, pointer lock/state/input in core, parts regrouped, failing tests removed); ver label v190, CHANGELOG entry
 - 2026-11-23 17:22 | next | mobs: removed the old hand-made levels' mobs (Level 1 chamber, Oceana runway, the Sink pool) and their rules; added tests/lvprobe.py smoke probe
 - 2026-11-23 17:27 | next | removed the old hand-made levels' checkpoints, goal, Bonus Goal, built-in tips, stone edges and world maps (and their Dev Mode / checkpoint / View Map buttons); core/checkpoints.js gone; the water material is waterMat
+- 2026-11-23 17:33 | next | removed the old hand-made levels' scenery and collision: signs, tunnel and cave rock, cave roof and door (level1/cave-roof.js gone), toxic strips, bay bridge, the Sink, auto-placed trees and Seg lines, gate/cave/path/wall barriers

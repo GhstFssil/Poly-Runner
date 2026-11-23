@@ -334,7 +334,7 @@
     body.position.y = Math.abs(s) * 0.1 * k + Math.sin(now / 600) * 0.012 * (1 - k);
     body.rotation.x = -(0.16 * k + 0.2 * topFrac);
     // Braking while moving on the ground is a slide, feet first, like a runner into home: she lies back until she is about one unit tall.
-    slideBlend += ((((playing && keys.s && !keys.w && grounded && speed > 6 && !ballOn) || gateIn || (SB && SB.caveLow)) ? 1 : 0) - slideBlend) * Math.min(1, dt * 10);
+    slideBlend += ((((playing && keys.s && !keys.w && grounded && speed > 6 && !ballOn) || (SB && SB.caveLow)) ? 1 : 0) - slideBlend) * Math.min(1, dt * 10);
     if (slideBlend > 0.001) {
       var sb = slideBlend;
       body.rotation.x += (1.35 - body.rotation.x) * sb;
@@ -373,7 +373,6 @@
     var cp = Math.cos(pitch), sp = Math.sin(pitch);
     var focus = new THREE.Vector3(player.position.x, player.position.y + 2.3 - 1.3 * slideBlend - 0.8 * rpBlend, player.position.z);
     var bx = Math.sin(yaw) * cp, bz = Math.cos(yaw) * cp, boom = CAM_DIST;
-    for (var ct = 0; ct < 14 && !camFits(focus.x + bx * boom, focus.y + sp * boom, focus.z + bz * boom); ct++) boom *= 0.8;   // the doorway tunnel's roof is low: keep the camera under it
     var camX = focus.x + bx * boom, camZ = focus.z + bz * boom;
     if (wallOn) { camX += wallNx * 3; camZ += wallNz * 3; }          // on a wall the camera stands a little out from its face
     camera.position.set(camX, focus.y + sp * boom, camZ);        // no ground check: the camera may clip into the ground

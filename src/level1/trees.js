@@ -83,7 +83,7 @@
   function updateTrees(px, pz) {
     if (Math.abs(pz - builtAtZ) < 60 && Math.abs(px - builtAtX) < 60) return;
     builtAtZ = pz; builtAtX = px;
-    if (level === 3) {                                       // the Sandbox: exactly the trees that were stamped
+    {                                                         // exactly the trees the layout stamped
       var cn = [0, 0, 0]; treeX.length = 0; treeZ.length = 0; treeR.length = 0; treeTop.length = 0;
       if (SB) SB.trees.forEach(function (t, ti) {
         var wx = L3_X + t[0], wz = t[1];
@@ -99,52 +99,10 @@
         treeX.push(wx); treeZ.push(wz); treeR.push(0.8 * sc * tkx); treeTop.push(gy + sc * (7.5 * tky + 14.9 * cky));
       });
       for (var cb = 0; cb < SHADES; cb++) treeSets[cb].forEach(function (m) { m.count = cn[cb]; m.instanceMatrix.needsUpdate = true; });
-      return;
-    }
-    if (candCache.size > 60000) { candCache.clear(); plantCache.clear(); }
-    var cz0 = Math.floor((pz - VIEW_AHEAD - 80) / T_CS), cz1 = Math.floor((pz + VIEW_BEHIND + 80) / T_CS);
-    var vx0 = Math.floor((px - VIEW_AHEAD - 80) / T_CS), vx1 = Math.floor((px + VIEW_AHEAD + 80) / T_CS);
-    var counts = [0, 0, 0];
-    treeX.length = 0; treeZ.length = 0; treeR.length = 0; treeTop.length = 0;
-    for (var cz = cz0; cz <= cz1; cz++) {
-      // Only the columns where open ground can be: the valley is 200 wide, the curve sweeps out to the left
-      var rowZ = (cz + 0.5) * T_CS, lim0 = rowZ > FUN_Z1 ? -HALF : ARC_CX - TURN_R - CH_HALF - 10, lim1 = rowZ > FUN_Z1 ? HALF : HALF;
-      var cx0 = Math.max(vx0, Math.floor(lim0 / T_CS)), cx1 = Math.min(vx1, Math.floor(lim1 / T_CS));
-      for (var cx = cx0; cx <= cx1; cx++) {
-        if (!planted(cx, cz)) continue;
-        var c = candidate(cx, cz);
-        if (c.y === null) {                 // a tree is not planted on the face of a ledge; its base sits at the lowest ground under it
-          var g0 = groundH(c.x, c.z), lo = g0, hi = g0, gs;
-          for (var q = 0; q < 4; q++) {
-            gs = groundH(c.x + (q & 1 ? 1.2 : -1.2), c.z + (q & 2 ? 1.2 : -1.2));
-            if (gs < lo) lo = gs;
-            if (gs > hi) hi = gs;
-          }
-          c.y = lo; c.flat = hi - lo < 1.4;
-        }
-        if (!c.flat && !c.pin) continue;
-        if (!c.pin) {
-          if (c.thin < (c.x > -HALF && c.x < HALF && c.z > -END ? 0.45 : 0.25)) continue;   // the first valley: a quarter fewer again (56% of the original are left)
-          if (c.z < -END && c.thin < 0.8125) continue;         // past the end of the straight valley only about a fifth are left
-          if (c.z < -LEDGE_START && c.thin < 0.71875) continue; // past the ledge line, under a third are left
-        }
-        if (counts[c.shade] >= MAX_TREES) continue;
-        tpv.set(c.x, c.y, c.z);
-        tq.setFromAxisAngle(tUp, c.rot);
-        tsv.set(c.sc, c.sc, c.sc);
-        tm4.compose(tpv, tq, tsv);
-        var slot = counts[c.shade]++;
-        treeSets[c.shade].forEach(function (m) { m.setMatrixAt(slot, tm4); });
-        treeX.push(c.x); treeZ.push(c.z); treeR.push(0.8 * c.sc); treeTop.push(c.y + TREE_TOP * c.sc);
-      }
-    }
-    for (var b = 0; b < SHADES; b++) {
-      treeSets[b].forEach(function (m) { m.count = counts[b]; m.instanceMatrix.needsUpdate = true; });
     }
   }
   updateTrees(0, 0);
   // Push her out of any trunk she is touching. Returns true if she hit one. (Walls and ledges are terrain: see the ground check in the loop.)
-  var lipSeg = [];   // x0, z0, x1, z1, top, 0 for each stretch of the second valley's lip wall
   function collide() {
     var hit = false, pp = player.position;
     for (var i = 0; i < treeX.length; i++) {
@@ -158,95 +116,6 @@
         pp.x = treeX[i] + (dx / d) * r;
         pp.z = treeZ[i] + (dz / d) * r;
         hit = true;
-      }
-    }
-    var sdx = pp.x - SIGN_X, sdz = pp.z - SIGN_Z, sr = PLAYER_RADIUS + 0.5;     // the sign's post
-    if (sdx * sdx + sdz * sdz < sr * sr && pp.y < SIGN_Y + 9) {
-      var sd = Math.sqrt(sdx * sdx + sdz * sdz) || 1e-4;
-      pp.x = SIGN_X + sdx / sd * sr; pp.z = SIGN_Z + sdz / sd * sr; hit = true;
-    }
-    var hdx = pp.x - HSIGN_X, hdz = pp.z - HSIGN_Z;                                // the heart sign's post
-    if (hdx * hdx + hdz * hdz < sr * sr && pp.y < HSIGN_Y + 9) {
-      var hd = Math.sqrt(hdx * hdx + hdz * hdz) || 1e-4;
-      pp.x = HSIGN_X + hdx / hd * sr; pp.z = HSIGN_Z + hdz / hd * sr; hit = true;
-    }
-    gateIn = false;
-    if (level === 2 && pp.y < GATE_TOP && pp.x > GATE_X0 - PLAYER_RADIUS && pp.x < GATE_X0 + GATE_L + PLAYER_RADIUS && Math.abs(pp.z - GATE_Z) < GATE_W + PLAYER_RADIUS) {
-      var gH = SLIDE_H + (PLAYER_H - SLIDE_H) * (1 - slideBlend), gHead = pp.y + gH, gdz = pp.z - GATE_Z;           // 3.6 tall standing, 1 tall in a slide
-      var gHw = GATE_OCT / 2 + Math.max(0, Math.min(2, L2_Y + 2 - gHead)) - PLAYER_RADIUS;       // the opening's half width at her head
-      var gLow = gHead <= L2_Y + 2.05 && pp.y > L2_Y - 1;
-      if (pp.x <= GATE_X0) {                                              // at the face: only a low enough, well centred Molly goes in
-        if (!(gLow && Math.abs(gdz) <= gHw + 0.5)) { pp.x = GATE_X0 - PLAYER_RADIUS; hit = true; }
-      } else if (pp.x < GATE_X0 + GATE_L) {                               // inside the block: she must be in the opening, or she was never let in from the side
-        if (Math.abs(gdz) <= GATE_OCT / 2 + 3) {
-          gateIn = true;
-          if (Math.abs(gdz) > gHw) { pp.z = GATE_Z + (gdz < 0 ? -gHw : gHw); hit = true; }
-          if (gHead > L2_Y + 2) { pp.y = Math.max(L2_Y, L2_Y + 2 - gH); if (vy > 0) vy = 0; }
-        } else { pp.z = GATE_Z + (gdz < 0 ? -1 : 1) * (GATE_W + PLAYER_RADIUS); hit = true; }
-      } else if (Math.abs(gdz) > GATE_OCT / 2 + 3) { pp.x = GATE_X0 + GATE_L + PLAYER_RADIUS; hit = true; }   // the back face
-    }
-    if (level === 2) {                                                     // the cave: an octagonal cut in the crag's wall, entered from the front only
-      var cdx = pp.x - OCV.x0, cdz = pp.z - OCV.z0, cu = cdx * OCV.hx + cdz * OCV.hz, cv = -cdx * OCV.hz + cdz * OCV.hx;
-      if (pp.y < OCV_TOP && cu > -PLAYER_RADIUS && cu < L2_CAVE_L + PLAYER_RADIUS && Math.abs(cv) < OCV_W + PLAYER_RADIUS) {
-        var ch = pp.y - L2_CAVE_Y, cw = Math.min(ocvW(Math.max(ch, 0.01)), ocvW(ch + 1.8), ocvW(ch + 3.5)) - PLAYER_RADIUS;
-        if (cu <= 0) {                                                     // at the face: only what fits the opening goes in
-          if (!(ch > -0.3 && Math.abs(cv) <= cw)) { var cd = -PLAYER_RADIUS - cu; pp.x += cd * OCV.hx; pp.z += cd * OCV.hz; hit = true; }
-        } else if (cu < L2_CAVE_L + 1) {                                   // inside: the walls and the ceiling
-          if (Math.abs(cv) > cw && cw > 0) { var cl = (cv < 0 ? -cw : cw) - cv; pp.x -= cl * OCV.hz; pp.z += cl * OCV.hx; hit = true; }
-          if (ch + PLAYER_H > 30) { pp.y = L2_CAVE_Y + 30 - PLAYER_H; if (vy > 0) vy = 0; }
-        }
-      }
-    }
-    if (level === 2 && pp.x > L2_MIN && !L2_BARE) {                                    // the path out of the cave: its walls of rock hold her in, however shallow her angle (she cannot run up them)
-      var nd = l2Dist(pp.x, pp.z);
-      var nlim = narHW(pp.x, pp.z) - 0.2;
-      if (nd > nlim && L2_PI >= L2_NAR0) {
-        var np = L2_PIECES[L2_PI], nhp = narY(np, L2_PS);
-        if (pp.y < nhp + 24 && mountainH(pp.x, pp.z, 1000) > 30 && ovK < 0.05) {         // only between walls of rock: out over the water there is nothing to hold her in
-          var nq = l2PointAt(L2_S), ndx = pp.x - nq[0], ndz = pp.z - nq[1], ndl = Math.sqrt(ndx * ndx + ndz * ndz) || 1e-4;
-          pp.x = nq[0] + ndx / ndl * nlim; pp.z = nq[1] + ndz / ndl * nlim; hit = true;
-        }
-      }
-    }
-    if (level === 2) {                                                     // Oceana Crags' sign post
-      var s2x = pp.x - L2SIGN_X, s2z = pp.z - L2SIGN_Z, s2r = PLAYER_RADIUS + 0.5;
-      if (s2x * s2x + s2z * s2z < s2r * s2r && pp.y < groundH(L2SIGN_X, L2SIGN_Z) + 9) { var s2d = Math.sqrt(s2x * s2x + s2z * s2z) || 1e-4; pp.x = L2SIGN_X + s2x / s2d * s2r; pp.z = L2SIGN_Z + s2z / s2d * s2r; hit = true; }
-    }
-    if (!doorOpen && Math.abs(pp.z - DR_Z0) < DR_W / 2 + 1.5 + PLAYER_RADIUS * 0.5 && pp.x > DR_X0 - 3 - PLAYER_RADIUS && pp.x < DR_X0 + 3 && pp.y < CH_FLOOR + DR_UP + DR_H) {   // the sealed doorway
-      pp.x = DR_X0 - 3 - PLAYER_RADIUS; hit = true;
-    }
-    // The invisible barrier just inside the plateau's three cliff edges
-    wallField(pp.x, pp.z);
-    plateauOut(pp.x, pp.z);
-    if (wd > 0 && pp.x < -HALF + 0.5 && pp.x > -HALF - 60 && pp.z < HALF && pp.z > PZ1_OLD + 8) {   // inside the first valley's west wall (nowhere near the plateau): back out into the valley, never off to the plateau's far edge
-      pp.x = -HALF + 0.5; hit = true;
-    }
-    if (PLATEAU_BARRIER && pp.z < PZ1 + 8 && pp.x > PX0 - 0.5 && pp.x < HALF && wd > 0 && valley2(pp.x, pp.z) === null && Math.min(Math.max(pdN, pdE), pdH) > -3 && !(pdE >= pdN && !(pdH < pdE))) {   // the south edge has no barrier now   // the east rim has no barrier at all now (it would only have stood 20 above the valley floor, below the rim), so she can jump down into the valley   // the west edge (pdW) is deliberately left out          // (the west end has no barrier: past x -3500 she falls)                  // out on rock (not in the valley, curve or apron) and within 3 of a cliff
-      var dP = Math.max(pdN, pdE);
-      if (pdH < dP) {
-        var rx = pp.x - ARC_CX, rz = pp.z - ARC_CZ, rr = Math.sqrt(rx * rx + rz * rz) || 1, kk = pdH + 3;
-        pp.x -= rx / rr * kk; pp.z -= rz / rr * kk;
-      } else if (dP === pdN) pp.z += pdN + 3;
-      else if (dP === pdW) pp.x += pdW + 3;
-      else if (dP === pdE) pp.x -= pdE + 3;
-      else if (dP === pdF) pp.z -= pdF + 3;
-      else { pp.x -= SL_NX * (pdS + 3); pp.z -= SL_NZ * (pdS + 3); }
-      hit = true;
-    }
-    // The second valley's lips: an invisible wall along the top of each side (see the stone edges built below), so the flat rims either
-    // side cannot be run along. Only felt from up at rim height; from down in the valley it is out of reach anyway.
-    for (var li = 0; li < lipSeg.length; li += 6) {
-      var lx0 = lipSeg[li], lz0 = lipSeg[li + 1], lx1 = lipSeg[li + 2], lz1 = lipSeg[li + 3];
-      if (pp.y < lipSeg[li + 4] - 6) continue;
-      var lr = PLAYER_RADIUS + 0.5;
-      if (pp.x < Math.min(lx0, lx1) - lr || pp.x > Math.max(lx0, lx1) + lr || pp.z < Math.min(lz0, lz1) - lr || pp.z > Math.max(lz0, lz1) + lr) continue;
-      var ldx = lx1 - lx0, ldz = lz1 - lz0, lt = ((pp.x - lx0) * ldx + (pp.z - lz0) * ldz) / (ldx * ldx + ldz * ldz || 1);
-      lt = lt < 0 ? 0 : lt > 1 ? 1 : lt;
-      var lpx = pp.x - (lx0 + ldx * lt), lpz = pp.z - (lz0 + ldz * lt), ld2 = lpx * lpx + lpz * lpz;
-      if (ld2 < lr * lr) {
-        var ld = Math.sqrt(ld2);
-        if (ld < 1e-4) { lpx = -ldz; lpz = ldx; ld = Math.sqrt(lpx * lpx + lpz * lpz) || 1; }
-        pp.x = lx0 + ldx * lt + lpx / ld * lr; pp.z = lz0 + ldz * lt + lpz / ld * lr; hit = true;
       }
     }
     return hit;

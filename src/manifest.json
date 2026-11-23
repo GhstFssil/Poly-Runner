@@ -43,7 +43,6 @@
     "sandbox/sandbox.js",
     "level1/trees.js",
     "level1/props.js",
-    "level1/cave-roof.js",
     "ui/health.js",
     "characters/molly.js",
     "characters/molly-update.js",

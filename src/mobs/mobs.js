@@ -168,7 +168,6 @@
       if (e.sbp) { e.act = false; e.hx = e.hz = e.x = e.z = 1e7; e.g.visible = false; e.g.position.set(1e7, 0, 1e7); }
     });
     enPrevOK = false; gzClear(); enHurtUntil = 0;
-    if (typeof setDoor === 'function') setDoor(false);
     if (level === 3) sbPlaceMobs();
   }
   resetMobs();
