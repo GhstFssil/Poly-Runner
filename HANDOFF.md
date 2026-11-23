@@ -1,30 +1,29 @@
-# Handoff (2026-11-22)
+# Handoff (2026-11-23)
 
 ## Goal
-Split the single-file game into `src/` parts by function (areas: core, level1, level2, sandbox, characters, mobs, ui), with GLOSSARY.md as the one list of terms.
+Each level in its own coordinate space. Both official levels already load as Sandbox layouts (`startSandbox(OFFICIAL_L1/L2)`, `level = 3`, played at `L3_X` = 60000) in level-local coordinates, so the work is: delete the old hand-made levels, then move the play space to the origin.
 
-## Done
-- v185-v189: every part in an area folder, grouped by area as far as load order allows (file map in ARCHITECTURE.md).
-- v190 (published 2026-11-22):
-  - Data is real files in `src/data/`: `molly.glb`, `comet.glb`, `molly-settings.json`, `comet-settings.json`, `user-def.json`, `grass-canyon.json`, `oceana-crags.json`, `changelog.json`. `build.py` wraps them (manifest data-file entries: `before`/`after`/`as`). Game file byte-identical except the CHANGELOG layout (trailing commas, `] }` spacing), which has the same data (checked with node). `bake_models.py` writes the `.glb` files; `check_deps.py` and `mk_pe_embed.py` updated.
-  - Code moves: pointer lock (`lockPointer`, `relockOnInput`) -> `core/pointer-lock.js`; Molly's State block -> `core/state.js`; the keys and F4 mouse-mode input (was the tail of `comet.js`) -> `core/input.js`, kept at the same spot so listener order is unchanged. Comet joined the characters group; `spawn.js` sits by `checkpoints.js`; speedometer and the two editor hosts joined the ui group. Area switches 22 -> 20.
-  - Removed 16 failing/flaky tests: `fu/` mn1, nf1, wall4, door4, minionhit, fu2, fu4, pe_keep, door3, steep1, mov, phys; `rg1`, `rig1`, `rig2`, `scan3`. Their BACKLOG entries and SWEEP map mentions are gone.
+## Done (on `next`, not published)
+- Confirmed with counters on every level check: once a level is picked, no `level === 1/2` branch runs (the old mobs and Segs only ticked on the menus).
+- Deleted the old hand-made levels' gameplay and scenery: mobs, checkpoints (`core/checkpoints.js` gone), goal, Bonus Goal, built-in tips, world maps and their buttons, signs, rock, cave roof and door (`level1/cave-roof.js` gone), toxic strips, bridge, the Sink, auto-placed trees and Seg lines, barriers. No code checks for level 1 or 2 now.
+- Kept every terrain function (Grass Canyon's valley/plateau/cave, Oceana's crags and path), since the `level1`/`level2` terrain kinds sample them.
+- `tests/lvprobe.py`: smoke probe (ground, slope, mud on a grid in level-local coordinates, a short run, start screenshots). Baseline from v190: `/tmp/polyrun-work/probe_base.json` (rebuild it from `git show b35f068:checker-run.html` if /tmp was cleared).
 
 ## In progress
-Nothing half-done. v190 published 2026-11-22 (data files, core moves, test cleanup). `next` = `main`.
+Nothing half-done.
 
 ## Decisions
-- Terms: mob / minion / Big Minion / Roost Gazer; character; stat; tile; Barrier; Mud; Crags; every word of a label capitalized.
-- Frozen storage names stay (see GLOSSARY.md). Data files are edited directly; the build is the only thing that wraps them.
-- The Rig Editor's own panel and script are in the characters area, not ui.
+- Ricky: delete the old levels and keep only their terrain; levels get separate coordinate spaces.
+- Ricky: during this work, 2-3 smoke tests per commit (lvprobe, `fu/deckstamp.py`, `fu/cavejoin.py`); the full suite once at the end, before asking about publishing.
+- `CP2_X`/`CP2_Z` stay in `trees.js` because the terrain's mounds read them (moving them could change terrain).
 
 ## Next steps
-1. Further grouping needs shared constants moved into core: Level 1's trees/props read Level 2 (`L2_*`) and Sandbox (`L3_*`, `DECK_*`, `GH_*`) constants while loading; `goal.js` needs `checkpoints.js` materials; `health.js` must stay before `molly.js`; `checkpoints.js` builds Level 2's gates.
-2. `tools/mk_sweep_docs.py` is behind the SWEEP docs (BACKLOG); sync or retire it.
-3. Rename to Poly Runner (BACKLOG).
+1. Move the play space to the origin: `L3_X` 60000 -> 0, and replace the x-range dispatch (`x > L3_MIN`, `x > L2_MIN` in `groundH`, `worldH0`, chunks, mud, ledges) so the old worlds' terrain is only sampled through `sbTerrBase`. Tests that place Molly at 60000 need updating. Check Sandbox saves store stamps relative to `L3_X` (they appear to).
+2. Run the full suite; re-run any failures on v190 to see which already failed.
+3. Update ARCHITECTURE.md and GLOSSARY.md (areas: `level1/` and `level2/` are now terrain), then ask Ricky about publishing.
 
 ## Gotchas
-- Shallow clone: `git -c push.negotiate=true push`.
-- `fu/y2.py` must run from `tests/`. Tests leave `shots/` in the repo root; don't commit it.
-- Tests hardcode `/home/claude/poly-runner`; a clone elsewhere needs `ln -s <clone> /home/claude/poly-runner` first.
-- Moving a part changes what runs first; check load-time reads/writes (and listener order) before any move.
+- Wall-time checks are noisy here (frame rate swings from 4 to 50 fps): `deckstamp`'s run and lvprobe's run distance can fail with no code change. Re-run before suspecting the change.
+- A lint check catches names used but no longer defined: eslint `no-undef` on the last `<script>` block of the built file (setup is outside the repo).
+- `showHint` ignores everything without `force`; the built-in tips were already off.
+- Shallow clone: `git -c push.negotiate=true push`. Tests leave `shots/` in the repo root; don't commit it.
