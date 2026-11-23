@@ -37,3 +37,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-22 11:45 | next | sandbox area: cut Level 3 / sbBuild, Caves, Walls, Pressure plates and targets into src/sandbox/sandbox.js (byte-identical)
 - 2026-11-22 14:37 | next | sandbox, level1 Trees, characters (molly, comet) and core (scene, loop) cut out of src/unsorted/ into their area files (byte-identical)
 - 2026-11-22 14:37 | v188 | published: version label v188 and CHANGELOG entry for the source split (next merged into main)
+- 2026-11-22 18:01 | next | split: Rig Editor cut into the characters area (rig-editor-panel.html, rig-editor-start.html, rig-editor.html); head part now 01-head + 01-head-b; game file byte-identical

@@ -18,7 +18,8 @@ Split the single-file game into `src/` parts by function (areas: core, level1, l
 - 2026-11-22: v188 published (level1 + sandbox cuts, then the rest): `src/core/scene.js`, `src/core/loop.js` (Sizing, Clock, Loop), `src/level1/trees.js`, `src/characters/molly.js` (Movement details, State vars, Molly's model), `src/characters/comet.js`. Byte-identical; chk, mk_test, comet1/2, modes, rot1, ends1, reg2/3/4, rl1, righ, y2 pass. `mov`, `phys`, `rig1` fail only on missing comparison builds (same before the cuts). Part order: ..., sandbox, trees, molly, ..., 06-script-d (5 lines), comet, loop, 07-script-end (`})();` + `</script>`).
 
 ## In progress
-Nothing half-done. `next` = `main` after v188.
+On `next` (not published), finishing the `unsorted/` leftovers (plan Ricky approved 2026-11-22): 1 Rig Editor -> characters, 2 `04-script-b1c` by section, 3 `01-head` -> ui, 4 small leftovers -> core; stop and check with Ricky before reordering.
+- Done: step 1, characters: `src/characters/rig-editor-panel.html` (the `rig-tpl` template, was `01-head` 462-649), `rig-editor-start.html` (was `02-script-start`), `rig-editor.html` (was `03-script-a`). `01-head` is now two parts (`01-head`, `01-head-b`). Byte-identical; chk, mk_test, rx8, fu3, fu6, righ pass (`rw4`/`rm1` are helpers that need arguments).
 
 ## Decisions
 - Terms: mob / minion / Big Minion / Roost Gazer; character; stat; tile; Barrier; Mud; Crags; every word of a label capitalized.
