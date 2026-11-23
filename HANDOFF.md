@@ -18,7 +18,7 @@ Split the single-file game into `src/` parts by function (areas: core, level1, l
 - 2026-11-22: v188 published (level1 + sandbox cuts, then the rest): `src/core/scene.js`, `src/core/loop.js` (Sizing, Clock, Loop), `src/level1/trees.js`, `src/characters/molly.js` (Movement details, State vars, Molly's model), `src/characters/comet.js`. Byte-identical; chk, mk_test, comet1/2, modes, rot1, ends1, reg2/3/4, rl1, righ, y2 pass. `mov`, `phys`, `rig1` fail only on missing comparison builds (same before the cuts). Part order: ..., sandbox, trees, molly, ..., 06-script-d (5 lines), comet, loop, 07-script-end (`})();` + `</script>`).
 
 ## In progress
-On `next` (not published). `unsorted/` is gone: every part is in an area folder (2026-11-22, plan Ricky approved; file map in ARCHITECTURE.md). Steps: 1 Rig Editor -> characters; 2 `04-script-b1c` cut by section (hurt/`landFall` appended to `ui/health.js`, Strafe -> characters, props/goal -> level1, checkpoints/spawn -> core); 3 head -> `ui/page-head`, `page-body`, `path-editor-embed`; 4 leftovers: `core/start.html`, `pointer-lock.js`, `end.html`, `characters/molly-update.js`, `level1/cave-roof.js`. All byte-identical; chk, mk_test, rx8, fu3, fu6, righ, ends1, cavejoin, coords1, nopit, reg2/3/4, halfheart, modes, rot1, rl1, peobj, pesave, door1, tunfloor, shaft1, y2, comet1 pass. Waiting on Ricky before reordering parts by area.
+Nothing half-done. v189 published (2026-11-22): `unsorted/` is gone (every part in an area folder; file map in ARCHITECTURE.md) and the game-script parts are reordered by area as far as load order allows (26 -> 15 area switches; found by a small analyzer of load-time reads/writes, not committed). Full test pass on the new order: no regressions (failures are the known missing comparison builds, helpers that need arguments, `scan3` missing module, and flaky `minionhit`/`door4`, which fail on the old order too; `mn1` fails the same way on old and new). `next` = `main`.
 
 ## Decisions
 - Terms: mob / minion / Big Minion / Roost Gazer; character; stat; tile; Barrier; Mud; Crags; every word of a label capitalized.
@@ -26,7 +26,7 @@ On `next` (not published). `unsorted/` is gone: every part is in an area folder 
 - The Rig Editor's own panel and script are in the characters area, not ui.
 
 ## Next steps
-1. Reorder parts by area (ask Ricky first): moving a part changes the game file's order, so it is no longer byte-identical; needs a wide test pass. `python3 tools/check_deps.py` shows coupling.
+1. Split is done apart from real data files (BACKLOG). Further grouping needs code moves (e.g. Comet reads `playing`/`mouseMode` set in `menu-wiring.js`; `core/checkpoints.js` builds Level 2's gates). `fu/mn1.py` fails (null `.open` in its setup) on v188 and v189: test needs a look.
 2. `menu-wiring.js` also holds pointer lock (`lockPointer`, `relockOnInput`): may belong in core; the State vars in `molly.js` (yaw, pitch, speed, drift) may belong in core. Split later.
 3. `tools/mk_sweep_docs.py` is behind the SWEEP docs; sync or retire it, never regenerate blindly.
 4. Recheck on this build: `fu/nf1.py` (crashes), `fu/wall4.py` (times out), `fu/door4.py`, `fu/minionhit.py` (flaky). `fu/door3.py` and `fu/steep1.py` also need the missing comparison builds.

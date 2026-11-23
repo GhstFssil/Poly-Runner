@@ -41,3 +41,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-22 18:06 | next | split: 04-script-b1c cut by section into ui/health.js (appended), characters/molly-moves.js, level1/props.js, characters/strafe-streaks.js, core/checkpoints.js, level1/goal.js, core/spawn.js; game file byte-identical
 - 2026-11-22 18:07 | next | split: page head cut into ui/page-head.html, ui/page-body.html and ui/path-editor-embed.html; game file byte-identical
 - 2026-11-22 18:11 | next | split: last leftovers cut into core/start.html, core/pointer-lock.js, core/end.html, characters/molly-update.js, level1/cave-roof.js; src/unsorted removed; ARCHITECTURE file map, HANDOFF, BACKLOG updated; game file byte-identical
+- 2026-11-22 19:19 | v189 | split: game-script parts reordered by area as far as load order allows (26 -> 15 area switches); full test pass, no regressions; version label v189, CHANGELOG; docs updated

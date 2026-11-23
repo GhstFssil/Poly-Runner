@@ -1,5 +1,10 @@
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v189', d: 'Nov 22, 2026', t: 'Behind the scenes', g: [
+    ['Under the hood', [
+      'Every part of the game\'s source now has its own file, sorted by what it does, and the files are grouped together wherever the game allows. Nothing in the game changes.'
+    ]]
+  ] },
   { v: 'v188', d: 'Nov 22, 2026', t: 'Behind the scenes', g: [
     ['Under the hood', [
       'More of the game\'s source has its own file (Level 1, the Sandbox, Molly, Comet, and the game loop). Nothing in the game changes.'
