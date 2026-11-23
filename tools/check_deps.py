@@ -4,7 +4,7 @@
 # The game is one script (one closure), so the split is plain files joined in order and any part may use any name.
 # This only reports the coupling so a carve-out can be judged. It reads top-level `function`, `var`, `let` and `const`
 # declarations (two-space indent) of 4+ letters from each part and looks for those names as whole words in the other parts.
-# Comments and strings count too, so a hit can be a false alarm. An area is the part's folder (data/, mobs/, unsorted/).
+# Comments and strings count too, so a hit can be a false alarm. An area is the part's folder (data/, mobs/, core/).
 import json, os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'src')

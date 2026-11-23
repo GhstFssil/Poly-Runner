@@ -11,7 +11,7 @@
     "data/user-def.js",
     "characters/rig-editor.html",
     "data/models.html",
-    "unsorted/04-script-b1.html",
+    "core/start.html",
     "ui/speedometer.js",
     "core/scene.js",
     "level1/level1.js",
@@ -21,7 +21,7 @@
     "characters/molly.js",
     "ui/rig-editor-host.js",
     "ui/path-editor-host.js",
-    "unsorted/04-script-b1b2.html",
+    "characters/molly-update.js",
     "ui/health.js",
     "characters/molly-moves.js",
     "level1/props.js",
@@ -30,16 +30,16 @@
     "level1/goal.js",
     "core/spawn.js",
     "mobs/mobs.js",
-    "unsorted/04-script-b2.html",
+    "level1/cave-roof.js",
     "ui/menu.js",
     "data/changelog.js",
     "ui/menu-wiring.js",
     "data/level1.js",
     "data/level2.js",
     "ui/screens.js",
-    "unsorted/06-script-d.html",
+    "core/pointer-lock.js",
     "characters/comet.js",
     "core/loop.js",
-    "unsorted/07-script-end.html"
+    "core/end.html"
   ]
 }

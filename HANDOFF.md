@@ -18,18 +18,15 @@ Split the single-file game into `src/` parts by function (areas: core, level1, l
 - 2026-11-22: v188 published (level1 + sandbox cuts, then the rest): `src/core/scene.js`, `src/core/loop.js` (Sizing, Clock, Loop), `src/level1/trees.js`, `src/characters/molly.js` (Movement details, State vars, Molly's model), `src/characters/comet.js`. Byte-identical; chk, mk_test, comet1/2, modes, rot1, ends1, reg2/3/4, rl1, righ, y2 pass. `mov`, `phys`, `rig1` fail only on missing comparison builds (same before the cuts). Part order: ..., sandbox, trees, molly, ..., 06-script-d (5 lines), comet, loop, 07-script-end (`})();` + `</script>`).
 
 ## In progress
-On `next` (not published), finishing the `unsorted/` leftovers (plan Ricky approved 2026-11-22): 1 Rig Editor -> characters, 2 `04-script-b1c` by section, 3 `01-head` -> ui, 4 small leftovers -> core; stop and check with Ricky before reordering.
-- Done: step 1, characters: `src/characters/rig-editor-panel.html` (the `rig-tpl` template, was `01-head` 462-649), `rig-editor-start.html` (was `02-script-start`), `rig-editor.html` (was `03-script-a`). `01-head` is now two parts (`01-head`, `01-head-b`). Byte-identical; chk, mk_test, rx8, fu3, fu6, righ pass (`rw4`/`rm1` are helpers that need arguments).
-- Done: step 2, `04-script-b1c` by section (gone): lines 1-14 (camera shake, `flashHurt`, `landFall`) appended to `ui/health.js`; `characters/molly-moves.js` (tilt/jump state, Strafe); `level1/props.js` (Warning sign, Toxic patches, Segs); `characters/strafe-streaks.js`; `core/checkpoints.js` (`lightGates`, `buildGate`, the gates incl. Level 2's); `level1/goal.js` (Stone edges, confetti, Bonus Goal, goalpost); `core/spawn.js` (Where she starts, `spawnAt`, `outOfHearts`). Byte-identical; chk, mk_test, ends1, cavejoin, coords1, nopit, reg3, halfheart, modes, rot1, rl1 pass.
-- Done: step 3, ui: `ui/page-head.html` (head, game CSS; was `01-head` 1-267), `ui/page-body.html` (game markup, three.js script tags, font link; 268-461), `ui/path-editor-embed.html` (the PE-BEGIN/END block; `mk_pe_embed.py` still finds it, regenerates identically). Byte-identical; chk, mk_test, peobj, pesave, rl1 pass.
+On `next` (not published). `unsorted/` is gone: every part is in an area folder (2026-11-22, plan Ricky approved; file map in ARCHITECTURE.md). Steps: 1 Rig Editor -> characters; 2 `04-script-b1c` cut by section (hurt/`landFall` appended to `ui/health.js`, Strafe -> characters, props/goal -> level1, checkpoints/spawn -> core); 3 head -> `ui/page-head`, `page-body`, `path-editor-embed`; 4 leftovers: `core/start.html`, `pointer-lock.js`, `end.html`, `characters/molly-update.js`, `level1/cave-roof.js`. All byte-identical; chk, mk_test, rx8, fu3, fu6, righ, ends1, cavejoin, coords1, nopit, reg2/3/4, halfheart, modes, rot1, rl1, peobj, pesave, door1, tunfloor, shaft1, y2, comet1 pass. Waiting on Ricky before reordering parts by area.
 
 ## Decisions
 - Terms: mob / minion / Big Minion / Roost Gazer; character; stat; tile; Barrier; Mud; Crags; every word of a label capitalized.
 - Frozen storage names stay (see GLOSSARY.md). Cut in place first (byte-identical), reorder later.
-- The Rig Editor's own panel (`03-script-a`, about 57 rig mentions) stays for the characters area, not ui.
+- The Rig Editor's own panel and script are in the characters area, not ui.
 
 ## Next steps
-1. Only `unsorted/` leftovers remain (head, script-start, script-a, b1, b1b2, b1c, b2, 06 head, 07 end). Next: `03-script-a` (Rig Editor panel -> characters), `01-head` (CSS/HTML), `04-script-b1c`; then reorder parts by area. `python3 tools/check_deps.py` shows coupling.
+1. Reorder parts by area (ask Ricky first): moving a part changes the game file's order, so it is no longer byte-identical; needs a wide test pass. `python3 tools/check_deps.py` shows coupling.
 2. `menu-wiring.js` also holds pointer lock (`lockPointer`, `relockOnInput`): may belong in core; the State vars in `molly.js` (yaw, pitch, speed, drift) may belong in core. Split later.
 3. `tools/mk_sweep_docs.py` is behind the SWEEP docs; sync or retire it, never regenerate blindly.
 4. Recheck on this build: `fu/nf1.py` (crashes), `fu/wall4.py` (times out), `fu/door4.py`, `fu/minionhit.py` (flaky). `fu/door3.py` and `fu/steep1.py` also need the missing comparison builds.
