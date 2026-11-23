@@ -52,7 +52,7 @@ Every slice has code to read, so this sweep never skips one.
 - Path Editor (`path-editor.html`): `peobj.py`, `pesave.py`, `pecycle.py`, `pegho.py`, `pefuzz.py` (several minutes: run it last).
 - Sandbox and levels (`sbBuild`, footprints, caves, walls): `fu/ends1.py` plus a test of your own for what you touched.
 - Stats and movement details: `fu/fu1.py`, `fu/fu1b.py`.
-- Rig Editor stats, loading and settings: `rx8.py`, `fu/fu2.py`, `fu/fu4.py`; model build, welds and weights: `rw4.py`, `rm1.py`, `fu/fu3.py`; saved model storage: `fu/fu6.py`.
+- Rig Editor stats, loading and settings: `rx8.py`; model build, welds and weights: `rw4.py`, `rm1.py`, `fu/fu3.py`; saved model storage: `fu/fu6.py`.
 - Plus every test in the state file's "Tests added by nights" for the area.
 
 ## For Ricky

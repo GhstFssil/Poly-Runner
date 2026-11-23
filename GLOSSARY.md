@@ -129,7 +129,7 @@ The rows for src, part, build and the game file describe the source split, which
 
 | Term | Meaning | Code / notes |
 |---|---|---|
-| src, part | the source files in `src/`; a part is one file the build joins | `src/manifest.json` |
+| src, part | the source files in `src/`; a part is one file the build joins: a source file as it is, or a data file in `src/data/` (JSON, `.glb`) that the build wraps | `src/manifest.json` |
 | build | join the parts, byte for byte, into the game file | `python3 tools/build.py` |
 | the game file | the generated, committed single HTML file | `checker-run.html` now |
 | area | a group of source files by function (core, level1, level2, sandbox, characters, mobs, ui). One task works in one area. The tests are mapped by area | |

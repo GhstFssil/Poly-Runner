@@ -172,19 +172,6 @@
   var ballIsSphere = false, dashNow = false, dashHold = 0, DASH_RATE = 20, DASH_MAX = 120;
   ballGroup.add(new THREE.Mesh(new THREE.DodecahedronGeometry(BALL_R * 1.14, 0),
     new THREE.MeshBasicMaterial({ color: 0xff3a2a, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide })));
-  // ---- State ----
-  var yaw = 0;                 // 0 = facing -Z
-  function yawAdd(d) { if (!plOn) { yaw += d; return; } yaw = plHu + fromPl(wrapA(toPl(wrapA(yaw - plHu)) + d)); }   // turning the camera by d turns it by d along the surface she is on
-  var pitch = 0.35;
-  var speed = 0;
-  var phase = 0;
-  var turnRate = 0;
-  var cpTime = [], cpBest = 0;   // this run: the clock reading at each checkpoint (cpTime[1..3]) and the furthest she has got
-  var bumpUntil = 0;           // collisions cost speed at most once every quarter second
-  var heading = 0;             // the direction she is actually moving, as an angle like yaw (0 = toward -Z)
-  var RP_DROP = -0.6;   // Runner's Pose: how far her body drops
-  var driftSide = 0, driftBlend = 0, driftHeld = false, driftKick = 0, driftCool = 0;   // Drift: A / D tighten the turn radius by half in that direction (side +1 = left, -1 = right)
-  var DRIFT_TIGHT = 2;                 // turning rate multiplier while drifting (radius x 0.5)
   // ---- Molly's model: a low-poly rigged runner (a .glb embedded in the page) whose clips are driven by what she is doing. ----
   var MOLLY_YAW = Math.PI, mollyOn = false, mollyMix = null, mollyAct = {}, mollyW = {}, mollyT = {}, mollyRunPh = 0, mollyPrevGround = true, mollyMesh = null, mollyV0 = 0;
   var MOLLY_CLIPS = ['Idle', 'Run_Slow', 'Run_Mid', 'Run_Fast', 'Jump', 'Slide', 'Faceplant', 'RunnersPose', 'Drift_L', 'Drift_R'];
