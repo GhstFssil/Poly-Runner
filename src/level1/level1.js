@@ -35,7 +35,6 @@
     pdH = z <= ARC_CZ ? Math.sqrt((x - ARC_CX) * (x - ARC_CX) + (z - ARC_CZ) * (z - ARC_CZ)) - RIM_R : 1e9;
     return Math.min(dP, pdH);
   }
-  var PLATEAU_BARRIER = false;             // the plateau's edges (and their row of short rock spikes) are open now; its east side never had one
   var HILL_MIN = 20, HILL_MAX = 100;
   var PLANE_Y = WALL_HEIGHT - 100, PLANE_LEN = 1500, PLANE_Z0 = -8500, PLANE_Z1 = -6100;   // a flat plane 100 units below the plateau, west of its end
   var CHUNK = 100;                        // the world is built in square tiles this size, made ahead of her and dropped behind her
@@ -125,7 +124,6 @@
   }
   function sbLane(x, z) { return laneAt(L2_X + x - L3_X, z + L2_SBZ); }   // Sandbox, Oceana Crags' ground: the narrow path out of the cave is the real level's own lane, exactly as it is there
   function groundH0(x, z) {
-    if (level === 2 && x > L2_MIN && laneAt(x, z)) return lnH;
     if (level === 3 && SB && SB.terrain === 'level2' && sbLane(x, z)) return lnH;
     var ix = Math.floor(x / GRID), iz = Math.floor(z / GRID), gx = ix * GRID, gz = iz * GRID;
     if (ix !== gcI || iz !== gcJ) {
@@ -149,7 +147,6 @@
   var ggPath = false;   // set by groundGrad: the slope came from a running surface (a lane, deck, slab, platform, banked path, shaft or cave floor), not the open ground
   function groundGrad(x, z) {
     ggPath = true;
-    if (level === 2 && x > L2_MIN && laneAt(x, z)) { ggx = lnGX; ggz = lnGZ; return; }
     if (level === 3 && SB && SB.terrain === 'level2' && sbLane(x, z)) { ggx = lnGX; ggz = lnGZ; return; }
     if (level === 3 && SB && SB.movers.length && sbMoverTop(x, z, sbMovPy(x, z)) > groundH0(x, z)) { ggx = 0; ggz = 0; return; }
     if (level === 3 && SB && SB.terrain === 'level2') { var dpy = sbMovPy(x, z), dk0 = sbDeckTop(x, z, dpy);   // on one of Oceana's path decks: the deck's own slope, from points on it
@@ -376,7 +373,7 @@
   // paved in mud, ending at the cave's other mouth, which opens onto a grassy field. The goalpost stands 100 units out across the field.
   var DR_W = 10, DR_H = 10, DR_UP = 6, DR_S1 = 65, DR_TR = 8, DR_BAND = 25, DR_PIECES = [], DR_LEN = 0, DR_X0 = CH_X + CH_R, DR_Z0 = CH_Z, DR_Y0 = CH_FLOOR + DR_UP;
   var DR_CL1 = 10, DR_CL2 = 180, DR_CL3 = 10, DR_A = Math.PI / 4, DR_CLIMB0 = 0, DR_XE = 0, DR_ZE = 0, DR_TOPX = 0;
-  var FIELD_HW = 60, FIELD_LEN = 560, GOAL_DIST = 500, GOAL_HALF = 20, FIELD_DIP = 1.5;   // the field lies 1.5 below the top of the mud ramp, a sheer step she shoots off at whatever speed she has
+  var FIELD_HW = 60, FIELD_LEN = 560, FIELD_DIP = 1.5;   // the field lies 1.5 below the top of the mud ramp, a sheer step she shoots off at whatever speed she has
   (function () {
     var px = DR_X0, pz = DR_Z0, hx = 1, hz = 0, S = 0;
     function straight(len) { DR_PIECES.push({ t: 0, x0: px, z0: pz, x1: px + hx * len, z1: pz + hz * len, s0: S, len: len }); px += hx * len; pz += hz * len; S += len; }
@@ -401,8 +398,7 @@
     return y2 + DR_Y1;
   }
   function drFloor(s) { return DR_Y0 + drRise(s - DR_CLIMB0); }
-  var FIELD_Y = drFloor(1e9), GOAL_Z = DR_ZE - GOAL_DIST;
-  var doorOpen = false;
+  var FIELD_Y = drFloor(1e9);
   function mudAt(x, z) {                           // on the mud ramp?
     if (x > L3_MIN) return sbMudAt(x, z);
     if (x < DR_XE - DR_W || x > DR_XE + DR_W || z > DR_ZE + DR_CL1 + DR_CL2 + DR_CL3 + 2 || z < DR_ZE - 1) return false;
@@ -429,17 +425,5 @@
     if (inDr && dd < DR_BAND && z > DR_ZE) return drFloor(ds) + DR_H;
     if (d < CAVE_BAND && x >= CAVE_SLAB) return caveFloor(s) + CAVE_H;         // rock either side of the tunnel, as high as its roof
     return null;
-  }
-  function cavePoint(s) { return piecePoint(CAVE_PIECES, s); }
-  function piecePoint(PP, s) {                   // [x, z, heading x, heading z] on a tunnel's centre line
-    for (var i = 0; i < PP.length; i++) {
-      var c = PP[i];
-      if (s <= c.s0 + c.len + 1e-6 || i === PP.length - 1) {
-        var u = Math.max(0, Math.min(c.len, s - c.s0));
-        if (c.t === 0) { var f = u / c.len; return [c.x0 + (c.x1 - c.x0) * f, c.z0 + (c.z1 - c.z0) * f, (c.x1 - c.x0) / c.len, (c.z1 - c.z0) / c.len]; }
-        var a = (c.side > 0 ? c.a0 : c.a1) + c.side * u / c.R;
-        return [c.cx + c.R * Math.cos(a), c.cz + c.R * Math.sin(a), c.side > 0 ? -Math.sin(a) : Math.sin(a), c.side > 0 ? Math.cos(a) : -Math.cos(a)];
-      }
-    }
   }
   var wMud = 0, wL2 = 0;

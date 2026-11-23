@@ -1,7 +1,4 @@
-  // ---- Trees: one per jittered grid cell, in rows running down the valley, so neighbours are 7 to 20 tiles apart ----
-  var T_CS = 18;                 // each 18-unit cell holds exactly one tree, a little off its centre, so the forest is evenly spread
-  var MIN_R = 3;                 // how many cells away a tree can still be too close
-  var MIN_D = 14.8;              // two trees are never closer than this (7.4 tiles)
+  // ---- Trees: the layout's stamped trees ----
   var MAX_TREES = 1400;          // room for the most that can be built around her
   var PLAYER_RADIUS; if (PLAYER_RADIUS === undefined) PLAYER_RADIUS = 0.5;       // how close her centre can get to a trunk or wall (half the collision box's width, from her stats)
   var PLAYER_H; if (PLAYER_H === undefined) PLAYER_H = 3.6;                      // the collision box's height standing (from her stats)
@@ -31,54 +28,10 @@
     treeSets.push(meshes);
   }
   var treeX = [], treeZ = [], treeR = [], treeTop = [];   // trunk colliders for the rows currently built, and the height of each tree's crown (the collider stops there)
-  var TREE_TOP = 22.4;                                      // the crown's tip above the tree's base at scale 1
   var builtAtZ = 1e9, builtAtX = 1e9;
   var tm4 = new THREE.Matrix4(), tq = new THREE.Quaternion(), tpv = new THREE.Vector3(), tsv = new THREE.Vector3();
   var tUp = new THREE.Vector3(0, 1, 0);
-  // Placement is random but never regular. Every cell of the valley floor offers one candidate tree at a random spot with a
-  // random priority; a candidate is planted unless a higher-priority tree that is itself planted sits closer than MIN_D.
-  // Each answer depends only on the cells around it, so the forest is the same wherever and whenever it is rebuilt,
-  // with no rows or columns to follow and no two trees closer than 7.4 tiles.
-  var CP_Z = -END + 50, CP_X = 0;           // the first checkpoint gate: 50 units short of the valley's end wall
-  var CP2_X = -3400, CP2_Z = -7500;     // the second, across the narrow west end of the plateau
-  var candCache = new Map(), plantCache = new Map();
-  function cellKey(cx, cz) { return cz * 4096 + (cx + 2048); }
-  function candidate(cx, cz) {
-    var key = cellKey(cx, cz), c = candCache.get(key);
-    if (c !== undefined) return c;
-    c = null;
-    var rnd = cellRng(cx, cz);
-    var x = (cx + 0.5 + (rnd() - 0.5) * 0.6) * T_CS, z = (cz + 0.5 + (rnd() - 0.5) * 0.6) * T_CS, pri = rnd();
-    var sc = 0.85 + rnd() * 0.55, rot = rnd() * Math.PI * 2;
-    var shade = Math.min(SHADES - 1, Math.floor(rnd() * SHADES)), thin = (((cx * 0.7548776662466927 + cz * 0.5698402909980532) % 1) + 1) % 1;   // a low-discrepancy sequence, so the trees thinned out leave an even pattern
-    var rk = rnd();
-    var rx0 = x - ARC_CX, rz0 = z - ARC_CZ, rho = Math.sqrt(rx0 * rx0 + rz0 * rz0);
-    if (rz0 <= 0 && x < -CH_HALF - 5 && Math.abs(rho - TURN_R) < CH_HALF) {   // in the curve the trees stand out toward the walls and the middle of the track stays clear
-      var uu = (rho - TURN_R) / CH_HALF, au = 0.4 + 0.44 * Math.abs(uu), rho2 = TURN_R + (uu < 0 ? -au : au) * CH_HALF;
-      x = ARC_CX + rx0 / rho * rho2; z = ARC_CZ + rz0 / rho * rho2;
-      if (rk > 0.5) { candCache.set(key, null); return null; }
-    }
-    wallField(x, z);
-    var onPlateau = Math.abs(x - PL_X) < PL_HX + 10 && Math.abs(z - PL_ZC) < PL_HZ + 10;
-    if (wd < -4 && !onPlateau && x * x + z * z >= 100 && !(Math.abs(z - CP_Z) < 40 && Math.abs(x) < 45)) {   // on open ground at least 4 from the rock, off the plateau, and the start stays clear
-      c = { x: x, z: z, pri: pri, sc: sc, rot: rot, shade: shade, y: null, key: key, thin: thin, pin: false };
-    }
-    if (cx === -1 && cz <= -2 && cz % 3 === 0 && z > -END) {   // a tree on the centre line every 54 units, all the way down the valley, so the middle of the track is never bare
-      var px2 = (cx + 1 + 0.5) * 0 + (rnd() - 0.5) * 11, pz2 = (cz + 0.5 + (rnd() - 0.5) * 0.5) * T_CS;
-      wallField(px2, pz2);
-      if (!(Math.abs(pz2 - CP_Z) < 40 && Math.abs(px2) < 45)) c = { x: px2, z: pz2, pri: pri, sc: sc, rot: rot, shade: shade, y: null, key: key, thin: 1, pin: true };
-    }
-    candCache.set(key, c);
-    return c;
-  }
-  function planted(cx, cz) {
-    var key = cellKey(cx, cz), p = plantCache.get(key);
-    if (p !== undefined) return p;
-    var c = candidate(cx, cz);
-    p = !!c;          // one tree per cell and never nearer than 7 units to a neighbour, so there is nothing to compete over
-    plantCache.set(key, p);
-    return p;
-  }
+  var CP2_X = -3400, CP2_Z = -7500;     // where Grass Canyon's old second checkpoint stood, on the plateau's narrow west end: the terrain's mounds keep clear of it
   // Rebuilt whenever she has moved 60 units since the last time, covering everything the fog lets her see plus a margin.
   function updateTrees(px, pz) {
     if (Math.abs(pz - builtAtZ) < 60 && Math.abs(px - builtAtX) < 60) return;

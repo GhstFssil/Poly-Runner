@@ -23,7 +23,7 @@
     return tx;
   })();
   var waterMat = new THREE.MeshBasicMaterial({ map: waterTex, transparent: true, opacity: 0.93, side: THREE.DoubleSide });   // the Sandbox's seas and lakes
-  var flewRamp = false, rampY = 0, drownT = 0, level = 1, styleStacks = 0, styleUntil = 0, curNow = 0, styleTipDone = false;
+  var flewRamp = false, rampY = 0, drownT = 0, level = 1, styleStacks = 0, styleUntil = 0, curNow = 0;
   function styleMult() { return styleStacks > 0 && curNow < styleUntil ? 1 + styleStacks : 1; }    // Segs fill the Power Line this many times as much while a Style Boost lasts
   // Confetti: a burst of coloured scraps that travels with her, falls, and fades
   var CONF_N = 90, confPos = new Float32Array(CONF_N * 3), confCol = new Float32Array(CONF_N * 3), confVel = new Float32Array(CONF_N * 3), confLife = 0;

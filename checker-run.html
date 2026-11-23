@@ -6029,7 +6029,6 @@ requestAnimationFrame(tick);
     pdH = z <= ARC_CZ ? Math.sqrt((x - ARC_CX) * (x - ARC_CX) + (z - ARC_CZ) * (z - ARC_CZ)) - RIM_R : 1e9;
     return Math.min(dP, pdH);
   }
-  var PLATEAU_BARRIER = false;             // the plateau's edges (and their row of short rock spikes) are open now; its east side never had one
   var HILL_MIN = 20, HILL_MAX = 100;
   var PLANE_Y = WALL_HEIGHT - 100, PLANE_LEN = 1500, PLANE_Z0 = -8500, PLANE_Z1 = -6100;   // a flat plane 100 units below the plateau, west of its end
   var CHUNK = 100;                        // the world is built in square tiles this size, made ahead of her and dropped behind her
@@ -6119,7 +6118,6 @@ requestAnimationFrame(tick);
   }
   function sbLane(x, z) { return laneAt(L2_X + x - L3_X, z + L2_SBZ); }   // Sandbox, Oceana Crags' ground: the narrow path out of the cave is the real level's own lane, exactly as it is there
   function groundH0(x, z) {
-    if (level === 2 && x > L2_MIN && laneAt(x, z)) return lnH;
     if (level === 3 && SB && SB.terrain === 'level2' && sbLane(x, z)) return lnH;
     var ix = Math.floor(x / GRID), iz = Math.floor(z / GRID), gx = ix * GRID, gz = iz * GRID;
     if (ix !== gcI || iz !== gcJ) {
@@ -6143,7 +6141,6 @@ requestAnimationFrame(tick);
   var ggPath = false;   // set by groundGrad: the slope came from a running surface (a lane, deck, slab, platform, banked path, shaft or cave floor), not the open ground
   function groundGrad(x, z) {
     ggPath = true;
-    if (level === 2 && x > L2_MIN && laneAt(x, z)) { ggx = lnGX; ggz = lnGZ; return; }
     if (level === 3 && SB && SB.terrain === 'level2' && sbLane(x, z)) { ggx = lnGX; ggz = lnGZ; return; }
     if (level === 3 && SB && SB.movers.length && sbMoverTop(x, z, sbMovPy(x, z)) > groundH0(x, z)) { ggx = 0; ggz = 0; return; }
     if (level === 3 && SB && SB.terrain === 'level2') { var dpy = sbMovPy(x, z), dk0 = sbDeckTop(x, z, dpy);   // on one of Oceana's path decks: the deck's own slope, from points on it
@@ -6370,7 +6367,7 @@ requestAnimationFrame(tick);
   // paved in mud, ending at the cave's other mouth, which opens onto a grassy field. The goalpost stands 100 units out across the field.
   var DR_W = 10, DR_H = 10, DR_UP = 6, DR_S1 = 65, DR_TR = 8, DR_BAND = 25, DR_PIECES = [], DR_LEN = 0, DR_X0 = CH_X + CH_R, DR_Z0 = CH_Z, DR_Y0 = CH_FLOOR + DR_UP;
   var DR_CL1 = 10, DR_CL2 = 180, DR_CL3 = 10, DR_A = Math.PI / 4, DR_CLIMB0 = 0, DR_XE = 0, DR_ZE = 0, DR_TOPX = 0;
-  var FIELD_HW = 60, FIELD_LEN = 560, GOAL_DIST = 500, GOAL_HALF = 20, FIELD_DIP = 1.5;   // the field lies 1.5 below the top of the mud ramp, a sheer step she shoots off at whatever speed she has
+  var FIELD_HW = 60, FIELD_LEN = 560, FIELD_DIP = 1.5;   // the field lies 1.5 below the top of the mud ramp, a sheer step she shoots off at whatever speed she has
   (function () {
     var px = DR_X0, pz = DR_Z0, hx = 1, hz = 0, S = 0;
     function straight(len) { DR_PIECES.push({ t: 0, x0: px, z0: pz, x1: px + hx * len, z1: pz + hz * len, s0: S, len: len }); px += hx * len; pz += hz * len; S += len; }
@@ -6395,8 +6392,7 @@ requestAnimationFrame(tick);
     return y2 + DR_Y1;
   }
   function drFloor(s) { return DR_Y0 + drRise(s - DR_CLIMB0); }
-  var FIELD_Y = drFloor(1e9), GOAL_Z = DR_ZE - GOAL_DIST;
-  var doorOpen = false;
+  var FIELD_Y = drFloor(1e9);
   function mudAt(x, z) {                           // on the mud ramp?
     if (x > L3_MIN) return sbMudAt(x, z);
     if (x < DR_XE - DR_W || x > DR_XE + DR_W || z > DR_ZE + DR_CL1 + DR_CL2 + DR_CL3 + 2 || z < DR_ZE - 1) return false;
@@ -6423,18 +6419,6 @@ requestAnimationFrame(tick);
     if (inDr && dd < DR_BAND && z > DR_ZE) return drFloor(ds) + DR_H;
     if (d < CAVE_BAND && x >= CAVE_SLAB) return caveFloor(s) + CAVE_H;         // rock either side of the tunnel, as high as its roof
     return null;
-  }
-  function cavePoint(s) { return piecePoint(CAVE_PIECES, s); }
-  function piecePoint(PP, s) {                   // [x, z, heading x, heading z] on a tunnel's centre line
-    for (var i = 0; i < PP.length; i++) {
-      var c = PP[i];
-      if (s <= c.s0 + c.len + 1e-6 || i === PP.length - 1) {
-        var u = Math.max(0, Math.min(c.len, s - c.s0));
-        if (c.t === 0) { var f = u / c.len; return [c.x0 + (c.x1 - c.x0) * f, c.z0 + (c.z1 - c.z0) * f, (c.x1 - c.x0) / c.len, (c.z1 - c.z0) / c.len]; }
-        var a = (c.side > 0 ? c.a0 : c.a1) + c.side * u / c.R;
-        return [c.cx + c.R * Math.cos(a), c.cz + c.R * Math.sin(a), c.side > 0 ? -Math.sin(a) : Math.sin(a), c.side > 0 ? Math.cos(a) : -Math.cos(a)];
-      }
-    }
   }
   var wMud = 0, wL2 = 0;
   // ---- Level 2, Oceana Crags: a flat, light brown stone runway 20 wide running -Z from a start pad, with deep water 10 below its edge. It lies
@@ -6496,9 +6480,6 @@ requestAnimationFrame(tick);
   })();
   // The Tunnel: a block of rock across the runway, 100 west of the range's centre line, with an octagonal opening 30 across (flat top, 8.3 per side) whose top is only 2 above
   // the runway. Only the top 2 of the octagon clear the floor, so a standing Molly (3.6 tall) meets a wall, and a sliding one (1 tall) passes under it.
-  var GATE_X0 = MT_P0X - 90, GATE_Z = L2_PIECES[L2_LAND2_I].z0, GATE_L = 90, GATE_W = 60, GATE_TOP = L2_Y + 85, GATE_OCT = 30 / (1 + Math.SQRT2), gateIn = false;
-  var OCV = L2_PIECES[L2_CAVE_I], OCV_W = 60, OCV_OA = 15, OCV_OC = GATE_OCT / Math.SQRT2, OCV_TOP = L2_CAVE_Y + 85;   // the cave's octagon: 30 across, flat top and bottom, its floor level with the runway inside
-  function ocvW(h) { return h < 0 || h > 30 ? -1 : h < OCV_OC ? OCV_OA - OCV_OC + h : h <= 30 - OCV_OC ? OCV_OA : OCV_OA - (h - (30 - OCV_OC)); }   // half width of the opening h above its floor
   // Sideways distance to the range's centre line (the shore starts at MT_HW); sets MT_S, how far along it. Past either end the shore starts at once.
   function mtDist(x, z) {
     var best = 1e9, d, t = z - MT_P0Z, zc = MT_ZA + MT_R, xe = MT_P0X - MT_R;
@@ -8060,7 +8041,7 @@ requestAnimationFrame(tick);
   }
   function spawnStart(msg) {                                   // a layout's own Player start if it has one, else the beginning of the path
     var sp0 = level === 3 && SB && SB.startPt;
-    if (sp0) { spawnAt(L3_X + sp0.x, sp0.z, 0, msg || '', -sp0.th); if (sp0.T !== undefined) { player.position.y = sp0.T; fallTop = sp0.T; grounded = false; } } else spawnAt(level === 3 ? L3_X : level === 2 ? L2_X : 0, 0, 0, msg || '');
+    if (sp0) { spawnAt(L3_X + sp0.x, sp0.z, 0, msg || '', -sp0.th); if (sp0.T !== undefined) { player.position.y = sp0.T; fallTop = sp0.T; grounded = false; } } else spawnAt(level === 3 ? L3_X : 0, 0, 0, msg || '');
   }
   var wSt = 0, wPl = 0;    // set by worldH: 1 if this spot is bare rock, 1 if it is plateau grass
   // Full height of the world at a point on the mesh grid: rolling ground, ledges, floor lift, rock walls, plateau hills and
@@ -8115,7 +8096,6 @@ requestAnimationFrame(tick);
     }
     return y;
   }
-  function worldH(x, z) { var L = ledgeCell(Math.floor(x / GRID), Math.floor(z / GRID)); return cornerY(x, z, L, ledCA, ledCI); }
   function cellHash(a, b) {
     var h = Math.imul(a | 0, 374761393) ^ Math.imul(b | 0, 668265263);
     h = Math.imul(h ^ (h >>> 13), 1274126177);
@@ -8360,10 +8340,7 @@ requestAnimationFrame(tick);
   }
   updateChunks(0, 0, 99);
 
-  // ---- Trees: one per jittered grid cell, in rows running down the valley, so neighbours are 7 to 20 tiles apart ----
-  var T_CS = 18;                 // each 18-unit cell holds exactly one tree, a little off its centre, so the forest is evenly spread
-  var MIN_R = 3;                 // how many cells away a tree can still be too close
-  var MIN_D = 14.8;              // two trees are never closer than this (7.4 tiles)
+  // ---- Trees: the layout's stamped trees ----
   var MAX_TREES = 1400;          // room for the most that can be built around her
   var PLAYER_RADIUS; if (PLAYER_RADIUS === undefined) PLAYER_RADIUS = 0.5;       // how close her centre can get to a trunk or wall (half the collision box's width, from her stats)
   var PLAYER_H; if (PLAYER_H === undefined) PLAYER_H = 3.6;                      // the collision box's height standing (from her stats)
@@ -8393,54 +8370,10 @@ requestAnimationFrame(tick);
     treeSets.push(meshes);
   }
   var treeX = [], treeZ = [], treeR = [], treeTop = [];   // trunk colliders for the rows currently built, and the height of each tree's crown (the collider stops there)
-  var TREE_TOP = 22.4;                                      // the crown's tip above the tree's base at scale 1
   var builtAtZ = 1e9, builtAtX = 1e9;
   var tm4 = new THREE.Matrix4(), tq = new THREE.Quaternion(), tpv = new THREE.Vector3(), tsv = new THREE.Vector3();
   var tUp = new THREE.Vector3(0, 1, 0);
-  // Placement is random but never regular. Every cell of the valley floor offers one candidate tree at a random spot with a
-  // random priority; a candidate is planted unless a higher-priority tree that is itself planted sits closer than MIN_D.
-  // Each answer depends only on the cells around it, so the forest is the same wherever and whenever it is rebuilt,
-  // with no rows or columns to follow and no two trees closer than 7.4 tiles.
-  var CP_Z = -END + 50, CP_X = 0;           // the first checkpoint gate: 50 units short of the valley's end wall
-  var CP2_X = -3400, CP2_Z = -7500;     // the second, across the narrow west end of the plateau
-  var candCache = new Map(), plantCache = new Map();
-  function cellKey(cx, cz) { return cz * 4096 + (cx + 2048); }
-  function candidate(cx, cz) {
-    var key = cellKey(cx, cz), c = candCache.get(key);
-    if (c !== undefined) return c;
-    c = null;
-    var rnd = cellRng(cx, cz);
-    var x = (cx + 0.5 + (rnd() - 0.5) * 0.6) * T_CS, z = (cz + 0.5 + (rnd() - 0.5) * 0.6) * T_CS, pri = rnd();
-    var sc = 0.85 + rnd() * 0.55, rot = rnd() * Math.PI * 2;
-    var shade = Math.min(SHADES - 1, Math.floor(rnd() * SHADES)), thin = (((cx * 0.7548776662466927 + cz * 0.5698402909980532) % 1) + 1) % 1;   // a low-discrepancy sequence, so the trees thinned out leave an even pattern
-    var rk = rnd();
-    var rx0 = x - ARC_CX, rz0 = z - ARC_CZ, rho = Math.sqrt(rx0 * rx0 + rz0 * rz0);
-    if (rz0 <= 0 && x < -CH_HALF - 5 && Math.abs(rho - TURN_R) < CH_HALF) {   // in the curve the trees stand out toward the walls and the middle of the track stays clear
-      var uu = (rho - TURN_R) / CH_HALF, au = 0.4 + 0.44 * Math.abs(uu), rho2 = TURN_R + (uu < 0 ? -au : au) * CH_HALF;
-      x = ARC_CX + rx0 / rho * rho2; z = ARC_CZ + rz0 / rho * rho2;
-      if (rk > 0.5) { candCache.set(key, null); return null; }
-    }
-    wallField(x, z);
-    var onPlateau = Math.abs(x - PL_X) < PL_HX + 10 && Math.abs(z - PL_ZC) < PL_HZ + 10;
-    if (wd < -4 && !onPlateau && x * x + z * z >= 100 && !(Math.abs(z - CP_Z) < 40 && Math.abs(x) < 45)) {   // on open ground at least 4 from the rock, off the plateau, and the start stays clear
-      c = { x: x, z: z, pri: pri, sc: sc, rot: rot, shade: shade, y: null, key: key, thin: thin, pin: false };
-    }
-    if (cx === -1 && cz <= -2 && cz % 3 === 0 && z > -END) {   // a tree on the centre line every 54 units, all the way down the valley, so the middle of the track is never bare
-      var px2 = (cx + 1 + 0.5) * 0 + (rnd() - 0.5) * 11, pz2 = (cz + 0.5 + (rnd() - 0.5) * 0.5) * T_CS;
-      wallField(px2, pz2);
-      if (!(Math.abs(pz2 - CP_Z) < 40 && Math.abs(px2) < 45)) c = { x: px2, z: pz2, pri: pri, sc: sc, rot: rot, shade: shade, y: null, key: key, thin: 1, pin: true };
-    }
-    candCache.set(key, c);
-    return c;
-  }
-  function planted(cx, cz) {
-    var key = cellKey(cx, cz), p = plantCache.get(key);
-    if (p !== undefined) return p;
-    var c = candidate(cx, cz);
-    p = !!c;          // one tree per cell and never nearer than 7 units to a neighbour, so there is nothing to compete over
-    plantCache.set(key, p);
-    return p;
-  }
+  var CP2_X = -3400, CP2_Z = -7500;     // where Grass Canyon's old second checkpoint stood, on the plateau's narrow west end: the terrain's mounds keep clear of it
   // Rebuilt whenever she has moved 60 units since the last time, covering everything the fog lets her see plus a margin.
   function updateTrees(px, pz) {
     if (Math.abs(pz - builtAtZ) < 60 && Math.abs(px - builtAtX) < 60) return;
@@ -9773,9 +9706,8 @@ var CHANGELOG = [
   var OFFICIAL_L2 = {"version":2,"width":20,"terrain":"level2","pieces":[{"len":50,"dy":0,"ang":0,"r":640,"sx":0,"sz":20,"fl":20},{"ang":-45,"r":800,"dy":0,"len":628.3185,"fl":20},{"ang":135,"r":800,"dy":0,"len":1884.9556,"fl":20},{"len":600,"dy":0,"ang":0,"r":640,"fl":20},{"len":619.97,"dy":0,"ang":0,"r":640,"sx":1255,"sz":-1961.3708279272596,"ov":1},{"ang":80,"r":149.99999406896177,"dy":0.66,"len":209.4395,"ov":1},{"len":98.5,"dy":44.4,"ang":0,"r":640,"ov":1},{"len":240,"dy":-30,"ang":0,"r":640,"sx":2100,"sz":-1400,"ov":1},{"ang":39.241,"r":300,"dy":0,"len":205.4654,"ov":1},{"len":1633.9,"dy":0,"ang":0,"r":640,"ov":1},{"ang":118,"r":640.0000642039101,"dy":44.94,"len":1318.0728,"sm":1,"smL":100,"ov":1},{"ang":123.059,"r":640,"dy":0,"len":1374.5822,"fl":10},{"len":677,"dy":0,"ang":0,"r":640,"ov":1,"fl":10}],"extraPaths":[{"x":2050,"z":-530,"heading":190,"rise":35,"layer":1,"pieces":[{"len":150,"ang":0,"r":286.4788975654116,"dy":0,"ov":1,"fl":10,"roll":0},{"len":150,"ang":0,"r":286.4788975654116,"dy":-30,"roll":20,"ov":1},{"len":335.1032,"ang":30,"r":639.9999687109444,"dy":0,"roll":20,"ov":1},{"len":75,"ang":0,"r":640,"dy":0,"ov":1},{"len":75,"ang":0,"r":143.2394487827058,"dy":0,"roll":-20,"ov":1},{"len":335.1032,"ang":-30,"r":640,"dy":0,"roll":-20,"ov":1},{"len":75,"ang":0,"r":640,"dy":0,"ov":1},{"len":100,"ang":0,"r":640,"dy":100,"ov":1,"sm":1,"smL":20,"fl":10},{"len":200,"ang":0,"r":640,"dy":0,"ov":1,"sm":1,"smL":20,"fl":10},{"len":100,"ang":0,"r":640,"dy":0,"sh":130,"roll":90,"fl":10},{"len":251.3274,"ang":90,"r":160,"dy":-30,"roll":90,"w":40,"b0":90,"fl":10},{"len":251.3274,"ang":90,"r":160,"dy":-30,"w":20,"roll":90,"fl":10},{"len":100,"ang":0,"r":640,"dy":0,"b0":90,"fl":10},{"len":200,"ang":0,"r":640,"dy":0,"ov":1,"fl":10},{"len":200,"ang":0,"r":640,"dy":0,"sh":270,"sy":50,"ov":1,"fl":10},{"disc":1,"rad":100,"cs":0,"bk":0,"len":200,"ang":0,"r":640,"dy":0,"ov":1,"fl":10},{"len":200,"ang":0,"r":640,"dy":-45,"ov":1,"sm":1,"smL":20,"fl":10},{"len":1200,"ang":0,"r":640,"dy":0,"ov":1}]}],"layers":[{"id":2,"name":"Layer 2","visible":true,"locked":false},{"id":1,"name":"Layer 1","visible":true,"locked":false}],"motion":{"clock":"the level's own clock, never time since a platform loaded","offset":"travel / 2 * sin(2 * pi * (T + phase) / period)"},"objects":[{"type":"ramp","id":1,"s":2639.3,"u":0,"length":45,"width":20,"slope":20,"boost":15},{"type":"ramp","id":3,"s":3139.3,"u":-0.2,"length":45,"width":20,"slope":20,"boost":15},{"type":"ramp","id":5,"s":4067.5,"u":0,"length":45,"width":20,"slope":0,"boost":20},{"type":"checkpoint","id":8,"s":4103.2,"u":0.2,"width":20,"number":1},{"type":"segchain","id":9,"s":2663.3,"u":-0.6,"yAbs":20,"big":false,"arc":15,"length":220,"spacing":11,"count":21},{"type":"segchain","id":10,"s":8955.3,"u":0,"big":true,"length":400,"spacing":100,"count":5},{"type":"minion","id":11,"s":180,"u":0},{"type":"minion","id":12,"s":610,"u":4},{"type":"minion","id":13,"s":610,"u":-4},{"type":"minion","id":14,"s":860,"u":-3},{"type":"minion","id":15,"s":1060,"u":0},{"type":"minion","id":16,"s":1335,"u":4},{"type":"minion","id":17,"s":1610,"u":3.5},{"type":"minion","id":18,"s":1885,"u":-4},{"type":"minion","id":19,"s":2160,"u":-3.5},{"type":"tip","id":21,"s":2239.1,"u":-1.9,"shape":"circle","radius":40,"text":"Jump at the end of a ramp for a Style Boost!"},{"type":"ledge","id":22,"heightMode":"independent","x":1702.1,"z":-1920.9,"length":80,"heading":0,"bend":0,"thickness":30,"height":50,"ends":"square"},{"type":"cave","id":23,"s":3587.3,"u":-0.1,"shape":"rect","width":15,"height":2,"roll":0,"angle":0,"depth":60,"curvature":0,"slope":0},{"type":"tip","id":24,"s":3323.3,"u":0,"shape":"circle","radius":40,"text":"Use a Slide to get under low openings!"},{"type":"sign","id":25,"s":3367.3,"u":-6},{"type":"ledge","id":27,"x":2040.8,"z":-1737.2,"length":340,"heading":170,"bend":0,"thickness":30,"height":-100,"ends":"square"},{"type":"tip","id":28,"s":8903.3,"u":-1.2,"shape":"circle","radius":40,"text":"Taking out a mob fills some of your Power Line! Use that to maintain Barrier and avoid getting hurt up ahead!"},{"type":"sign","id":29,"s":9512.2,"u":5},{"type":"tip","id":30,"s":4167.2,"u":-0.4,"shape":"circle","radius":40,"text":"Doctor Rektangulik has poisoned the ground up ahead! Don't step on the dark patches!"},{"type":"ledge","id":31,"heightMode":"independent","x":1787.8,"z":-829.1,"length":200,"heading":-75,"bend":0,"thickness":40,"height":10,"ends":"round"},{"type":"ledge","id":32,"x":1595.4,"z":-554.2,"length":120,"heading":120,"bend":90,"thickness":4,"height":60,"ends":"round"},{"type":"ledge","id":33,"heightMode":"independent","x":1486.7,"z":-420.6,"length":400,"heading":0,"bend":60,"thickness":30,"height":7,"ends":"round"},{"type":"ledge","id":34,"x":1556.8,"z":-1026.8,"length":320,"heading":60,"bend":30,"thickness":90,"height":6,"ends":"square"},{"type":"ledge","id":35,"x":1692.2,"z":-1076.6,"length":300,"heading":0,"bend":0,"thickness":4,"height":7,"ends":"round"},{"type":"ledge","id":36,"heightMode":"independent","x":1491.6,"z":-1206.2,"length":300,"heading":0,"bend":360,"thickness":50,"height":6,"ends":"round"},{"type":"ledge","id":37,"x":1712.5,"z":-569.7,"length":200,"heading":0,"bend":-30,"thickness":10,"height":3,"ends":"round"},{"type":"toxic","id":38,"x":2019.5,"z":-797.2,"rot":209.2,"noAttach":true,"width":12,"length":12},{"type":"toxic","id":39,"x":1966.4,"z":-722.7,"rot":209.2,"noAttach":true,"width":12,"length":12},{"type":"toxic","id":42,"x":1673.5,"z":-210.6,"rot":209.2,"noAttach":true,"width":2,"length":1300},{"type":"toxic","id":43,"x":1922.7,"z":-615.9,"rot":209.2,"noAttach":true,"width":4,"length":12},{"type":"toxic","id":44,"x":1644.8,"z":-115.7,"rot":209.2,"noAttach":true,"width":2,"length":1400},{"type":"toxic","id":45,"x":1915.4,"z":-606.4,"rot":209.2,"noAttach":true,"width":8,"length":12},{"type":"toxic","id":46,"x":1908,"z":-596.9,"rot":209.2,"noAttach":true,"width":12,"length":12},{"type":"toxic","id":47,"x":1891,"z":-571.1,"rot":209.2,"noAttach":true,"width":16,"length":50},{"type":"toxic","id":48,"x":1837.1,"z":-498.4,"rot":209.2,"noAttach":true,"width":4,"length":50},{"type":"toxic","id":49,"x":1858.2,"z":-503.6,"rot":209.2,"noAttach":true,"width":8,"length":100},{"type":"toxic","id":50,"x":1804.1,"z":-414.3,"rot":209.2,"noAttach":true,"width":8,"length":100},{"type":"toxic","id":51,"x":1732.9,"z":-307.3,"rot":209.2,"noAttach":true,"width":12,"length":100},{"type":"toxic","id":52,"x":1670.2,"z":-169.4,"rot":209.2,"noAttach":true,"width":8,"length":100},{"type":"toxic","id":53,"x":1658,"z":-175.7,"rot":209.2,"noAttach":true,"width":8,"length":100},{"type":"toxic","id":54,"x":1593.7,"z":-56.3,"rot":209.2,"noAttach":true,"width":12,"length":100},{"type":"toxic","id":55,"layer":1,"x":1539.1,"z":66.1,"rot":209.2,"noAttach":true,"width":6,"length":100},{"type":"toxic","id":56,"layer":1,"x":1467.2,"z":174.5,"rot":209.2,"noAttach":true,"width":14,"length":100},{"type":"toxic","id":57,"layer":1,"x":1401.2,"z":311.6,"rot":209.2,"noAttach":true,"width":8,"length":100},{"type":"toxic","id":58,"layer":1,"x":1390.4,"z":302.3,"rot":209.2,"noAttach":true,"width":8,"length":200},{"type":"ledge","id":59,"length":200,"bend":60,"thickness":10,"height":8,"ends":"round","after":37,"turn":0},{"type":"spawner","id":60,"layer":1,"x":1653.6,"z":-653.8,"noAttach":true,"radius":100,"every":3,"max":6},{"type":"spawner","id":61,"layer":1,"x":1769.6,"z":-943.3,"noAttach":true,"radius":40,"every":3,"max":6},{"type":"spawner","id":62,"layer":1,"x":1582.9,"z":-935.1,"noAttach":true,"radius":100,"every":3,"max":6},{"type":"spawner","id":63,"layer":1,"x":1674.1,"z":-1396.8,"noAttach":true,"radius":100,"every":3,"max":6},{"type":"bigminion","id":64,"x":1754.3,"z":-1215,"noAttach":true,"trapped":false,"idle":true},{"type":"cave","id":65,"layer":1,"x":1754.3,"z":-1215,"rot":130,"noAttach":true,"shape":"rect","width":5,"height":5,"roll":0,"angle":90,"depth":15,"curvature":0,"slope":0},{"type":"cave","id":66,"layer":1,"x":1754.3,"z":-1215,"rot":130,"yAbs":5.48,"noAttach":true,"shape":"rect","width":5,"height":5,"roll":0,"angle":20,"depth":20,"curvature":0,"slope":0},{"type":"cave","id":67,"layer":1,"noAttach":true,"shape":"rect","width":5,"height":5,"roll":0,"angle":0,"depth":700,"curvature":50,"slope":0,"angleSet":true,"after":66,"turn":0},{"type":"cave","id":68,"layer":1,"noAttach":true,"shape":"rect","width":5,"height":5,"roll":0,"angle":-35,"depth":150,"curvature":20,"slope":0,"angleSet":true,"after":67,"turn":0},{"type":"ledge","id":70,"heightMode":"independent","x":1533.8,"z":740.4,"length":80,"heading":100,"bend":0,"thickness":100,"height":150,"ends":"square"},{"type":"cave","id":71,"x":1584.8,"z":690.9,"rot":190,"yAbs":105,"noAttach":true,"shape":"rect","width":15,"height":2,"roll":0,"angle":0,"depth":150,"curvature":0,"slope":0},{"type":"sign","id":72,"x":1548.7,"z":854.2,"rot":250,"noAttach":true},{"type":"checkpoint","id":73,"x":2038.4,"z":-464.1,"rot":190,"noAttach":true,"width":20,"number":2},{"type":"ledge","id":75,"heightMode":"independent","x":996.7,"z":976.7,"length":315,"heading":180,"bend":180,"thickness":20,"height":50,"ends":"square"},{"type":"ledge","id":76,"heightMode":"independent","x":795.8,"z":956.8,"length":315,"heading":0,"bend":180,"thickness":20,"height":50,"ends":"square"},{"type":"door","id":77,"x":795.8,"z":966.8,"rot":270,"noAttach":true,"width":22,"height":30,"mode":"closed","open":3,"closed":3,"phase":0,"links":[80],"after":{"mode":"open"}},{"type":"door","id":78,"x":996.4,"z":966.7,"rot":270,"noAttach":true,"width":22,"height":30,"mode":"open","open":3,"closed":3,"phase":0,"links":[79],"after":{"mode":"closed"}},{"type":"plate","id":79,"x":898.3,"z":966.4,"rot":270,"noAttach":true,"shape":"circle","radius":90,"look":"none"},{"type":"bigminion","id":80,"x":816.5,"z":966.7,"rot":270,"noAttach":true,"trapped":false},{"type":"spawner","id":81,"x":845.1,"z":913.5,"rot":270,"noAttach":true,"radius":20,"every":3,"max":6},{"type":"spawner","id":82,"x":845.4,"z":1018.9,"rot":270,"noAttach":true,"radius":20,"every":3,"max":6},{"type":"tip","id":83,"x":1146.5,"z":966.1,"rot":270,"noAttach":true,"shape":"circle","radius":40,"text":"There's a serious fight up ahead. A hit from a Big Minion is strong enough to weaken the Barrier. Use Dodecadash to take it out before that happens!"},{"type":"tip","id":84,"x":1559,"z":846.9,"rot":190,"noAttach":true,"shape":"circle","radius":40,"text":"The path is extremely dangerous here. It's going to take major speed to get across it. Hold S while in Barrier to charge up Dodecadash, then release when the gauge under the speedometer is full for a huge takeoff!"},{"type":"ledge","id":86,"heightMode":"independent","layer":1,"x":809.6,"z":1027.3,"length":40,"heading":331.5,"bend":20,"thickness":20,"height":80,"ends":"round"},{"type":"goal","id":87,"x":-30.7,"z":967,"rot":270,"noAttach":true,"kind":"regular","style":"banner","width":27},{"type":"goal","id":88,"x":386.6,"z":853.3,"rot":270,"noAttach":true,"kind":"bonus","style":"ring","width":10},{"type":"segchain","id":89,"s":100316,"u":0.2,"big":true,"length":800,"spacing":85,"count":10}]};   // Oceana Crags, Act 1: the official layout built in the Path Editor
   // ---- Where she starts: the start meadow or the checkpoint ----
   var cleared = false, clearEl = document.getElementById('clear'), rpHold = 0, rpReady = false, rpFlash = 0, rpGlowNow = 0, rpBlend = 0, mudWas = false;
-  var hintEl = document.getElementById('hint'), hintDone = false, signDone = false, jumpDone = false, endDone = false, segTipDone = false, readyDone = false, chamberDone = false, mudTipDone = false, hintUntil = 0, hintPrevZ = 0, hintPrevX = 0;
-  var hintStart = false;
-  function newRun() { if (level !== 3) TIME_LIMIT = 300; styleTipDone = false; toxUntil = 0; cpTime = []; cpBest = 0; hintDone = false; signDone = false; jumpDone = false; endDone = false; segTipDone = false; readyDone = false; chamberDone = false; mudTipDone = false; hintEl.hidden = true; hintStart = true; }
+  var hintEl = document.getElementById('hint'), hintUntil = 0;
+  function newRun() { if (level !== 3) TIME_LIMIT = 300; toxUntil = 0; cpTime = []; cpBest = 0; hintEl.hidden = true; }
   var hintFull = '', hintTyped = 0, HINT_CPS = 50;
   function showHint(txt, ms, now, force) {               // the levels have no built-in tips now (only tips placed in the Path Editor show: force); a tip types itself into the box; one that arrives while another is up types in below it, and the two durations add
     if (!force) return;
@@ -9876,7 +9808,7 @@ var CHANGELOG = [
     return tx;
   })();
   var waterMat = new THREE.MeshBasicMaterial({ map: waterTex, transparent: true, opacity: 0.93, side: THREE.DoubleSide });   // the Sandbox's seas and lakes
-  var flewRamp = false, rampY = 0, drownT = 0, level = 1, styleStacks = 0, styleUntil = 0, curNow = 0, styleTipDone = false;
+  var flewRamp = false, rampY = 0, drownT = 0, level = 1, styleStacks = 0, styleUntil = 0, curNow = 0;
   function styleMult() { return styleStacks > 0 && curNow < styleUntil ? 1 + styleStacks : 1; }    // Segs fill the Power Line this many times as much while a Style Boost lasts
   // Confetti: a burst of coloured scraps that travels with her, falls, and fades
   var CONF_N = 90, confPos = new Float32Array(CONF_N * 3), confCol = new Float32Array(CONF_N * 3), confVel = new Float32Array(CONF_N * 3), confLife = 0;
@@ -10485,7 +10417,7 @@ function showScreen(name) {                                // the menu shows one
   var showCoords = false, coordsEl = document.getElementById('coords'), dvCoordsEl = document.getElementById('dvcoords');
   function updateCoords() {
     if (!showCoords) return;
-    var p = player.position, t = 'X ' + (p.x - (level === 3 ? L3_X : level === 2 ? L2_X : 0)).toFixed(1) + '   Y ' + (p.y - (level === 3 && SB && SB.y0 ? SB.y0 : 0)).toFixed(1) + '   Z ' + p.z.toFixed(1);
+    var p = player.position, t = 'X ' + (p.x - (level === 3 ? L3_X : 0)).toFixed(1) + '   Y ' + (p.y - (level === 3 && SB && SB.y0 ? SB.y0 : 0)).toFixed(1) + '   Z ' + p.z.toFixed(1);
     coordsEl.textContent = t; dvCoordsEl.textContent = t;
   }
   on('dvcoordsBtn', function () {

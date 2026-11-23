@@ -1390,7 +1390,7 @@
   }
   function spawnStart(msg) {                                   // a layout's own Player start if it has one, else the beginning of the path
     var sp0 = level === 3 && SB && SB.startPt;
-    if (sp0) { spawnAt(L3_X + sp0.x, sp0.z, 0, msg || '', -sp0.th); if (sp0.T !== undefined) { player.position.y = sp0.T; fallTop = sp0.T; grounded = false; } } else spawnAt(level === 3 ? L3_X : level === 2 ? L2_X : 0, 0, 0, msg || '');
+    if (sp0) { spawnAt(L3_X + sp0.x, sp0.z, 0, msg || '', -sp0.th); if (sp0.T !== undefined) { player.position.y = sp0.T; fallTop = sp0.T; grounded = false; } } else spawnAt(level === 3 ? L3_X : 0, 0, 0, msg || '');
   }
   var wSt = 0, wPl = 0;    // set by worldH: 1 if this spot is bare rock, 1 if it is plateau grass
   // Full height of the world at a point on the mesh grid: rolling ground, ledges, floor lift, rock walls, plateau hills and
@@ -1445,7 +1445,6 @@
     }
     return y;
   }
-  function worldH(x, z) { var L = ledgeCell(Math.floor(x / GRID), Math.floor(z / GRID)); return cornerY(x, z, L, ledCA, ledCI); }
   function cellHash(a, b) {
     var h = Math.imul(a | 0, 374761393) ^ Math.imul(b | 0, 668265263);
     h = Math.imul(h ^ (h >>> 13), 1274126177);

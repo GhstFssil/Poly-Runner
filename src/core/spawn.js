@@ -1,8 +1,7 @@
   // ---- Where she starts: the start meadow or the checkpoint ----
   var cleared = false, clearEl = document.getElementById('clear'), rpHold = 0, rpReady = false, rpFlash = 0, rpGlowNow = 0, rpBlend = 0, mudWas = false;
-  var hintEl = document.getElementById('hint'), hintDone = false, signDone = false, jumpDone = false, endDone = false, segTipDone = false, readyDone = false, chamberDone = false, mudTipDone = false, hintUntil = 0, hintPrevZ = 0, hintPrevX = 0;
-  var hintStart = false;
-  function newRun() { if (level !== 3) TIME_LIMIT = 300; styleTipDone = false; toxUntil = 0; cpTime = []; cpBest = 0; hintDone = false; signDone = false; jumpDone = false; endDone = false; segTipDone = false; readyDone = false; chamberDone = false; mudTipDone = false; hintEl.hidden = true; hintStart = true; }
+  var hintEl = document.getElementById('hint'), hintUntil = 0;
+  function newRun() { if (level !== 3) TIME_LIMIT = 300; toxUntil = 0; cpTime = []; cpBest = 0; hintEl.hidden = true; }
   var hintFull = '', hintTyped = 0, HINT_CPS = 50;
   function showHint(txt, ms, now, force) {               // the levels have no built-in tips now (only tips placed in the Path Editor show: force); a tip types itself into the box; one that arrives while another is up types in below it, and the two durations add
     if (!force) return;

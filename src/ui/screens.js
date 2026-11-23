@@ -13,7 +13,7 @@
   var showCoords = false, coordsEl = document.getElementById('coords'), dvCoordsEl = document.getElementById('dvcoords');
   function updateCoords() {
     if (!showCoords) return;
-    var p = player.position, t = 'X ' + (p.x - (level === 3 ? L3_X : level === 2 ? L2_X : 0)).toFixed(1) + '   Y ' + (p.y - (level === 3 && SB && SB.y0 ? SB.y0 : 0)).toFixed(1) + '   Z ' + p.z.toFixed(1);
+    var p = player.position, t = 'X ' + (p.x - (level === 3 ? L3_X : 0)).toFixed(1) + '   Y ' + (p.y - (level === 3 && SB && SB.y0 ? SB.y0 : 0)).toFixed(1) + '   Z ' + p.z.toFixed(1);
     coordsEl.textContent = t; dvCoordsEl.textContent = t;
   }
   on('dvcoordsBtn', function () {
