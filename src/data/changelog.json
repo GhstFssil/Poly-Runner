@@ -1,0 +1,771 @@
+[
+  {
+    "v": "v189",
+    "d": "Nov 22, 2026",
+    "t": "Behind the scenes",
+    "g": [
+      [
+        "Under the hood",
+        [
+          "Every part of the game's source now has its own file, sorted by what it does, and the files are grouped together wherever the game allows. Nothing in the game changes."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v188",
+    "d": "Nov 22, 2026",
+    "t": "Behind the scenes",
+    "g": [
+      [
+        "Under the hood",
+        [
+          "More of the game's source has its own file (Level 1, the Sandbox, Molly, Comet, and the game loop). Nothing in the game changes."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v187",
+    "d": "Nov 22, 2026",
+    "t": "Behind the scenes",
+    "g": [
+      [
+        "Under the hood",
+        [
+          "The game's source is split into still more files (the Rig Editor and Path Editor openers, the menu buttons, and Level 2 each have their own). Nothing in the game changes."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v186",
+    "d": "Nov 22, 2026",
+    "t": "Behind the scenes",
+    "g": [
+      [
+        "Under the hood",
+        [
+          "The game's source is now split into more files (the Speedometer, hearts and breath, the menus and screens, and Dev Mode each have their own). Nothing in the game changes."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v185",
+    "d": "Nov 22, 2026",
+    "t": "Tunnel floors, Roost Gazer, clearer names",
+    "g": [
+      [
+        "Fixes",
+        [
+          "In a sloped tunnel Molly now stands on the floor as it is drawn. Before, she stood above it: about 0.5 at 20 degrees, 1.6 at 35. The roof, a tunnel mouth's height and the opening a tunnel cuts in a shaft wall match the drawing too.",
+          "The very bottom of a cone or bowl counts as flat, so the slope no longer creeps her about once she has landed there."
+        ]
+      ],
+      [
+        "Molly's stats",
+        [
+          "New stat in the Rig Editor: Grip while drifting (x her grip). It multiplies her sideways grip while A or D is held in a Drift. 1 is the same as before, so nothing changes until you move it."
+        ]
+      ],
+      [
+        "Dev Mode",
+        [
+          "New button in the in-game Dev Mode: Invulnerable. While it is On, minions can neither hurt Molly nor push her (she passes through them), and a Big Minion no longer drains her Barrier. She can still damage them and bounce off their heads. It resets when you reload."
+        ]
+      ],
+      [
+        "Minions",
+        [
+          "A Big Minion hit with the Barrier now throws Molly back along the ground instead of launching her up in the air.",
+          "A Big Minion that has just been damaged cannot hurt her for 1.5 seconds.",
+          "Touching a minion's head from the side no longer hurts (the stomp bounce is unchanged).",
+          "A minion can no longer shove Molly up or down a wall she is running on."
+        ]
+      ],
+      [
+        "Roost Gazer",
+        [
+          "New flying mob: a minion's head with tiny legs, wings and one big eye. Place it in the Path Editor (Roost Gazer); Behavior is Chases (buzzes round her head), Idle (hovers still, turns to face her) or Cycle (moves like a platform: side to side, forward and back, or up and down, with Travel, Seconds per cycle and Phase). Hover height is a field too (6 units by default).",
+          "Touching it does no damage. Within 30 units it fires a laser every 2 seconds that does half a heart, but only with a clear line to her: the ground, ledges, slabs, tunnel walls, moving platforms, doors, banked walls and other mobs all stop the laser, and it holds its fire until the line is clear. The Barrier absorbs lasers. The Barrier at speed and thrown Stars defeat it like a minion.",
+          "The Rig Editor has a Roost Gazers tab on the Mobs page: size, wings, legs, colors, speed, how far it buzzes round her, laser range, seconds between shots, laser speed and laser damage."
+        ]
+      ],
+      [
+        "Path Editor",
+        [
+          "The layer rows no longer squeeze the layer name: their buttons are much narrower (Select is now a small icon).",
+          "Curve angle and curve radius now only change each other: the segment's length stays put. (Typing a radius on a straight segment makes it curve right; the angle tops out at 360 degrees.)",
+          "New segments, new paths and new circular decks supersede the terrain by default. Layouts you already saved keep their setting.",
+          "Each segment's number now sits in the middle of the segment on the map, not at its end (the dot still marks the end).",
+          "Each segment's fields start collapsed: click its title to open them."
+        ]
+      ],
+      [
+        "Menus and look",
+        [
+          "Every menu screen now has the checkerboard background (dev mode, characters, saved sandboxes, level maps and so on). The pause screen and what opens from it stay see-through over the game.",
+          "Under water the screen turns blue and the fog closes in. It follows the camera dipping under the surface, not Molly's head.",
+          "If the cursor did not lock after a slow level load, the next click or key press now locks it."
+        ]
+      ],
+      [
+        "Health display",
+        [
+          "A half heart now draws as a heart cracked down the middle (left half red). Nothing deals half damage yet; this is for the coming Roost Gazer."
+        ]
+      ],
+      [
+        "Barrier",
+        [
+          "The Barrier now tilts to the ground's cross-slope (and to a wall's bank) the way Molly's body does, instead of staying level."
+        ]
+      ],
+      [
+        "Names and wording",
+        [
+          "Creatures that are not characters are now called mobs (minions, Big Minions and Roost Gazers are the kinds).",
+          "The Rig Editor lists numbers as Stats, not dials. Lengths are given in tiles.",
+          "The Barrier is called the Barrier everywhere, including the hints in the levels.",
+          "Every Path Editor, Rig Editor and menu label is now in Title Case.",
+          "Strips (ledges, mud, platforms, gaps, segment chains) now turn with Rotation, like the other stamps. Layouts you already saved still load."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v184",
+    "d": "Nov 17, 2026",
+    "t": "Toxic bubbles and level fixes",
+    "g": [
+      [
+        "Fixes",
+        [
+          "Doors stop Molly at any speed. A closed door is only 2 thick, and from about 20 Zips she could pass straight through it.",
+          "Show Coordinates: Y now reads as the Path Editor's true Y. On Oceana Crags it read 40 too high.",
+          "A cave joined to a shaft now heads the way the shaft faces in the game, as the editor shows it, so turning the shaft turns the caves chained to it.",
+          "Joined caves of different angles: the floor and roof ease from one cave to the next across the joint, so Molly no longer gets stuck on the step between them.",
+          "Cone-shaped holes: Molly lands at the bottom instead of falling and sliding between the faces for ever.",
+          "Toxic ground now bubbles: toxic terrain patches and Oceana Crags' poisoned low ground show square bubbles wherever they hurt (patches barely showed any, and Oceana's ground had none).",
+          "Path Editor: pressing up on the first piece (or down on the last) no longer saves an empty undo step, so the next Ctrl+Z works the first time."
+        ]
+      ],
+      [
+        "Levels",
+        [
+          "Oceana Crags: ledges and hills placed on a path deck now stand on the deck (before, they were built on the low ground hidden under it). A ledge is a raised block with upright sides; a hill is a bump in the deck.",
+          "Trapped-minion pits are gone. An old layout with a trapped Big Minion still loads; the minion stands on the ground. (An idle Big Minion in a shaft does the same job.)"
+        ]
+      ],
+      [
+        "Looks",
+        [
+          "Toxic patches make a quarter as many bubbles as before, and bubbles thin out to a quarter of their number between 60 and 150 units from Molly."
+        ]
+      ],
+      [
+        "Performance",
+        [
+          "Big toxic patches are drawn with at most 64 squares a side instead of 300; bubbles on toxic ground and toxic ledges work out their height once instead of every frame; at most 500 Sandbox bubbles are drawn at once (was 800)."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v183",
+    "d": "Nov 16, 2026",
+    "t": "Oceana Crags, rebuilt",
+    "g": [
+      [
+        "Levels",
+        [
+          "Oceana Crags, Act 1 is now the layout built in the Path Editor, played the same way as Grass Canyon. Import Oceana Crags in the Path Editor and the Levels map load this layout too."
+        ]
+      ],
+      [
+        "Performance",
+        [
+          "Toxic patches cost less: the game finds the nearby ones instead of checking every patch, works out each bubble's spot once, and draws all the patches together. They look and hurt the same as before."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v182",
+    "d": "Nov 16, 2026",
+    "t": "Next-stamp fixes, a Strafe stat",
+    "g": [
+      [
+        "Path Editor",
+        [
+          "The Bend you set in the next-stamp panel now carries onto the ledge, gap, platform, mud or seg chain you place. Before, it was reset to 0.",
+          "The next-stamp panel has a Rotation box for trees, hills and the other stamps that can be turned, matching a placed stamp. The next mud no longer shows a Heading box (it takes its heading from where you place it, so the box did nothing).",
+          "The inspector and the next-stamp panel are tidied: every box sits in a fixed spot in a two-column grid (Snap and Layer, X and Z, Rotation and Y, then Length and Width, Height and Bend, then the stamp's own boxes), labels are one or two words, and the longer wording shows when you hover a label or option (or the ⓘ by the title). The next-stamp panel uses the same spots as a placed stamp.",
+          "Big Minions no longer have a Placement option (Trapped in a pit). Layouts that already have a trapped one keep it."
+        ]
+      ],
+      [
+        "Rig Editor",
+        [
+          "Stats has a Strafe distance row (Q/E sidestep). The default, 2 units, is the one tile it always was."
+        ]
+      ],
+      [
+        "Gameplay",
+        [
+          "Fixed getting stuck against a ledge or crag after a glancing hit: her speed stayed on and answered W and S while she stood pinned. When a ledge face blocks her and she is not running into it (along it, or at a corner), she now stops, so her speed reads zero until she steers clear."
+        ]
+      ],
+      [
+        "Menus",
+        [
+          "The Characters page is no longer cut off at the top when it is taller than the window: it starts at the top and scrolls."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v181.1",
+    "d": "Nov 16, 2026",
+    "t": "Hidden layers stay faint",
+    "g": [
+      [
+        "Path Editor",
+        [
+          "Stamps on a hidden layer now show as faint shadows for every kind (crags, spawners, tips, ledges, gaps, mud, platforms), including the placing preview. Before, their outlines and moving-range marks were drawn at full strength."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v181",
+    "d": "Nov 15, 2026",
+    "t": "Toxic patches you can size",
+    "g": [
+      [
+        "Path Editor",
+        [
+          "Toxic patches have Width (across) and Length (along) boxes in the inspector, so you can size one by typing instead of being stuck with 12 by 12."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v180",
+    "d": "Nov 15, 2026",
+    "t": "Comet's moves, made to order",
+    "g": [
+      [
+        "Comet",
+        [
+          "Star Throw has a throw: holding Q or E she leans in with a star in her hand behind her, growing as she charges; letting go, her arm swings through and the star leaves her hand part way. Her legs keep running. E throws right-handed, Q left-handed.",
+          "While she charges, a marker on the screen shows where the star will go: the end of its range at this charge, or where it would hit the ground. It grows with each second of charge.",
+          "Her Power line, the charge bar and the Seg icon are the colour of her stars, and every Seg in the level turns blue while you play as her (Molly keeps them red)."
+        ]
+      ],
+      [
+        "Rig Editor",
+        [
+          "Comet's page has three more animations: Star throw (timing, the star in her hand, a charging pose and a throw pose), Hover (float, bob, every star's size, place, tilt and spin, and changes laid over her run) and Fly (her arms, spine and head, changes to her legs, and the star at her hands). Each previews with its stars. The Hover box keeps Hover's costs and movement stats.",
+          "Copy settings now copies all three pages in one block (Molly, Comet and Mobs, each under its own name), and Apply pasted settings puts each back on its own page. A block copied from one page in an older build still applies to the page you are on. Comet's settings no longer carry a copy of the mob stats.",
+          "New defaults: Ricky's Molly and Comet settings are what each runner ships with, and her built-in model is rebuilt from them (Comet now has a built-in model of her own: blue suit, top speed 50, 4 s to top speed). Reset buttons on Comet's page go back to her defaults. A fresh browser plays with these settings, stats and mob stats included."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v179",
+    "d": "Nov 15, 2026",
+    "t": "Comet, pressure plates, targets and a new Grass Canyon",
+    "g": [
+      [
+        "Levels",
+        [
+          "Grass Canyon, Act 1 is Ricky's re-edited layout: a door, a mud pad and two more Seg chains, with the trees thinned (1,411, down from 1,976). Opening it in the Path Editor loads the same layout."
+        ]
+      ],
+      [
+        "Path Editor",
+        [
+          "Pressure plate: a flat plate on the ground (or at its Y) that Molly presses by standing on it. Light gray, light brown, a faint glowing halo round its edge, or invisible; a rectangle or a circle of any size. It stays pressed for the rest of the run, or only while she stands on it.",
+          "Target: an upright wooden disc with a red ring and middle, on a sign post or hanging in the air. Size, height, tilt, spin and heading; it can move side to side and/or up and down on the level clock, like platforms. One heart: the Barrier breaks it when it hits at its break speed (20 Zips unless set), and it splits in two and falls apart like a beaten minion. Otherwise it is solid. Its hitbox matches its size and can be scaled.",
+          "Doors can be linked to plates and targets as well as minions: a linked door changes to its After mode once every minion linked is beaten, every plate pressed and every target broken. Plates and targets reset when she respawns, as minions do.",
+          "Every stamp is now free by default (Snap to the path is still a choice per stamp). A stamp placed near the path still faces along it. Mud and Seg chains stamp on their own curve, and can be set to follow the path afterwards."
+        ]
+      ],
+      [
+        "Comet",
+        [
+          "A second runner. Pick her on the Characters page (Play as Comet). She starts as a copy of Molly, and has her own Rig Editor page with every one of Molly's stats, kept apart from Molly's, and her own saved model.",
+          "No Strafe and no Barrier. Instead, Q or E is Star Throw: a small, flat, spinning star of blue energy that flies straight where the camera faces, 50 units, for half a heart. It needs Power above 0 and costs 1, with a 2 s cooldown. Hold the key to charge it on the speedometer's charge bar: each second, up to 3, costs 2 Power and adds 50% size, half a heart and 50 units. It goes by itself at 3 s, or when she cannot pay for the next second. It hurts minions and breaks targets.",
+          "2 is Hover: 6 Power to start, then 1 a second. She floats half a unit over whatever she would stand on, with none of what standing does (no mud, no toxic ground, no pressure plates, no hard landings), on Hover's own movement stats. Two small spinning stars ride at her ankles and a bigger one behind her back.",
+          "While hovering, Space held in the air is Fly: lift that cancels gravity (adjustable), for 4 more Power a second. She raises her arms over her head and the star from her back goes up to her hands."
+        ]
+      ],
+      [
+        "Rig Editor",
+        [
+          "Pages across the top: Molly, Comet and Mobs. Mobs has the Minions and Big Minions tabs (the same stats as before); a new kind of mob is one more tab.",
+          "The Drift animation now shows what she does in the game: her Fast run, leaning into the corner from her feet. Its stats are now changes laid over her run while she drifts (all 0 to start, so nothing changes until you move one); Save to game puts them in the game."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v178.1",
+    "d": "Nov 15, 2026",
+    "t": "Nightly fixes",
+    "g": [
+      [
+        "Path Editor",
+        [
+          "Opening a layout file whose joined pieces loop round (one cave joined after another that is joined after the first) no longer breaks the editor: the piece that closes the loop stands on its own. (Nightly sweep, Nov 15.)"
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v178",
+    "d": "Nov 14, 2026",
+    "t": "True heights, layers and a clear view",
+    "g": [
+      [
+        "Path Editor",
+        [
+          "Every stamp has a Y: one flat height for the whole world, 0 where her feet are at the start of the path. A stamp sits on the ground (and the editor shows how high that is, when opened from the game) until you type a Y; then it stays at that height. Back on the ground undoes it. What Y means: the foot of a tree, sign, goal, checkpoint or door; a Seg's middle; the top of a ledge or platform where it starts; the floor a minion stands on; the height a hill or crag is built up from; a lake's water; the ground of a terrain patch or under mud; where a spawner's minions appear; the base of a tip area's range. Gaps stay bottomless.",
+          "Layers: the top row is drawn on top, and ▲ ▼ reorder them. A hidden layer shows as a faint shadow. Select picks every stamp on a layer. With several stamps selected, Layer-Split Overlap spreads overlapping ones across layers, making new layers when needed."
+        ]
+      ],
+      [
+        "Movement",
+        [
+          "Ground too steep to walk up (over about 46°) is no longer somewhere to stand: she slides down it, cannot land or jump on it, and so cannot climb a cliff by jumping along it. Paths, decks, platforms and lanes keep their banks and slopes."
+        ]
+      ],
+      [
+        "Camera",
+        [
+          "Anything between the camera and Molly is drawn see-through, as a fine stipple along the line to her, so she is never hidden."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v177",
+    "d": "Nov 14, 2026",
+    "t": "Doors made simple",
+    "g": [
+      [
+        "Path Editor",
+        [
+          "A door has one way of opening and shutting: its timing, speed, tilts and how it opens. A linked door only changes its mode once everything it is linked to is beaten (always open, always closed, or the cycle), so it never jumps between two sets of settings. Older layouts keep their mode after; the rest of their second set is dropped.",
+          "Opens by: straight down into the floor, toward its bottom edge (it slides its own height along its lean, so a door leaning 45° slides down and back at 45° until its top edge is where its bottom edge was), or swinging only.",
+          "Fixed: loading a layout with a linked door made the editor forget where the door was, so saving it again lost its place."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v176",
+    "d": "Nov 14, 2026",
+    "t": "Circular decks and minions you can design",
+    "g": [
+      [
+        "Path Editor",
+        [
+          "New segment type: + Circular deck. It has a radius instead of a length. She comes in at its rim; the next segment leaves from the rim where its Heading points (the same heading as the way in: straight across). Slope + makes a hill, − a bowl; Bank tips the whole deck. She can fall off its edge. On Oceana it is a stone deck of its own.",
+          "Gradual slopes: each segment can ease its slope into the segments either side (Slope change at its ends: Gradual, with a Blend length), so a path has no kink where its slope changes.",
+          "Mud can go anywhere now: stamped off the path it has its own heading, bend and width.",
+          "Ledges and platforms can have a toxic surface: dark, bubbling, and a heart a second to stand on."
+        ]
+      ],
+      [
+        "Minions",
+        [
+          "A Minions panel in the Rig Editor, for Minions and Big Minions separately: the size of every block, the colours, the walk (stride, leg and arm swing, arms raised while chasing, bob) and the stats (top speed, acceleration, sight, hearts, damage to her, the time before they can hurt her again), with a live preview.",
+          "Damage from the Barrier now depends on its speed: one, two or three hearts at three speeds you set (by default 20 Zips for one heart, the others off).",
+          "A stomp only counts on the top quarter of the head, and it always bounces her up (a speed you set for each kind), even when it finishes the minion. Without the Barrier, landing on a head bounces her the same way and does no damage."
+        ]
+      ],
+      [
+        "Movement",
+        [
+          "The SEGS counter counts every Seg picked up this run (a Big Seg counts 10), up to 999, and no longer drops when the Power Line is spent. The Power Line itself is unchanged.",
+          "New stats: how hard S in the air drives the Barrier down, and its top speed doing it."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v175",
+    "d": "Nov 14, 2026",
+    "t": "Layouts you can keep as files",
+    "g": [
+      [
+        "Path Editor",
+        [
+          "New Save to file and Open from file buttons under File: the layout (the same text as the box) goes into a file you keep anywhere, and a saved file opens back into the editor (Ctrl+Z undoes an open). Layouts are autosaved only inside the browser or app, so a file is the copy that cannot be lost with it.",
+          "Opening a file that is not a Poly Runner layout changes nothing.",
+          "The game is called Poly Runner everywhere it shows: the page title, the Path Editor, and the desktop app (window title, launcher, app name). Folder and storage names are unchanged on purpose, so no saved data is touched.",
+          "Desktop app 1.1: only one copy of the app can run at a time (two copies sharing one storage folder can corrupt it and lose saved layouts), and the Path Editor's layout and presets are copied to ordinary files in ~/PolyRun/layouts while you work (the latest, plus dated snapshots). Open latest backup (under File) brings the last one back. Needs the new desktop app; the game alone just has Save to file and Open from file."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v174",
+    "d": "Nov 14, 2026",
+    "t": "Ends, Zips and a truer Rig Editor",
+    "g": [
+      [
+        "Path Editor",
+        [
+          "New Ends setting on gaps, ledges and mud: Rounded (a half-circle past each end, as before) or Squared (a flat end, 1.5 past the piece, 1 for mud). Nothing in an existing level changes; every piece stays Rounded until you pick Squared.",
+          "The editor now draws what the game really covers: the piece's width plus its margin all round (1.5 on gaps and ledges, 1 on mud) and the true shape of each end. Platforms are square in the game, so they have no Ends setting.",
+          "Checked against the game on about 36,000 points: the editor's footprint and the game's agree for both shapes, straight and bent."
+        ]
+      ],
+      [
+        "Movement",
+        [
+          "Every speed is in Zips now, and Sideways grip is in Zips per second squared (your old value is converted, nothing moves). Gravity is an editable stat (default 20 Zips/s²).",
+          "Grip fade has two toggles: Wall grip fades with the bank (on) and Grip fades on slopes (off, as before). The Movement details follow them.",
+          "Fixed: any Top speed or Grip stat other than the default used to wall off Grass Canyon's big curve. The curve is no longer touched by the stats."
+        ]
+      ],
+      [
+        "Rig Editor",
+        [
+          "Overall scale now sizes Molly in the game too: her model is 3.6 x the scale and her collision box scales with it (the Barrier and the camera are unchanged).",
+          "New Thinnest strip stat (Faceting, cm, default 0.8; 0 keeps every ring).",
+          "The upper-arm trim band stats now show where the band is really drawn. Your numbers were converted (19 / 6.5 became 11.48 / 11.01), so nothing moved.",
+          "Knee pads bend with the knee (the top half follows the thigh, the bottom half the shin) instead of spiking on a deep bend.",
+          "Her saved model now lives in IndexedDB instead of the shared 5 MB store, so a big build (48 sides, 8 rings) is kept. An old saved copy is moved over on the first load.",
+          "The built-in Molly is re-baked with the welded hips and shoulders and all of the above."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v173",
+    "d": "Nov 12, 2026",
+    "t": "Wall running with real gravity",
+    "g": [
+      [
+        "Sandbox",
+        [
+          "Gravity now keeps pulling on a wall: it bends her direction every frame instead of being thrown away, so the only thing that holds her line is her grip.",
+          "Her grip fades with the wall's steepness (her grip x the cosine of the wall angle): about 15% of it on an 81 degree wall, none at all on a vertical one. A new Wall grip stat in the Rig Editor scales this (1 = normal, 0 = none, 2 = double).",
+          "The Barrier can now run on walls, so Dodecadash speed can carry her across one.",
+          "Walls are measured in 3D: her progress along a wall follows its rise, gravity pulls along a climbing or falling wall as well as across it, and stepping onto a rising wall keeps her true speed on its surface.",
+          "Minions and Big Minions have a Behavior setting in the Path Editor: Chases Molly, or Idle. An idle one stands still and only turns to face her; it shows an IDLE tag on the map."
+        ]
+      ],
+      [
+        "Movement",
+        [
+          "One clean formula everywhere: her drive + real gravity along the surface (40 x the sine of the angle) - friction. Her drive works up to her top speed; whenever she is not driving (coasting, braking or past her top speed) friction acts instead.",
+          "Gone: the softened slope curve, the downhill top-speed bonus and the 50-Zip coasting cap. Kept: the 30-Zip uphill floor and the mud ramp stall.",
+          "New Friction stat in the Rig Editor (default 11.4 Zips/s², half in the Barrier). Hills steeper than about 35 degrees speed her up at the default; standing on a gentler slope, friction holds her still.",
+          "Stat card fix: Acceleration and Braking showed half their real values and the time to brake to a stop showed double. The card also lists Friction and the angle where hills start to speed her up."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v172",
+    "d": "Nov 11, 2026",
+    "t": "Closed path ends",
+    "g": [
+      [
+        "Sandbox",
+        [
+          "Oceana's thin path slab is closed off at both ends of every stretch, and it ends square: there is no longer an invisible floor past the end of a path that she could stand on.",
+          "Fixed an invisible wall on ramps over Oceana's slab of path: her feet used the path as the ramp's foot while the ramp was drawn from the water far below. A ramp is now a flat plane rising from the height she stands on at its foot (the path, a slab or the ground), the same for what you see and what she stands on, and its Y offset lifts it from there.",
+          "A floating slab's top now has exactly the path's own surface (its texture, stone by default, a shade per facet), so giving a segment a slab thickness no longer changes how it looks."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v171",
+    "d": "Nov 11, 2026",
+    "t": "Bare Oceana, path textures, smoother Molly",
+    "g": [
+      [
+        "Oceana Crags",
+        [
+          "Its built-in path is gone from the terrain, in the sandbox and in Level 2 itself: no lane, runways, ramps, pads, gap channels, walled path, bridge or toxic strips on it. What is left is the crags, the Sink and the sea, to lay your own paths and objects into. Level 2 keeps its objects but has no path to stand on until it is rebuilt."
+        ]
+      ],
+      [
+        "Sandbox",
+        [
+          "Every path segment has a Texture: Stone, Wood planks, Metal plates or Grass. It shows on the ground, on floating slabs and on Oceana's thin path slab.",
+          "Fixed gaps between paths and the ground: the thin slab over water is drawn as wide as each segment really is, it is drawn wherever any part of the path is over low ground, and she stands on it right out to its edges instead of falling off its last couple of units. A segment set to supersede the terrain no longer leaves a hole where the ground is just under it.",
+          "Import Grass Canyon now loads the current official level with every one of its objects, not a rebuild of the old hand-made version."
+        ]
+      ],
+      [
+        "Molly",
+        [
+          "Slopes and banks gentler than about 4 degrees no longer tilt her, the tilt grows in smoothly past that, and it follows the ground averaged around her feet, so bumpy grass does not make her jitter or nod.",
+          "Drifting keeps her running legs moving again (the held Drift pose is no longer used), with the lean into the corner on top.",
+          "Her collision box height and width are new stats."
+        ]
+      ],
+      [
+        "Rig Editor",
+        [
+          "Stats is a collapsible menu at the top of the side panel instead of a button under the preview.",
+          "Every slider has a number box beside it: type any value, even past the slider's range."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v170",
+    "d": "Nov 11, 2026",
+    "t": "Style Boost zone marked",
+    "g": [
+      [
+        "Ramps",
+        [
+          "The last stretch of every ramp, where a jump gives a Style Boost, is now marked with a red and white checkerboard laid on the surface. It covers the ramp's full width and exactly the length the Style Boost setting says (15 by default). It shows on sandbox ramps and on Oceana Crags."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v169",
+    "d": "Nov 11, 2026",
+    "t": "Follows the ground rides the water",
+    "g": [
+      [
+        "Sandbox",
+        [
+          "A path set to Follow the ground now rides the surface of the water over water (Oceana Crags and Open ocean) instead of dropping to the sea floor far below. Slab thickness still compares against the real ground."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v168",
+    "d": "Nov 10, 2026",
+    "t": "One kind of path segment",
+    "g": [
+      [
+        "Sandbox",
+        [
+          "Paths are now made of one kind of segment, added with one + Segment button. There are no left or right arcs: a curve has an angle (positive curves right, negative curves left, 0 is straight) and a radius. Old files are converted when they load and build the same path as before.",
+          "Every segment has the same settings: Start X/Y/Z and Facing, End X/Y/Z, Length, Curve angle, Curve radius, Rise and Slope angle, Start and End bank, Start and End width, Over the terrain, Ground and Slab thickness. A segment starts where the last one ended; typing a start sets it by hand (the Start where the last segment ended button undoes that), and changing a segment moves the ones after it.",
+          "Typing an End X or Z reshapes the segment into the curve that leaves its start along its heading and arrives there; End Y sets the Rise. Length, angle and radius keep each other consistent (angle keeps the radius, radius keeps the angle, length keeps the radius).",
+          "Ground: Independent keeps its own height; Follows the ground puts the path at the terrain height plus its Rise all along the segment.",
+          "Slab thickness is the distance from the top of the path down to its underside. Where the underside would be below the ground it merges with the ground; where it is clear of the ground it floats."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v167",
+    "d": "Nov 10, 2026",
+    "t": "Caves that climb",
+    "g": [
+      [
+        "Sandbox",
+        [
+          "A cave Angle can now be negative (down to -85), which makes the tunnel climb. Slope can carry it from downhill to uphill, and linked caves carry a climb on or change to their own. A climbing tunnel that starts at the surface leaves the ground at once, so start it underground (the cave Y setting), after a downhill cave, or after a shaft."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v166",
+    "d": "Nov 10, 2026",
+    "t": "Chained cave angles",
+    "g": [
+      [
+        "Sandbox",
+        [
+          "Fixed: a cave linked to another could not be given a new angle unless you first switched its Angle dropdown. Now typing a new angle on a linked cave sets its own angle straight away, and the field shows the angle it is carrying on from until you do. A cave after a shaft keeps its own angle. Any chain can change angle at every cave."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v165",
+    "d": "Nov 10, 2026",
+    "t": "Snap setting, path over terrain, new terrains, linked cave angles",
+    "g": [
+      [
+        "Sandbox",
+        [
+          "Every object that is not a strip (trees, minions, signs, checkpoints, caves and the rest) has a Snap to the path setting: Snaps follows the path when it changes; Free stays exactly where it is, and is not snapped when moved or placed. The setting is also available for the next stamp before placing.",
+          "Path pieces have a new Over the terrain setting. Default: terrain wins where it is higher (the path is buried). Path wins: the ground is cut down or built up to the path across its width, easing back to the terrain over 14 units.",
+          "Two new terrain options for the Ground setting: Crags (the jagged rock of Oceana Crags on a flat floor, with a clear lane along the path) and Giant Hill (one enormous hill, 9,000 units across and 3,000 high, starting where the path does; the path’s Rise is measured from the hill’s surface). Not used by the current levels.",
+          "Floating slabs always draw: higher ground in the way of a floating path is cut down to just under it, so it spans a drop. The bottom of the world is never above the lowest point of the path.",
+          "Linked caves can have their own angle: a cave that starts from another has a new Angle setting (carries on at the angle the last one ended on, or its own). That lets the angle change through a chain of caves, including after a shaft.",
+          "Steepness rule: she cannot run into a wall that is 60° or more steeper than the surface she is on. Running at one from flat ground stops her (or, from the side, she glances off along it) instead of sending her up the face.",
+          "Toxic ground and toxic patches only hurt her on the surface itself, not while she is in a cave or on another surface beneath it."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v164",
+    "d": "Nov 10, 2026",
+    "t": "Wall surfaces; objects stand on slabs and platforms",
+    "g": [
+      [
+        "Sandbox",
+        [
+          "Real wall surfaces: a path banked past 80° (the editor now allows up to ±90°) is a true tilted plane instead of part of the ground. Molly catches it from the path or from a jump, moves on it as on flat ground (her heading is measured along the wall, the camera turns the same way, the pull is the slope table’s and drags her toward the lower side), and leaves it off the edge, off the end, or with a jump that kicks her away from the face. The camera stands a little out from the face and her body tilts to it.",
+          "Trees, signs, checkpoints, goals, Segs, toxic patches, trigger zones and minions placed on a floating path piece or a platform now sit on its top instead of the ground beneath it. Minions also keep to the slab while they stand on it."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v163",
+    "d": "Nov 9 to 10, 2026",
+    "t": "Since the last update zip: slopes, banks, shafts, widths, floating paths",
+    "g": [
+      [
+        "Movement",
+        [
+          "Surface-plane movement: on a slope or bank Molly runs, turns and takes the slope’s pull as if the surface were flat ground. Her speed, steering, camera turning and jump launches are all measured along the surface.",
+          "Running across an incline pulls her heading and speed toward the low side. It is a pure vector sum of her velocity and the slope’s pull, with no extra multipliers. (The “Side pull” stat in the Stats tab no longer does anything.)"
+        ]
+      ],
+      [
+        "Banks and curves",
+        [
+          "Banked paths that also curve no longer jitter or become impossible to cross. Along a curved 60–85° bank the ground now holds flat to about 0.04 units.",
+          "Known limit: a bank beyond about 84° is a vertical wall, which the ground cannot hold, so it is the same as 84°. Real wall surfaces are planned."
+        ]
+      ],
+      [
+        "Path Editor and Sandbox",
+        [
+          "Each piece has its own width: “Width at the end” (0 keeps the width) and “Width change”, either Taper along the piece or Step at its start. The editor draws the road as a ribbon so the width shows.",
+          "Floating paths: “Float: slab thickness” (0 = on the ground) makes a piece a slab of stone with a top, underside, sides and end caps, with the ground left alone beneath it. Molly can fall off its sides and ends. It works with width changes and banks.",
+          "The persistent tip that covered part of the editor menu is gone."
+        ]
+      ],
+      [
+        "Shafts and caves",
+        [
+          "Shaft walls are exactly vertical, so nothing can climb out of a pit up the old 2.5-unit skirt around the rim. A shaft has its own rock floor.",
+          "New “Carve” setting for shafts (0–100%): 0 opens right at the surface; 100 slopes the surface in at 45° all the way down. The graded part follows the surface, so there is no overhang.",
+          "A cave linked to the end of a shaft now works: the tunnel starts at the shaft’s wall, with an opening cut into it and its floor level with the shaft’s."
+        ]
+      ],
+      [
+        "Menu",
+        [
+          "This change log."
+        ]
+      ],
+      [
+        "Heads-up",
+        [
+          "Trees, minions and other stamps placed along a floating piece use the ground height under it, so they sit below the slab for now."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v162",
+    "d": "Nov 8 to 9, 2026",
+    "t": "The update zip sent on Nov 9 at 7:11 pm",
+    "g": [
+      [
+        "Caves",
+        [
+          "Sky slivers and tears at cave mouths are fixed: ground near a mouth is cut finer, the hole is narrower, and the tunnel floor extends out as a lip."
+        ]
+      ],
+      [
+        "Movement",
+        [
+          "Drift redesigned: holding A or D at 30 Zips or more turns her momentum and the camera 15° in about 0.15 s, with a 1 second cooldown after you let go.",
+          "Strafe and Drift no longer work inside the Barrier."
+        ]
+      ],
+      [
+        "Characters",
+        [
+          "A Characters page on the main menu with stat cards (just Molly for now).",
+          "The stat card shows in the pause menu, in regular levels and the Sandbox.",
+          "The Rig Editor has a Stats tab where each stat can be changed, with the card updating live."
+        ]
+      ],
+      [
+        "Rig Editor",
+        [
+          "New “Contour shift” slider: moves the figure’s faceting up or down along its contours, so the faces look less radial."
+        ]
+      ],
+      [
+        "Also in this build",
+        [
+          "Caves in the Sandbox, banked paths (a bank on any piece), multiple paths, doors, and further Rig Editor work (these are from my build notes, without details)."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v160 to v161",
+    "d": "Nov 8, 2026",
+    "t": "Grass Canyon becomes the official Level 1",
+    "g": [
+      [
+        "Levels",
+        [
+          "Grass Canyon Act 1 was rebuilt in your Path Editor and made the official Level 1, replacing the old hand-coded version."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v159",
+    "d": "Nov 8, 2026",
+    "t": "Terrain, ledges, tips and Oceana Crags fixes",
+    "g": [
+      [
+        "Path Editor and Sandbox",
+        [
+          "Listed from my build notes, without more detail: ground types, ledges, tip areas, terrain patches, checkpoint tools in Dev Mode, and fixes to Oceana Crags."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "v156 to v158",
+    "d": "Nov 7 to 8, 2026",
+    "t": "Trees, big minions, signs, platforms, gaps and more",
+    "g": [
+      [
+        "Sandbox stamps and mechanics",
+        [
+          "Listed from my build notes, without more detail: trees, big minions, caution signs, steering changes, toxic patches, platforms, gaps, and the first desktop package."
+        ]
+      ]
+    ]
+  },
+  {
+    "v": "Before v156",
+    "d": "To Nov 7, 2026",
+    "t": "The foundation",
+    "g": [
+      [
+        "What was already there",
+        [
+          "Molly and the low-poly look, speed counted in Zips, hearts, checkpoints, ramps, plateaus and platforms, the Barrier (2 key) and Drift (A and D).",
+          "Level 1 Grass Canyon, Level 2 Oceana Crags, and Dev Mode with the Path Editor, Rig Editor and Sandbox."
+        ]
+      ]
+    ]
+  }
+]

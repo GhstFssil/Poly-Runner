@@ -5,12 +5,35 @@
     "ui/page-body.html",
     "characters/rig-editor-panel.html",
     "ui/path-editor-embed.html",
-    "data/molly-settings.html",
-    "data/comet-settings.html",
+    {
+      "file": "data/molly-settings.json",
+      "before": "<script id=\"molly-settings\" type=\"text/plain\">",
+      "after": "</script>\n"
+    },
+    {
+      "file": "data/comet-settings.json",
+      "before": "<script id=\"comet-settings\" type=\"text/plain\">",
+      "after": "</script>\n"
+    },
     "characters/rig-editor-start.html",
-    "data/user-def.js",
+    {
+      "file": "data/user-def.json",
+      "before": "var USERDEF=",
+      "after": ";\n"
+    },
     "characters/rig-editor.html",
-    "data/models.html",
+    {
+      "file": "data/molly.glb",
+      "as": "base64",
+      "before": "<script id=\"molly-glb\" type=\"text/plain\">",
+      "after": "</script>\n"
+    },
+    {
+      "file": "data/comet.glb",
+      "as": "base64",
+      "before": "<script id=\"comet-glb\" type=\"text/plain\">",
+      "after": "</script>\n"
+    },
     "core/start.html",
     "core/scene.js",
     "core/pointer-lock.js",
@@ -28,9 +51,22 @@
     "characters/molly-update.js",
     "characters/molly-moves.js",
     "characters/strafe-streaks.js",
-    "data/changelog.js",
-    "data/level1.js",
-    "data/level2.js",
+    {
+      "file": "data/changelog.json",
+      "as": "changelog",
+      "before": "// ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.\n",
+      "after": ""
+    },
+    {
+      "file": "data/grass-canyon.json",
+      "before": "  var OFFICIAL_L1 = ",
+      "after": ";\n"
+    },
+    {
+      "file": "data/oceana-crags.json",
+      "before": "  var OFFICIAL_L2 = ",
+      "after": ";   // Oceana Crags, Act 1: the official layout built in the Path Editor\n"
+    },
     "core/checkpoints.js",
     "level1/goal.js",
     "core/spawn.js",

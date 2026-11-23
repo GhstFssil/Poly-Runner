@@ -1,4 +1,4 @@
-<script id="comet-settings" type="text/plain">{
+{
  "scale": 1,
  "pelvisDrop": 16.5,
  "shoulderX": 13,
@@ -1134,4 +1134,4 @@
  "runF.lean": 30,
  "runF.bounce": 2,
  "runF.dur": 0.41
-}</script>
+}

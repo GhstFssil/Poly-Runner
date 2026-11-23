@@ -39,11 +39,7 @@ js+="""
 """
 block="<!--PE-BEGIN-->\n<template id=\"pe-tpl\"><style>"+head+css+"</style>"+body+"</template>\n<script>window.__peBoot=function(SR,HOST){"+js+"};</script>\n<!--PE-END-->\n"
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import build
-try: sp,g=build.part_with('<!--PE-BEGIN-->')
-except SystemExit: sp,g=build.part_with('<script id="molly-settings"')
-if '<!--PE-BEGIN-->' in g:
-    i=g.index('<!--PE-BEGIN-->'); j=g.index('<!--PE-END-->\n')+len('<!--PE-END-->\n'); g=g[:i]+block+g[j:]
-else:
-    k=g.index('<script id="molly-settings"'); g=g[:k]+block+g[k:]
+sp,g=build.part_with('<!--PE-BEGIN-->')
+i=g.index('<!--PE-BEGIN-->'); j=g.index('<!--PE-END-->\n')+len('<!--PE-END-->\n'); g=g[:i]+block+g[j:]
 build.write_part(sp,g); build.write()
 print('ok',len(block))

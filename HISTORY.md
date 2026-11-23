@@ -42,3 +42,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-22 18:07 | next | split: page head cut into ui/page-head.html, ui/page-body.html and ui/path-editor-embed.html; game file byte-identical
 - 2026-11-22 18:11 | next | split: last leftovers cut into core/start.html, core/pointer-lock.js, core/end.html, characters/molly-update.js, level1/cave-roof.js; src/unsorted removed; ARCHITECTURE file map, HANDOFF, BACKLOG updated; game file byte-identical
 - 2026-11-22 19:19 | v189 | split: game-script parts reordered by area as far as load order allows (26 -> 15 area switches); full test pass, no regressions; version label v189, CHANGELOG; docs updated
+- 2026-11-22 20:15 | next | split: data is now real files in src/data/ (molly.glb, comet.glb, settings/user-def/level JSONs, changelog.json); build.py wraps them (manifest data-file entries); CHANGELOG layout normalized (same data); bake_models, check_deps, mk_pe_embed updated

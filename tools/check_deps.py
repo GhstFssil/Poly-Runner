@@ -5,18 +5,17 @@
 # This only reports the coupling so a carve-out can be judged. It reads top-level `function`, `var`, `let` and `const`
 # declarations (two-space indent) of 4+ letters from each part and looks for those names as whole words in the other parts.
 # Comments and strings count too, so a hit can be a false alarm. An area is the part's folder (data/, mobs/, core/).
-import json, os, re, sys
+import os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, 'tools')); import build
 SRC = os.path.join(ROOT, 'src')
 DECL = re.compile(r'^  (?:function\s+|var\s+|let\s+|const\s+)([A-Za-z_$][\w$]{3,})', re.M)
 
 def main():
     verbose = '-v' in sys.argv[1:]
-    with open(os.path.join(SRC, 'manifest.json'), encoding='utf-8') as f:
-        parts = json.load(f)['parts']
-    text = {}
-    for p in parts:
-        with open(os.path.join(SRC, p), encoding='utf-8') as f: text[p] = f.read()
+    entries = build.manifest()['parts']             # a data file counts with the text the build wraps it in
+    parts = [build.part_name(e) for e in entries]
+    text = {build.part_name(e): build.render(e).decode('utf-8') for e in entries}
     area = lambda p: p.split('/')[0]
     defs = {}                                   # name -> part that declares it
     for p in parts:
