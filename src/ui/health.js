@@ -28,3 +28,17 @@
     if (breathT >= BREATH_EVERY) { breathT -= BREATH_EVERY; breath -= 1; drawBreath(true); if (breath <= 0) return true; }
     return false;
   }
+  var shakeAmp = 0;                                  // camera shake: set by shake(), dies away in about a quarter of a second
+  function shake(a) { if (a > shakeAmp) shakeAmp = a; }
+  function flashHurt() {
+    shake(0.55);                                     // every time she is hurt the camera jolts
+    [hpEl, hurtEl].forEach(function (el) { el.classList.remove('hurt', 'on'); void el.offsetWidth; });
+    hpEl.classList.add('hurt'); hurtEl.classList.add('on');
+  }
+  function landFall(h) {
+    if (ballOn || hovOn) return;                                // the Barrier (or Comet's Hover) takes the landing                                        // she has just touched down after falling h units from her highest point
+    var dmg = h >= 135 ? 3 : h >= 90 ? 2 : h >= 45 ? 1 : 0;
+    if (dmg === 0 || hp <= 0) return;
+    hp = Math.max(0, hp - dmg); drawHearts(); flashHurt();
+    
+  }

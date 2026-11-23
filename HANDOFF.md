@@ -20,6 +20,7 @@ Split the single-file game into `src/` parts by function (areas: core, level1, l
 ## In progress
 On `next` (not published), finishing the `unsorted/` leftovers (plan Ricky approved 2026-11-22): 1 Rig Editor -> characters, 2 `04-script-b1c` by section, 3 `01-head` -> ui, 4 small leftovers -> core; stop and check with Ricky before reordering.
 - Done: step 1, characters: `src/characters/rig-editor-panel.html` (the `rig-tpl` template, was `01-head` 462-649), `rig-editor-start.html` (was `02-script-start`), `rig-editor.html` (was `03-script-a`). `01-head` is now two parts (`01-head`, `01-head-b`). Byte-identical; chk, mk_test, rx8, fu3, fu6, righ pass (`rw4`/`rm1` are helpers that need arguments).
+- Done: step 2, `04-script-b1c` by section (gone): lines 1-14 (camera shake, `flashHurt`, `landFall`) appended to `ui/health.js`; `characters/molly-moves.js` (tilt/jump state, Strafe); `level1/props.js` (Warning sign, Toxic patches, Segs); `characters/strafe-streaks.js`; `core/checkpoints.js` (`lightGates`, `buildGate`, the gates incl. Level 2's); `level1/goal.js` (Stone edges, confetti, Bonus Goal, goalpost); `core/spawn.js` (Where she starts, `spawnAt`, `outOfHearts`). Byte-identical; chk, mk_test, ends1, cavejoin, coords1, nopit, reg3, halfheart, modes, rot1, rl1 pass.
 
 ## Decisions
 - Terms: mob / minion / Big Minion / Roost Gazer; character; stat; tile; Barrier; Mud; Crags; every word of a label capitalized.
