@@ -1,5 +1,18 @@
 [
   {
+    "v": "v190",
+    "d": "Nov 22, 2026",
+    "t": "Behind the scenes",
+    "g": [
+      [
+        "Under the hood",
+        [
+          "The game's data (Molly's and Comet's models and settings, the official levels and this change log) is now kept in plain data files, and the controls and Molly's state have files of their own. Nothing in the game changes."
+        ]
+      ]
+    ]
+  },
+  {
     "v": "v189",
     "d": "Nov 22, 2026",
     "t": "Behind the scenes",

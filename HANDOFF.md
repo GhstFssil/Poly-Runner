@@ -5,13 +5,13 @@ Split the single-file game into `src/` parts by function (areas: core, level1, l
 
 ## Done
 - v185-v189: every part in an area folder, grouped by area as far as load order allows (file map in ARCHITECTURE.md).
-- On `next` (not published), 2026-11-22:
+- v190 (published 2026-11-22):
   - Data is real files in `src/data/`: `molly.glb`, `comet.glb`, `molly-settings.json`, `comet-settings.json`, `user-def.json`, `grass-canyon.json`, `oceana-crags.json`, `changelog.json`. `build.py` wraps them (manifest data-file entries: `before`/`after`/`as`). Game file byte-identical except the CHANGELOG layout (trailing commas, `] }` spacing), which has the same data (checked with node). `bake_models.py` writes the `.glb` files; `check_deps.py` and `mk_pe_embed.py` updated.
   - Code moves: pointer lock (`lockPointer`, `relockOnInput`) -> `core/pointer-lock.js`; Molly's State block -> `core/state.js`; the keys and F4 mouse-mode input (was the tail of `comet.js`) -> `core/input.js`, kept at the same spot so listener order is unchanged. Comet joined the characters group; `spawn.js` sits by `checkpoints.js`; speedometer and the two editor hosts joined the ui group. Area switches 22 -> 20.
   - Removed 16 failing/flaky tests: `fu/` mn1, nf1, wall4, door4, minionhit, fu2, fu4, pe_keep, door3, steep1, mov, phys; `rg1`, `rig1`, `rig2`, `scan3`. Their BACKLOG entries and SWEEP map mentions are gone.
 
 ## In progress
-Nothing half-done. Waiting on Ricky's go-ahead to publish `next` as v190 (bump `<div class="ver">`, CHANGELOG entry in `src/data/changelog.json`).
+Nothing half-done. v190 published 2026-11-22 (data files, core moves, test cleanup). `next` = `main`.
 
 ## Decisions
 - Terms: mob / minion / Big Minion / Roost Gazer; character; stat; tile; Barrier; Mud; Crags; every word of a label capitalized.
