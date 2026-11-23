@@ -817,12 +817,6 @@
     var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(P), 3)); g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(C), 3));
     var m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })); m.renderOrder = 2; scene.add(m); return m;
   }
-  var l2BoostM = null;
-  function l2BoostZone() {                                       // Oceana Crags' ramps: the last L2_STYLE_ZONE of each
-    if (l2BoostM || L2_BARE) return;
-    var st = []; L2_PIECES.forEach(function (pc) { if (pc.ramp) st.push([pc.x0, pc.z0, pc.hx, pc.hz, -pc.hz, pc.hx, pc.len - L2_STYLE_ZONE, pc.len, L2_HW]); });
-    l2BoostM = boostZoneMesh(st);
-  }
   function sbRampInit() {                                        // each ramp's foot: the height she would stand on there without it (on Oceana's slab of path that is the path, not the water far below)
     if (!SB) return; sbNoRamps = true;
     try { SB.ramps.forEach(function (rp) { rp.base = undefined; var fx = Math.sin(rp.th), fz = -Math.cos(rp.th); rp.base = rp.T !== undefined ? rp.T - (rp.y || 0) : l3Top(L3_X + rp.x - fx * rp.hl, rp.z - fz * rp.hl); }); }
@@ -1090,15 +1084,15 @@
     });
     if (B.terrain === 'ocean') {                                 // the open sea, a little below the path
       B.waterY = -10;
-      var sea0 = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMesh.material); sea0.rotation.x = -Math.PI / 2; sea0.position.set(L3_X, B.waterY, 0); scene.add(sea0); B.meshes.push(sea0);
+      var sea0 = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMat); sea0.rotation.x = -Math.PI / 2; sea0.position.set(L3_X, B.waterY, 0); scene.add(sea0); B.meshes.push(sea0);
     }
     if (B.terrain !== 'ocean' && B.terrain !== 'level2' && B.patches.some(function (q) { return q.ground === 'ocean'; })) {   // an ocean patch has the same sea over it
       B.waterY = -10;
-      var sea1 = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMesh.material); sea1.rotation.x = -Math.PI / 2; sea1.position.set(L3_X, B.waterY, 0); scene.add(sea1); B.meshes.push(sea1);
+      var sea1 = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMat); sea1.rotation.x = -Math.PI / 2; sea1.position.set(L3_X, B.waterY, 0); scene.add(sea1); B.meshes.push(sea1);
     }
     if (B.terrain === 'level2') {                                // Oceana Crags' sea
       B.waterY = WATER_Y;
-      var sea = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMesh.material); sea.rotation.x = -Math.PI / 2;
+      var sea = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMat); sea.rotation.x = -Math.PI / 2;
       sea.position.set(L3_X + (L2_BOX[0] + L2_BOX[1]) / 2 - L2_X, WATER_Y, (L2_BOX[2] + L2_BOX[3]) / 2 - L2_SBZ); scene.add(sea); B.meshes.push(sea);
     }
     if (B.terrain === 'level2') {                                // Oceana Crags: the path is a deck of its own. Every stretch of it that is not a wall and not cut by a gap is drawn here exactly as she stands on it: at the path's own height, tilted to its bank, as wide as the segment, as deep as its slab thickness (2 where it has none). The ground under it is left alone (a superseding piece only has taller rock cut down to just under it), so wherever the ground stands higher than the deck it simply shows through, and that is where the terrain wins
@@ -1392,7 +1386,6 @@
     sbDispose(); SB = sbBuild(j); sbCaveInit(); sbMoverInit(); gcI = 1e9; gcJ = 1e9;
     for (var key in chunks) { scene.remove(chunks[key]); delete chunks[key]; }       // the ground is rebuilt for the new layout
     level = 3; newRun(); TIME_LIMIT = SB.timeLimit > 0 ? SB.timeLimit : 300; timeLeft = TIME_LIMIT; sbMakeMeshes(); sbRampInit(); sbBoostZones();   /* after the meshes: Oceana's slab of path is marked out while they are made, and a ramp's foot can stand on it */
-    document.getElementById('bMap').hidden = true;
     spawnStart(''); begin();
   }
   function spawnStart(msg) {                                   // a layout's own Player start if it has one, else the beginning of the path

@@ -7,10 +7,7 @@
   on('bDevBack', function () { showScreen('pause'); });
   // Dev Mode: start from anywhere with a full clock, and top up the Power Line.
   function devStart(k, x, z, face) { if (k === 0) newRun(); else { cpTime[k] = TIME_LIMIT; cpBest = Math.max(cpBest, k); } spawnAt(x, z, k, '', face); timeLeft = TIME_LIMIT; begin(); }
-  on('dvstart', function () { devStart(0, level === 3 ? L3_X : level === 2 ? L2_X : 0, 0, 0); });
-  on('dv1', function () { if (level === 2) devStart(1, L2CP_X, L2CP_Z, -Math.PI / 2); else devStart(1, CP_X, CP_Z, 0); });
-  on('dv2', function () { if (level === 2) devStart(2, L2CP2_X, L2CP2_Z, -Math.PI / 2); else devStart(2, CP2_X, CP2_Z, Math.PI / 2); });
-  on('dv3', function () { devStart(3, CP4_X, CP4_Z, 0); });
+  on('dvstart', function () { devStart(0, L3_X, 0, 0); });
   on('dvpower', function () { setPower(POWER_MAX); var b = document.getElementById('dvpower'); b.textContent = 'Power Line full!'; setTimeout(function () { b.textContent = 'Fill Power Line'; }, 1200); });
   // Dev Mode: Molly's position (Oceana Crags counts x from its own start; on a built level Y is the editor's true Y, from where her feet are at the path's start), under the speedometer and on the Dev Mode card while paused
   var showCoords = false, coordsEl = document.getElementById('coords'), dvCoordsEl = document.getElementById('dvcoords');
@@ -25,8 +22,6 @@
   });
   on('dvinvBtn', function () { invulnMode = !invulnMode; document.getElementById('dvinvBtn').textContent = 'Invulnerable: ' + (invulnMode ? 'On' : 'Off'); });
   on('bCpsBack', function () { showScreen('pause'); });
-  on('bMap', function () { showScreen('map'); });
-  on('bMapBack', function () { showScreen('pause'); });
   var mapPE = null, lvMaps = {};
   function levelMapImage(n) {                                  // a level's map, drawn by the Path Editor's own renderer from the level's data, so it follows every change to the level
     if (lvMaps[n]) return lvMaps[n];
@@ -34,7 +29,7 @@
       mapPE = document.createElement('div'); mapPE.style.cssText = 'position:fixed;left:-99999px;top:0;width:1200px;height:800px;overflow:hidden;pointer-events:none'; mapPE.__nosave = true;
       document.body.appendChild(mapPE); var msr = mapPE.attachShadow({ mode: 'open' }); msr.appendChild(document.getElementById('pe-tpl').content.cloneNode(true)); window.__peBoot(msr, mapPE);
     }
-    mapPE.__terrain = terrainProbe; mapPE.__terrBase = function (kind, x, z) { return sbTerrBase(kind, x, z, true) - (kind === 'level2' ? L2_Y : 0); }; mapPE.__pe.load(n === 1 ? JSON.parse(JSON.stringify(OFFICIAL_L1)) : n === 2 ? JSON.parse(JSON.stringify(OFFICIAL_L2)) : levelToEditor(n));
+    mapPE.__terrain = terrainProbe; mapPE.__terrBase = function (kind, x, z) { return sbTerrBase(kind, x, z, true) - (kind === 'level2' ? L2_Y : 0); }; mapPE.__pe.load(n === 1 ? JSON.parse(JSON.stringify(OFFICIAL_L1)) : JSON.parse(JSON.stringify(OFFICIAL_L2)));
     return (lvMaps[n] = mapPE.__pe.mapImage(1450, 1000));
   }
   function showLevelMap(n) {
@@ -47,9 +42,6 @@
   on('bMapL1', function () { showLevelMap(1); });
   on('bMapL2', function () { showLevelMap(2); });
   on('bLvMapBack', function () { showScreen('levels'); });
-  on('gocp', function () { if (level === 2) spawnAt(L2CP_X, L2CP_Z, 1, 'Back at checkpoint 1', -Math.PI / 2); else spawnAt(CP_X, CP_Z, 1, 'Back at checkpoint 1'); begin(); });
-  on('gocp2', function () { if (level === 2) spawnAt(L2CP2_X, L2CP2_Z, 2, 'Back at checkpoint 2', -Math.PI / 2); else spawnAt(CP2_X, CP2_Z, 2, 'Back at checkpoint 2', Math.PI / 2); begin(); });   // facing west, along the plateau
-  on('gocp3', function () { spawnAt(CP4_X, CP4_Z, 3, 'Back at checkpoint 3', 0); begin(); });   // facing -Z, into the chamber
   on('gostart', function () { newRun(); spawnStart('Back at the start'); begin(); });
   var scoreTimer = 0, scoreE = 0, scoreLast = 0, scoreDone = false, clearTimer = 0, scoreSpace = false, scoreSpaceWait = false, SCORE_SLOW = 5, SCORE_FAST_MS = 2000;   // the count runs 5 times slower than its timeline; holding Space plays the whole thing in about 2 seconds
   var RATINGS = [[800000, 'S', '#e8a400'], [720000, 'A', '#2e9b4b'], [640000, 'B', '#2b7fd0'], [560000, 'C', '#8a5ad0'], [480000, 'D', '#c9602b'], [0, 'E', '#7a6a5a']];

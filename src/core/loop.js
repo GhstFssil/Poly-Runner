@@ -28,7 +28,7 @@
   function frame(now) {
     requestAnimationFrame(frame);
     var dt = Math.min((now - last) / 1000, 0.05);
-    last = now; curNow = now; if (l2BoostM) l2BoostM.visible = level === 2;
+    last = now; curNow = now;
 
     // Speed climbs linearly while W is held and falls linearly at the same rate when released.
     // Holding S (without W) brakes twice as fast. Everything pauses with the game.
@@ -40,23 +40,6 @@
       showTime();
     }
     if (!toastEl.hidden && now > toastUntil) toastEl.hidden = true;
-    if (playing) {                                          // first time across z = -100 in the valley each run: a four-second tip
-      var hz = player.position.z;
-      if (!hintDone && hintPrevZ > -100 && hz <= -100 && player.position.x > -HALF && player.position.x < HALF) { hintDone = true; showHint('Strafe (Q/E) to avoid the trees!', 4000, now); }
-      if (hintStart) { hintStart = false; if (level === 3) { /* the Sandbox starts with no tip */ } else if (level === 2) showHint('Watch out for deep water! Molly can\'t swim!', 5000, now); else showHint('Hold W to have Molly run! Move the mouse to look around! Molly will steer toward the direction of the camera.', 7000, now); }
-      var hx = player.position.x;
-      if (!signDone && hintPrevX > SIGN_X && hx <= SIGN_X && hintPrevX - hx < 20 && Math.abs(hz - RMP_ZC) < 70) { signDone = true; showHint('Falling from too high up will hurt you! Use Barrier (2) to prevent damage!', 5000, now); }
-      if (level === 2 && !signDone && hintPrevX < L2SIGN_X && hx >= L2SIGN_X && hx - hintPrevX < 20 && Math.abs(hz - L2SIGN_Z) < 40) { signDone = true; showHint('Do a slide to get under low barriers!', 5000, now); }
-      hintPrevX = hx;
-      if (!jumpDone && hintPrevZ > -3800 && hz <= -3800 && hintPrevZ - hz < 20 && player.position.x > -HALF && player.position.x < HALF) { jumpDone = true; showHint('Jump (spacebar) to avoid ledges! The longer you hold it, the higher the jump!', 5000, now); }
-      if (!endDone && hintPrevZ > -END && hz <= -END && hintPrevZ - hz < 20 && player.position.x > -HALF && player.position.x < HALF) { endDone = true; showHint('Go into a slide (S) if you need to brake more quickly!', 4000, now); }
-      if (!segTipDone && Math.hypot(hx - chainX[0], hz - chainZ[0]) < 40) { segTipDone = true; showHint('Collect Segs to fill up your Power Line!', 4000, now); }
-      if (!readyDone && valley2Dist(hx, hz) < V2_HALF && V2_S >= V2_DESC + (V2_LEN - V2_DESC) * 2 / 3) { readyDone = true; showHint('Get ready to jump!', 3000, now); }
-      if (!chamberDone && Math.hypot(hx - CH_X, hz - CH_Z) < CH_R - 3) { chamberDone = true; showHint("Look out, it's Dr. Rektangulik's minions! Smash them with Barrier! You can either ram them or jump on their heads.", 10000, now); }
-      if (!mudTipDone && pathDist(DR_PIECES, hx, hz) < DR_W && PATH_S >= DR_CLIMB0 - 12) { mudTipDone = true; showHint('This muddy incline is too slick to walk up. Take off at high speed by holding Runner\'s Pose (S) for 3 seconds, then releasing it!', 7000, now); }
-      hintPrevZ = hz;
-    }
-    if (playing && level === 2 && !L2_BARE && !styleTipDone && l2Dist(player.position.x, player.position.z) <= L2_HW && L2_S >= L2_STRAIGHT0) { styleTipDone = true; showHint('Jump on the end of a ramp for a Style Boost!', 5000, now); }
     updateConfetti(dt); updateSpawnFx(dt); updateToxic(dt, now);
     waterTex.offset.x = (waterTex.offset.x + dt * 0.012) % 1; waterTex.offset.y = (waterTex.offset.y + dt * 0.006) % 1;
     if (!hintEl.hidden && (now > hintUntil || !playing)) hintEl.hidden = true;
@@ -168,7 +151,7 @@
     jumpBuf = Math.max(0, jumpBuf - sdt);
     if (jumpBuf > 0 && grounded && playing && !wallOn) {
       vy = (spaceDown ? JUMP_V : JUMP_V * 0.35) * (ballOn ? 0.7071 : 1); grounded = false; jumpBuf = 0; player.position.y += 0.02; speed *= cfac; cfac = 1;
-      if ((level === 2 && !L2_BARE && l2Dist(player.position.x, player.position.z) <= L2_HW && L2_PIECES[L2_PI].ramp && L2_PS >= L2_RAMP_L - L2_STYLE_ZONE) || (level === 3 && sbRampEnd(player.position.x, player.position.z))) {   // a jump from the last 5 units of the ramp: a Style Boost
+      if (level === 3 && sbRampEnd(player.position.x, player.position.z)) {   // a jump from the last 5 units of the ramp: a Style Boost
         vy = Math.max(vy, 44);                                                       // she leaves at least as hard as the ramp itself would throw her, so the boost never costs her the gap
         speed += 20 * TILE; styleStacks += 1; styleUntil = now + 3000;                // +20 Zips; Segs count one more times as much for the next 3 s (each new boost restarts the clock)
         burstConfetti(player.position.x, player.position.y, player.position.z, -Math.sin(heading) * speed, -Math.cos(heading) * speed);
@@ -273,8 +256,7 @@
     }
     var sub = false, bottomY = PLANE_Y - 150;
     if (playing) {
-      if (level === 2) { sub = pp.y + PLAYER_H - 0.2 < WATER_Y; bottomY = WATER_Y - 100; }
-      else if (level === 3 && SB) {
+      if (level === 3 && SB) {
         var sbx = pp.x - L3_X, sbi;
         if (SB.waterY !== null) { sub = pp.y + PLAYER_H - 0.2 < SB.waterY; bottomY = SB.waterY - 100; }
         if (SB.minY < 1e8) bottomY = Math.min(bottomY, SB.minY - 80);      // the bottom of the world is never above the lowest point of the path
@@ -342,30 +324,6 @@
     updateTrees(player.position.x, player.position.z);
     updateSegs(player.position.x, player.position.z);
     tickSegs(now, segX0, segZ0, player.position.x, player.position.z, player.position.y);
-    if (playing && !cpLit[0] && player.position.z < CP_Z + 1 && player.position.z > CP_Z - 60 && Math.abs(player.position.x) < 110) {
-      lightOne(0); cpTime[1] = timeLeft; cpBest = Math.max(cpBest, 1); if (spawn.cp < 1) { spawn.x = CP_X; spawn.z = CP_Z; spawn.cp = 1; spawn.yaw = 0; } 
-    }
-    if (playing && !cpLit[1] && player.position.x < CP2_X + 1 && player.position.x > CP2_X - 60 && Math.abs(player.position.z - CP2_Z) < 80) {
-      lightOne(1); cpTime[2] = timeLeft; cpBest = Math.max(cpBest, 2); if (spawn.cp < 2) { spawn.x = CP2_X; spawn.z = CP2_Z; spawn.cp = 2; spawn.yaw = Math.PI / 2; } 
-    }
-    if (playing && !cpLit[2] && player.position.z < CP4_Z + 1 && player.position.z > CP4_Z - 60 && Math.abs(player.position.x - CP4_X) < 20 && player.position.y > CH_FLOOR - 6) {
-      lightOne(2); cpTime[3] = timeLeft; cpBest = Math.max(cpBest, 3); if (spawn.cp < 3) { spawn.x = CP4_X; spawn.z = CP4_Z; spawn.cp = 3; spawn.yaw = 0; } 
-    }
-    if (playing && level === 2 && !l2Cp2Lit && player.position.x > L2CP2_X && player.position.x < L2CP2_X + 40 && Math.abs(player.position.z - L2CP2_Z) < 14 && player.position.y > L2_Y + 40) {
-      l2Cp2Lit = true; cpMat3.color.setHex(0xffc533); cpTime[2] = timeLeft; cpBest = Math.max(cpBest, 2); if (spawn.cp < 2) { spawn.x = L2CP2_X; spawn.z = L2CP2_Z; spawn.cp = 2; spawn.yaw = -Math.PI / 2; }
-    }
-    if (playing && level === 2 && !l2CpLit && player.position.x > L2CP_X && player.position.x < L2CP_X + 40 && Math.abs(player.position.z - L2CP_Z) < L2_HW + 6) {
-      l2CpLit = true; cpMat2.color.setHex(0xffc533); cpTime[1] = timeLeft; cpBest = Math.max(cpBest, 1); if (spawn.cp < 1) { spawn.x = L2CP_X; spawn.z = L2CP_Z; spawn.cp = 1; spawn.yaw = -Math.PI / 2; }
-    }
-    if (playing && !bonusDone && bonusPrev && bonusPrev[2] > BONUS_Z && player.position.z <= BONUS_Z && bonusPrev[2] - player.position.z < 80) {   // through the ring: crossing its plane inside the hoop
-      var bt = (bonusPrev[2] - BONUS_Z) / (bonusPrev[2] - player.position.z);
-      var bcx = bonusPrev[0] + (player.position.x - bonusPrev[0]) * bt, bcy = bonusPrev[1] + (player.position.y - bonusPrev[1]) * bt + 1.2;
-      if (Math.hypot(bcx - BONUS_X, bcy - BONUS_Y) < BONUS_R - 0.5) {
-        bonusDone = true; levelClear('Bonus Goal Reached!');
-      }
-    }
-    bonusPrev = [player.position.x, player.position.y, player.position.z];
-    if (playing && !cleared && player.position.z < GOAL_Z && player.position.z > GOAL_Z - 60 && Math.abs(player.position.x - DR_XE) < GOAL_HALF + 2 && player.position.y > FIELD_Y - 6 && player.position.y < FIELD_Y + 25) levelClear();
     setZips(speed / TILE); updateCoords();
 
     // Run bob and lean (the model's clips pose the limbs).
@@ -427,8 +385,7 @@
     SEE.on.value = seeD > 0.5 ? 1 : 0;
     var camUw = false;                                            // the CAMERA is under the water (not just her head): the screen goes blue and the fog closes in
     if (playing) {
-      if (level === 2) camUw = camera.position.y < WATER_Y;
-      else if (level === 3 && SB) {
+      if (level === 3 && SB) {
         var cux = camera.position.x - L3_X, cui;
         if (SB.waterY !== null && camera.position.y < SB.waterY) camUw = true;
         for (cui = 0; cui < SB.lakes.length && !camUw; cui++) { var lku = SB.lakes[cui]; if (lku.wy !== undefined && Math.hypot(cux - lku.x, camera.position.z - lku.z) < lku.r * 0.95 && camera.position.y < lku.wy) camUw = true; }

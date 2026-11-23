@@ -100,7 +100,6 @@
           <button class="go2" id="bPControls" type="button">Controls</button>
           <button class="go2" id="bPSettings" type="button">Graphics</button>
           <button class="go2" id="bCps" type="button">Checkpoints</button>
-          <button class="go2" id="bMap" type="button">View Map</button>
           <button class="go2" id="bDev" type="button">Dev Mode</button>
           <button class="go2" id="bPE" type="button" hidden>Back to Path Editor</button>
           <button class="go2" id="bTitle" type="button">Return To Title</button>
@@ -113,9 +112,6 @@
         <div class="menu">
           <button class="go2" id="dvstart" type="button">Start From the Beginning</button>
           <div id="dvDyn" class="menu"></div>
-          <button class="go2" id="dv1" type="button">Start From Checkpoint 1</button>
-          <button class="go2" id="dv2" type="button">Start From Checkpoint 2</button>
-          <button class="go2" id="dv3" type="button">Start From Checkpoint 3</button>
           <button class="go2" id="dvpower" type="button">Fill Power Line</button>
           <button class="go2" id="dvcoordsBtn" type="button">Show Coordinates: Off</button>
           <button class="go2" id="dvinvBtn" type="button">Invulnerable: Off</button>
@@ -129,19 +125,9 @@
         <h1>Checkpoints</h1>
         <div class="menu">
           <button class="go2" id="gostart" type="button">Restart From the Beginning</button>
-          <button class="go2" id="gocp" type="button">Checkpoint 1</button>
-          <button class="go2" id="gocp2" type="button">Checkpoint 2</button>
-          <button class="go2" id="gocp3" type="button">Checkpoint 3</button>
           <div id="cpDyn" class="menu"></div>
         </div>
         <button class="go2 back" id="bCpsBack" type="button">Back</button>
-      </div>
-    </section>
-    <section class="scr" id="scr-map" aria-label="Map">
-      <div class="mapbox" id="mapbox">
-        <div class="maphead"><span>WORLD MAP</span><span>forward runs left → right · ticks every 1,000 units</span></div>
-        <canvas id="mapc" width="725" height="500" aria-label="Map of the whole world, centred on her current location, with the start, the checkpoints, the goal and her heading"></canvas>
-        <button class="go2 back" id="bMapBack" type="button">Back</button>
       </div>
     </section>
     <section class="scr" id="scr-lvmap" aria-label="Level map">
@@ -155,7 +141,6 @@
 
   <div id="toast" hidden></div>
   <div id="hint" hidden role="status"></div>
-  <div id="bonus" hidden><div class="ctitle">Bonus Goal Reached!</div></div>
   <div id="clear" hidden><div class="ctitle">Level Cleared!</div><div class="csub" id="clearsub"></div>
     <div id="scorebox" hidden>
       <div class="srow"><span>TIME LEFT</span><b id="sc-time">0:00.0</b></div>
