@@ -64,7 +64,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     <div class="row">
       <label class="f" style="flex:1">Path Width<input type="number" id="width" value="9" min="2" max="40" step="1"></label>
     </div>
-    <label class="f">Ground<select id="terrain"><option value="">Flat Patchy Grass</option><option value="level1">Grass Canyon's Generated Terrain</option><option value="level2">Oceana Crags' Generated Terrain</option><option value="grass">Bumpy Grass (Grass Canyon's rolling ground only)</option><option value="ocean">Open Ocean (Oceana Crags' sea only)</option><option value="crags">Crags (the jagged rock of Oceana Crags only)</option><option value="giant">Giant Hill (one enormous hill, for Sunset Hill)</option></select></label>
+    <label class="f">Ground<select id="terrain"><option value="">Flat Patchy Grass</option><option value="level1">Grass Canyon's Generated Terrain</option><option value="level2">Oceana Crags' Generated Terrain</option><option value="grass">Bumpy Grass (Grass Canyon's rolling ground only)</option><option value="ocean">Open Ocean (Oceana Crags' sea only)</option><option value="crags">Crags (the jagged rock of Oceana Crags only)</option><option value="giant">Giant Hill (one enormous hill, for Sunset Hill)</option><option value="sunset">Sunset Hill (the hill with wandering slopes, ravines and trees, under a sunset sky)</option></select></label>
     <div id="lvset" style="display:flex;flex-direction:column;gap:6px">
       <label class="f">Time Limit (seconds; 0 = no clock)<input id="tlim" type="number" min="0" max="36000" step="1" value="0"></label>
       <div class="f" style="gap:4px"><span>Score Needed for Each Rank (E is anything below D)</span>
@@ -1421,10 +1421,10 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   // ---- the ground under the layout: read from the game's own terrain code, so it appears where the editor runs inside the game ----
   var TER = { key: '', b: null, cell: 0, nx: 0, nz: 0, h: null, k: null, img: null, done: false, ver: 0, rows: 0, timer: 0 };
   function terHost() { return typeof HOST !== 'undefined' && HOST.__terrain ? HOST.__terrain : null; }
-  function terWanted() { return $('terShow').checked && (S.terrain === 'level1' || S.terrain === 'level2'); }
+  function terWanted() { return $('terShow').checked && (S.terrain === 'level1' || S.terrain === 'level2' || S.terrain === 'sunset'); }
   function terNote() {
     var t = '';
-    if ($('terShow').checked && (S.terrain === 'level1' || S.terrain === 'level2')) { if (!terHost()) t = 'The ground only shows when this editor runs inside the game (Dev Mode).'; else if (!TER.done && TER.nz) t = 'Reading the ground… ' + Math.round(100 * TER.rows / TER.nz) + '%'; }
+    if ($('terShow').checked && (S.terrain === 'level1' || S.terrain === 'level2' || S.terrain === 'sunset')) { if (!terHost()) t = 'The ground only shows when this editor runs inside the game (Dev Mode).'; else if (!TER.done && TER.nz) t = 'Reading the ground… ' + Math.round(100 * TER.rows / TER.nz) + '%'; }
     if ($('terNote').textContent !== t) $('terNote').textContent = t;
   }
   function terBounds() {

@@ -44,7 +44,7 @@
     if (kind === 'grass') return terrainFlat(ex, z);
     if (kind === 'crags') return Math.min(300, mtSpikes(ex, z));
     if (kind === 'ocean') return top ? -10 : L2_VOID;
-    return 0;                                                       // flat ground; the Giant Hill measures a path from its own surface, so that is 0 too
+    return 0;                                                       // flat ground; the Giant Hill and Sunset Hill measure a path from their own surface, so that is 0 too
   }
   function sbDiscY(D, x, z) {                                   // the height of a circular deck at (x, z) (Sandbox coordinates): its slope rises (+) or falls (-) toward the centre, and its bank tips it to the right (+) of its heading, as a path's bank does
     var dx = x - D.cx, dz = z - D.cz, r = Math.hypot(dx, dz);
@@ -442,6 +442,7 @@
   }
   // Oceana Crags (Sandbox ground 'level2'): the path is not part of the ground at all. It is a deck of its own: an exact strip, drawn by sbMakeMeshes and stood on through sbDeckTop, with the ground under it left as it is. Her floor is whichever is higher, the deck or the ground, so what she stands on and what is drawn are the same surface by construction
   var DECK_TH = 2, DECK_CUT = 0.3, DECK_EDGE = 4.5;            // a deck's thickness where the segment gives no slab thickness; how far under a superseding deck taller rock is cut down; and how far past the deck's edges that cut stays full before it eases back up (a grid cell and its jitter, so no rock pokes through the deck's edge)
+  var l3Ed = 1e9;                                                 // how far outside the nearest path's edge the last ground point read is
   var l3Tx = 0, l3Ps = 0, l3Pu = 0;                               // the path surface nearest the last ground point read: its texture (0 stone, 1 wood planks, 2 metal plates, 3 grass), how far along the path and how far across it
   var l3Bk = 0, l3A = 0, l3P = -Infinity, l3N = Infinity, l3S0 = 0, ledI = NaN, ledA = 0, ledCA = 0, ledCI = NaN, ledTox = false;   // what the last ground height was built from: stacked bumps, the highest and lowest independent ones, and what was added in all
   function sbComb(hA, P, N, La, Li) {                            // ground rise at a corner: stacked bumps plus stacked ledges, but an independent bump or ledge only reaches its own height and merges into whatever is higher (or lower, for a trench)
@@ -453,8 +454,51 @@
     return y + L;
   }
   var GH_X = 0, GH_Z = -9000, GH_R = 9000, GH_H = 3000;           // the Giant Hill: centred 9,000 units ahead of the start, 9,000 in radius and 3,000 high, so its foot is where the path begins and its flanks climb to about 27 degrees
+  // Sunset Hill (Sandbox ground 'sunset'): the Giant Hill's footprint, but the slope wanders on the way up between almost flat and about 45 degrees, and small ravines are carved through it.
+  // The hill is 48 spokes running down from the top, each climbing at its own wandering slope (neighbouring spokes are alike, so the steep and gentle bands sweep around the hill), blended smoothly between spokes
+  var SH_H = 3000, SH_N = 48, SH_DR = 10, SH_NR = Math.ceil(GH_R / SH_DR) + 1, SH_MIN = 2, SH_MAX = 42, SH_TAB = null;   // summit height; spokes; table step along a spoke; the gentlest and steepest slope in degrees (a little more where the spokes blend)
+  var SH_RAV_W = 60, SH_RAV_D = 60, SH_RAV_S = 700;               // a ravine's usual width and depth (each wanders about 30% either way), and the scale of the field whose level lines they follow (roughly how far apart they are)
+  var SH_TREES = 2 / 3;                                            // trees grow up to this fraction of the summit's height
+  var shCut = 0;                                                   // how deep the ravine is at the last point read (0: not in one)
+  function shTable() {
+    if (SH_TAB) return SH_TAB;
+    SH_TAB = new Float32Array(SH_N * SH_NR);
+    var tn = new Float64Array(SH_NR), tmax = Math.tan(SH_MAX * Math.PI / 180), a, i, k, it, tot, s;
+    for (a = 0; a < SH_N; a++) {
+      var th = a / SH_N * 2 * Math.PI, cx = 0.9 * Math.cos(th), cz = 0.9 * Math.sin(th);   // each spoke reads the slope field along its own line, offset around a circle, so spokes next to each other read nearly the same values
+      for (i = 0; i < SH_NR; i++) {
+        var r = i * SH_DR, n = 0.7 * vnoise(r / 900 + cx, cz + 17.3, 61) + 0.3 * vnoise(r / 320 + cx * 2.8, cz * 2.8 - 9.1, 62);
+        tn[i] = Math.tan((SH_MIN + (SH_MAX - SH_MIN) * smooth01((n - 0.25) / 0.5)) * Math.PI / 180) * smooth01(r / 400) * smooth01((GH_R - r) / 700);   // a rounded top and a foot that eases into the plain
+      }
+      for (k = 1, it = 0; it < 4; it++) { tot = 0; for (i = 0; i < SH_NR - 1; i++) tot += Math.min(tmax, tn[i] * k) * SH_DR; k *= SH_H / tot; }   // steepen or flatten the whole spoke so it reaches about the summit's height
+      for (s = 0, i = SH_NR - 1; i >= 0; i--) { SH_TAB[a * SH_NR + i] = s; s += Math.min(tmax, tn[i] * k) * SH_DR; }
+      for (i = 0; i < SH_NR; i++) SH_TAB[a * SH_NR + i] *= SH_H / SH_TAB[a * SH_NR];   // and exactly: every spoke meets the others at the top
+    }
+    for (i = 0; i < SH_NR; i++) {                                   // toward the top the spokes are close together, so a difference between them would be a cliff across the hill: there they all draw in to their average
+      for (s = 0, a = 0; a < SH_N; a++) s += SH_TAB[a * SH_NR + i];
+      s /= SH_N; k = smooth01((i * SH_DR - 300) / 4000);
+      for (a = 0; a < SH_N; a++) SH_TAB[a * SH_NR + i] = s + (SH_TAB[a * SH_NR + i] - s) * k;
+    }
+    return SH_TAB;
+  }
+  function shBase(x, z) {                                          // Sunset Hill's height without its ravines or small bumps (Sandbox coordinates)
+    var T = SH_TAB || shTable(), dx = x - GH_X, dz = z - GH_Z, r0 = Math.hypot(dx, dz);
+    var r = r0 + 240 * (vnoise(x / 1900 + 3.3, z / 1900 - 7.7, 63) - 0.5) * smooth01(r0 / 1500);   // the contours wander, so the hill is not round
+    if (r >= GH_R - SH_DR) return 0; if (r < 0) r = 0;
+    var u = (Math.atan2(dz, dx) / (2 * Math.PI) + 1) * SH_N, a1 = Math.floor(u), f = u - a1, fr = r / SH_DR, i = Math.floor(fr), t = fr - i, p = [0, 0, 0, 0];
+    for (var q = 0; q < 4; q++) { var o = (((a1 - 1 + q) % SH_N) + SH_N) % SH_N * SH_NR + i; p[q] = T[o] + (T[o + 1] - T[o]) * t; }
+    return 0.5 * (2 * p[1] + (p[2] - p[0]) * f + (2 * p[0] - 5 * p[1] + 4 * p[2] - p[3]) * f * f + (3 * p[1] - p[0] - 3 * p[2] + p[3]) * f * f * f);   // smooth from spoke to spoke (Catmull-Rom)
+  }
+  function shRf(x, z) { return 0.75 * vnoise(x / SH_RAV_S + 11.7, z / SH_RAV_S - 4.2, 64) + 0.25 * vnoise(x * 2.6 / SH_RAV_S - 6.6, z * 2.6 / SH_RAV_S + 2.9, 65); }
+  function shRavine(x, z) {                                        // how deep a ravine cuts at (x, z): ravines run along the level lines of a slow random field, a steep-walled channel with a narrow floor
+    var n0 = shRf(x, z) - 0.5; if (n0 > 0.12 || n0 < -0.12) return 0;   // (the field cannot climb faster than this, so farther from the line than this there is no ravine)
+    var e = 2, gx = shRf(x + e, z) - 0.5 - n0, gz = shRf(x, z + e) - 0.5 - n0, gl = Math.hypot(gx, gz) / e; if (gl < 1e-7) return 0;
+    var d = Math.abs(n0) / gl, hw = SH_RAV_W / 2 * (0.7 + 0.6 * vnoise(x / 400 + 5.1, z / 400, 66)); if (d >= hw) return 0;   // distance to the line, and this stretch's half width
+    var dep = SH_RAV_D * (0.7 + 0.6 * vnoise(x / 350 - 2.2, z / 350 + 8.4, 67));
+    return dep * smooth01((hw - d) / (0.6 * hw)) * smooth01((Math.hypot(x, z) - 150) / 100);   // walls over the outer 60% of each side; none right at the start
+  }
   function level3H(x, z) {
-    wSt = 0; wPl = 0; wMud = 0; wF = 0; wL2 = 0; l3A = 0; l3P = -Infinity; l3N = Infinity; l3S0 = 0; l3Bk = 0; l3Tx = 0;
+    wSt = 0; wPl = 0; wMud = 0; wF = 0; wL2 = 0; l3A = 0; l3P = -Infinity; l3N = Infinity; l3S0 = 0; l3Bk = 0; l3Tx = 0; shCut = 0; l3Ed = 1e9;
     if (!SB) return 0;
     var ex = x - L3_X, y = 0, B = SB, HW = SB.hw, hwq = SB.hw, best = 1e9, py = 0, ing = false, tox = false, pov = false, i, d;
     sbNear(B.gapH, ex, z, B.maxG, function (e) { if (!ing && sbIn(e, ex, z, 0)) ing = true; });
@@ -481,6 +525,7 @@
       l3Ps = ddx * Math.sin(Dk.hh) - ddz * Math.cos(Dk.hh); l3Pu = ddx * Math.cos(Dk.hh) + ddz * Math.sin(Dk.hh);
     }
     if (ing) { best = 1e9; py = 0; }                                  // a gap is a break in the path: the ground is whatever is under it, with no path across
+    l3Ed = best - HW;                                                 // how far outside the nearest path's edge this point is (negative: on it)
     if (B.terrain === 'grass') {                                      // Grass Canyon's rolling ground and nothing else: no walls, ledges or plateau, going on for ever. The path is laid over it and the ground eases into it
       var gb = terrainFlat(ex, z); y = gb;
       if (best < HW + 14) { var gk = 1 - smooth01((best - HW) / 14); y = gb + (py - gb) * gk; if (best <= HW) wL2 = 1; }
@@ -495,6 +540,11 @@
       var gdd = Math.hypot(ex - GH_X, z - GH_Z), ghv = GH_H * smooth01(1 - gdd / GH_R) + terrainFlat(ex, z);
       y = ghv;
       if (best < HW + 14) { var gk2 = 1 - smooth01((best - HW) / 14); y = ghv + py * gk2; if (best <= HW) wL2 = 1; }
+    }
+    else if (B.terrain === 'sunset') {                                // Sunset Hill: the path rides on the hill (its Rise measured from the hill's surface), but a ravine cuts through path and ground alike: no land bridges (a floating piece can still span one)
+      var shb = shBase(ex, z); shCut = shRavine(ex, z); y = shb + terrainFlat(ex, z);
+      if (best < HW + 14) { var gk3 = 1 - smooth01((best - HW) / 14); y += (shb + py - y) * gk3; if (best <= HW && shCut < 1) wL2 = 1; }
+      if (shCut > 0) { y -= shCut; if (shCut > 3) wSt = 1; }         // bare rock down in a ravine
     }
     else if (B.terrain === 'ocean') {                                 // Oceana Crags' open sea and nothing else: no ground at all, the path is a causeway over it. She falls through the water to the bottom of the world
       y = L2_VOID; if (best < HW + 2) { y = L2_VOID + (py - L2_VOID) * (1 - smooth01((best - HW) / 2)); if (best <= HW) wL2 = 1; }
@@ -1368,13 +1418,15 @@
   window.__gh = function (x, z) { return groundH(x, z); };
   window.__gg = function (x, z) { groundGrad(x, z); return [ggx, ggz]; };
   window.__br = function () { return [breath, breathT]; };
+  window.__shDbg = function (x, z) { return [shBase(x, z), shRavine(x, z)]; };   // (tests: Sunset Hill's height without ravines, and the ravine's depth)
   window.__sbTick = function (dt) { sbTick(dt, performance.now()); };
   function terrainProbe(kind, x0, z0, nx, nz, cell) {            // the level's own ground at a grid of points (the editor paints it under the layout): height and what it is made of
     var h = new Float32Array(nx * nz), k = new Uint8Array(nx * nz), i, j, ex, ez, y, kk, lg;
     {
       for (j = 0; j < nz; j++) for (i = 0; i < nx; i++) {
         ex = x0 + (i + 0.5) * cell; ez = z0 + (j + 0.5) * cell;
-        if (kind === 'level2') { y = oldWorldH(L2_X + ex, ez + L2_SBZ); kk = wL2 === 3 ? 6 : wL2 === 2 ? 5 : wL2 ? 4 : 0; lg = oldLedgeH(L2_X + ex, ez + L2_SBZ); if (y < WATER_Y) kk |= 32; }
+        if (kind === 'sunset') { var shb = shBase(ex, ez), shc = shRavine(ex, ez); y = shb + terrainFlat(ex, ez) - shc; lg = 0; kk = shc > 3 ? 1 : shb > SH_H * SH_TREES ? 2 : 0; }   // Sunset Hill: rock in the ravines, paler grass above the treeline
+        else if (kind === 'level2') { y = oldWorldH(L2_X + ex, ez + L2_SBZ); kk = wL2 === 3 ? 6 : wL2 === 2 ? 5 : wL2 ? 4 : 0; lg = oldLedgeH(L2_X + ex, ez + L2_SBZ); if (y < WATER_Y) kk |= 32; }
         else { y = oldWorldH(ex, ez); kk = wL2 === 3 ? 6 : wSt ? 1 : wPl ? 2 : wMud ? 3 : 0; lg = oldLedgeH(ex, ez); }
         if (lg > 0.4 || lg < -0.4) kk |= 16;
         h[j * nx + i] = y + lg; k[j * nx + i] = kk;
@@ -1549,7 +1601,7 @@
         color.setHSL(0.068 + (jit - 0.5) * 0.03, 0.36, 0.30 + (jit - 0.5) * 0.08 + Math.min(0.14, Math.max(0, cy - 35) / 1800) - (rise3 > 6 ? 0.05 : 0) + 0.025 * Math.sin(cy * 0.4));
       } else if (!face && vd[a] === 3 && vd[b] === 3 && vd[c] === 3) {                                  // the mud ramp
         color.setHSL(0.075 + (jit - 0.5) * 0.02, 0.42, 0.2 + (jit - 0.5) * 0.07 + (0.5 + 0.5 * Math.sin(cz * 0.9 + cx * 0.3)) * 0.03);
-      } else if (face || vd[a] === 1 || vd[b] === 1 || vd[c] === 1 || vd[a] === 3 || vd[b] === 3 || vd[c] === 3 || rise3 > (plat ? 5 : 0.48)) {   // cliffs, and the steep faces of ledges and hillsides, are rock
+      } else if (face || vd[a] === 1 || vd[b] === 1 || vd[c] === 1 || vd[a] === 3 || vd[b] === 3 || vd[c] === 3 || rise3 > (plat ? 5 : SB && SB.terrain === 'sunset' ? 2.6 : 0.48)) {   // cliffs, and the steep faces of ledges and hillsides, are rock (Sunset Hill stays grassy up to about 40 degrees)
         color.setHex(STONE[Math.floor(jit * STONE.length) % STONE.length]);
         color.offsetHSL(0, 0, Math.min(0.1, cy / 400) + (rand01(tq, 3 + ci + cj * 977, 6) - 0.5) * 0.05);
       } else {

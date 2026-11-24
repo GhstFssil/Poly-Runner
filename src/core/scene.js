@@ -11,6 +11,14 @@
   scene.fog = new THREE.Fog(SKY, 160 * GFX.fog, 640 * GFX.fog);
 
   var camera = new THREE.PerspectiveCamera(65, 1, 0.1, 700 * GFX.fog);
+  // The sunset sky (Sunset Hill): a dome kept round the camera, pale blue overhead fading through peach to deep orange at the horizon. The fog takes the horizon's colour, so far ground fades into it
+  var SUNSET_TOP = 0xa9cde8, SUNSET_MID = 0xf4b26a, SUNSET_HZ = 0xe0601e;
+  var skyDome = new THREE.Mesh(new THREE.SphereGeometry(600 * GFX.fog, 32, 16), new THREE.ShaderMaterial({
+    uniforms: { cT: { value: new THREE.Color(SUNSET_TOP) }, cM: { value: new THREE.Color(SUNSET_MID) }, cH: { value: new THREE.Color(SUNSET_HZ) } },
+    vertexShader: 'varying vec3 vD;\nvoid main() { vD = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform vec3 cT; uniform vec3 cM; uniform vec3 cH; varying vec3 vD;\nvoid main() { float h = normalize(vD).y; vec3 c = mix(cH, cM, smoothstep(-0.03, 0.08, h)); c = mix(c, cT, smoothstep(0.05, 0.3, h)); gl_FragColor = vec4(c, 1.0); }',
+    side: THREE.BackSide, depthWrite: false, depthTest: false, fog: false }));
+  skyDome.renderOrder = -1e9; skyDome.frustumCulled = false; skyDome.visible = false; scene.add(skyDome);
   // See-through: any opaque surface between the camera and Molly is drawn see-through (a fine stipple, most of it left out) inside a narrow cone along the line from the camera to her, so she is never hidden. It stops short of her, so she and the ground at her feet are drawn as usual.
   var SEE = { on: { value: 0 }, a: { value: new THREE.Vector3() }, b: { value: new THREE.Vector3() }, r: { value: 2.2 }, t1: { value: 0.8 } };
   THREE.Material.prototype.onBeforeCompile = function (shader) {

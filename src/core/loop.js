@@ -390,7 +390,8 @@
       }
     }
     if (camUw !== uwOn) { uwOn = camUw; uwEl.classList.toggle('on', uwOn); }
-    scene.fog.color.setHex(uwOn ? 0x2f6fb5 : SKY); scene.background.setHex(uwOn ? 0x2f6fb5 : SKY); scene.fog.near = (uwOn ? 10 : 160) * GFX.fog; scene.fog.far = (uwOn ? 260 : 640) * GFX.fog;
+    var skyC = SB && SB.terrain === 'sunset' ? SUNSET_HZ : SKY; skyDome.visible = skyC !== SKY && !uwOn; if (skyDome.visible) skyDome.position.copy(camera.position);   // Sunset Hill's sky
+    scene.fog.color.setHex(uwOn ? 0x2f6fb5 : skyC); scene.background.setHex(uwOn ? 0x2f6fb5 : skyC); scene.fog.near = (uwOn ? 10 : 160) * GFX.fog; scene.fog.far = (uwOn ? 260 : 640) * GFX.fog;
     renderer.render(scene, camera);
     SEE.on.value = 0;
   }
