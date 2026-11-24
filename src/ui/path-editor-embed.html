@@ -135,7 +135,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     <div class="row">
       <button class="small" id="saveFile" title="Download the layout as a file you keep anywhere (a backup that does not depend on this browser)">Save to File</button>
       <button class="small" id="openFile" title="Open a layout file saved earlier; it replaces the layout here (Ctrl+Z undoes it)">Open From File</button>
-      <button class="small" id="restoreBk" title="Open the layout the desktop app last copied to ~/PolyRun/layouts" hidden>Open Latest Backup</button>
+      <button class="small" id="restoreBk" title="Open the layout the desktop app last copied to ~/PolyRunner/layouts" hidden>Open Latest Backup</button>
       <input type="file" id="fileIn" accept=".json,.txt,application/json,text/plain" hidden>
     </div>
     <div class="stats" id="msg"></div>
@@ -193,17 +193,17 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var m = 0; S.layers.forEach(function (l) { m = Math.max(m, l.id); }); nextLayer = m + 1;
     if (S.activeLayer === undefined || !lyrById(S.activeLayer)) S.activeLayer = S.layers[0].id;
   }
-  // In the desktop app (it gives the page window.polyrun) the layout and the presets are also copied to ordinary files, so losing the app's own storage cannot lose the work.
+  // In the desktop app (it gives the page window.polyrunner) the layout and the presets are also copied to ordinary files, so losing the app's own storage cannot lose the work.
   var bkTimer = 0;
   function backupNow() {
     bkTimer = 0;
     try {
-      if (!window.polyrun || !window.polyrun.backup) return;
-      var t = $('json').value; if (t) window.polyrun.backup('layout', t);
-      var pr = localStorage.getItem('polyrunner-pe-presets'); if (pr) window.polyrun.backup('presets', pr);
+      if (!window.polyrunner || !window.polyrunner.backup) return;
+      var t = $('json').value; if (t) window.polyrunner.backup('layout', t);
+      var pr = localStorage.getItem('polyrunner-pe-presets'); if (pr) window.polyrunner.backup('presets', pr);
     } catch (e) {}
   }
-  function backupSoon() { if (!bkTimer && window.polyrun && window.polyrun.backup) bkTimer = setTimeout(backupNow, 20000); }   // at most one copy every 20 seconds while editing
+  function backupSoon() { if (!bkTimer && window.polyrunner && window.polyrunner.backup) bkTimer = setTimeout(backupNow, 20000); }   // at most one copy every 20 seconds while editing
   window.addEventListener('beforeunload', function () { if (bkTimer) backupNow(); });
   function save() {                                               // every change is kept in this browser; if its storage is full (a big saved Molly model shares it) that fails, and it must not fail silently
     if (typeof HOST !== 'undefined' && HOST.__nosave) return;
@@ -1177,9 +1177,9 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if ($('msg').textContent !== 'That is not a path file.') $('msg').textContent = 'Opened ' + label + '. Ctrl+Z undoes it.';
     else { $('json').value = prev; $('msg').textContent = label + ' is not a Poly Runner layout file, so nothing changed.'; }
   }
-  if (window.polyrun && window.polyrun.restore) $('restoreBk').hidden = false;
+  if (window.polyrunner && window.polyrunner.restore) $('restoreBk').hidden = false;
   $('restoreBk').onclick = function () {
-    window.polyrun.restore('layout').then(function (t) { if (!t) { $('msg').textContent = 'No automatic backup yet. (They are kept in ~/PolyRun/layouts while you edit.)'; return; } openText(t, 'the latest automatic backup'); }, function () { $('msg').textContent = 'Could not read the backup.'; });
+    window.polyrunner.restore('layout').then(function (t) { if (!t) { $('msg').textContent = 'No automatic backup yet. (They are kept in ~/PolyRunner/layouts while you edit.)'; return; } openText(t, 'the latest automatic backup'); }, function () { $('msg').textContent = 'Could not read the backup.'; });
   };
   $('openFile').onclick = function () { $('fileIn').value = ''; $('fileIn').click(); };
   $('fileIn').onchange = function () {

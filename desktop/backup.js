@@ -1,4 +1,4 @@
-// Automatic file backups of the Path Editor's layout and presets, kept in an ordinary folder (~/PolyRun/layouts) that has nothing to do
+// Automatic file backups of the Path Editor's layout and presets, kept in an ordinary folder (~/PolyRunner/layouts) that has nothing to do
 // with the app's own browser-style storage. Pure file logic (no Electron), so it can be tested on its own.
 const fs = require('fs');
 const path = require('path');

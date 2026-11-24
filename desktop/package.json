@@ -1,7 +1,7 @@
 {
-  "name": "polyrun",
+  "name": "polyrunner",
   "productName": "Poly Runner",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Poly Runner: a 3D platformer starring Molly",
   "main": "main.js",
   "author": "Ricky",
@@ -15,7 +15,7 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-    "appId": "com.ricky.polyrun",
+    "appId": "com.polyrunner.game",
     "productName": "Poly Runner",
     "files": [
       "main.js",
@@ -30,7 +30,7 @@
       ],
       "category": "Game",
       "icon": "icon.png",
-      "artifactName": "PolyRun-${version}.AppImage",
+      "artifactName": "PolyRunner-${version}.AppImage",
       "executableArgs": [
         "--no-sandbox"
       ]

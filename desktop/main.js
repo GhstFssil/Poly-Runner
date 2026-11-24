@@ -8,7 +8,7 @@ const fs = require('fs');
 
 app.commandLine.appendSwitch('no-sandbox');   // Ubuntu's setuid sandbox helper is usually not set up for a home-folder install, and this is a local, offline game
 
-app.setPath('userData', path.join(app.getPath('appData'), 'PolyRun'));   // a plain, predictable folder name: ~/.config/PolyRun
+app.setPath('userData', path.join(app.getPath('appData'), 'PolyRunner'));   // a plain, predictable folder name: ~/.config/PolyRunner
 
 // One copy at a time: two copies sharing one storage folder can corrupt it, and the app then throws the storage away (that is how saved layouts were lost once).
 // A second launch just brings the first window to the front.
@@ -17,12 +17,12 @@ const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) app.quit();
 app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); } });
 
-const backupDir = () => path.join(os.homedir(), 'PolyRun', 'layouts');   // automatic file backups of the Path Editor's layout and presets, outside the app's own storage
-ipcMain.handle('polyrun-backup', (e, kind, text) => { try { return saveBackup(backupDir(), kind, text); } catch (err) { return { error: String(err && err.message || err) }; } });
-ipcMain.handle('polyrun-restore', (e, kind) => { try { return readLatest(backupDir(), kind); } catch (err) { return null; } });
+const backupDir = () => path.join(os.homedir(), 'PolyRunner', 'layouts');   // automatic file backups of the Path Editor's layout and presets, outside the app's own storage
+ipcMain.handle('polyrunner-backup', (e, kind, text) => { try { return saveBackup(backupDir(), kind, text); } catch (err) { return { error: String(err && err.message || err) }; } });
+ipcMain.handle('polyrunner-restore', (e, kind) => { try { return readLatest(backupDir(), kind); } catch (err) { return null; } });
 
 const bundled = path.join(__dirname, 'game');                       // the copy that ships inside the app
-const userGame = () => path.join(app.getPath('userData'), 'game');  // ~/.config/PolyRun/game: if it holds an index.html, it wins
+const userGame = () => path.join(app.getPath('userData'), 'game');  // ~/.config/PolyRunner/game: if it holds an index.html, it wins
 
 function gameDir() {
   return fs.existsSync(path.join(userGame(), 'index.html')) ? userGame() : bundled;

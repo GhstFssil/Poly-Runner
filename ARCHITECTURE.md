@@ -9,7 +9,7 @@
   - the Rig Editor, in `<template id="rig-tpl">`, booted by `window.__rigBoot`;
   - the built-in models `#molly-glb` and `#comet-glb`, baked by `python3 tools/bake_models.py`;
   - the shipped settings `#molly-settings` and `#comet-settings` (Comet's has no `mn.*`).
-- `desktop/`: the Electron app (one copy only, file backups through `window.polyrun`). The update folder `~/.config/PolyRun/game` overrides the built-in game.
+- `desktop/`: the Electron app (one copy only, file backups through `window.polyrunner`). The update folder `~/.config/PolyRunner/game` overrides the built-in game. Until desktop app 1.2 (v194) the folders were `~/.config/PolyRun` and `~/PolyRun`; the app never reads them (a one-time script, kept outside the repo, copied Ricky's).
 - `tools/`:
   - `mk_pe_embed.py`, `bake_models.py`;
   - `build_release.py` (the offline game zip and desktop zip);

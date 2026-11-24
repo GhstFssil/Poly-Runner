@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Build the two downloads from this repository (used by the GitHub Action, and works locally too):
-   <out>/polyrunner-game-<version>.zip                the offline game folder (paste over ~/.config/PolyRun/game, or open game/index.html)
+   <out>/polyrunner-game-<version>.zip                the offline game folder (paste over ~/.config/PolyRunner/game, or open game/index.html)
    <out>/polyrunner-desktop-<app version>.zip          the desktop app source with that game inside (run build-and-install.sh)
 Usage: python3 tools/build_release.py <three dir> <@fontsource dir> <out dir>
    <three dir>: node_modules/three (r128); <@fontsource dir>: node_modules/@fontsource

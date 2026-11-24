@@ -8,7 +8,8 @@
         "Changed",
         [
           "The game file is now poly-runner.html (it was checker-run.html).",
-          "The game keeps its saves in the browser under Poly Runner's own names now. The first time this version opens, your saved models, layouts, presets and Saved Sandboxes are copied across by themselves, and the old copies are left alone."
+          "The game keeps its saves in the browser under Poly Runner's own names now. The first time this version opens, your saved models, layouts, presets and Saved Sandboxes are copied across by themselves, and the old copies are left alone.",
+          "Desktop app 1.2: its folders are now ~/.config/PolyRunner (the app's own storage and the update folder) and ~/PolyRunner (the app and its layout backups). To bring saves over from 1.1, run the one-time migration script before the new app's first start."
         ]
       ]
     ]

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Build the two things Ricky installs, from this repository (run tools/mk_electron.py first; it writes the offline game folder):
-   /home/claude/polyrunner-game-vNNN.zip      the game folder alone (paste over ~/.config/PolyRun/game, or run it in a browser)
+   /home/claude/polyrunner-game-vNNN.zip      the game folder alone (paste over ~/.config/PolyRunner/game, or run it in a browser)
    /home/claude/polyrunner-desktop-X.Y.zip    the desktop app source + the game folder, for build-and-install.sh
 Usage: python3 tools/package.py <game version, e.g. v175>"""
 import sys, os, shutil, subprocess, json

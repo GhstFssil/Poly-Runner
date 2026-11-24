@@ -1,8 +1,8 @@
-# the desktop hooks: a fake window.polyrun records backups and serves a restore
+# the desktop hooks: a fake window.polyrunner records backups and serves a restore
 import json,sys
 from playwright.sync_api import sync_playwright
 J={"version":2,"width":9,"pieces":[{"len":300}],"objects":[{"type":"tree","id":1,"x":10,"z":-20},{"type":"gap","id":2,"x":30,"z":-40,"heading":0,"bend":0,"length":30,"width":15,"ends":"square"}]}
-FAKE="""window.__calls=[];window.__latest=%s;window.polyrun={desktop:true,backup:function(k,t){window.__calls.push([k,t.length]);return Promise.resolve({saved:true})},restore:function(k){return Promise.resolve(k==='layout'?window.__latest:null)}};"""
+FAKE="""window.__calls=[];window.__latest=%s;window.polyrunner={desktop:true,backup:function(k,t){window.__calls.push([k,t.length]);return Promise.resolve({saved:true})},restore:function(k){return Promise.resolve(k==='layout'?window.__latest:null)}};"""
 with sync_playwright() as p:
     b=p.chromium.launch(); 
     # standalone, with the fake bridge

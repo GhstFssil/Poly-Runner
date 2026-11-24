@@ -1,26 +1,26 @@
 # Handoff (2026-11-24)
 
 ## Goal
-Rename the game to Poly Runner everywhere, including the hidden saved-data names (with a migration), shipped as one version (v194). Three commits on `next`.
+Rename the game to Poly Runner everywhere, including the hidden saved-data names, shipped as one version (v194, desktop app 1.2). All three commits are on `next`; not published yet.
 
-## Done
-- v193 published (Sunset Hill fixes). The source split is finished (its BACKLOG entry deleted).
-- Commit 1 (on `next`): the game file is `poly-runner.html` (was `checker-run.html`; `src/manifest.json` output). Paths updated in `tools/` (build_release, mk_electron, reslice), `tests/` (chk, mk_test), `release.yml`, README, ARCHITECTURE, GLOSSARY; "Poly Run" -> "Poly Runner" in the sweep docs and `mk_sweep_docs.py`. Game file byte-identical apart from its name. Titles, menus and the desktop window already said Poly Runner.
-
-- Commit 2 (on `next`): browser storage. IndexedDB `polyrunner` (`idbMigrate` in molly.js copies keys from `polyrun` once, marker key `__migrated`; never creates an old database). localStorage `polyrun-*` -> `polyrunner-*`, copied once (marker `polyrunner-migrated`) at the top of core/start.html and path-editor.html; a key that doesn't fit is moved instead. Saved layout file names `polyrunner-layout-*`. Test `tests/fu/rename_saves.py`. CHANGELOG entry v194 added (label not bumped yet). CLAUDE.md file name updated (Ricky OK'd).
-
-## In progress
-- Commit 3: desktop app. `window.polyrunner` and its messages, `~/PolyRunner`, `~/.config/PolyRunner` (copy the old folder before the game starts: Electron keeps the saves there), package `polyrunner`, app id `com.polyrunner.game`, AppImage name, build-and-install.sh.
+## Done (on `next`)
+- Commit 1: the game file is `poly-runner.html` (was `checker-run.html`); tools, tests, `release.yml`, docs, CLAUDE.md updated. Titles, menus and the desktop window already said Poly Runner.
+- Commit 2: browser storage `polyrun` -> `polyrunner` (IndexedDB, `polyrun-*` localStorage keys, layout file names), copied once on first load (`idbMigrate` in molly.js, marker `__migrated`; localStorage copy at the top of core/start.html and path-editor.html, marker `polyrunner-migrated`; a key that doesn't fit is moved). Test `tests/fu/rename_saves.py`.
+- Commit 3: desktop app 1.2: `window.polyrunner` and `polyrunner-backup`/`-restore`, folders `~/.config/PolyRunner` and `~/PolyRunner`, package `polyrunner`, app id `com.polyrunner.game`, `PolyRunner-1.2.0.AppImage`, `PolyRunner.desktop`, `run-polyrunner.sh`. The app does NOT migrate the old folders: Ricky runs a one-time script (`migrate-to-polyrunner.sh`, sent to him, not in the repo).
+- v194 CHANGELOG entry written (label still v193).
 
 ## Decisions
-- Ricky: rename the hidden names too; one release; app id without his name (`com.polyrunner.game`). `pr_*`, `runnerRig2`, `cometRig` keep their names (GLOSSARY.md, Frozen names).
-- Firefox opening the renamed local file sees a different site: a migration can't reach the old saves there (export Saved Sandboxes from the old file first).
+- Ricky: rename the hidden names too; one release; app id without his name; desktop folders moved by a one-time script, not by app code (no cruft). `pr_*`, `runnerRig2`, `cometRig` keep their names.
+- The script copies (old folders stay as backup), refuses if the app is running or a new folder exists, leaves out the old update folder `game/` (it would hide the new built-in game) and the lock files, and removes the old `PolyRun.desktop`.
 
 ## Next steps
-1. Commit 3, tested with fake saves (add its line to the v194 CHANGELOG entry).
-2. Ricky backs up `~/.config/PolyRun` and `~/PolyRun`, then ask before publishing v194 (label bump + CHANGELOG entry).
+1. Ask Ricky before publishing: bump the label to v194, merge `next` into `main`.
+2. Ricky: close the app, back up `~/.config/PolyRun` and `~/PolyRun`, run the script, install desktop 1.2 (`build-and-install.sh`), start it and check layouts, Saved Sandboxes and models.
+3. Later (BACKLOG): remove the in-game one-time copy once his saves are confirmed.
 
 ## Gotchas
-- `tools/mk_sweep_docs.py` is older than the SWEEP-*.md files (they gained HISTORY.md rules by hand): don't regenerate them with it, or those rules are lost.
-- `tools/mk_electron.py` reads fonts from a hard-coded `/tmp/fx` (fails in a fresh workspace; the release workflow uses `build_release.py` instead).
+- Firefox opening `poly-runner.html` sees a different site than `checker-run.html`: no copy possible there (export Saved Sandboxes from the old file).
+- `tools/mk_sweep_docs.py` is older than the SWEEP-*.md files: don't regenerate them with it.
+- `tools/mk_electron.py` reads fonts from a hard-coded `/tmp/fx`; the release workflow uses `build_release.py`.
+- The desktop app itself wasn't launched here (no Electron run); its JS syntax, the bridge test (`fu/pe_backup.py`) and the release build pass.
 - Shallow clone: `git -c push.negotiate=true push`. Tests leave `shots/` and `tests/fu/new_*` behind; don't commit them.

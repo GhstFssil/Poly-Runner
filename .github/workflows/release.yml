@@ -32,7 +32,7 @@ jobs:
         run: |
           NOTES="Poly Runner $VER, desktop app $APP. Built from commit ${GITHUB_SHA::7}.
 
-          - polyrunner-game-$VER.zip: the game folder. For the desktop app, paste its contents over ~/.config/PolyRun/game (or use Game > Use built-in version after installing the app below). It also runs on its own: open game/index.html in a browser.
+          - polyrunner-game-$VER.zip: the game folder. For the desktop app, paste its contents over ~/.config/PolyRunner/game (or use Game > Use built-in version after installing the app below). It also runs on its own: open game/index.html in a browser.
           - polyrunner-desktop-$APP.zip: the desktop app with this game built in. Unzip it and run: bash build-and-install.sh"
           if gh release view "$VER" > /dev/null 2>&1; then
             gh release edit "$VER" --notes "$NOTES"

@@ -23,11 +23,9 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 - [ ] (Ricky, 2026-11-23) Big star when flying should be tilted horizontal compared to its orientation when it's on her back.
 - [ ] (Ricky, 2026-11-24) Possibility of having a draw/stretch tool in the path/rig editor? Draw could create chained segments of objects and stretch could adjust the position of points.
 
-## Separate track: rename to Poly Runner (the source split is done)
+## Separate track: rename to Poly Runner (done on `next` for v194)
 (Discussed 2026-11-16; Ricky backs up saves first. Best done after groups 1-2 so those fixes aren't mixed into the move.)
-- [ ] (Ricky, 2026-11-24) Rename the hidden saved-data names, with a migration (names decided: GLOSSARY.md, Frozen names). Shipped together with the visible rename (done on `next` 2026-11-24) as one version. Commit 2: browser storage; commit 3: the desktop app (it copies `~/.config/PolyRun` before the game starts, since Electron keeps the saves there).
-  - **Risk: high if done without migration. The game would look in the new names, find nothing, and start fresh; saves would look lost (still on disk, but only recoverable by hand).** Not corruption, but easy to mistake for it.
-  - If done: copy, never move (fill the new names only when empty, leave the old data untouched); the desktop app copies `~/.config/PolyRun` before the game starts; test the migration with fake saves in the harness; Ricky backs up `~/.config/PolyRun` and `~/PolyRun` first.
+- [ ] (Claude, 2026-11-24) Once Ricky's saves are confirmed under the new names (after v194), remove the one-time copy from the old names: `idbMigrate` in `src/characters/molly.js` and the localStorage copy at the top of `src/core/start.html` and `path-editor.html` (then `mk_pe_embed.py`), plus `tests/fu/rename_saves.py`. Keep the GLOSSARY note that the old names must never be reused.
 
 ## Nightly sweep suggestions
 Questions and suggestions the sweep may not act on (possible bugs that might be intended, features, physics, tuning, looks, design) are appended below by the sweep itself, one line each, tagged with the night's branch; details are in that night's report in `sweep-reports/`. Ricky promotes or deletes them.
