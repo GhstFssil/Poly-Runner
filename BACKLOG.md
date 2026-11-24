@@ -14,6 +14,7 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 - [ ] (Ricky, 2026-11-23) Give comet her own hair (ringlet curls)
 - [ ] (Ricky, 2026-11-23) Give fine-grained control of hair.
 - [ ] (Ricky, 2026-11-23) Add special assets for the faces (eyes, mouth, nose).
+- [ ] (Ricky, 2026-11-23) Character select should be a choice each time after selecting a level to play, not a switch that must be flipped on the characters page.
 
 ## Separate track: split the game into source files and rename to Poly Runner
 (Discussed 2026-11-16; Ricky backs up saves first. Best done after groups 1-2 so those fixes aren't mixed into the move.)
