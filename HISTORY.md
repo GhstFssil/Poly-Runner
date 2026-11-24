@@ -64,3 +64,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-24 17:28 | next | rename commit 3: desktop app 1.2: bridge window.polyrunner and polyrunner-backup/-restore, folders ~/.config/PolyRunner and ~/PolyRunner, package polyrunner, app id com.polyrunner.game, AppImage/shortcut/launcher names; old folders copied by a one-time script given to Ricky (not in the repo); v194 CHANGELOG line; GLOSSARY, ARCHITECTURE, BACKLOG (rename entry done; removal of the in-game copy logged)
 - 2026-11-24 17:29 | v194 | published: version label v194; Poly Runner rename (game file poly-runner.html, browser storage polyrunner with one-time copy, desktop app 1.2 folders and app id); next merged into main
 - 2026-11-24 17:34 | main | CLAUDE.md: session start skips nightly branches whose fixes are already on main (docs only)
+- 2026-11-24 17:46 | main | HANDOFF: Ricky confirmed the desktop 1.2 install and folder migration worked (docs only)

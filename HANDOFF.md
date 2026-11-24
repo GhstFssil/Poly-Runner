@@ -15,8 +15,8 @@ Rename the game to Poly Runner everywhere, including the hidden saved-data names
 
 ## Next steps
 1. (done) v194 published.
-2. Ricky: close the app, back up `~/.config/PolyRun` and `~/PolyRun`, run the script, install desktop 1.2 (`build-and-install.sh`), start it and check layouts, Saved Sandboxes and models.
-3. Later (BACKLOG): remove the in-game one-time copy once his saves are confirmed.
+2. (done 2026-11-24) Ricky ran the script and installed desktop 1.2: migration worked, the game loads faster and runs smoother.
+3. Saves confirmed: the in-game one-time copy can now be removed (BACKLOG entry), when Ricky asks.
 
 ## Gotchas
 - Firefox opening `poly-runner.html` sees a different site than `checker-run.html`: no copy possible there (export Saved Sandboxes from the old file).
