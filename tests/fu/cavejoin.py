@@ -12,7 +12,7 @@ def once(angs,h1,h2,zips):
         {'type':'cave','id':3,'after':2,'shape':'rect','width':10,'height':h2,'angle':angs[2],'angleSet':True,'depth':80}]
   pg.evaluate("j=>__sbStart(j)",{'width':12,'pieces':[{'t':'straight','len':600}],'objects':objs}); pg.wait_for_timeout(900)
   jz=pg.evaluate("()=>__dbg().SB.caves.map(c=>c.end?c.end.z:null)")[:2]
-  pg.evaluate("""z=>{window.__tr=[];(function f(){var d=__dbg();__tr.push(d.z);if(__tr.length<400)requestAnimationFrame(f)})();__pos(60000,0,-40);__st({vy:0,speed:z*2,heading:0,yaw:0});__keys({KeyW:true,w:true,ArrowUp:true})}""",zips)
+  pg.evaluate("""z=>{window.__tr=[];(function f(){var d=__dbg();__tr.push(d.z);if(__tr.length<400)requestAnimationFrame(f)})();__pos(0,0,-40);__st({vy:0,speed:z*2,heading:0,yaw:0});__keys({KeyW:true,w:true,ArrowUp:true})}""",zips)
   pg.wait_for_timeout(4000); pg.evaluate("__keys({KeyW:false,w:false,ArrowUp:false})")
   tr=pg.evaluate("__tr")
   for i in range(40,len(tr)):              # stalled: under 1 unit of progress over 40 frames

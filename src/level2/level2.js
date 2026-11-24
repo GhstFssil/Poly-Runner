@@ -57,9 +57,6 @@
   })();
   // The Tunnel: a block of rock across the runway, 100 west of the range's centre line, with an octagonal opening 30 across (flat top, 8.3 per side) whose top is only 2 above
   // the runway. Only the top 2 of the octagon clear the floor, so a standing Molly (3.6 tall) meets a wall, and a sliding one (1 tall) passes under it.
-  var GATE_X0 = MT_P0X - 90, GATE_Z = L2_PIECES[L2_LAND2_I].z0, GATE_L = 90, GATE_W = 60, GATE_TOP = L2_Y + 85, GATE_OCT = 30 / (1 + Math.SQRT2), gateIn = false;
-  var OCV = L2_PIECES[L2_CAVE_I], OCV_W = 60, OCV_OA = 15, OCV_OC = GATE_OCT / Math.SQRT2, OCV_TOP = L2_CAVE_Y + 85;   // the cave's octagon: 30 across, flat top and bottom, its floor level with the runway inside
-  function ocvW(h) { return h < 0 || h > 30 ? -1 : h < OCV_OC ? OCV_OA - OCV_OC + h : h <= 30 - OCV_OC ? OCV_OA : OCV_OA - (h - (30 - OCV_OC)); }   // half width of the opening h above its floor
   // Sideways distance to the range's centre line (the shore starts at MT_HW); sets MT_S, how far along it. Past either end the shore starts at once.
   function mtDist(x, z) {
     var best = 1e9, d, t = z - MT_P0Z, zc = MT_ZA + MT_R, xe = MT_P0X - MT_R;

@@ -82,7 +82,7 @@
       for (var k = 1; k <= n && !hit; k++) {
         var x = g.position.x + st.d.x * step * k / n, y = g.position.y + st.d.y * step * k / n, z = g.position.z + st.d.z * step * k / n;
         for (var j = 0; j < MOBS.length && !hit; j++) {
-          var e = MOBS[j]; if (e.dead || (e.sbp ? level !== 3 : e.l2 ? level !== 2 : level !== 1) || ((e.ov || e.sbp) && !e.act)) continue;   // the same mobs the game is running
+          var e = MOBS[j]; if (e.dead || level !== 3 || !e.act) continue;   // the same mobs the game is running
           if (Math.hypot(x - e.x, z - e.z) < e.R + st.r && y > e.fy - st.r && y < e.fy + e.H + st.r) {
             hit = true; e.hearts -= st.dmg; if (e.big) e.restUntil = now + BIG_REST; e.pulse = now; e.flashUntil = now + 1000; if (e.hearts <= 1e-6) killMob(e, now);
           }

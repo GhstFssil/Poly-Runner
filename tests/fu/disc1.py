@@ -19,7 +19,7 @@ with sync_playwright() as p:
         E.append(pg.evaluate("window.__pe.samples().map(q=>[+q.x.toFixed(3),+q.z.toFixed(3),+q.y.toFixed(3)])"))
     print('editor errors',errs); b.close()
 g=Rig(w=480,h=320,draw=False); pg=g.pg; pg.click('#bDevT'); pg.click('#dtBlank'); pg.wait_for_timeout(2000)
-X=60000
+X=0
 for ci,c in enumerate(cases):
     L=lay(*c)
     if c[2] is None: del L['pieces'][1]['h']
@@ -30,7 +30,7 @@ for ci,c in enumerate(cases):
     # ground inside the disc vs the formula
     def f(x,z): dx,dz=x-D['cx'],z-D['cz']; r=math.hypot(dx,dz); return D['base']+(D['R']-min(D['R'],r))*D['tanC']-(dx*math.cos(D['hh'])+dz*math.sin(D['hh']))*D['tanB']
     pts=[(D['cx']+r*math.cos(a),D['cz']+r*math.sin(a)) for r in (0,10,20,30,37) for a in (0,1.3,2.6,4,5.2)]
-    gy=pg.evaluate("ps=>ps.map(p=>__gH(p[0]+60000,p[1]))",pts)
+    gy=pg.evaluate("ps=>ps.map(p=>__gH(p[0]+0,p[1]))",pts)
     gerr=max(abs(gy[i]-f(*pts[i])) for i in range(len(pts)))
     last=Gs[-1]; exitp=Gs[len(Gs)-1-25]
     print('case slope %s bank %s heading %s: editor vs game %s | ground vs deck formula max %.3f | entry y %.2f | exit point (%.1f, %.1f) | end of path (%.1f, %.1f, y %.2f)'%(c[0],c[1],c[2],dmax,gerr,Gs[25][2],exitp[0],exitp[1],last[0],last[1],last[2]))

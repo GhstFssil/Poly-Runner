@@ -1,5 +1,18 @@
 [
   {
+    "v": "v191",
+    "d": "Nov 23, 2026",
+    "t": "Behind the scenes",
+    "g": [
+      [
+        "Under the hood",
+        [
+          "The original built-in versions of Grass Canyon and Oceana Crags are gone. Both levels have been built in the Path Editor for a while, and only the old levels' ground shape is still used. Levels now sit at the centre of the world, which keeps positions precise. Nothing in the game changes."
+        ]
+      ]
+    ]
+  },
+  {
     "v": "v190",
     "d": "Nov 22, 2026",
     "t": "Behind the scenes",

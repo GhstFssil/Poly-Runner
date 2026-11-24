@@ -3,7 +3,7 @@ sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
 # Oceana ground (terrain 'level2'): bubbles rise off the poisoned low ground near her (there were none before), none on the path, and they stay under the cap. (Hearts lost is shown but timing-dependent.)
 g=Rig(w=480,h=320,draw=False); pg=g.pg
-X=60000
+X=0
 J={'width':20,'terrain':'level2','pieces':[{'t':'straight','len':1200}],'objects':[]}
 pg.click('#bDevT'); pg.click('#dtBlank'); pg.wait_for_timeout(2500)
 pg.evaluate("j=>__sbStart(j)",J); pg.wait_for_timeout(2000)

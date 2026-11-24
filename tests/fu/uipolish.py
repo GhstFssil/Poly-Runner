@@ -20,7 +20,7 @@ chk('click while playing without the lock asks again', pg.evaluate("window.__lk"
 # underwater: the ocean's surface is B.waterY; put her and the camera well under it
 sky=pg.evaluate("document.getElementById('uw').classList.contains('on')")
 chk('not tinted above water', not sky)
-pg.evaluate("__pos(60000,-40,300)"); pg.wait_for_timeout(600)
+pg.evaluate("__pos(0,-40,300)"); pg.wait_for_timeout(600)
 chk('tinted under water', pg.evaluate("document.getElementById('uw').classList.contains('on')"))
 pg.keyboard.press('Escape'); pg.wait_for_timeout(300)
 chk('pause screen is not splash', not spl())

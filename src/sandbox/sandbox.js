@@ -1,6 +1,6 @@
-  // ---- Level 3, the Sandbox: flat patchy grass at x = 60000 and up, shaped by whatever the Path Editor made (its exported file). The layout is kept in editor
+  // ---- Level 3, the Sandbox: flat patchy grass at the origin, shaped by whatever the Path Editor made (its exported file). The layout is kept in editor
   // coordinates (the path starts at 0, 0 heading north) and shifted by L3_X into the world. ----
-  var L3_X = 60000, L3_MIN = 50000;
+  var L3_X = 0;   // where a layout sits in the world: at the origin (the old hand-made levels sampled for their terrain keep their own coordinates, see oldWorldH)
   var SB = null, sbNoRamps = false;                              // sbNoRamps: while each ramp's foot is measured, ramps are left out of the ground
   function sbHash(c) { return { c: c, m: {} }; }
   var TOX_C = 32;
@@ -39,8 +39,8 @@
     return o;
   }
   function sbTerrBase(kind, ex, z, top) {                        // top: the surface a path rides on, which over water is the water's surface rather than the ground far below it                             // the level's own ground at a point, before any path is laid over it (a path that follows the ground, or a slab being compared with it, starts from this)
-    if (kind === 'level2') { var h2 = worldH0(L2_X + ex, z + L2_SBZ); return top ? Math.max(h2, WATER_Y) : h2; }
-    if (kind === 'level1') return worldH0(ex, z);
+    if (kind === 'level2') { var h2 = oldWorldH(L2_X + ex, z + L2_SBZ); return top ? Math.max(h2, WATER_Y) : h2; }
+    if (kind === 'level1') return oldWorldH(ex, z);
     if (kind === 'grass') return terrainFlat(ex, z);
     if (kind === 'crags') return Math.min(300, mtSpikes(ex, z));
     if (kind === 'ocean') return top ? -10 : L2_VOID;
@@ -449,7 +449,7 @@
   }
   function cornerY(x, z, L, La, LI) {                            // ground height at a mesh corner for a cell whose ledge is L (La and LI: its stacked and independent parts)
     var y = worldH0(x, z);
-    if (SB && SB.indep && level === 3 && x > L3_MIN) return y + sbComb(l3A, l3P, l3N, La, LI) - l3S0;
+    if (SB && SB.indep && level === 3) return y + sbComb(l3A, l3P, l3N, La, LI) - l3S0;
     return y + L;
   }
   var GH_X = 0, GH_Z = -9000, GH_R = 9000, GH_H = 3000;           // the Giant Hill: centred 9,000 units ahead of the start, 9,000 in radius and 3,000 high, so its foot is where the path begins and its flanks climb to about 27 degrees
@@ -500,13 +500,13 @@
       y = L2_VOID; if (best < HW + 2) { y = L2_VOID + (py - L2_VOID) * (1 - smooth01((best - HW) / 2)); if (best <= HW) wL2 = 1; }
     }
     else if (B.terrain === 'level2') {                                // Oceana Crags' own generated ground (it sets the colour flags too). The path here is a deck of its own, not part of the ground
-      y = worldH0(L2_X + ex, z + L2_SBZ);
+      y = oldWorldH(L2_X + ex, z + L2_SBZ);
       if (bp && best < 1e8) {
         if (pov && y > py - DECK_CUT) { var pkc = 1 - smooth01((best - HW - DECK_EDGE) / 14); if (pkc > 0) { y += (py - DECK_CUT - y) * pkc; wL2 = 0; wSt = 1; wPl = 0; wMud = 0; } }   // this piece supersedes the terrain: rock standing higher than the deck is cut down to just under it, a little wider than the deck, easing back up to the terrain over 14 units. Lower ground is never touched
       }
     }
     else if (B.terrain) {                                             // Grass Canyon's own generated ground (it sets the colour flags too)
-      y = worldH0(ex, z);
+      y = oldWorldH(ex, z);
       if (pov) { var pk2 = 1 - smooth01((best - HW) / 14); if (pk2 > 0) { y += (py - y) * pk2; if (best <= HW) { wL2 = 1; wSt = 0; wPl = 0; wMud = 0; } } }   // this piece is set to win over the terrain: the ground is cut down or built up to it, easing back to the terrain over 14 units
       else if (best <= HW && y < py - 0.3) { y = py; wL2 = 1; wSt = 0; wPl = 0; wMud = 0; }        // the path over low ground is a slab, as in the real level
     }
@@ -546,7 +546,7 @@
   function sbLedge(x, z) {
     if (!SB) return 0;
     var best = 0, bi = 0, bt = false, bit = false, ex = x - L3_X, base = 0; ledTox = false;
-    if (SB.terrain === 'level1' || SB.terrain === 'level2') base = SB.terrain === 'level2' ? ledgeH(L2_X + ex, z + L2_SBZ) : ledgeH(ex, z);
+    if (SB.terrain === 'level1' || SB.terrain === 'level2') base = SB.terrain === 'level2' ? oldLedgeH(L2_X + ex, z + L2_SBZ) : oldLedgeH(ex, z);
     sbNear(SB.ledgeH, ex, z, SB.maxL, function (e) { if (sbIn(e, ex, z, 0)) { if (e.o.ind) { if (Math.abs(e.o.hgt) > Math.abs(bi)) { bi = e.o.hgt; bit = !!e.o.tox; } } else if (Math.abs(e.o.hgt) > Math.abs(best)) { best = e.o.hgt; bt = !!e.o.tox; } } });
     ledA = base + best; ledI = bi === 0 ? NaN : bi; ledTox = ledI === ledI && Math.abs(ledI) > Math.abs(best) ? bit : bt;   // ledTox: the ledge whose top this is has a toxic surface
     return ledI === ledI && Math.abs(ledI) > Math.abs(best) ? ledI + (base ? base : 0) : base + best;   // for anything that only wants one number: the taller of the two
@@ -817,12 +817,6 @@
     var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(P), 3)); g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(C), 3));
     var m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })); m.renderOrder = 2; scene.add(m); return m;
   }
-  var l2BoostM = null;
-  function l2BoostZone() {                                       // Oceana Crags' ramps: the last L2_STYLE_ZONE of each
-    if (l2BoostM || L2_BARE) return;
-    var st = []; L2_PIECES.forEach(function (pc) { if (pc.ramp) st.push([pc.x0, pc.z0, pc.hx, pc.hz, -pc.hz, pc.hx, pc.len - L2_STYLE_ZONE, pc.len, L2_HW]); });
-    l2BoostM = boostZoneMesh(st);
-  }
   function sbRampInit() {                                        // each ramp's foot: the height she would stand on there without it (on Oceana's slab of path that is the path, not the water far below)
     if (!SB) return; sbNoRamps = true;
     try { SB.ramps.forEach(function (rp) { rp.base = undefined; var fx = Math.sin(rp.th), fz = -Math.cos(rp.th); rp.base = rp.T !== undefined ? rp.T - (rp.y || 0) : l3Top(L3_X + rp.x - fx * rp.hl, rp.z - fz * rp.hl); }); }
@@ -1090,15 +1084,15 @@
     });
     if (B.terrain === 'ocean') {                                 // the open sea, a little below the path
       B.waterY = -10;
-      var sea0 = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMesh.material); sea0.rotation.x = -Math.PI / 2; sea0.position.set(L3_X, B.waterY, 0); scene.add(sea0); B.meshes.push(sea0);
+      var sea0 = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMat); sea0.rotation.x = -Math.PI / 2; sea0.position.set(L3_X, B.waterY, 0); scene.add(sea0); B.meshes.push(sea0);
     }
     if (B.terrain !== 'ocean' && B.terrain !== 'level2' && B.patches.some(function (q) { return q.ground === 'ocean'; })) {   // an ocean patch has the same sea over it
       B.waterY = -10;
-      var sea1 = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMesh.material); sea1.rotation.x = -Math.PI / 2; sea1.position.set(L3_X, B.waterY, 0); scene.add(sea1); B.meshes.push(sea1);
+      var sea1 = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMat); sea1.rotation.x = -Math.PI / 2; sea1.position.set(L3_X, B.waterY, 0); scene.add(sea1); B.meshes.push(sea1);
     }
     if (B.terrain === 'level2') {                                // Oceana Crags' sea
       B.waterY = WATER_Y;
-      var sea = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMesh.material); sea.rotation.x = -Math.PI / 2;
+      var sea = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), waterMat); sea.rotation.x = -Math.PI / 2;
       sea.position.set(L3_X + (L2_BOX[0] + L2_BOX[1]) / 2 - L2_X, WATER_Y, (L2_BOX[2] + L2_BOX[3]) / 2 - L2_SBZ); scene.add(sea); B.meshes.push(sea);
     }
     if (B.terrain === 'level2') {                                // Oceana Crags: the path is a deck of its own. Every stretch of it that is not a wall and not cut by a gap is drawn here exactly as she stands on it: at the path's own height, tilted to its bank, as wide as the segment, as deep as its slab thickness (2 where it has none). The ground under it is left alone (a superseding piece only has taller rock cut down to just under it), so wherever the ground stands higher than the deck it simply shows through, and that is where the terrain wins
@@ -1363,7 +1357,7 @@
   window.__enUpd = function (dt) { updateMobs(dt, performance.now()); };
   window.__mobs = function () { return MOBS; };
   window.__wall = function () { return [wallOn, wallR * 57.29578, heading, yaw]; };
-  window.__hd = function () { return [heading, yaw, speed, driftHeld, driftCool, grounded, player.position.x - 60000, player.position.y, player.position.z, slDeg, slA]; };
+  window.__hd = function () { return [heading, yaw, speed, driftHeld, driftCool, grounded, player.position.x - L3_X, player.position.y, player.position.z, slDeg, slA]; };
   window.__keys = function (o) { for (var k in o) keys[k] = o[k]; };
   window.__bub = function () { return sbBub.count; };
   window.__lean = function () { return [leanZ, sideLean, driftBlend, body.rotation.z, !!(mollyAct && mollyAct.Drift_L), mollyDriftRun, mollyW && +((mollyW.Drift_L || 0) + (mollyW.Drift_R || 0)).toFixed(2)]; };
@@ -1380,8 +1374,8 @@
     {
       for (j = 0; j < nz; j++) for (i = 0; i < nx; i++) {
         ex = x0 + (i + 0.5) * cell; ez = z0 + (j + 0.5) * cell;
-        if (kind === 'level2') { y = worldH0(L2_X + ex, ez + L2_SBZ); kk = wL2 === 3 ? 6 : wL2 === 2 ? 5 : wL2 ? 4 : 0; lg = ledgeH(L2_X + ex, ez + L2_SBZ); if (y < WATER_Y) kk |= 32; }
-        else { y = worldH0(ex, ez); kk = wL2 === 3 ? 6 : wSt ? 1 : wPl ? 2 : wMud ? 3 : 0; lg = ledgeH(ex, ez); }
+        if (kind === 'level2') { y = oldWorldH(L2_X + ex, ez + L2_SBZ); kk = wL2 === 3 ? 6 : wL2 === 2 ? 5 : wL2 ? 4 : 0; lg = oldLedgeH(L2_X + ex, ez + L2_SBZ); if (y < WATER_Y) kk |= 32; }
+        else { y = oldWorldH(ex, ez); kk = wL2 === 3 ? 6 : wSt ? 1 : wPl ? 2 : wMud ? 3 : 0; lg = oldLedgeH(ex, ez); }
         if (lg > 0.4 || lg < -0.4) kk |= 16;
         h[j * nx + i] = y + lg; k[j * nx + i] = kk;
       }
@@ -1392,18 +1386,17 @@
     sbDispose(); SB = sbBuild(j); sbCaveInit(); sbMoverInit(); gcI = 1e9; gcJ = 1e9;
     for (var key in chunks) { scene.remove(chunks[key]); delete chunks[key]; }       // the ground is rebuilt for the new layout
     level = 3; newRun(); TIME_LIMIT = SB.timeLimit > 0 ? SB.timeLimit : 300; timeLeft = TIME_LIMIT; sbMakeMeshes(); sbRampInit(); sbBoostZones();   /* after the meshes: Oceana's slab of path is marked out while they are made, and a ramp's foot can stand on it */
-    document.getElementById('bMap').hidden = true;
     spawnStart(''); begin();
   }
   function spawnStart(msg) {                                   // a layout's own Player start if it has one, else the beginning of the path
     var sp0 = level === 3 && SB && SB.startPt;
-    if (sp0) { spawnAt(L3_X + sp0.x, sp0.z, 0, msg || '', -sp0.th); if (sp0.T !== undefined) { player.position.y = sp0.T; fallTop = sp0.T; grounded = false; } } else spawnAt(level === 3 ? L3_X : level === 2 ? L2_X : 0, 0, 0, msg || '');
+    if (sp0) { spawnAt(L3_X + sp0.x, sp0.z, 0, msg || '', -sp0.th); if (sp0.T !== undefined) { player.position.y = sp0.T; fallTop = sp0.T; grounded = false; } } else spawnAt(level === 3 ? L3_X : 0, 0, 0, msg || '');
   }
   var wSt = 0, wPl = 0;    // set by worldH: 1 if this spot is bare rock, 1 if it is plateau grass
   // Full height of the world at a point on the mesh grid: rolling ground, ledges, floor lift, rock walls, plateau hills and
   // the cliff at the plateau's edges.
-  function worldH0(x, z) {
-    if (x > L3_MIN) return level3H(x, z);
+  function worldH0(x, z) { return level3H(x, z); }               // the play world: the loaded layout (flat 0 before one is loaded); the old levels' terrain is oldWorldH
+  function oldWorldH(x, z) {                                       // the old hand-made levels' ground, in their own coordinates (Oceana Crags past L2_MIN): the terrain the layouts' level1 and level2 grounds sample
     if (x > L2_MIN) { wSt = 0; wPl = 0; wMud = 0; wF = 0; var yl2 = level2H(x, z); wL2 = l2Kind === 2 && ovTox ? 3 : l2Kind; return yl2; }
     wL2 = 0;
     var y = terrainFlat(x, z);
@@ -1452,7 +1445,6 @@
     }
     return y;
   }
-  function worldH(x, z) { var L = ledgeCell(Math.floor(x / GRID), Math.floor(z / GRID)); return cornerY(x, z, L, ledCA, ledCI); }
   function cellHash(a, b) {
     var h = Math.imul(a | 0, 374761393) ^ Math.imul(b | 0, 668265263);
     h = Math.imul(h ^ (h >>> 13), 1274126177);
@@ -1474,7 +1466,7 @@
   var chunks = {};
   // Where a cave's mouth meets the terrain, the ground's own triangles that cross the tunnel's opening are left out, so the opening is real. (wx, wz world; y0..y1 the triangle's heights.)
   function caveHole(wx, wz, y0, y1) {
-    if (wx < L3_MIN || !SB) return false;
+    if (!SB) return false;
     if (SB.shafts.length && sbShaftIn(wx, wz, -0.1)) return true;   // a shaft's opening: the ground over it is left out
     if (!SB.caveZone) return false;
     var q = sbCaveQ(SB.caveZone, wx, wz, -0.1); if (!q) return false;   // a hair narrower than the tunnel, so the ground's cut edge tucks in behind its walls and no sky shows between them
@@ -1497,15 +1489,15 @@
         var gx = x0 + i * GRID, gz = z0 + j * GRID;
         var ix = ci * NX + i, jz = cj * NZ + j;
         l3Bk = 0; var y = worldH0(gx, gz), kind = wL2 === 3 ? 6 : wL2 === 2 ? 5 : wL2 ? 4 : wSt ? 1 : wPl ? 2 : wMud ? 3 : 0, px = gx, pz = gz;
-        if (kind === 4 && gx > L3_MIN && l3Tx) kind = 6 + l3Tx;
-        if (gx > L3_MIN && SB && SB.toxLedge && kind !== 6) { var tlg = sbLedge(gx, gz); if (ledTox && Math.abs(tlg) > 0.4) kind = 6; }   // the top of a toxic ledge: poisoned ground   // a sandbox path segment with its own surface: 7 planks, 8 metal, 9 grass
+        if (kind === 4 && l3Tx) kind = 6 + l3Tx;
+        if (SB && SB.toxLedge && kind !== 6) { var tlg = sbLedge(gx, gz); if (ledTox && Math.abs(tlg) > 0.4) kind = 6; }   // the top of a toxic ledge: poisoned ground   // a sandbox path segment with its own surface: 7 planks, 8 metal, 9 grass
         vTs[j * W + i] = l3Ps; vTu[j * W + i] = l3Pu;
         if (kind === 1) {
           px += (rand01(ix, jz, 2) * 2 - 1) * 0.9; pz += (rand01(ix, jz, 3) * 2 - 1) * 0.9;
         }
         var k = j * W + i;
-        vB[k] = gx > L3_MIN && l3Bk ? 1 : 0;
-        if (IND) { if (gx > L3_MIN) { vA[k] = l3A; vP[k] = l3P; vN[k] = l3N; vS[k] = l3S0; } else vS[k] = NaN; }
+        vB[k] = l3Bk ? 1 : 0;
+        if (IND) { vA[k] = l3A; vP[k] = l3P; vN[k] = l3N; vS[k] = l3S0; }
         vx[k] = px - x0; vy[k] = y; vz[k] = pz - z0; vd[k] = kind; vf[k] = wF;   // x and z are stored relative to the tile to keep precision far from the start
       }
     }
@@ -1532,9 +1524,9 @@
       tOv = -1; riseOv = -1;
     }
     function emit(a, b, c, ha, hb, hc, face, sub) {
-      if (!sub && !face && x0 > L3_MIN - CHUNK && SB && ((SB.caveZone && sbCaveQ(SB.caveZone, x0 + (vx[a] + vx[b] + vx[c]) / 3, z0 + (vz[a] + vz[b] + vz[c]) / 3, 4.5)) || (SB.shafts.length && sbShaftIn(x0 + (vx[a] + vx[b] + vx[c]) / 3, z0 + (vz[a] + vz[b] + vz[c]) / 3, 4.5)))) { emitSub(a, b, c, ha, hb, hc); return; }
+      if (!sub && !face && SB && ((SB.caveZone && sbCaveQ(SB.caveZone, x0 + (vx[a] + vx[b] + vx[c]) / 3, z0 + (vz[a] + vz[b] + vz[c]) / 3, 4.5)) || (SB.shafts.length && sbShaftIn(x0 + (vx[a] + vx[b] + vx[c]) / 3, z0 + (vz[a] + vz[b] + vz[c]) / 3, 4.5)))) { emitSub(a, b, c, ha, hb, hc); return; }
       if ((t + 1) * 9 > pos.length) { var np = new Float32Array(pos.length * 2), nc = new Float32Array(pos.length * 2); np.set(pos); nc.set(col); pos = np; col = nc; }
-      if (!face && x0 > L3_MIN - CHUNK && caveHole(x0 + (vx[a] + vx[b] + vx[c]) / 3, z0 + (vz[a] + vz[b] + vz[c]) / 3, Math.min(ha, hb, hc), Math.max(ha, hb, hc))) return;
+      if (!face && caveHole(x0 + (vx[a] + vx[b] + vx[c]) / 3, z0 + (vz[a] + vz[b] + vz[c]) / 3, Math.min(ha, hb, hc), Math.max(ha, hb, hc))) return;
       var o = t * 9, idx = [a, b, c], hh3 = [ha, hb, hc];
       for (var q = 0; q < 3; q++) {
         pos[o + q * 3] = vx[idx[q]]; pos[o + q * 3 + 1] = hh3[q]; pos[o + q * 3 + 2] = vz[idx[q]];
@@ -1591,7 +1583,7 @@
         faceTri(s0, vy[s0] + plo, s1, vy[s1] + phi1, s0, vy[s0] + phi, nx, nz);
       }
       var zq = null;
-      if (x0 > L3_MIN - CHUNK && SB && SB.caveZone) zq = sbCaveQ(SB.caveZone, x0 + (vx[a] + vx[b]) / 2, z0 + (vz[a] + vz[b]) / 2, 2);
+      if (SB && SB.caveZone) zq = sbCaveQ(SB.caveZone, x0 + (vx[a] + vx[b]) / 2, z0 + (vz[a] + vz[b]) / 2, 2);
       if (!zq) { piece(0, 1, lo, hi, loB, hiB); return; }
       if (two) { lo = (lo + loB) / 2; hi = (hi + hiB) / 2; }
       // a cliff face with a cave in it: the opening's height range is left out, and only where the edge is within the opening's width
@@ -1654,25 +1646,7 @@
     mesh.userData.ci = ci; mesh.userData.cj = cj;
     chunks[chunkKey(ci, cj)] = mesh;
   }
-  // A tile is worth building only if some open ground lies within 150 units of it (deeper rock is never seen).
-  var tileUseful = {};
-  function useful(ci, cj) {
-    var key = chunkKey(ci, cj), u = tileUseful[key];
-    if (u === undefined) {
-      var tx = (ci + 0.5) * CHUNK, tz = (cj + 0.5) * CHUNK;
-      wallField(tx, tz);
-      u = tx > L3_MIN || wd < 150 + CHUNK * 0.71 ||
-          (tx >= PXW - 150 && tx <= PX1 + 75 && tz >= PZ0 - 150 && tz <= PZ1 + 150) ||   // all of the plateau, and a little past its cliffs
-          (tx >= PX0 - RMP_END - RMP_PLAT - 100 && tx <= PX0 + 100 && Math.abs(tz - RMP_ZC) <= RMP_PLAT / 2 + 100) ||   // and the ramp up to the platform
-          (tx > L2_MIN && tx >= L2_BOX[0] - 100 && tx <= L2_BOX[1] + 100 && tz >= L2_BOX[2] - 100 && tz <= L2_BOX[3] + 100 && l2Dist(tx, tz, true) < L2_HW + 130) ||
-          (tx > L2_MIN && mtDist(tx, tz) < MT_SKIRT + 90) ||               // the Crags   // level 2's runway
-          (tx >= CAVE_X0 - 120 && tx <= CH_X + CH_R + 250 && tz <= CAVE_Z0 + 200 && tz >= CH_Z - CH_R - 250 && (pathDist(CAVE_PIECES, tx, tz) < CAVE_BAND + 150 || Math.hypot(tx - CH_X, tz - CH_Z) < CH_R + 250)) ||   // and the cave
-          (tx >= CH_X && tx <= DR_XE + FIELD_HW + 250 && tz >= DR_ZE - FIELD_LEN - 250 && tz <= CH_Z + 250) ||   // and the doorway, ramp and field
-          (tx >= V2_BOX[0] - 300 && tx <= V2_BOX[1] + 300 && tz >= V2_BOX[2] - 300 && tz <= V2_BOX[3] + 300 && valley2Dist(tx, tz) < V2_HALF + V2_RIM + 150);   // and the second valley
-      tileUseful[key] = u;
-    }
-    return u;
-  }
+  function useful(ci, cj) { return true; }                       // every tile around her is built (the layout's ground is all open)
   // Build the tiles around her (at most `budget` per call, nearest first) and drop the ones that fell out of range.
   function updateChunks(px, pz, budget) {
     var VIEW = Math.max(VIEW_AHEAD, VIEW_BEHIND);

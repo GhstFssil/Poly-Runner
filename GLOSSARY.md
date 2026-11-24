@@ -132,7 +132,9 @@ The rows for src, part, build and the game file describe the source split, which
 | src, part | the source files in `src/`; a part is one file the build joins: a source file as it is, or a data file in `src/data/` (JSON, `.glb`) that the build wraps | `src/manifest.json` |
 | build | join the parts, byte for byte, into the game file | `python3 tools/build.py` |
 | the game file | the generated, committed single HTML file | `checker-run.html` now |
-| area | a group of source files by function (core, level1, level2, sandbox, characters, mobs, ui). One task works in one area. The tests are mapped by area | |
+| area | a group of source files by function (core, level1, level2, sandbox, characters, mobs, ui; level1 and level2 now hold only the old levels' terrain). One task works in one area. The tests are mapped by area | |
+| play world | where she runs: the loaded layout, at the origin | `worldH0`, `ledgeH` |
+| old levels | the original hand-made Grass Canyon and Oceana Crags; only their terrain is left, sampled by a layout's `level1` and `level2` grounds in the old levels' own coordinates | `oldWorldH`, `oldLedgeH` |
 | version label | the `v184` in `<div class="ver">`; a push to `main` bumps it | |
 | next, main | `next` is where work happens; `main` is what ships | |
 | publish | merge `next` into `main` as the next version; the release workflow does the rest | CLAUDE.md |

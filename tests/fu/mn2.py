@@ -3,7 +3,7 @@ import sys,json
 sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
 g=Rig(w=480,h=320,draw=False); pg=g.pg
-X=60000
+X=0
 J={'width':9,'pieces':[{'t':'straight','len':400}],'objects':[{'type':'minion','id':1,'x':0,'z':-60,'idle':True},{'type':'bigminion','id':2,'x':40,'z':-60,'idle':True}]}
 pg.click('#bDevT'); pg.click('#dtBlank'); pg.wait_for_timeout(2000)
 def start():

@@ -1,8 +1,7 @@
   // ---- Where she starts: the start meadow or the checkpoint ----
   var cleared = false, clearEl = document.getElementById('clear'), rpHold = 0, rpReady = false, rpFlash = 0, rpGlowNow = 0, rpBlend = 0, mudWas = false;
-  var hintEl = document.getElementById('hint'), hintDone = false, signDone = false, jumpDone = false, endDone = false, segTipDone = false, readyDone = false, chamberDone = false, mudTipDone = false, hintUntil = 0, hintPrevZ = 0, hintPrevX = 0;
-  var hintStart = false;
-  function newRun() { if (level !== 3) TIME_LIMIT = 300; styleTipDone = false; toxTipDone = false; dropTipDone = false; toxUntil = 0; cpTime = []; cpBest = 0; bonusDone = false; bonusEl.hidden = true; hintDone = false; signDone = false; jumpDone = false; endDone = false; segTipDone = false; readyDone = false; chamberDone = false; mudTipDone = false; hintEl.hidden = true; hintStart = true; }
+  var hintEl = document.getElementById('hint'), hintUntil = 0;
+  function newRun() { if (level !== 3) TIME_LIMIT = 300; toxUntil = 0; cpTime = []; cpBest = 0; hintEl.hidden = true; }
   var hintFull = '', hintTyped = 0, HINT_CPS = 50;
   function showHint(txt, ms, now, force) {               // the levels have no built-in tips now (only tips placed in the Path Editor show: force); a tip types itself into the box; one that arrives while another is up types in below it, and the two durations add
     if (!force) return;
@@ -59,12 +58,11 @@
     timeLeft = (cpNo > 0 && cpTime[cpNo] !== undefined) ? cpTime[cpNo] : TIME_LIMIT; shownSec = -1; showTime();   // from a checkpoint the clock goes back to what it read when she reached it
     setBall(false, true); fpOn = false;
     wallOn = false; speed = 0; heading = face; yaw = face; pitch = 0.35; vy = 0; sgx = 0; sgz = 0; grounded = true; turnRate = 0; leanZ = 0; jumpBuf = 0;
-    player.position.set(sx, groundH(sx, sz), sz);
+    player.position.set(sx, sbFoot(sx, sz), sz);                 // the ground there whatever her old height (her feet would hide a deck above them)
     player.rotation.y = face;
     updateChunks(sx, sz, 99);
     builtAtZ = 1e9; builtAtX = 1e9; updateTrees(sx, sz);
     segCount = 0; segTotal = 0; segGot = {}; segValEl.textContent = '0'; setSegLine(0); segBuiltX = 1e9; updateSegs(sx, sz);
-    lightGates(cpNo);
     if (level === 3) sbLight(cpNo);
     hp = MAXHP; drawHearts(); breathReset(); fallTop = player.position.y; drownT = 0; styleStacks = 0; styleUntil = 0; confLife = 0; confetti.visible = false;
     cleared = false; clearEl.hidden = true; clearEl.classList.remove('scoring'); clearInterval(scoreTimer); clearTimeout(clearTimer); rpHold = 0; rpReady = false; rpFlash = 0;

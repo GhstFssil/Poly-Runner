@@ -66,7 +66,7 @@
       };
       peHost.__live = function (j) { liveRebuild(j); };
       peHost.__yInfo = function (j, ids) { return yInfo(j, ids); };
-      peHost.__import = function (n) { var j = n === 1 ? JSON.parse(JSON.stringify(OFFICIAL_L1)) : n === 2 ? JSON.parse(JSON.stringify(OFFICIAL_L2)) : levelToEditor(n); if (j) peHost.__pe.load(j); };   // Grass Canyon: the official layout itself, every stamp included (not a rebuild of the old hand-made level)
+      peHost.__import = function (n) { var j = n === 1 ? JSON.parse(JSON.stringify(OFFICIAL_L1)) : n === 2 ? JSON.parse(JSON.stringify(OFFICIAL_L2)) : null; if (j) peHost.__pe.load(j); };   // Grass Canyon: the official layout itself, every stamp included (not a rebuild of the old hand-made level)
       ['keydown', 'keyup', 'keypress'].forEach(function (t) {
         peHost.addEventListener(t, function (e) {
           if (liveOn) {                                              // live preview: the game keeps its keys unless you are typing in the editor or using its own shortcuts

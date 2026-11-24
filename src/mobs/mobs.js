@@ -140,33 +140,14 @@
   (function () {
     function make(x, z, fy, l2, sc, gz) {
       var g = new THREE.Group(); scene.add(g);
-      var e = { mats: [], flashUntil: 0, flashK: 0, sc: 1, H: EN_H, R: EN_R, big: (sc || 1) > 1, gz: !!gz, hearts: 1, dmg: 1, invUntil: 0, pulse: 0, g: g, parts: [], hx: x, hz: z, x: x, z: z, vx: 0, vz: 0, face: 0, phase: 0, dead: false, deadAt: 0, bits: [], fy: fy === undefined ? CH_FLOOR : fy, l2: !!l2 };
+      var e = { mats: [], flashUntil: 0, flashK: 0, sc: 1, H: EN_H, R: EN_R, big: (sc || 1) > 1, gz: !!gz, hearts: 1, dmg: 1, invUntil: 0, pulse: 0, g: g, parts: [], hx: x, hz: z, x: x, z: z, vx: 0, vz: 0, face: 0, phase: 0, dead: false, deadAt: 0, bits: [], fy: fy, l2: !!l2 };
       enBuild(e); e.hearts = e.c.hearts; return e;
     }
-    var homes = [[-45, -25], [45, -25], [0, -62]];
-    for (var i = 0; i < 3; i++) MOBS.push(make(CH_X + homes[i][0], CH_Z + homes[i][1]));
-    // Oceana Crags: minions on the opening runway, before the first checkpoint. [distance along the runway from its far end, sideways offset]; the spawn point is 40 along it.
-    function l2At(sd) {
-      for (var i = 0; i < L2_PIECES.length; i++) {
-        var q = L2_PIECES[i]; if (sd < q.s0 || sd > q.s0 + q.len) continue;
-        var d = sd - q.s0;
-        if (q.t === 's') return [q.x0 + q.hx * d, q.z0 + q.hz * d, q.hx, q.hz];
-        var f = q.sig * d / q.R, f2 = q.sig * (d + 0.5) / q.R, c = Math.cos(f), sn = Math.sin(f), c2 = Math.cos(f2), s2 = Math.sin(f2);
-        var x = q.cx + q.ux * c + q.uz * sn, z = q.cz - q.ux * sn + q.uz * c, x2 = q.cx + q.ux * c2 + q.uz * s2, z2 = q.cz - q.ux * s2 + q.uz * c2, l = Math.hypot(x2 - x, z2 - z);
-        return [x, z, (x2 - x) / l, (z2 - z) / l];
-      }
-      return [0, 0, 0, -1];
-    }
-    [[220, 0], [650, 4], [650, -4], [900, -3], [1100, 0], [1375, 4], [1650, 3.5], [1925, -4], [2200, -3.5]].forEach(function (m) {
-      var a = l2At(m[0]); MOBS.push(make(a[0] - a[3] * m[1], a[1] + a[2] * m[1], L2_Y, true));
-    });
-    for (var oi = 0; oi < 26; oi++) { var oe = make(1e7, 1e7, L2_Y, true); oe.ov = true; oe.act = false; MOBS.push(oe); }
     for (var si = 0; si < 60; si++) { var se = make(1e7, 1e7, 0, true); se.sbp = true; se.act = false; MOBS.push(se); }   // the Sandbox's minions and spawner pool   // the Sink's minions: a pool, woken one a second (at most 20 alive)
     for (var bi = 0; bi < 8; bi++) { var be = make(1e7, 1e7, 0, true, 5); be.sbp = true; be.act = false; MOBS.push(be); }   // the Sandbox's Big Minions
     for (var gi = 0; gi < 8; gi++) { var ge = make(1e7, 1e7, 0, true, 1, true); ge.sbp = true; ge.act = false; MOBS.push(ge); }   // the Sandbox's Roost Gazers
     mobsReady = true;
   })();
-  var ovSpawnT = 0;
   function reviveMob(e, x, z) {
     e.bits.forEach(function (b) { scene.remove(b.m); }); e.bits = [];
     e.dead = false; e.act = true; e.hx = x; e.hz = z; e.x = x; e.z = z; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.fy = SB && level === 3 ? sbFoot(x, z) : groundH(x, z); e.hearts = e.c.hearts; e.idle = false; e.invUntil = 0; e.restUntil = 0; e.nextShot = 0; e.ay = undefined; e.gt = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc);
@@ -175,43 +156,18 @@
     e.parts.forEach(function (p) { p.position.copy(p.userData.rest); }); e.model.body.position.y = 0;
     e.parts.forEach(function (p) { p.rotation.set(0, 0, 0); p.scale.set(1, 1, 1); p.visible = true; });
   }
-  function spawnSinkMinion(now) {                            // one a second while she is at the Sink, somewhere random on its poisoned floor (not on a crag, not on top of her), 20 alive at most
-    var pp = player.position, alive = 0, slot = null, i;
-    if (ovKAt(pp.x, pp.z) < 0.02 && ovKAt(pp.x, pp.z - 150) < 0.02 && ovKAt(pp.x + 150, pp.z) < 0.02 && ovKAt(pp.x - 150, pp.z) < 0.02 && ovKAt(pp.x, pp.z + 150) < 0.02) return;
-    for (i = 0; i < MOBS.length; i++) {
-      var e = MOBS[i]; if (!e.ov) continue;
-      if (e.act && !e.dead) alive++;
-      else if (!slot && (!e.act || now - e.deadAt > 3200)) slot = e;
-    }
-    if (alive >= 20 || !slot) return;
-    for (var tries = 0; tries < 30; tries++) {
-      var a = Math.random() * 6.2832, r = Math.sqrt(Math.random()) * 0.8, x = OV_CX + OV_A * r * Math.cos(a), z = OV_CZ + OV_B * r * Math.sin(a);
-      if (Math.hypot(x - pp.x, z - pp.z) < 40) continue;
-      mountainH(x, z, 1000); if (!ovTox || ovK < 0.9) continue;
-      reviveMob(slot, x, z); return;
-    }
-  }
   function resetMobs() {
     if (!mobsReady) return;
     MOBS.forEach(function (e) {
       e.bits.forEach(function (b) { scene.remove(b.m); });
       e.bits = []; e.dead = false; e.x = e.hx; e.z = e.hz; e.vx = e.vz = 0; e.face = 0; e.phase = 0; e.hearts = e.c.hearts; e.invUntil = 0; e.restUntil = 0; e.nextShot = 0; e.ay = undefined; e.gt = 0; e.flashUntil = 0; enFlash(e, 0); e.g.scale.setScalar(e.sc);
-      e.g.position.set(e.x, e.fy, e.z); e.g.rotation.y = 0; e.g.visible = e.sbp ? false : e.l2 ? level === 2 : level === 1;
+      e.g.position.set(e.x, e.fy, e.z); e.g.rotation.y = 0; e.g.visible = false;
       e.parts.forEach(function (p) { if (p.parent !== e.model.body) e.model.body.add(p); });
       e.parts.forEach(function (p) { p.position.copy(p.userData.rest); }); e.model.body.position.y = 0;
       e.parts.forEach(function (p) { p.rotation.set(0, 0, 0); p.scale.set(1, 1, 1); p.visible = true; });
-      if (e.ov || e.sbp) { e.act = false; e.hx = e.hz = e.x = e.z = 1e7; e.g.visible = false; e.g.position.set(1e7, 0, 1e7); }
+      if (e.sbp) { e.act = false; e.hx = e.hz = e.x = e.z = 1e7; e.g.visible = false; e.g.position.set(1e7, 0, 1e7); }
     });
-    ovSpawnT = 0; enPrevOK = false; gzClear();
-    for (var oi = 0, placed = 0; oi < MOBS.length && placed < 5; oi++) {      // five minions are already waiting within 100 units of the drop
-      if (!MOBS[oi].ov) continue;
-      for (var tr = 0; tr < 80; tr++) {
-        var oa = placed * 1.26 + tr * 0.7, orr = 25 + 75 * rand01(placed, tr, 95), ox = L2_X + 1436 + orr * Math.cos(oa), oz = -500.7 + orr * Math.sin(oa);
-        if (oz > -508) continue; mountainH(ox, oz, 1000); if (!ovTox || ovK < 0.8) continue;
-        reviveMob(MOBS[oi], ox, oz); MOBS[oi].g.visible = level === 2; placed++; break;
-      }
-    } enHurtUntil = 0;
-    if (typeof setDoor === 'function') setDoor(false);
+    enPrevOK = false; gzClear(); enHurtUntil = 0;
     if (level === 3) sbPlaceMobs();
   }
   resetMobs();
@@ -244,13 +200,11 @@
   function updateMobs(dt, now) {
     if (!mobsReady) return;
     var pp = player.position, pr = ballOn ? BALL_R : 0.5;
-    var near = level === 1 && Math.hypot(pp.x - CH_X, pp.z - CH_Z) < CH_R + 400;
     var ax = enPrevOK ? enPrevX : pp.x, az = enPrevOK ? enPrevZ : pp.z;
-    if (level === 2 && playing) { ovSpawnT = Math.min(ovSpawnT + dt, 3); while (ovSpawnT >= 1) { ovSpawnT -= 1; spawnSinkMinion(now); } }
     for (var i = 0; i < MOBS.length; i++) {
       var e = MOBS[i];
-      if (e.sbp ? level !== 3 : e.l2 ? level !== 2 : level !== 1) continue;
-      if ((e.ov || e.sbp) && !e.act) continue;
+      if (level !== 3) continue;
+      if (!e.act) continue;
       if (e.l2) { if (SB && level === 3) sbPyOv = e.fy + 0.5; e.fy = groundH(e.x, e.z); sbPyOv = undefined; }
       if (e.big || e.gz) enFlash(e, e.dead ? 0 : now < e.flashUntil ? 0.55 + 0.45 * Math.sin(now * 0.025) : 0);
       if (e.dead) {
@@ -265,7 +219,7 @@
         }
         continue;
       }
-      if (e.l2 ? Math.hypot(pp.x - e.x, pp.z - e.z) > 700 : !near) continue;
+      if (Math.hypot(pp.x - e.x, pp.z - e.z) > 700) continue;
       // chase
       var dx = pp.x - e.x, dz = pp.z - e.z, d = Math.hypot(dx, dz), chase = d < e.c.see && Math.abs(pp.y - e.fy) < 40, EACC = e.c.acc * TILE, EMAX = e.c.top * TILE;
       var spd = Math.hypot(e.vx, e.vz);
@@ -287,18 +241,14 @@
       if (spd > EMAX) { e.vx *= EMAX / spd; e.vz *= EMAX / spd; spd = EMAX; }
       var ex0 = e.x, ez0 = e.z;
       e.x += e.vx * dt; e.z += e.vz * dt;
-      if (e.l2 && !e.ov && !e.sbp && l2Dist(e.x, e.z) > L2_HW - 1.2) { e.x = ex0; e.z = ez0; e.vx = e.vz = 0; }
       if (e.l2 && (e.vx || e.vz)) { var gnn = groundH(e.x, e.z), mvd = Math.hypot(e.x - ex0, e.z - ez0); if (gnn - e.fy > 0.3 + mvd * 0.9) { e.x = ex0; e.z = ez0; e.vx = e.vz = 0; } }   // they cannot climb a wall or a ledge: ground rising faster than about 42 degrees stops them   // the runway's edge: they never leave it
       // keep each other apart
       for (var j = 0; j < MOBS.length; j++) {
-        if (j === i || MOBS[j].dead || MOBS[j].gz || (MOBS[j].ov || MOBS[j].sbp) && !MOBS[j].act) continue;
+        if (j === i || MOBS[j].dead || MOBS[j].gz || !MOBS[j].act) continue;
         var ox = e.x - MOBS[j].x, oz = e.z - MOBS[j].z, od = Math.hypot(ox, oz);
         var mr = e.R + MOBS[j].R + 0.3;
         if (!e.idle && od < mr && od > 0.0001) { var pu = (mr - od) / 2; e.x += ox / od * pu; e.z += oz / od * pu; }
       }
-      // they stay inside the chamber
-      var cx = e.x - CH_X, cz = e.z - CH_Z, cd = Math.hypot(cx, cz);
-      if (!e.l2 && cd > CH_R - 1.5) { e.x = CH_X + cx / cd * (CH_R - 1.5); e.z = CH_Z + cz / cd * (CH_R - 1.5); }
       }
       // Molly: closest approach this frame (she can cover 8 units a frame), then the touch rules
       var sx = pp.x - ax, sz = pp.z - az, sl = sx * sx + sz * sz, tt = sl > 1e-6 ? Math.max(0, Math.min(1, ((e.x - ax) * sx + (e.z - az) * sz) / sl)) : 1;
@@ -336,7 +286,5 @@
     }
     gzBolts(dt);
     enPrevX = pp.x; enPrevZ = pp.z; enPrevOK = true;
-    var allDown = level === 1; for (var q2 = 0; q2 < MOBS.length; q2++) if (!MOBS[q2].l2 && !MOBS[q2].dead) allDown = false;
-    if (allDown && !doorOpen) { setDoor(true); showHint('Hey, a door in the wall!', 5000, now); }
   }
 

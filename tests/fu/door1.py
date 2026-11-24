@@ -8,7 +8,7 @@ def door(extra):
     d={'type':'door','id':9,'s':40,'u':0,'width':12,'height':10}; d.update(extra)
     return {'width':9,'pieces':[{'t':'straight','len':300}],'objects':[d]}
 def state():
-    return pg.evaluate("""(function(){var m=__dbg().SB.movers.filter(function(q){return q.door})[0];var P=m.geo.attributes.position.array,V=[];for(var i=0;i<P.length;i+=3)V.push([+(P[i]-60000).toFixed(2),+P[i+1].toFixed(2),+P[i+2].toFixed(2)]);
+    return pg.evaluate("""(function(){var m=__dbg().SB.movers.filter(function(q){return q.door})[0];var P=m.geo.attributes.position.array,V=[];for(var i=0;i<P.length;i+=3)V.push([+(P[i]-0).toFixed(2),+P[i+1].toFixed(2),+P[i+2].toFixed(2)]);
       return {k:+m.k.toFixed(3),dy:+m.dy.toFixed(2),sx:+m.sx.toFixed(2),sz:+m.sz.toFixed(2),tx:+(m.tx*180/Math.PI).toFixed(1),ys:[Math.min.apply(null,V.map(v=>v[1])),Math.max.apply(null,V.map(v=>v[1]))],zs:[Math.min.apply(null,V.map(v=>v[2])),Math.max.apply(null,V.map(v=>v[2]))]}})()""")
 # 45 degree forward lean, always closed, then always open, sliding toward its bottom edge
 pg.evaluate("j=>__sbStart(j)",door({'mode':'closed','shutTiltX':45,'openTiltX':45,'slide':'edge'})); pg.wait_for_timeout(1500); c=state()

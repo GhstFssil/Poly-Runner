@@ -10,7 +10,7 @@ print('after Play as Comet:',pg.evaluate("[...document.querySelectorAll('#charSt
 J={'width':9,'pieces':[{'t':'straight','len':400}],'objects':[{'type':'minion','id':1,'x':0,'z':-390},{'type':'target','id':2,'x':0,'z':-80,'size':6,'height':3},{'type':'plate','id':3,'x':0,'z':-10,'width':8,'length':8}]}
 pg.evaluate("document.getElementById('chBack').click()"); pg.evaluate("document.getElementById('bDevT').click()"); pg.evaluate("document.getElementById('dtBlank').click()"); pg.wait_for_timeout(2000)
 pg.evaluate("j=>__sbStart(j)",J); pg.wait_for_timeout(2000)
-def put(x,z): pg.evaluate("([x,z])=>{__put(60000+x,__gH(60000+x,z),z);__hd(0);__spd(0)}",[x,z])
+def put(x,z): pg.evaluate("([x,z])=>{__put(0+x,__gH(0+x,z),z);__hd(0);__spd(0)}",[x,z])
 def wait_until(js,ms=15000):
     t=0
     while t<ms:
@@ -33,7 +33,7 @@ print('power 2, held: released when it could not pay',ok,'level',c['lvl'],'power
 wait_until("__comet().cool<=0"); pg.evaluate("__setPower(0)"); pg.keyboard.press('KeyQ'); pg.wait_for_timeout(150); print('power 0: cooldown started?',C()['cool']>0)
 # star vs minion and target: charged once (1 heart) kills the minion
 wait_until("__comet().cool<=0"); J2={'width':9,'pieces':[{'t':'straight','len':400}],'objects':[{'type':'minion','id':1,'x':0,'z':-30}]}; pg.evaluate("j=>__sbStart(j)",J2); pg.wait_for_timeout(1500); pg.evaluate("__setPower(50)"); put(0,-14)
-mh=lambda: pg.evaluate("(function(){var e=__ens().filter(function(q){return q.x>59000&&q.x<9e6})[0];return e?[e.hearts,e.dead]:null})()")
+mh=lambda: pg.evaluate("(function(){var e=__ens().filter(function(q){return q.x>-9e6&&q.x<9e6})[0];return e?[e.hearts,e.dead]:null})()")
 print('minion before:',mh())
 pg.keyboard.down('KeyQ'); wait_until("__comet().lvl>=1"); pg.keyboard.up('KeyQ'); pg.wait_for_timeout(1500); print('minion after a 1 s charged star:',mh())
 wait_until("__comet().cool<=0"); pg.evaluate("j=>__sbStart(j)",J); pg.wait_for_timeout(1500); pg.evaluate("__setPower(50)"); put(0,-60)
