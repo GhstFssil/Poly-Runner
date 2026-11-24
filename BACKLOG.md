@@ -11,6 +11,9 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 - [ ] (Ricky, 2026-11-22) Tavern and Update Buttons:
   - Step 1: Set up the subdomain with the GitHub page, and have it open a downloads menu for the game assets. Should have the same background as the menu inside the game.
   - Step 2: Add an Update button to the main menu, just above the Changes button, which fetches the version release files from the page, unzips, and merges the "game" file into the game's .config file automatically, then refreshes.
+- [ ] (Ricky, 2026-11-23) Give comet her own hair (ringlet curls)
+- [ ] (Ricky, 2026-11-23) Give fine-grained control of hair.
+- [ ] (Ricky, 2026-11-23) Add special assets for the faces (eyes, mouth, nose).
 
 ## Separate track: split the game into source files and rename to Poly Runner
 (Discussed 2026-11-16; Ricky backs up saves first. Best done after groups 1-2 so those fixes aren't mixed into the move.)
