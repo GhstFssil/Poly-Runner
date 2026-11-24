@@ -76,9 +76,9 @@ function showScreen(name) {                                // the menu shows one
   on('bPE', function () { openPE(); });
   on('dtRig', openRig);
   on('dtPath', openPE);
-  on('dtSandbox', function () { var j = null; try { j = JSON.parse(localStorage.getItem('polyrun-last-export')); } catch (e) {} startSandbox(j); });
+  on('dtSandbox', function () { var j = null; try { j = JSON.parse(localStorage.getItem('polyrunner-last-export')); } catch (e) {} startSandbox(j); });
   on('dtBlank', function () { startSandbox(null); });
-  function readSaves() { try { return JSON.parse(localStorage.getItem('polyrun-sandboxes') || '{}') || {}; } catch (e) { return {}; } }
+  function readSaves() { try { return JSON.parse(localStorage.getItem('polyrunner-sandboxes') || '{}') || {}; } catch (e) { return {}; } }
   function fillSaves() {
     var box = document.getElementById('saveList'), all = readSaves(), names = Object.keys(all).sort(function (a, b) { return all[b].saved - all[a].saved; });
     box.innerHTML = '';
@@ -88,7 +88,7 @@ function showScreen(name) {                                // the menu shows one
       function mk(t, f, grow) { var b = document.createElement('button'); b.type = 'button'; b.className = 'go2'; b.textContent = t; b.style.cssText = 'margin-top:0;' + (grow ? 'flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis' : 'padding-left:10px;padding-right:10px'); b.onclick = f; row.appendChild(b); }
       mk(nm, function () { var j = null; try { j = JSON.parse(all[nm].json); } catch (e) {} startSandbox(j); }, true);
       mk('Edit', function () { openPE(); peHost.__pe.load(all[nm].json, nm); });
-      mk('✕', function () { if (this.dataset.sure) { var a2 = readSaves(); delete a2[nm]; try { localStorage.setItem('polyrun-sandboxes', JSON.stringify(a2)); } catch (e) {} fillSaves(); } else { this.dataset.sure = 1; this.textContent = 'Sure?'; } });
+      mk('✕', function () { if (this.dataset.sure) { var a2 = readSaves(); delete a2[nm]; try { localStorage.setItem('polyrunner-sandboxes', JSON.stringify(a2)); } catch (e) {} fillSaves(); } else { this.dataset.sure = 1; this.textContent = 'Sure?'; } });
       box.appendChild(row);
     });
   }

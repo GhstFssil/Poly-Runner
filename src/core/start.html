@@ -1,5 +1,19 @@
 <script>
 (function () {
+  // Until v194 this page's browser storage keys were named 'polyrun-…'. Once per browser, each one is copied to its new name ('polyrun-x' -> 'polyrunner-x')
+  // where the new name is still empty; the old keys are left alone. A key whose copy does not fit (storage full) is moved instead, so it is never lost.
+  // The same code is in path-editor.html and the game's start (core/start.html); 'polyrunner-migrated' marks it done.
+  (function () {
+    try {
+      var ls = window.localStorage, ks = [], i; if (ls.getItem('polyrunner-migrated')) return;
+      for (i = 0; i < ls.length; i++) { var k = ls.key(i); if (k && k.indexOf('polyrun-') === 0) ks.push(k); }
+      ks.forEach(function (k) {
+        var n = 'polyrunner-' + k.slice(8), v = ls.getItem(k); if (v === null || ls.getItem(n) !== null) return;
+        try { ls.setItem(n, v); } catch (e) { ls.removeItem(k); try { ls.setItem(n, v); } catch (e2) { ls.setItem(k, v); throw e2; } }
+      });
+      ls.setItem('polyrunner-migrated', '1');
+    } catch (e) {}
+  })();
   var canvas = document.getElementById('view');
   var stage = document.getElementById('stage');
   var startEl = document.getElementById('start');

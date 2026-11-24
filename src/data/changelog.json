@@ -1,5 +1,19 @@
 [
   {
+    "v": "v194",
+    "d": "Nov 24, 2026",
+    "t": "Poly Runner, everywhere",
+    "g": [
+      [
+        "Changed",
+        [
+          "The game file is now poly-runner.html (it was checker-run.html).",
+          "The game keeps its saves in the browser under Poly Runner's own names now. The first time this version opens, your saved models, layouts, presets and Saved Sandboxes are copied across by themselves, and the old copies are left alone."
+        ]
+      ]
+    ]
+  },
+  {
     "v": "v193",
     "d": "Nov 24, 2026",
     "t": "Sunset Hill fixes",

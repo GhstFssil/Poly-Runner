@@ -6,7 +6,7 @@ D="document.getElementById('rigHost').__rigdbg()"
 def info(g):
     m=g.ev("__molly()"); ph=g.ev("__phys()")
     return {'on':m['on'],'verts':m['verts'],'height':round(m['bb'][1]-m['bb'][0],3) if m['bb'] else None,'scale':ph['mollyScale'],'idbBytes':m['stored'],'lsChars':m['storedLS']}
-IDB="""()=>new Promise(function(res){var r=indexedDB.open('polyrun',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv')};r.onsuccess=function(){try{var q=r.result.transaction('kv','readonly').objectStore('kv').get('mollyGlb');q.onsuccess=function(){res(q.result?q.result.byteLength:0)};q.onerror=function(){res(-1)}}catch(e){res(-2)}};r.onerror=function(){res(-3)}})"""
+IDB="""()=>new Promise(function(res){var r=indexedDB.open('polyrunner',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv')};r.onsuccess=function(){try{var q=r.result.transaction('kv','readonly').objectStore('kv').get('mollyGlb');q.onsuccess=function(){res(q.result?q.result.byteLength:0)};q.onerror=function(){res(-1)}}catch(e){res(-2)}};r.onerror=function(){res(-3)}})"""
 def errs(g): return [e for e in g.errs if 'flatShading' not in e and 'ERR_FAILED' not in e and 'normalized normal' not in e][:4]
 # 1 fresh browser
 g=Rig(draw=False); print('1 fresh:',info(g),'in the database:',g.ev(IDB))

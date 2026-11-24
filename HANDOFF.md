@@ -7,8 +7,9 @@ Rename the game to Poly Runner everywhere, including the hidden saved-data names
 - v193 published (Sunset Hill fixes). The source split is finished (its BACKLOG entry deleted).
 - Commit 1 (on `next`): the game file is `poly-runner.html` (was `checker-run.html`; `src/manifest.json` output). Paths updated in `tools/` (build_release, mk_electron, reslice), `tests/` (chk, mk_test), `release.yml`, README, ARCHITECTURE, GLOSSARY; "Poly Run" -> "Poly Runner" in the sweep docs and `mk_sweep_docs.py`. Game file byte-identical apart from its name. Titles, menus and the desktop window already said Poly Runner.
 
+- Commit 2 (on `next`): browser storage. IndexedDB `polyrunner` (`idbMigrate` in molly.js copies keys from `polyrun` once, marker key `__migrated`; never creates an old database). localStorage `polyrun-*` -> `polyrunner-*`, copied once (marker `polyrunner-migrated`) at the top of core/start.html and path-editor.html; a key that doesn't fit is moved instead. Saved layout file names `polyrunner-layout-*`. Test `tests/fu/rename_saves.py`. CHANGELOG entry v194 added (label not bumped yet). CLAUDE.md file name updated (Ricky OK'd).
+
 ## In progress
-- Commit 2: browser storage. IndexedDB `polyrun` -> `polyrunner`, localStorage `polyrun-*` -> `polyrunner-*`, copied on first load (only into empty names; old data left alone). Game and Path Editor (`path-editor.html`, then `mk_pe_embed.py`).
 - Commit 3: desktop app. `window.polyrunner` and its messages, `~/PolyRunner`, `~/.config/PolyRunner` (copy the old folder before the game starts: Electron keeps the saves there), package `polyrunner`, app id `com.polyrunner.game`, AppImage name, build-and-install.sh.
 
 ## Decisions
@@ -16,9 +17,8 @@ Rename the game to Poly Runner everywhere, including the hidden saved-data names
 - Firefox opening the renamed local file sees a different site: a migration can't reach the old saves there (export Saved Sandboxes from the old file first).
 
 ## Next steps
-1. Commits 2 and 3, each tested with fake saves in the harness.
+1. Commit 3, tested with fake saves (add its line to the v194 CHANGELOG entry).
 2. Ricky backs up `~/.config/PolyRun` and `~/PolyRun`, then ask before publishing v194 (label bump + CHANGELOG entry).
-3. CLAUDE.md still names `checker-run.html` (twice): needs Ricky's OK to edit.
 
 ## Gotchas
 - `tools/mk_sweep_docs.py` is older than the SWEEP-*.md files (they gained HISTORY.md rules by hand): don't regenerate them with it, or those rules are lost.

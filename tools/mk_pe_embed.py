@@ -24,9 +24,9 @@ js+="""
   HOST.__pe = { pick: function (i) { setSel(i); renderInsp(); }, mapImage: mapImage, size: size, setName: function (n) { $('peName').value = n || ''; }, load: function (j, n) { if (n !== undefined) $('peName').value = n; $('json').value = typeof j === 'string' ? j : JSON.stringify(j); $('load').click(); }, json: function () { return $('json').value; } };
   $('peSave').onclick = function () {
     var nm = ($('peName').value || '').trim(); if (!nm) { $('peName').focus(); $('peName').placeholder = 'Type a name first'; return; }
-    var all = {}; try { all = JSON.parse(localStorage.getItem('polyrun-sandboxes') || '{}') || {}; } catch (e) {}
+    var all = {}; try { all = JSON.parse(localStorage.getItem('polyrunner-sandboxes') || '{}') || {}; } catch (e) {}
     all[nm] = { json: $('json').value, saved: Date.now() };
-    try { localStorage.setItem('polyrun-sandboxes', JSON.stringify(all)); $('peSave').textContent = '✓ Saved'; } catch (e) { $('peSave').textContent = 'Save failed'; }
+    try { localStorage.setItem('polyrunner-sandboxes', JSON.stringify(all)); $('peSave').textContent = '✓ Saved'; } catch (e) { $('peSave').textContent = 'Save failed'; }
     setTimeout(function () { $('peSave').textContent = '💾 Save'; }, 1500);
   };
   $('peLive').onclick = function () { var on = !HOST.__liveOn; HOST.__liveOn = on; this.classList.toggle('on', on); $('peLiveMsg').textContent = ''; var j = null; try { j = JSON.parse($('json').value); } catch (e) {} if (HOST.__liveToggle) HOST.__liveToggle(on, j); };

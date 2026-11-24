@@ -23,7 +23,7 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (levels) and
 - After every edit: `python3 tools/build.py && python3 tests/chk.py && python3 tests/mk_test.py` (`chk.py` fails if the game file is out of sync with `src/`), then only the tests for the area touched (each SWEEP-*.md has the map). Once per fresh session: `sh tests/setup.sh`.
 
 ## Project
-- The game is built from `src/` (`src/manifest.json` lists the parts) into `checker-run.html` (3.4 MB, generated, committed). Edit `src/`, never `checker-run.html`, then run `python3 tools/build.py`. Grep and read line ranges only. Never hand-edit between `<!--PE-BEGIN-->` and `<!--PE-END-->`: edit `path-editor.html`, then run `python3 tools/mk_pe_embed.py` (it rebuilds).
+- The game is built from `src/` (`src/manifest.json` lists the parts) into `poly-runner.html` (3.4 MB, generated, committed). Edit `src/`, never `poly-runner.html`, then run `python3 tools/build.py`. Grep and read line ranges only. Never hand-edit between `<!--PE-BEGIN-->` and `<!--PE-END-->`: edit `path-editor.html`, then run `python3 tools/mk_pe_embed.py` (it rebuilds).
 - Work in one area at a time (an area is a group of source files by function; see GLOSSARY.md): name it first, edit only its files and tests, and give a reason before touching another.
 - No physics changes to compensate for level problems. Units: TILE 2, 1 Zip = 2 u/s; show speeds in Zips.
 - Game-changing sessions: add a CHANGELOG entry at the top of `var CHANGELOG`.

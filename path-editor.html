@@ -158,9 +158,23 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
 
 <script>
 (function () {
+  // Until v194 this page's browser storage keys were named 'polyrun-…'. Once per browser, each one is copied to its new name ('polyrun-x' -> 'polyrunner-x')
+  // where the new name is still empty; the old keys are left alone. A key whose copy does not fit (storage full) is moved instead, so it is never lost.
+  // The same code is in path-editor.html and the game's start (core/start.html); 'polyrunner-migrated' marks it done.
+  (function () {
+    try {
+      var ls = window.localStorage, ks = [], i; if (ls.getItem('polyrunner-migrated')) return;
+      for (i = 0; i < ls.length; i++) { var k = ls.key(i); if (k && k.indexOf('polyrun-') === 0) ks.push(k); }
+      ks.forEach(function (k) {
+        var n = 'polyrunner-' + k.slice(8), v = ls.getItem(k); if (v === null || ls.getItem(n) !== null) return;
+        try { ls.setItem(n, v); } catch (e) { ls.removeItem(k); try { ls.setItem(n, v); } catch (e2) { ls.setItem(k, v); throw e2; } }
+      });
+      ls.setItem('polyrunner-migrated', '1');
+    } catch (e) {}
+  })();
   var $ = function (id) { return document.getElementById(id); };
   var cv = $('cv'), ctx = cv.getContext('2d');
-  var KEY = 'polyrun-path-editor-v2';
+  var KEY = 'polyrunner-path-editor-v2';
   var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: {}, gazer: { gm: 'chase', hgt: 6, move: 'side', dist: 40, period: 4, phase: 0 }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, slide: 'down', sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {}, plate: { shape: 'rect', w: 8, d: 8, r: 4, look: 'gray', whl: false }, target: { size: 6, post: true, h: 7, tilt: 0, spin: 0, hb: 1, k: 20, sd: 0, sp: 4, vd: 0, vp: 4, phase: 0 } };
   var S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0, ov: 1 }, { len: 1005.3, ang: 90, r: 640, dy: 0, ov: 1 }, { len: 400, ang: 0, r: 640, dy: 20, ov: 1 }, { len: 502.65, ang: -45, r: 640, dy: 0, ov: 1 }, { len: 300, ang: 0, r: 640, dy: 0, ov: 1 }], objs: [] };
   var GH = null, DEFUSER = {};                                  // GH: the not-yet-placed stamp whose settings the panel shows while a stamp tool is chosen
@@ -196,20 +210,20 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     try {
       if (!window.polyrun || !window.polyrun.backup) return;
       var t = $('json').value; if (t) window.polyrun.backup('layout', t);
-      var pr = localStorage.getItem('polyrun-pe-presets'); if (pr) window.polyrun.backup('presets', pr);
+      var pr = localStorage.getItem('polyrunner-pe-presets'); if (pr) window.polyrun.backup('presets', pr);
     } catch (e) {}
   }
   function backupSoon() { if (!bkTimer && window.polyrun && window.polyrun.backup) bkTimer = setTimeout(backupNow, 20000); }   // at most one copy every 20 seconds while editing
   window.addEventListener('beforeunload', function () { if (bkTimer) backupNow(); });
   function save() {                                               // every change is kept in this browser; if its storage is full (a big saved Molly model shares it) that fails, and it must not fail silently
     if (typeof HOST !== 'undefined' && HOST.__nosave) return;
-    try { localStorage.setItem(KEY, JSON.stringify(S)); localStorage.setItem('polyrun-last-export', $('json').value); backupSoon(); }
+    try { localStorage.setItem(KEY, JSON.stringify(S)); localStorage.setItem('polyrunner-last-export', $('json').value); backupSoon(); }
     catch (e) { if (!save.warned || Date.now() - save.warned > 20000) { save.warned = Date.now(); try { flashHint('Not autosaved: this browser\'s storage is full. Copy the layout text to keep it.'); } catch (e2) {} } }
   }
   function load() {
     try { var j = JSON.parse(localStorage.getItem(KEY)); if (j && j.pieces) S = j; } catch (e) {}
     S.more = S.more || []; ensureLayers();
-    try { if (!S.objs.length) { var o = JSON.parse(localStorage.getItem('polyrun-path-editor-v1')); if (o && o.objs && o.objs.length) { S = o; } } } catch (e) {}
+    try { if (!S.objs.length) { var o = JSON.parse(localStorage.getItem('polyrunner-path-editor-v1')); if (o && o.objs && o.objs.length) { S = o; } } } catch (e) {}
     S.objs.forEach(function (o) { if (o.t === 'toxic' && o.size !== undefined) { o.w = o.d = o.size; delete o.size; } if (o.rot === undefined) o.rot = 0; });
   }
   function snap() { hist.push(JSON.stringify(S)); if (hist.length > 80) hist.shift(); }
@@ -1161,7 +1175,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   };
   $('saveFile').onclick = function () {                           // the same text as the box, as a file: a copy of the layout that lives outside the browser's own storage
     try {
-      var d = new Date(), p2 = function (n) { return (n < 10 ? '0' : '') + n; }, name = 'polyrun-layout-' + d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + '-' + p2(d.getHours()) + p2(d.getMinutes()) + '.json';
+      var d = new Date(), p2 = function (n) { return (n < 10 ? '0' : '') + n; }, name = 'polyrunner-layout-' + d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + '-' + p2(d.getHours()) + p2(d.getMinutes()) + '.json';
       var blob = new Blob([$('json').value], { type: 'application/json' }), url = URL.createObjectURL(blob), a = document.createElement('a');
       a.href = url; a.download = name; a.style.display = 'none'; var hb = document.body || document.documentElement; if (hb && hb.appendChild) hb.appendChild(a); a.click();
       setTimeout(function () { try { URL.revokeObjectURL(url); a.remove(); } catch (e) {} }, 4000);
@@ -1354,11 +1368,11 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   }
   function copySel() {
     var sl = selList(); if (!sl.length) return; clip = snapshotSel(sl);
-    try { localStorage.setItem('polyrun-pe-clip', JSON.stringify(clip)); } catch (e) {}
+    try { localStorage.setItem('polyrunner-pe-clip', JSON.stringify(clip)); } catch (e) {}
     flashHint(sl.length + (sl.length === 1 ? ' stamp' : ' stamps') + ' copied — Ctrl+V pastes at the pointer');
   }
   function pasteClip() {
-    if (!clip) { try { clip = JSON.parse(localStorage.getItem('polyrun-pe-clip')); } catch (e) { clip = null; } }
+    if (!clip) { try { clip = JSON.parse(localStorage.getItem('polyrunner-pe-clip')); } catch (e) { clip = null; } }
     if (!clip || !clip.items || !clip.items.length) { flashHint('Nothing copied yet'); return; }
     var t = hover || [view.cx, view.cz]; pasteSnap(clip, t[0], t[1]);
   }
@@ -1370,8 +1384,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
 
   // ---- presets: a saved group of stamps you can drop anywhere, on any level ----
   var presets = [], armed = -1;
-  try { presets = JSON.parse(localStorage.getItem('polyrun-pe-presets') || '[]') || []; } catch (e) { presets = []; }
-  function savePresets() { try { localStorage.setItem('polyrun-pe-presets', JSON.stringify(presets)); backupSoon(); } catch (e) { flashHint('Could not save: this browser is blocking storage'); } }
+  try { presets = JSON.parse(localStorage.getItem('polyrunner-pe-presets') || '[]') || []; } catch (e) { presets = []; }
+  function savePresets() { try { localStorage.setItem('polyrunner-pe-presets', JSON.stringify(presets)); backupSoon(); } catch (e) { flashHint('Could not save: this browser is blocking storage'); } }
   function renderPresets() {
     $('presets').innerHTML = presets.map(function (p, i) {
       return '<div class="lrow" data-pi="' + i + '"><button class="small' + (armed === i ? ' on' : '') + '" data-pact="arm" title="Click, then click the map to stamp a copy">' + (armed === i ? 'Stamping…' : 'Stamp') + '</button>' +

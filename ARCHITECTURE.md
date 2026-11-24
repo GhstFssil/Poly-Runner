@@ -24,7 +24,7 @@
 - `CHAR` is 'molly' or 'comet' (localStorage `pr_char`), picked on the Characters page; `setChar` switches.
 - Stats are stored in `runnerRig2` (Molly, plus the `mn.*` mob stats) and `cometRig` (Comet, never `mn.*`).
 - Lookup order is `rigPick`: what's stored, then `SHIPPED[ch]`, then the built-in RIGCFG / COMET_DEF numbers.
-- Saved models are in IndexedDB `polyrun` / `kv` under `mollyGlb` and `cometGlb`; `loadCharModel` falls back to the built-in model.
+- Saved models are in IndexedDB `polyrunner` / `kv` (`polyrun` until v194; copied once by `idbMigrate`) under `mollyGlb` and `cometGlb`; `loadCharModel` falls back to the built-in model.
 - Comet:
   - Star Throw: Q/E, `starPress` / `starRelease` / `spawnStar` / `cometStars`.
   - Hover and Fly: `hovOn` / `flyOn` / `applyStats`.
