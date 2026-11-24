@@ -54,3 +54,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-23 19:46 | next | fix: spawning reads the ground without her old height (at the origin the spawn point can be under her, and her feet hid Oceana's deck); play-world ground, ledges and mud always come from the layout; tests cone1/nopit/gazer/comet1 offsets; ARCHITECTURE/GLOSSARY: play world, old levels
 - 2026-11-23 19:46 | next | HANDOFF: origin move done, full suite compared with v190; waiting on publish
 - 2026-11-23 19:54 | v191 | published: old built-in levels removed (terrain kept), levels play at the origin, spawn fix; label v191 with its CHANGELOG entry
+- 2026-11-23 19:55 | main | HANDOFF: v191 published, next = main

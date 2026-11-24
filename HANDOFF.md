@@ -3,7 +3,7 @@
 ## Goal
 Each level in its own coordinate space. Done: the old hand-made levels are gone (only their terrain is left), and layouts play at the origin.
 
-## Done (on `next`, not published)
+## Done (v191, published 2026-11-23)
 - Removed the old levels' mobs, checkpoints, goal, tips, maps, scenery, collision and Segs (`core/checkpoints.js` and `level1/cave-roof.js` gone). No code checks for level 1 or 2.
 - Play space at the origin (`L3_X` 0, `L3_MIN` gone). The play world's ground, ledges and mud (`worldH0`, `ledgeH`, `mudAt`) always come from the loaded layout; the old levels' terrain is sampled only through `oldWorldH` / `oldLedgeH`, in their own coordinates.
 - Fix found by the full suite: `spawnAt` reads the ground without her old height (`sbFoot`); otherwise starting Oceana from the title put her in the sea.
@@ -11,7 +11,7 @@ Each level in its own coordinate space. Done: the old hand-made levels are gone 
 - Full suite run on this build and on v190 (with v190's own tests) and compared: no other differences beyond run-to-run noise. ARCHITECTURE.md and GLOSSARY.md updated (play world, old levels).
 
 ## In progress
-Nothing half-done. Waiting on Ricky: publish as v191?
+Nothing half-done. v191 published 2026-11-23; `next` = `main`.
 
 ## Decisions
 - Ricky: delete the old levels and keep only their terrain; levels get separate coordinate spaces; 2-3 smoke tests per commit, full suite at the end.
@@ -19,8 +19,7 @@ Nothing half-done. Waiting on Ricky: publish as v191?
 - `L3_X` is kept (0) rather than removed from ~90 places: a mechanical cleanup for later if wanted.
 
 ## Next steps
-1. Publish when Ricky says: bump the label to v191 with a CHANGELOG entry ("Behind the scenes": the old built-in levels are gone and levels play at the origin; nothing in the game changes), merge `next` into `main`.
-2. Optional: drop `L3_X`; move the old levels' terrain into a `terrain` area; rename to Poly Runner (BACKLOG).
+1. Optional: drop `L3_X`; move the old levels' terrain into a `terrain` area; rename to Poly Runner (BACKLOG).
 
 ## Gotchas
 - Old-level terrain functions take old coordinates; never pass play positions to `oldWorldH`, or old ones to `worldH0`.
