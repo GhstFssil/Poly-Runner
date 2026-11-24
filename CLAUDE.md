@@ -27,7 +27,7 @@ Single-file three.js r128 platformer starring Molly, built by Ricky (levels) and
 - Work in one area at a time (an area is a group of source files by function; see GLOSSARY.md): name it first, edit only its files and tests, and give a reason before touching another.
 - No physics changes to compensate for level problems. Units: TILE 2, 1 Zip = 2 u/s; show speeds in Zips.
 - Game-changing sessions: add a CHANGELOG entry at the top of `var CHANGELOG`.
-- Session start: `git ls-remote origin 'refs/heads/nightly/*'`; read the newest unmerged report of each sweep and give Ricky a 3-line summary. Merging nightly fixes follows the decimal-version rule in ARCHITECTURE.md.
+- Session start: `git ls-remote origin 'refs/heads/nightly/*'`; read the newest unmerged report of each sweep and give Ricky a 3-line summary. A branch whose fixes are already on `main` (its report's tests exist there) counts as merged: skip it. Merging nightly fixes follows the decimal-version rule in ARCHITECTURE.md.
 - The nightly sweeps (bugs, edges, perf) work only on `nightly/*` branches, never `main`, except appending to `.md` docs there (not sweep reports), then merging `main` into `next`. They never change features, physics, tuning, looks or design: those suggestions go in the report and BACKLOG.md (SWEEP-BUGS.md, SWEEP-EDGES.md, SWEEP-PERF.md).
 
 ## Shipping
