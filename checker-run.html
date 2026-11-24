@@ -267,7 +267,7 @@
 <div id="stage">
   <canvas id="view" aria-label="3D view of a girl in a red jumpsuit with a ponytail running through a long grass valley with stone walls"></canvas>
   <div id="start" class="splash">
-    <div class="ver">v190</div>
+    <div class="ver">v191</div>
     <button id="bClog" class="clogBtn" type="button" title="What changed in each version">Changes</button>
     <section class="scr on" id="scr-main" aria-label="Main menu">
       <h1 class="logo"><span>POLY</span><span>RUNNER</span></h1>
@@ -9293,6 +9293,11 @@ requestAnimationFrame(tick);
   }
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v191', d: 'Nov 23, 2026', t: 'Behind the scenes', g: [
+    ['Under the hood', [
+      'The original built-in versions of Grass Canyon and Oceana Crags are gone. Both levels have been built in the Path Editor for a while, and only the old levels\' ground shape is still used. Levels now sit at the centre of the world, which keeps positions precise. Nothing in the game changes.'
+    ]]
+  ] },
   { v: 'v190', d: 'Nov 22, 2026', t: 'Behind the scenes', g: [
     ['Under the hood', [
       'The game\'s data (Molly\'s and Comet\'s models and settings, the official levels and this change log) is now kept in plain data files, and the controls and Molly\'s state have files of their own. Nothing in the game changes.'
