@@ -11,6 +11,16 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 - [ ] (Ricky, 2026-11-22) Tavern and Update Buttons:
   - Step 1: Set up the subdomain with the GitHub page, and have it open a downloads menu for the game assets. Should have the same background as the menu inside the game.
   - Step 2: Add an Update button to the main menu, just above the Changes button, which fetches the version release files from the page, unzips, and merges the "game" file into the game's .config file automatically, then refreshes.
+- [ ] (Ricky, 2026-11-23) Give comet her own hair (ringlet curls)
+- [ ] (Ricky, 2026-11-23) Give fine-grained control of hair.
+- [ ] (Ricky, 2026-11-23) Add special assets for the faces (eyes, mouth, nose).
+- [ ] (Ricky, 2026-11-23) Character select should be a choice each time after selecting a level to play, not a switch that must be flipped on the characters page.
+- [ ] (Ricky, 2026-11-23) Comet's hover animation should be more of a standing-style animation, not a running-style animation.
+- [ ] (Ricky, 2026-11-23) Sidestep. The character moves to the left or right relative to the character's heading and independent of the camera; left mouse and right mouse buttons, respectively.
+- [ ] (Ricky, 2026-11-23) Scroll wheel on the mouse moves the camera in or out. Camera also moves out slightly as you go faster.
+- [ ] (Ricky, 2026-11-23) Caps lock allows you to move the camera without changing the character's heading.
+- [ ] (Ricky, 2026-11-23) Star throw's angle is too low.
+- [ ] (Ricky, 2026-11-23) Big star when flying should be tilted horizontal compared to its orientation when it's on her back.
 
 ## Separate track: split the game into source files and rename to Poly Runner
 (Discussed 2026-11-16; Ricky backs up saves first. Best done after groups 1-2 so those fixes aren't mixed into the move.)
