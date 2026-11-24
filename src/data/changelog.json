@@ -1,5 +1,24 @@
 [
   {
+    "v": "v193",
+    "d": "Nov 24, 2026",
+    "t": "Sunset Hill fixes",
+    "g": [
+      [
+        "Changed",
+        [
+          "Sunset Hill's trees are a quarter as dense: about one every 1,000 square tiles (4,000 square units), still in loose clumps and clearings."
+        ]
+      ],
+      [
+        "Fixed",
+        [
+          "The Path Editor now shows the ground of the whole of Sunset Hill, not just the part round the start of a short layout."
+        ]
+      ]
+    ]
+  },
+  {
     "v": "v192",
     "d": "Nov 23, 2026",
     "t": "Sunset Hill's ground",

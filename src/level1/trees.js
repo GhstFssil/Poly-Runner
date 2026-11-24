@@ -56,10 +56,10 @@
     }
   }
   updateTrees(0, 0);
-  // Sunset Hill's own trees, scattered by the terrain: about one per 1,000 square units, in loose clumps and clearings, none on or beside a path, in a ravine or in a lake, thinning out to nothing at the treeline (SH_TREES of the summit's height, wandering a little)
-  var SHT_C = Math.sqrt(500), shtCache = new Map(), shtSB = null;   // cells of 500 square units with an even chance of a tree each; what each cell holds once worked out (for this layout)
+  // Sunset Hill's own trees, scattered by the terrain: about one per 1,000 square tiles (4,000 square units), in loose clumps and clearings, none on or beside a path, in a ravine or in a lake, thinning out to nothing at the treeline (SH_TREES of the summit's height, wandering a little)
+  var SHT_C = Math.sqrt(2000), shtCache = new Map(), shtSB = null;   // cells of 2,000 square units with an even chance of a tree each; what each cell holds once worked out (for this layout)
   function shTreeAt(i, j) {
-    if (rand01(i, j, 71) >= 0.5 * (0.35 + 1.3 * vnoise(i / 9, j / 9, 72))) return 0;   // clumps and clearings, averaging one tree per two cells
+    if (rand01(i, j, 71) >= 0.5 * (0.35 + 1.3 * vnoise(i / 4.5, j / 4.5, 72))) return 0;   // clumps and clearings, averaging one tree per two cells
     var x = (i + 0.15 + 0.7 * rand01(i, j, 73)) * SHT_C, z = (j + 0.15 + 0.7 * rand01(i, j, 74)) * SHT_C, hb = shBase(x, z);
     var line = SH_H * SH_TREES * (1 + 0.12 * (vnoise(x / 600, z / 600, 75) - 0.5));
     if (hb > line || (hb > line - 150 && rand01(i, j, 76) < (hb - line + 150) / 150)) return 0;   // the last 150 units below the treeline thin out

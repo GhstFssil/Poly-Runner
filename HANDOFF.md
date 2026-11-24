@@ -1,4 +1,4 @@
-# Handoff (2026-11-23)
+# Handoff (2026-11-24)
 
 ## Goal
 Level 3: Sunset Hill, Act 1 (Comet's level). Step 1: its ground, trees and sky, as a Path Editor ground Ricky builds the layout on.
@@ -6,15 +6,16 @@ Level 3: Sunset Hill, Act 1 (Comet's level). Step 1: its ground, trees and sky, 
 ## Done (published as v192)
 - New ground `sunset` (Path Editor: "Sunset Hill"): the Giant Hill's footprint (radius 9,000, summit 3,000), slope wandering from about 3 to 45 degrees (`shBase`, 48 spokes via `shTable`), plus small bumps.
 - Ravines (`shRavine`): about 60 wide and 60 deep (each varies about 30%), about 9% of the hill. They cut through paths (Ricky: no land bridges); a floating piece can span one. Ravine floors and walls are rock.
-- Trees of its own (`shTrees` in `trees.js`): about one per 1,000 square units in clumps, none within 6 units of a path, in ravines or lakes; thin out and stop at 2/3 of the summit's height (`SH_TREES`).
+- Trees of its own (`shTrees` in `trees.js`): about one per 1,000 square tiles (4,000 square units; was 1,000 units until 11-24) in clumps, none within 6 units of a path, in ravines or lakes; thin out and stop at 2/3 of the summit's height (`SH_TREES`).
 - Sunset sky: `skyDome` (pale blue top to deep orange horizon), fog orange, on this ground only. Hillside up to about 40 degrees stays grass (other grounds unchanged).
 - Path Editor paints the ground (slope shading, ravines grey, paler grass above the treeline) when run inside the game.
 - Test `tests/fu/sunset1.py`. Hooks `__shDbg`, `__treeDbg`. lvprobe vs v191: official levels' ground identical.
 
 ## In progress
-Nothing half-done. v192 published; waiting for Ricky's look.
+On `next`, unpublished (CHANGELOG entry v193): tree density cut to 1 per 1,000 square tiles (`SHT_C` = sqrt(2000), clump noise rescaled so clumps keep their size); Path Editor reads the whole hill's ground for `sunset` (`terBounds`), test `tests/fu/sunset2.py`.
 
 ## Decisions
+- Ricky: tree density is per square tile (TILE 2), not per square unit.
 - Ricky: treeline is by height (2/3 of the summit's), not distance; ravines never bridged by paths.
 - Ravine walls are too steep to climb (about 75 degrees): a fall in means running out along it. Steepest hillside is right at her climb limit (CLIMB_SLOPE 1.05).
 

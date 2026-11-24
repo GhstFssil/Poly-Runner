@@ -267,7 +267,7 @@
 <div id="stage">
   <canvas id="view" aria-label="3D view of a girl in a red jumpsuit with a ponytail running through a long grass valley with stone walls"></canvas>
   <div id="start" class="splash">
-    <div class="ver">v192</div>
+    <div class="ver">v193</div>
     <button id="bClog" class="clogBtn" type="button" title="What changed in each version">Changes</button>
     <section class="scr on" id="scr-main" aria-label="Main menu">
       <h1 class="logo"><span>POLY</span><span>RUNNER</span></h1>
@@ -2065,6 +2065,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     samples.forEach(function (p) { ext(p.x, p.z); }); S.objs.forEach(function (o) { var q = pos(o); ext(q.x, q.z); });
     if (x0 > x1) { x0 = -200; x1 = 200; z0 = -600; z1 = 200; }
     var pad = 600, b = { x0: Math.floor((x0 - pad) / 500) * 500, x1: Math.ceil((x1 + pad) / 500) * 500, z0: Math.floor((z0 - pad) / 500) * 500, z1: Math.ceil((z1 + pad) / 500) * 500 };
+    if (S.terrain === 'sunset') { b.x0 = Math.min(b.x0, -9500); b.x1 = Math.max(b.x1, 9500); b.z0 = Math.min(b.z0, -18500); b.z1 = Math.max(b.z1, 500); }   // Sunset Hill is read whole (the Giant Hill's footprint: 9,000 units round a centre 9,000 ahead of the start), however small the layout
     var o = TER.key === S.terrain && TER.b; if (o) { b.x0 = Math.min(b.x0, o.x0); b.x1 = Math.max(b.x1, o.x1); b.z0 = Math.min(b.z0, o.z0); b.z1 = Math.max(b.z1, o.z1); }   // it only ever grows, so dragging things about does not keep rebuilding it
     return b;
   }
@@ -8435,10 +8436,10 @@ requestAnimationFrame(tick);
     }
   }
   updateTrees(0, 0);
-  // Sunset Hill's own trees, scattered by the terrain: about one per 1,000 square units, in loose clumps and clearings, none on or beside a path, in a ravine or in a lake, thinning out to nothing at the treeline (SH_TREES of the summit's height, wandering a little)
-  var SHT_C = Math.sqrt(500), shtCache = new Map(), shtSB = null;   // cells of 500 square units with an even chance of a tree each; what each cell holds once worked out (for this layout)
+  // Sunset Hill's own trees, scattered by the terrain: about one per 1,000 square tiles (4,000 square units), in loose clumps and clearings, none on or beside a path, in a ravine or in a lake, thinning out to nothing at the treeline (SH_TREES of the summit's height, wandering a little)
+  var SHT_C = Math.sqrt(2000), shtCache = new Map(), shtSB = null;   // cells of 2,000 square units with an even chance of a tree each; what each cell holds once worked out (for this layout)
   function shTreeAt(i, j) {
-    if (rand01(i, j, 71) >= 0.5 * (0.35 + 1.3 * vnoise(i / 9, j / 9, 72))) return 0;   // clumps and clearings, averaging one tree per two cells
+    if (rand01(i, j, 71) >= 0.5 * (0.35 + 1.3 * vnoise(i / 4.5, j / 4.5, 72))) return 0;   // clumps and clearings, averaging one tree per two cells
     var x = (i + 0.15 + 0.7 * rand01(i, j, 73)) * SHT_C, z = (j + 0.15 + 0.7 * rand01(i, j, 74)) * SHT_C, hb = shBase(x, z);
     var line = SH_H * SH_TREES * (1 + 0.12 * (vnoise(x / 600, z / 600, 75) - 0.5));
     if (hb > line || (hb > line - 150 && rand01(i, j, 76) < (hb - line + 150) / 150)) return 0;   // the last 150 units below the treeline thin out
@@ -9379,6 +9380,14 @@ requestAnimationFrame(tick);
   }
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v193', d: 'Nov 24, 2026', t: 'Sunset Hill fixes', g: [
+    ['Changed', [
+      'Sunset Hill\'s trees are a quarter as dense: about one every 1,000 square tiles (4,000 square units), still in loose clumps and clearings.'
+    ]],
+    ['Fixed', [
+      'The Path Editor now shows the ground of the whole of Sunset Hill, not just the part round the start of a short layout.'
+    ]]
+  ] },
   { v: 'v192', d: 'Nov 23, 2026', t: 'Sunset Hill\'s ground', g: [
     ['New', [
       'A new ground for the Path Editor: Sunset Hill. One enormous hill whose slope keeps changing on the way up, from almost flat to about 45 degrees, with small steep-walled ravines winding through it. A ravine cuts straight through any path that crosses it, so it is a jump, not a bridge.',
