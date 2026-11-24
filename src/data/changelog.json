@@ -1,5 +1,21 @@
 [
   {
+    "v": "v192",
+    "d": "Nov 23, 2026",
+    "t": "Sunset Hill's ground",
+    "g": [
+      [
+        "New",
+        [
+          "A new ground for the Path Editor: Sunset Hill. One enormous hill whose slope keeps changing on the way up, from almost flat to about 45 degrees, with small steep-walled ravines winding through it. A ravine cuts straight through any path that crosses it, so it is a jump, not a bridge.",
+          "Sunset Hill grows its own scattered pine trees, about one every 1,000 square units, in loose clumps and clearings. They stay off the paths and out of the ravines, and thin out and stop two-thirds of the way up the hill.",
+          "The sky over Sunset Hill is a sunset: pale blue overhead, fading to deep orange at the horizon, and distant ground fades into the orange.",
+          "The Path Editor shows Sunset Hill's ground under the layout (slopes, ravines and the treeline) when it runs inside the game."
+        ]
+      ]
+    ]
+  },
+  {
     "v": "v191",
     "d": "Nov 23, 2026",
     "t": "Behind the scenes",

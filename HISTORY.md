@@ -55,3 +55,5 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-23 19:46 | next | HANDOFF: origin move done, full suite compared with v190; waiting on publish
 - 2026-11-23 19:54 | v191 | published: old built-in levels removed (terrain kept), levels play at the origin, spawn fix; label v191 with its CHANGELOG entry
 - 2026-11-23 19:55 | main | HANDOFF: v191 published, next = main
+- 2026-11-23 22:53 | next | new ground 'sunset' (Sunset Hill): wandering-slope giant hill (3-45 deg), ravines that cut through paths, its own trees below a 2/3-height treeline, sunset sky dome and orange fog; Path Editor option and ground preview; test fu/sunset1.py; GLOSSARY/ARCHITECTURE/HANDOFF
+- 2026-11-24 09:20 | v192 | published: Sunset Hill ground (label v191 -> v192)

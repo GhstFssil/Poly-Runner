@@ -267,7 +267,7 @@
 <div id="stage">
   <canvas id="view" aria-label="3D view of a girl in a red jumpsuit with a ponytail running through a long grass valley with stone walls"></canvas>
   <div id="start" class="splash">
-    <div class="ver">v191</div>
+    <div class="ver">v192</div>
     <button id="bClog" class="clogBtn" type="button" title="What changed in each version">Changes</button>
     <section class="scr on" id="scr-main" aria-label="Main menu">
       <h1 class="logo"><span>POLY</span><span>RUNNER</span></h1>
@@ -696,7 +696,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     <div class="row">
       <label class="f" style="flex:1">Path Width<input type="number" id="width" value="9" min="2" max="40" step="1"></label>
     </div>
-    <label class="f">Ground<select id="terrain"><option value="">Flat Patchy Grass</option><option value="level1">Grass Canyon's Generated Terrain</option><option value="level2">Oceana Crags' Generated Terrain</option><option value="grass">Bumpy Grass (Grass Canyon's rolling ground only)</option><option value="ocean">Open Ocean (Oceana Crags' sea only)</option><option value="crags">Crags (the jagged rock of Oceana Crags only)</option><option value="giant">Giant Hill (one enormous hill, for Sunset Hill)</option></select></label>
+    <label class="f">Ground<select id="terrain"><option value="">Flat Patchy Grass</option><option value="level1">Grass Canyon's Generated Terrain</option><option value="level2">Oceana Crags' Generated Terrain</option><option value="grass">Bumpy Grass (Grass Canyon's rolling ground only)</option><option value="ocean">Open Ocean (Oceana Crags' sea only)</option><option value="crags">Crags (the jagged rock of Oceana Crags only)</option><option value="giant">Giant Hill (one enormous hill, for Sunset Hill)</option><option value="sunset">Sunset Hill (the hill with wandering slopes, ravines and trees, under a sunset sky)</option></select></label>
     <div id="lvset" style="display:flex;flex-direction:column;gap:6px">
       <label class="f">Time Limit (seconds; 0 = no clock)<input id="tlim" type="number" min="0" max="36000" step="1" value="0"></label>
       <div class="f" style="gap:4px"><span>Score Needed for Each Rank (E is anything below D)</span>
@@ -2053,10 +2053,10 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   // ---- the ground under the layout: read from the game's own terrain code, so it appears where the editor runs inside the game ----
   var TER = { key: '', b: null, cell: 0, nx: 0, nz: 0, h: null, k: null, img: null, done: false, ver: 0, rows: 0, timer: 0 };
   function terHost() { return typeof HOST !== 'undefined' && HOST.__terrain ? HOST.__terrain : null; }
-  function terWanted() { return $('terShow').checked && (S.terrain === 'level1' || S.terrain === 'level2'); }
+  function terWanted() { return $('terShow').checked && (S.terrain === 'level1' || S.terrain === 'level2' || S.terrain === 'sunset'); }
   function terNote() {
     var t = '';
-    if ($('terShow').checked && (S.terrain === 'level1' || S.terrain === 'level2')) { if (!terHost()) t = 'The ground only shows when this editor runs inside the game (Dev Mode).'; else if (!TER.done && TER.nz) t = 'Reading the ground… ' + Math.round(100 * TER.rows / TER.nz) + '%'; }
+    if ($('terShow').checked && (S.terrain === 'level1' || S.terrain === 'level2' || S.terrain === 'sunset')) { if (!terHost()) t = 'The ground only shows when this editor runs inside the game (Dev Mode).'; else if (!TER.done && TER.nz) t = 'Reading the ground… ' + Math.round(100 * TER.rows / TER.nz) + '%'; }
     if ($('terNote').textContent !== t) $('terNote').textContent = t;
   }
   function terBounds() {
@@ -5943,6 +5943,14 @@ requestAnimationFrame(tick);
   scene.fog = new THREE.Fog(SKY, 160 * GFX.fog, 640 * GFX.fog);
 
   var camera = new THREE.PerspectiveCamera(65, 1, 0.1, 700 * GFX.fog);
+  // The sunset sky (Sunset Hill): a dome kept round the camera, pale blue overhead fading through peach to deep orange at the horizon. The fog takes the horizon's colour, so far ground fades into it
+  var SUNSET_TOP = 0xa9cde8, SUNSET_MID = 0xf4b26a, SUNSET_HZ = 0xe0601e;
+  var skyDome = new THREE.Mesh(new THREE.SphereGeometry(600 * GFX.fog, 32, 16), new THREE.ShaderMaterial({
+    uniforms: { cT: { value: new THREE.Color(SUNSET_TOP) }, cM: { value: new THREE.Color(SUNSET_MID) }, cH: { value: new THREE.Color(SUNSET_HZ) } },
+    vertexShader: 'varying vec3 vD;\nvoid main() { vD = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform vec3 cT; uniform vec3 cM; uniform vec3 cH; varying vec3 vD;\nvoid main() { float h = normalize(vD).y; vec3 c = mix(cH, cM, smoothstep(-0.03, 0.08, h)); c = mix(c, cT, smoothstep(0.05, 0.3, h)); gl_FragColor = vec4(c, 1.0); }',
+    side: THREE.BackSide, depthWrite: false, depthTest: false, fog: false }));
+  skyDome.renderOrder = -1e9; skyDome.frustumCulled = false; skyDome.visible = false; scene.add(skyDome);
   // See-through: any opaque surface between the camera and Molly is drawn see-through (a fine stipple, most of it left out) inside a narrow cone along the line from the camera to her, so she is never hidden. It stops short of her, so she and the ground at her feet are drawn as usual.
   var SEE = { on: { value: 0 }, a: { value: new THREE.Vector3() }, b: { value: new THREE.Vector3() }, r: { value: 2.2 }, t1: { value: 0.8 } };
   THREE.Material.prototype.onBeforeCompile = function (shader) {
@@ -6690,7 +6698,7 @@ requestAnimationFrame(tick);
     if (kind === 'grass') return terrainFlat(ex, z);
     if (kind === 'crags') return Math.min(300, mtSpikes(ex, z));
     if (kind === 'ocean') return top ? -10 : L2_VOID;
-    return 0;                                                       // flat ground; the Giant Hill measures a path from its own surface, so that is 0 too
+    return 0;                                                       // flat ground; the Giant Hill and Sunset Hill measure a path from their own surface, so that is 0 too
   }
   function sbDiscY(D, x, z) {                                   // the height of a circular deck at (x, z) (Sandbox coordinates): its slope rises (+) or falls (-) toward the centre, and its bank tips it to the right (+) of its heading, as a path's bank does
     var dx = x - D.cx, dz = z - D.cz, r = Math.hypot(dx, dz);
@@ -7088,6 +7096,7 @@ requestAnimationFrame(tick);
   }
   // Oceana Crags (Sandbox ground 'level2'): the path is not part of the ground at all. It is a deck of its own: an exact strip, drawn by sbMakeMeshes and stood on through sbDeckTop, with the ground under it left as it is. Her floor is whichever is higher, the deck or the ground, so what she stands on and what is drawn are the same surface by construction
   var DECK_TH = 2, DECK_CUT = 0.3, DECK_EDGE = 4.5;            // a deck's thickness where the segment gives no slab thickness; how far under a superseding deck taller rock is cut down; and how far past the deck's edges that cut stays full before it eases back up (a grid cell and its jitter, so no rock pokes through the deck's edge)
+  var l3Ed = 1e9;                                                 // how far outside the nearest path's edge the last ground point read is
   var l3Tx = 0, l3Ps = 0, l3Pu = 0;                               // the path surface nearest the last ground point read: its texture (0 stone, 1 wood planks, 2 metal plates, 3 grass), how far along the path and how far across it
   var l3Bk = 0, l3A = 0, l3P = -Infinity, l3N = Infinity, l3S0 = 0, ledI = NaN, ledA = 0, ledCA = 0, ledCI = NaN, ledTox = false;   // what the last ground height was built from: stacked bumps, the highest and lowest independent ones, and what was added in all
   function sbComb(hA, P, N, La, Li) {                            // ground rise at a corner: stacked bumps plus stacked ledges, but an independent bump or ledge only reaches its own height and merges into whatever is higher (or lower, for a trench)
@@ -7099,8 +7108,51 @@ requestAnimationFrame(tick);
     return y + L;
   }
   var GH_X = 0, GH_Z = -9000, GH_R = 9000, GH_H = 3000;           // the Giant Hill: centred 9,000 units ahead of the start, 9,000 in radius and 3,000 high, so its foot is where the path begins and its flanks climb to about 27 degrees
+  // Sunset Hill (Sandbox ground 'sunset'): the Giant Hill's footprint, but the slope wanders on the way up between almost flat and about 45 degrees, and small ravines are carved through it.
+  // The hill is 48 spokes running down from the top, each climbing at its own wandering slope (neighbouring spokes are alike, so the steep and gentle bands sweep around the hill), blended smoothly between spokes
+  var SH_H = 3000, SH_N = 48, SH_DR = 10, SH_NR = Math.ceil(GH_R / SH_DR) + 1, SH_MIN = 2, SH_MAX = 42, SH_TAB = null;   // summit height; spokes; table step along a spoke; the gentlest and steepest slope in degrees (a little more where the spokes blend)
+  var SH_RAV_W = 60, SH_RAV_D = 60, SH_RAV_S = 700;               // a ravine's usual width and depth (each wanders about 30% either way), and the scale of the field whose level lines they follow (roughly how far apart they are)
+  var SH_TREES = 2 / 3;                                            // trees grow up to this fraction of the summit's height
+  var shCut = 0;                                                   // how deep the ravine is at the last point read (0: not in one)
+  function shTable() {
+    if (SH_TAB) return SH_TAB;
+    SH_TAB = new Float32Array(SH_N * SH_NR);
+    var tn = new Float64Array(SH_NR), tmax = Math.tan(SH_MAX * Math.PI / 180), a, i, k, it, tot, s;
+    for (a = 0; a < SH_N; a++) {
+      var th = a / SH_N * 2 * Math.PI, cx = 0.9 * Math.cos(th), cz = 0.9 * Math.sin(th);   // each spoke reads the slope field along its own line, offset around a circle, so spokes next to each other read nearly the same values
+      for (i = 0; i < SH_NR; i++) {
+        var r = i * SH_DR, n = 0.7 * vnoise(r / 900 + cx, cz + 17.3, 61) + 0.3 * vnoise(r / 320 + cx * 2.8, cz * 2.8 - 9.1, 62);
+        tn[i] = Math.tan((SH_MIN + (SH_MAX - SH_MIN) * smooth01((n - 0.25) / 0.5)) * Math.PI / 180) * smooth01(r / 400) * smooth01((GH_R - r) / 700);   // a rounded top and a foot that eases into the plain
+      }
+      for (k = 1, it = 0; it < 4; it++) { tot = 0; for (i = 0; i < SH_NR - 1; i++) tot += Math.min(tmax, tn[i] * k) * SH_DR; k *= SH_H / tot; }   // steepen or flatten the whole spoke so it reaches about the summit's height
+      for (s = 0, i = SH_NR - 1; i >= 0; i--) { SH_TAB[a * SH_NR + i] = s; s += Math.min(tmax, tn[i] * k) * SH_DR; }
+      for (i = 0; i < SH_NR; i++) SH_TAB[a * SH_NR + i] *= SH_H / SH_TAB[a * SH_NR];   // and exactly: every spoke meets the others at the top
+    }
+    for (i = 0; i < SH_NR; i++) {                                   // toward the top the spokes are close together, so a difference between them would be a cliff across the hill: there they all draw in to their average
+      for (s = 0, a = 0; a < SH_N; a++) s += SH_TAB[a * SH_NR + i];
+      s /= SH_N; k = smooth01((i * SH_DR - 300) / 4000);
+      for (a = 0; a < SH_N; a++) SH_TAB[a * SH_NR + i] = s + (SH_TAB[a * SH_NR + i] - s) * k;
+    }
+    return SH_TAB;
+  }
+  function shBase(x, z) {                                          // Sunset Hill's height without its ravines or small bumps (Sandbox coordinates)
+    var T = SH_TAB || shTable(), dx = x - GH_X, dz = z - GH_Z, r0 = Math.hypot(dx, dz);
+    var r = r0 + 240 * (vnoise(x / 1900 + 3.3, z / 1900 - 7.7, 63) - 0.5) * smooth01(r0 / 1500);   // the contours wander, so the hill is not round
+    if (r >= GH_R - SH_DR) return 0; if (r < 0) r = 0;
+    var u = (Math.atan2(dz, dx) / (2 * Math.PI) + 1) * SH_N, a1 = Math.floor(u), f = u - a1, fr = r / SH_DR, i = Math.floor(fr), t = fr - i, p = [0, 0, 0, 0];
+    for (var q = 0; q < 4; q++) { var o = (((a1 - 1 + q) % SH_N) + SH_N) % SH_N * SH_NR + i; p[q] = T[o] + (T[o + 1] - T[o]) * t; }
+    return 0.5 * (2 * p[1] + (p[2] - p[0]) * f + (2 * p[0] - 5 * p[1] + 4 * p[2] - p[3]) * f * f + (3 * p[1] - p[0] - 3 * p[2] + p[3]) * f * f * f);   // smooth from spoke to spoke (Catmull-Rom)
+  }
+  function shRf(x, z) { return 0.75 * vnoise(x / SH_RAV_S + 11.7, z / SH_RAV_S - 4.2, 64) + 0.25 * vnoise(x * 2.6 / SH_RAV_S - 6.6, z * 2.6 / SH_RAV_S + 2.9, 65); }
+  function shRavine(x, z) {                                        // how deep a ravine cuts at (x, z): ravines run along the level lines of a slow random field, a steep-walled channel with a narrow floor
+    var n0 = shRf(x, z) - 0.5; if (n0 > 0.12 || n0 < -0.12) return 0;   // (the field cannot climb faster than this, so farther from the line than this there is no ravine)
+    var e = 2, gx = shRf(x + e, z) - 0.5 - n0, gz = shRf(x, z + e) - 0.5 - n0, gl = Math.hypot(gx, gz) / e; if (gl < 1e-7) return 0;
+    var d = Math.abs(n0) / gl, hw = SH_RAV_W / 2 * (0.7 + 0.6 * vnoise(x / 400 + 5.1, z / 400, 66)); if (d >= hw) return 0;   // distance to the line, and this stretch's half width
+    var dep = SH_RAV_D * (0.7 + 0.6 * vnoise(x / 350 - 2.2, z / 350 + 8.4, 67));
+    return dep * smooth01((hw - d) / (0.6 * hw)) * smooth01((Math.hypot(x, z) - 150) / 100);   // walls over the outer 60% of each side; none right at the start
+  }
   function level3H(x, z) {
-    wSt = 0; wPl = 0; wMud = 0; wF = 0; wL2 = 0; l3A = 0; l3P = -Infinity; l3N = Infinity; l3S0 = 0; l3Bk = 0; l3Tx = 0;
+    wSt = 0; wPl = 0; wMud = 0; wF = 0; wL2 = 0; l3A = 0; l3P = -Infinity; l3N = Infinity; l3S0 = 0; l3Bk = 0; l3Tx = 0; shCut = 0; l3Ed = 1e9;
     if (!SB) return 0;
     var ex = x - L3_X, y = 0, B = SB, HW = SB.hw, hwq = SB.hw, best = 1e9, py = 0, ing = false, tox = false, pov = false, i, d;
     sbNear(B.gapH, ex, z, B.maxG, function (e) { if (!ing && sbIn(e, ex, z, 0)) ing = true; });
@@ -7127,6 +7179,7 @@ requestAnimationFrame(tick);
       l3Ps = ddx * Math.sin(Dk.hh) - ddz * Math.cos(Dk.hh); l3Pu = ddx * Math.cos(Dk.hh) + ddz * Math.sin(Dk.hh);
     }
     if (ing) { best = 1e9; py = 0; }                                  // a gap is a break in the path: the ground is whatever is under it, with no path across
+    l3Ed = best - HW;                                                 // how far outside the nearest path's edge this point is (negative: on it)
     if (B.terrain === 'grass') {                                      // Grass Canyon's rolling ground and nothing else: no walls, ledges or plateau, going on for ever. The path is laid over it and the ground eases into it
       var gb = terrainFlat(ex, z); y = gb;
       if (best < HW + 14) { var gk = 1 - smooth01((best - HW) / 14); y = gb + (py - gb) * gk; if (best <= HW) wL2 = 1; }
@@ -7141,6 +7194,11 @@ requestAnimationFrame(tick);
       var gdd = Math.hypot(ex - GH_X, z - GH_Z), ghv = GH_H * smooth01(1 - gdd / GH_R) + terrainFlat(ex, z);
       y = ghv;
       if (best < HW + 14) { var gk2 = 1 - smooth01((best - HW) / 14); y = ghv + py * gk2; if (best <= HW) wL2 = 1; }
+    }
+    else if (B.terrain === 'sunset') {                                // Sunset Hill: the path rides on the hill (its Rise measured from the hill's surface), but a ravine cuts through path and ground alike: no land bridges (a floating piece can still span one)
+      var shb = shBase(ex, z); shCut = shRavine(ex, z); y = shb + terrainFlat(ex, z);
+      if (best < HW + 14) { var gk3 = 1 - smooth01((best - HW) / 14); y += (shb + py - y) * gk3; if (best <= HW && shCut < 1) wL2 = 1; }
+      if (shCut > 0) { y -= shCut; if (shCut > 3) wSt = 1; }         // bare rock down in a ravine
     }
     else if (B.terrain === 'ocean') {                                 // Oceana Crags' open sea and nothing else: no ground at all, the path is a causeway over it. She falls through the water to the bottom of the world
       y = L2_VOID; if (best < HW + 2) { y = L2_VOID + (py - L2_VOID) * (1 - smooth01((best - HW) / 2)); if (best <= HW) wL2 = 1; }
@@ -8014,13 +8072,15 @@ requestAnimationFrame(tick);
   window.__gh = function (x, z) { return groundH(x, z); };
   window.__gg = function (x, z) { groundGrad(x, z); return [ggx, ggz]; };
   window.__br = function () { return [breath, breathT]; };
+  window.__shDbg = function (x, z) { return [shBase(x, z), shRavine(x, z)]; };   // (tests: Sunset Hill's height without ravines, and the ravine's depth)
   window.__sbTick = function (dt) { sbTick(dt, performance.now()); };
   function terrainProbe(kind, x0, z0, nx, nz, cell) {            // the level's own ground at a grid of points (the editor paints it under the layout): height and what it is made of
     var h = new Float32Array(nx * nz), k = new Uint8Array(nx * nz), i, j, ex, ez, y, kk, lg;
     {
       for (j = 0; j < nz; j++) for (i = 0; i < nx; i++) {
         ex = x0 + (i + 0.5) * cell; ez = z0 + (j + 0.5) * cell;
-        if (kind === 'level2') { y = oldWorldH(L2_X + ex, ez + L2_SBZ); kk = wL2 === 3 ? 6 : wL2 === 2 ? 5 : wL2 ? 4 : 0; lg = oldLedgeH(L2_X + ex, ez + L2_SBZ); if (y < WATER_Y) kk |= 32; }
+        if (kind === 'sunset') { var shb = shBase(ex, ez), shc = shRavine(ex, ez); y = shb + terrainFlat(ex, ez) - shc; lg = 0; kk = shc > 3 ? 1 : shb > SH_H * SH_TREES ? 2 : 0; }   // Sunset Hill: rock in the ravines, paler grass above the treeline
+        else if (kind === 'level2') { y = oldWorldH(L2_X + ex, ez + L2_SBZ); kk = wL2 === 3 ? 6 : wL2 === 2 ? 5 : wL2 ? 4 : 0; lg = oldLedgeH(L2_X + ex, ez + L2_SBZ); if (y < WATER_Y) kk |= 32; }
         else { y = oldWorldH(ex, ez); kk = wL2 === 3 ? 6 : wSt ? 1 : wPl ? 2 : wMud ? 3 : 0; lg = oldLedgeH(ex, ez); }
         if (lg > 0.4 || lg < -0.4) kk |= 16;
         h[j * nx + i] = y + lg; k[j * nx + i] = kk;
@@ -8195,7 +8255,7 @@ requestAnimationFrame(tick);
         color.setHSL(0.068 + (jit - 0.5) * 0.03, 0.36, 0.30 + (jit - 0.5) * 0.08 + Math.min(0.14, Math.max(0, cy - 35) / 1800) - (rise3 > 6 ? 0.05 : 0) + 0.025 * Math.sin(cy * 0.4));
       } else if (!face && vd[a] === 3 && vd[b] === 3 && vd[c] === 3) {                                  // the mud ramp
         color.setHSL(0.075 + (jit - 0.5) * 0.02, 0.42, 0.2 + (jit - 0.5) * 0.07 + (0.5 + 0.5 * Math.sin(cz * 0.9 + cx * 0.3)) * 0.03);
-      } else if (face || vd[a] === 1 || vd[b] === 1 || vd[c] === 1 || vd[a] === 3 || vd[b] === 3 || vd[c] === 3 || rise3 > (plat ? 5 : 0.48)) {   // cliffs, and the steep faces of ledges and hillsides, are rock
+      } else if (face || vd[a] === 1 || vd[b] === 1 || vd[c] === 1 || vd[a] === 3 || vd[b] === 3 || vd[c] === 3 || rise3 > (plat ? 5 : SB && SB.terrain === 'sunset' ? 2.6 : 0.48)) {   // cliffs, and the steep faces of ledges and hillsides, are rock (Sunset Hill stays grassy up to about 40 degrees)
         color.setHex(STONE[Math.floor(jit * STONE.length) % STONE.length]);
         color.offsetHSL(0, 0, Math.min(0.1, cy / 400) + (rand01(tq, 3 + ci + cj * 977, 6) - 0.5) * 0.05);
       } else {
@@ -8370,10 +8430,36 @@ requestAnimationFrame(tick);
         tpv.set(wx, gy + 7.5 * sc * (tky - cky), wz); tsv.set(sc * ckx, sc * cky, sc * ckx); tm4.compose(tpv, tq, tsv); for (var lm = 1; lm < 4; lm++) treeSets[sh][lm].setMatrixAt(slot, tm4);
         treeX.push(wx); treeZ.push(wz); treeR.push(0.8 * sc * tkx); treeTop.push(gy + sc * (7.5 * tky + 14.9 * cky));
       });
+      if (SB && SB.terrain === 'sunset') shTrees(px, pz, cn);      // Sunset Hill grows its own trees as well
       for (var cb = 0; cb < SHADES; cb++) treeSets[cb].forEach(function (m) { m.count = cn[cb]; m.instanceMatrix.needsUpdate = true; });
     }
   }
   updateTrees(0, 0);
+  // Sunset Hill's own trees, scattered by the terrain: about one per 1,000 square units, in loose clumps and clearings, none on or beside a path, in a ravine or in a lake, thinning out to nothing at the treeline (SH_TREES of the summit's height, wandering a little)
+  var SHT_C = Math.sqrt(500), shtCache = new Map(), shtSB = null;   // cells of 500 square units with an even chance of a tree each; what each cell holds once worked out (for this layout)
+  function shTreeAt(i, j) {
+    if (rand01(i, j, 71) >= 0.5 * (0.35 + 1.3 * vnoise(i / 9, j / 9, 72))) return 0;   // clumps and clearings, averaging one tree per two cells
+    var x = (i + 0.15 + 0.7 * rand01(i, j, 73)) * SHT_C, z = (j + 0.15 + 0.7 * rand01(i, j, 74)) * SHT_C, hb = shBase(x, z);
+    var line = SH_H * SH_TREES * (1 + 0.12 * (vnoise(x / 600, z / 600, 75) - 0.5));
+    if (hb > line || (hb > line - 150 && rand01(i, j, 76) < (hb - line + 150) / 150)) return 0;   // the last 150 units below the treeline thin out
+    if (shRavine(x, z) > 0 || SB.lakes.some(function (k) { return Math.hypot(x - k.x, z - k.z) < k.r + 3; })) return 0;
+    worldH0(L3_X + x, z); if (l3Ed < 6) return 0;                  // clear of every path by 6 units
+    return [x, z, sbFoot(L3_X + x, z), Math.floor(rand01(i, j, 77) * SHADES), 0.9 + 0.5 * rand01(i, j, 78), rand01(i, j, 79) * 6.2832];
+  }
+  window.__treeDbg = function (px, pz) { builtAtZ = 1e9; var t0 = performance.now(); updateTrees(px, pz); return [treeX.length, performance.now() - t0]; };   // (tests: rebuild the trees around a point; how many are built and how long it took)
+  function shTrees(px, pz, cn) {
+    if (shtSB !== SB || shtCache.size > 80000) { shtSB = SB; shtCache.clear(); }
+    var R = VIEW_AHEAD + 120, i0 = Math.floor((px - L3_X - R) / SHT_C), i1 = Math.floor((px - L3_X + R) / SHT_C), j0 = Math.floor((pz - R) / SHT_C), j1 = Math.floor((pz + R) / SHT_C);
+    for (var i = i0; i <= i1; i++) for (var j = j0; j <= j1; j++) {
+      var key = i * 131071 + j, t = shtCache.get(key);
+      if (t === undefined) { t = shTreeAt(i, j); shtCache.set(key, t); }
+      if (!t || cn[t[3]] >= MAX_TREES) continue;
+      var wx = L3_X + t[0], sc = t[4], slot = cn[t[3]]++, set = treeSets[t[3]];
+      tq.setFromAxisAngle(tUp, t[5]);
+      tpv.set(wx, t[2], t[1]); tsv.set(sc, sc, sc); tm4.compose(tpv, tq, tsv); for (var lm = 0; lm < 4; lm++) set[lm].setMatrixAt(slot, tm4);
+      treeX.push(wx); treeZ.push(t[1]); treeR.push(0.8 * sc); treeTop.push(t[2] + sc * 22.4);
+    }
+  }
   // Push her out of any trunk she is touching. Returns true if she hit one. (Walls and ledges are terrain: see the ground check in the loop.)
   function collide() {
     var hit = false, pp = player.position;
@@ -9293,6 +9379,14 @@ requestAnimationFrame(tick);
   }
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v192', d: 'Nov 23, 2026', t: 'Sunset Hill\'s ground', g: [
+    ['New', [
+      'A new ground for the Path Editor: Sunset Hill. One enormous hill whose slope keeps changing on the way up, from almost flat to about 45 degrees, with small steep-walled ravines winding through it. A ravine cuts straight through any path that crosses it, so it is a jump, not a bridge.',
+      'Sunset Hill grows its own scattered pine trees, about one every 1,000 square units, in loose clumps and clearings. They stay off the paths and out of the ravines, and thin out and stop two-thirds of the way up the hill.',
+      'The sky over Sunset Hill is a sunset: pale blue overhead, fading to deep orange at the horizon, and distant ground fades into the orange.',
+      'The Path Editor shows Sunset Hill\'s ground under the layout (slopes, ravines and the treeline) when it runs inside the game.'
+    ]]
+  ] },
   { v: 'v191', d: 'Nov 23, 2026', t: 'Behind the scenes', g: [
     ['Under the hood', [
       'The original built-in versions of Grass Canyon and Oceana Crags are gone. Both levels have been built in the Path Editor for a while, and only the old levels\' ground shape is still used. Levels now sit at the centre of the world, which keeps positions precise. Nothing in the game changes.'
@@ -10934,7 +11028,8 @@ function showScreen(name) {                                // the menu shows one
       }
     }
     if (camUw !== uwOn) { uwOn = camUw; uwEl.classList.toggle('on', uwOn); }
-    scene.fog.color.setHex(uwOn ? 0x2f6fb5 : SKY); scene.background.setHex(uwOn ? 0x2f6fb5 : SKY); scene.fog.near = (uwOn ? 10 : 160) * GFX.fog; scene.fog.far = (uwOn ? 260 : 640) * GFX.fog;
+    var skyC = SB && SB.terrain === 'sunset' ? SUNSET_HZ : SKY; skyDome.visible = skyC !== SKY && !uwOn; if (skyDome.visible) skyDome.position.copy(camera.position);   // Sunset Hill's sky
+    scene.fog.color.setHex(uwOn ? 0x2f6fb5 : skyC); scene.background.setHex(uwOn ? 0x2f6fb5 : skyC); scene.fog.near = (uwOn ? 10 : 160) * GFX.fog; scene.fog.far = (uwOn ? 260 : 640) * GFX.fog;
     renderer.render(scene, camera);
     SEE.on.value = 0;
   }

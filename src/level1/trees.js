@@ -51,10 +51,36 @@
         tpv.set(wx, gy + 7.5 * sc * (tky - cky), wz); tsv.set(sc * ckx, sc * cky, sc * ckx); tm4.compose(tpv, tq, tsv); for (var lm = 1; lm < 4; lm++) treeSets[sh][lm].setMatrixAt(slot, tm4);
         treeX.push(wx); treeZ.push(wz); treeR.push(0.8 * sc * tkx); treeTop.push(gy + sc * (7.5 * tky + 14.9 * cky));
       });
+      if (SB && SB.terrain === 'sunset') shTrees(px, pz, cn);      // Sunset Hill grows its own trees as well
       for (var cb = 0; cb < SHADES; cb++) treeSets[cb].forEach(function (m) { m.count = cn[cb]; m.instanceMatrix.needsUpdate = true; });
     }
   }
   updateTrees(0, 0);
+  // Sunset Hill's own trees, scattered by the terrain: about one per 1,000 square units, in loose clumps and clearings, none on or beside a path, in a ravine or in a lake, thinning out to nothing at the treeline (SH_TREES of the summit's height, wandering a little)
+  var SHT_C = Math.sqrt(500), shtCache = new Map(), shtSB = null;   // cells of 500 square units with an even chance of a tree each; what each cell holds once worked out (for this layout)
+  function shTreeAt(i, j) {
+    if (rand01(i, j, 71) >= 0.5 * (0.35 + 1.3 * vnoise(i / 9, j / 9, 72))) return 0;   // clumps and clearings, averaging one tree per two cells
+    var x = (i + 0.15 + 0.7 * rand01(i, j, 73)) * SHT_C, z = (j + 0.15 + 0.7 * rand01(i, j, 74)) * SHT_C, hb = shBase(x, z);
+    var line = SH_H * SH_TREES * (1 + 0.12 * (vnoise(x / 600, z / 600, 75) - 0.5));
+    if (hb > line || (hb > line - 150 && rand01(i, j, 76) < (hb - line + 150) / 150)) return 0;   // the last 150 units below the treeline thin out
+    if (shRavine(x, z) > 0 || SB.lakes.some(function (k) { return Math.hypot(x - k.x, z - k.z) < k.r + 3; })) return 0;
+    worldH0(L3_X + x, z); if (l3Ed < 6) return 0;                  // clear of every path by 6 units
+    return [x, z, sbFoot(L3_X + x, z), Math.floor(rand01(i, j, 77) * SHADES), 0.9 + 0.5 * rand01(i, j, 78), rand01(i, j, 79) * 6.2832];
+  }
+  window.__treeDbg = function (px, pz) { builtAtZ = 1e9; var t0 = performance.now(); updateTrees(px, pz); return [treeX.length, performance.now() - t0]; };   // (tests: rebuild the trees around a point; how many are built and how long it took)
+  function shTrees(px, pz, cn) {
+    if (shtSB !== SB || shtCache.size > 80000) { shtSB = SB; shtCache.clear(); }
+    var R = VIEW_AHEAD + 120, i0 = Math.floor((px - L3_X - R) / SHT_C), i1 = Math.floor((px - L3_X + R) / SHT_C), j0 = Math.floor((pz - R) / SHT_C), j1 = Math.floor((pz + R) / SHT_C);
+    for (var i = i0; i <= i1; i++) for (var j = j0; j <= j1; j++) {
+      var key = i * 131071 + j, t = shtCache.get(key);
+      if (t === undefined) { t = shTreeAt(i, j); shtCache.set(key, t); }
+      if (!t || cn[t[3]] >= MAX_TREES) continue;
+      var wx = L3_X + t[0], sc = t[4], slot = cn[t[3]]++, set = treeSets[t[3]];
+      tq.setFromAxisAngle(tUp, t[5]);
+      tpv.set(wx, t[2], t[1]); tsv.set(sc, sc, sc); tm4.compose(tpv, tq, tsv); for (var lm = 0; lm < 4; lm++) set[lm].setMatrixAt(slot, tm4);
+      treeX.push(wx); treeZ.push(t[1]); treeR.push(0.8 * sc); treeTop.push(t[2] + sc * 22.4);
+    }
+  }
   // Push her out of any trunk she is touching. Returns true if she hit one. (Walls and ledges are terrain: see the ground check in the loop.)
   function collide() {
     var hit = false, pp = player.position;

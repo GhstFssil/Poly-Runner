@@ -51,6 +51,10 @@ One source of truth for the game's words. Use these terms, spelled this way, in 
 | layout | a Path Editor document: the path, the stamps and the terrain, saved as JSON. Never "map" or "level file" | `OFFICIAL_L1` (Grass Canyon), `OFFICIAL_L2` (Oceana Crags) |
 | path | the line of straights and arcs a layout is built around | `B.samples` |
 | segment | one straight or arc of a path (not a Seg) | |
+| Ground | a layout's terrain, picked in the Path Editor's Ground list: Flat Patchy Grass, Grass Canyon's / Oceana Crags' Generated Terrain, Bumpy Grass, Open Ocean, Crags, Giant Hill, Sunset Hill | `terrain`: '', `level1`, `level2`, `grass`, `ocean`, `crags`, `giant`, `sunset` |
+| Sunset Hill (ground) | the Giant Hill's footprint with slopes that wander between almost flat and about 45 degrees, Ravines, its own trees up to the Treeline, and the sunset sky. Also the stage name (Sunset Hill, Act 1) | `sunset`, `shBase`, `shTable`, `skyDome` |
+| Ravine | a winding steep-walled channel carved through Sunset Hill's ground; it cuts through a path rather than being bridged (a floating piece can span it) | `shRavine`, `shCut` |
+| Treeline | the height on Sunset Hill above which its own trees stop growing | `SH_TREES`, `shTrees` |
 | Valley, The Sink | names in the old hand-coded terrain code only: Level 1's original terrain, and the poisoned low ground in Oceana Crags. Not for players | code comments |
 | Dev Mode | the menu screen (title page and pause) with the Path Editor, Rig Editor, Sandbox buttons, Saved Sandboxes, the Change Log, and in-game tools (Fill Power Line, Invulnerable) | `bDevT`, `bDev` |
 | Saved Sandboxes | layouts kept in the browser | `polyrun-sandboxes` |
