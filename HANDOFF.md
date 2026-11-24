@@ -1,7 +1,7 @@
 # Handoff (2026-11-24)
 
 ## Goal
-Rename the game to Poly Runner everywhere, including the hidden saved-data names, shipped as one version (v194, desktop app 1.2). All three commits are on `next`; not published yet.
+Rename the game to Poly Runner everywhere, including the hidden saved-data names, shipped as one version (v194, desktop app 1.2). Published as v194 (2026-11-24).
 
 ## Done (on `next`)
 - Commit 1: the game file is `poly-runner.html` (was `checker-run.html`); tools, tests, `release.yml`, docs, CLAUDE.md updated. Titles, menus and the desktop window already said Poly Runner.
@@ -14,7 +14,7 @@ Rename the game to Poly Runner everywhere, including the hidden saved-data names
 - The script copies (old folders stay as backup), refuses if the app is running or a new folder exists, leaves out the old update folder `game/` (it would hide the new built-in game) and the lock files, and removes the old `PolyRun.desktop`.
 
 ## Next steps
-1. Ask Ricky before publishing: bump the label to v194, merge `next` into `main`.
+1. (done) v194 published.
 2. Ricky: close the app, back up `~/.config/PolyRun` and `~/PolyRun`, run the script, install desktop 1.2 (`build-and-install.sh`), start it and check layouts, Saved Sandboxes and models.
 3. Later (BACKLOG): remove the in-game one-time copy once his saves are confirmed.
 
