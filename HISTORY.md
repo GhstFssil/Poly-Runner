@@ -59,3 +59,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-24 09:20 | v192 | published: Sunset Hill ground (label v191 -> v192)
 - 2026-11-24 16:55 | next | Sunset Hill: trees 1 per 1,000 square tiles (was per square unit); Path Editor reads the whole hill ground
 - 2026-11-24 16:52 | v193 | Published v193: Sunset Hill trees 1 per 1,000 square tiles; Path Editor shows the whole hill
+- 2026-11-24 17:00 | next | rename commit 1: game file checker-run.html -> poly-runner.html (manifest output, tools, tests, release.yml, docs); 'Poly Run' -> 'Poly Runner' in sweep docs; GLOSSARY records the decided hidden-name renames; finished split and visible-rename BACKLOG entries removed; game file byte-identical

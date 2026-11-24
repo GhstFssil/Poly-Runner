@@ -4,7 +4,7 @@ name: Build downloads
 on:
   push:
     branches: [main]
-    paths: ['checker-run.html', 'desktop/**', 'tools/build_release.py', '.github/workflows/release.yml']
+    paths: ['poly-runner.html', 'desktop/**', 'tools/build_release.py', '.github/workflows/release.yml']
   workflow_dispatch: {}
 permissions:
   contents: write

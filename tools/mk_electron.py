@@ -2,7 +2,7 @@
 """Rebuild the offline game folder for the desktop app from the working game file.
 Usage: python3 mk_electron.py   ->  /tmp/polyrun-work/electron-src/game/ (and /tmp/polyrun-work/polyrun-desktop.zip, /tmp/polyrun-work/polyrun-game-update.zip)"""
 import re, shutil, os, subprocess
-SRC='/home/claude/poly-runner/checker-run.html'; OUT='/tmp/polyrun-work/electron-src/game'
+SRC='/home/claude/poly-runner/poly-runner.html'; OUT='/tmp/polyrun-work/electron-src/game'
 TH='/tmp/polyrun-work/t/node_modules/three'
 FS='/tmp/fx/node_modules/@fontsource'
 shutil.rmtree(OUT,ignore_errors=True); os.makedirs(OUT+'/lib'); os.makedirs(OUT+'/fonts')

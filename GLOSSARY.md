@@ -10,7 +10,7 @@ One source of truth for the game's words. Use these terms, spelled this way, in 
 ## Say this, not that
 | Say | Not | Why |
 |---|---|---|
-| Poly Runner | Poly Run, Polyrunner, PolyRun | the rename is in BACKLOG.md; applied to prose as files are touched |
+| Poly Runner | Poly Run, Polyrunner, PolyRun | the game's name everywhere players see it; old spellings survive only in frozen names (below) and old log lines |
 | Seg | segment (for the collectible) | a segment is a piece of a path |
 | segment | Seg (for a path piece) | see above |
 | Barrier | ball, shell, Hedron Barrier | one name; the Controls screen says Barrier |
@@ -25,7 +25,7 @@ One source of truth for the game's words. Use these terms, spelled this way, in 
 ## The game and the people
 | Term | Meaning | Code / notes |
 |---|---|---|
-| Poly Runner | the game | file becomes `poly-runner.html` (now `checker-run.html`) |
+| Poly Runner | the game | the game file is `poly-runner.html` (was `checker-run.html` until 2026-11-24) |
 | Molly | the main character | `CHAR = 'molly'` |
 | Comet | the second character: no Strafe, no Barrier; has Star Throw, Hover and Fly | `CHAR = 'comet'` |
 | character | Molly or Comet; picked on the Characters page | `CHAR`, `setChar`, `loadCharModel`, `pr_char` |
@@ -135,7 +135,7 @@ The rows for src, part, build and the game file describe the source split, which
 |---|---|---|
 | src, part | the source files in `src/`; a part is one file the build joins: a source file as it is, or a data file in `src/data/` (JSON, `.glb`) that the build wraps | `src/manifest.json` |
 | build | join the parts, byte for byte, into the game file | `python3 tools/build.py` |
-| the game file | the generated, committed single HTML file | `checker-run.html` now |
+| the game file | the generated, committed single HTML file | `poly-runner.html` |
 | area | a group of source files by function (core, level1, level2, sandbox, characters, mobs, ui; level1 and level2 now hold only the old levels' terrain). One task works in one area. The tests are mapped by area | |
 | play world | where she runs: the loaded layout, at the origin | `worldH0`, `ledgeH` |
 | old levels | the original hand-made Grass Canyon and Oceana Crags; only their terrain is left, sampled by a layout's `level1` and `level2` grounds in the old levels' own coordinates | `oldWorldH`, `oldLedgeH` |
@@ -149,6 +149,8 @@ The rows for src, part, build and the game file describe the source split, which
 
 ## Frozen names (they look old but hold players' saved data)
 Renaming any of these loses saved layouts, settings and models unless the game reads the old name first and writes the new one. The rename task must decide each one; until then they stay as they are.
+
+Decided 2026-11-24 (Ricky), being renamed with a copy-on-first-load migration (fill the new name only when it is empty; the old data stays): IndexedDB `polyrun` -> `polyrunner`; localStorage `polyrun-*` -> `polyrunner-*`; `window.polyrun` and `polyrun-*` messages -> `polyrunner`; `~/PolyRun` -> `~/PolyRunner`; `~/.config/PolyRun` -> `~/.config/PolyRunner`; package `polyrunner`; app id `com.polyrunner.game`. `pr_char`, `pr_gfx`, `pr_mouse2`, `runnerRig2` and `cometRig` keep their names.
 
 - Browser storage: IndexedDB `polyrun` (store `kv`, keys `mollyGlb`, `cometGlb`); localStorage `runnerRig2`, `cometRig`, `pr_char`, `pr_gfx`, `pr_mouse2`, `polyrun-sandboxes`, `polyrun-pe-presets`, `polyrun-pe-clip`, `polyrun-last-export`, `polyrun-path-editor-v1`.
 - Desktop app: the bridge `window.polyrun` and its `polyrun-backup`/`polyrun-restore` messages, the folders `~/PolyRun` and `~/.config/PolyRun/game`, the package name `polyrun` and the app id `com.ricky.polyrun`.

@@ -18,7 +18,7 @@ for fam, pk, ws in fonts:
         fn = '%s-latin-%d-normal.woff2' % (pk, w); shutil.copy(os.path.join(FS, pk, 'files', fn), G + '/fonts/' + fn)
         css.append("@font-face{font-family:'%s';font-style:normal;font-weight:%d;font-display:swap;src:url(fonts/%s) format('woff2');}" % (fam, w, fn))
 open(G + '/fonts.css', 'w').write('\n'.join(css) + '\n')
-s = open(os.path.join(ROOT, 'checker-run.html'), encoding='utf-8').read()
+s = open(os.path.join(ROOT, 'poly-runner.html'), encoding='utf-8').read()
 for a, b in [('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', 'lib/three.min.js'), ('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js', 'lib/GLTFLoader.js'),
              ('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js', 'lib/OrbitControls.js'), ('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js', 'lib/GLTFExporter.js')]:
     s = s.replace(a, b)

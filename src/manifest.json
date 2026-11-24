@@ -1,5 +1,5 @@
 {
-  "output": "checker-run.html",
+  "output": "poly-runner.html",
   "parts": [
     "ui/page-head.html",
     "ui/page-body.html",

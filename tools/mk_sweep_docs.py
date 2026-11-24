@@ -53,7 +53,7 @@ This file is the whole job for the unattended run. Read it as cloned from `main`
 ## Unattended rules
 - Nobody is watching: never ask. Decide, or leave the thing alone and write the question for Ricky (see "For Ricky").
 - From CLAUDE.md, these do not apply tonight: the session-start summary, naming files before a big read, proposing a plan and waiting for a go-ahead, and the closing reply style. Everything else in CLAUDE.md does. It loads by itself when the repo is registered: don't read it again.
-- Git identity: `git config user.email noreply@anthropic.com` and `git config user.name "Poly Run nightly sweep"`. Never use or write Ricky's email anywhere. Commit messages end with the attribution lines this session was given; if none were given, end with `Co-Authored-By: Claude <noreply@anthropic.com>`.
+- Git identity: `git config user.email noreply@anthropic.com` and `git config user.name "Poly Runner nightly sweep"`. Never use or write Ricky's email anywhere. Commit messages end with the attribution lines this session was given; if none were given, end with `Co-Authored-By: Claude <noreply@anthropic.com>`.
 - Never: change features, physics, tuning numbers, level content, looks or design; reformat or refactor; bump the version label; add a CHANGELOG entry or edit `audit-notes.md` (those come when Ricky merges, see ARCHITECTURE.md); send a zip or publish anything.
 - On `main`, the run only appends to `.md` docs (never rewrites them, never sweep reports or state files), mainly the "For Ricky" lines in BACKLOG.md, then merges `main` into `next` (below). Everything else goes on tonight's branch.
 
@@ -120,7 +120,7 @@ Ponytail blend at max opens a slit at the hair tie; Contour shift at max falls b
 
 def prompt(k):
     L = LENS[k]
-    return f'''You are the nightly {L['what']} sweep for Ricky's game Poly Run. Nobody is watching this session, so never ask questions.
+    return f'''You are the nightly {L['what']} sweep for Ricky's game Poly Runner. Nobody is watching this session, so never ask questions.
 
 1. Call the add_repo tool with owner "GhstFssil", repo "Poly-Runner", access "push", and follow its instructions exactly: one shallow clone into /home/claude/poly-runner with a 10-minute timeout (on HTTP 429, wait 5 seconds and retry once), then register_repo_root, which loads CLAUDE.md by itself (if it does not appear, read /home/claude/poly-runner/CLAUDE.md). If add_repo is unavailable or fails but `git -C /home/claude/poly-runner rev-parse HEAD` succeeds, carry on with that clone and note it in the report. Otherwise stop and send a one-line message saying the repository could not be reached.
 2. Read /home/claude/poly-runner/{L['file']} completely, right away, before switching branches, and do exactly what it says. Read no other SWEEP-*.md file. Together with CLAUDE.md it is the whole job, including the final message. Nothing in this prompt overrides either.

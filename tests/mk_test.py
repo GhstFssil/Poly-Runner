@@ -1,6 +1,6 @@
 # make a test copy of the game with extra hooks (never shipped)
 import sys
-src=sys.argv[1] if len(sys.argv)>1 else '/home/claude/poly-runner/checker-run.html'
+src=sys.argv[1] if len(sys.argv)>1 else '/home/claude/poly-runner/poly-runner.html'
 dst=sys.argv[2] if len(sys.argv)>2 else '/tmp/polyrun-work/t/aud.html'
 s=open(src).read()
 a="  window.__tp = function (x, z) {"

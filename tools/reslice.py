@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """Cut the code into 20 slices of about 5% each and write the table into SWEEP.md (between the SLICES markers).
-Counted: every line of path-editor.html and of checker-run.html, except the generated Path Editor embed (between PE-BEGIN and PE-END, which is path-editor.html again) Molly's saved settings and model (the molly-settings and molly-glb data blocks) and the text of the change log.
+Counted: every line of path-editor.html and of poly-runner.html, except the generated Path Editor embed (between PE-BEGIN and PE-END, which is path-editor.html again) Molly's saved settings and model (the molly-settings and molly-glb data blocks) and the text of the change log.
 Cuts are made at section comments, <script>/<template>/<style> tags and top-level statements (a line indented exactly two spaces inside the page's main script), never inside a function, and the sizes are balanced as it goes.
 Usage: python3 tools/reslice.py            (rewrites the table, prints a summary)
        python3 tools/reslice.py --check    (prints the summary only)"""
 import re, sys, os
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 N_SLICES=20
-FILES=['path-editor.html','checker-run.html']
+FILES=['path-editor.html','poly-runner.html']
 def load():
     units=[]   # (file, lineno, weight, is_boundary, section_name)
     for f in FILES:
         L=open(os.path.join(ROOT,f),encoding='utf-8').read().split('\n')
         skip=False; data=False
         for i,l in enumerate(L,1):
-            if f=='checker-run.html':
+            if f=='poly-runner.html':
                 if '<!--PE-BEGIN-->' in l: skip=True; continue
                 if '<!--PE-END-->' in l: skip=False; continue
                 if skip: continue
@@ -53,7 +53,7 @@ def main():
     units=load(); sl,total=slices(units)
     rows=[]
     for i,s in enumerate(sl,1):
-        # a slice may span the end of path-editor.html into checker-run.html: show each part
+        # a slice may span the end of path-editor.html into poly-runner.html: show each part
         parts=[]; cur=None
         for u in s:
             if cur and cur[0]==u[0] and u[1]==cur[2]+1: cur[2]=u[1]
