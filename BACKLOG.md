@@ -21,6 +21,7 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 - [ ] (Ricky, 2026-11-23) Caps lock allows you to move the camera without changing the character's heading.
 - [ ] (Ricky, 2026-11-23) Star throw's angle is too low.
 - [ ] (Ricky, 2026-11-23) Big star when flying should be tilted horizontal compared to its orientation when it's on her back.
+- [ ] (Ricky, 2026-11-24) Possibility of having a draw/stretch tool in the path/rig editor? Draw could create chained segments of objects and stretch could adjust the position of points.
 
 ## Separate track: split the game into source files and rename to Poly Runner
 (Discussed 2026-11-16; Ricky backs up saves first. Best done after groups 1-2 so those fixes aren't mixed into the move.)
