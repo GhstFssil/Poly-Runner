@@ -65,3 +65,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-24 17:29 | v194 | published: version label v194; Poly Runner rename (game file poly-runner.html, browser storage polyrunner with one-time copy, desktop app 1.2 folders and app id); next merged into main
 - 2026-11-24 17:34 | main | CLAUDE.md: session start skips nightly branches whose fixes are already on main (docs only)
 - 2026-11-24 17:46 | main | HANDOFF: Ricky confirmed the desktop 1.2 install and folder migration worked (docs only)
+- 2026-11-24 18:05 | main | BACKLOG regrouped by project (Now v195, camera and controls, characters, editor tools, new mechanics, infrastructure); install warnings moved to infrastructure; star throw clarification (docs only)
