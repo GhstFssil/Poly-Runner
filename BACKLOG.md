@@ -22,6 +22,7 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 - [ ] (Ricky, 2026-11-23) Star throw's angle is too low.
 - [ ] (Ricky, 2026-11-23) Big star when flying should be tilted horizontal compared to its orientation when it's on her back.
 - [ ] (Ricky, 2026-11-24) Possibility of having a draw/stretch tool in the path/rig editor? Draw could create chained segments of objects and stretch could adjust the position of points.
+- [ ] (Ricky, 2026-11-24) Installing the game works fine, but throws warnings about unsupported and deprecated tools. Should we make sure we're using supported tools or current versions of them?
 
 ## Separate track: rename to Poly Runner (done on `next` for v194)
 (Discussed 2026-11-16; Ricky backs up saves first. Best done after groups 1-2 so those fixes aren't mixed into the move.)
