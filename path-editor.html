@@ -1443,6 +1443,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     samples.forEach(function (p) { ext(p.x, p.z); }); S.objs.forEach(function (o) { var q = pos(o); ext(q.x, q.z); });
     if (x0 > x1) { x0 = -200; x1 = 200; z0 = -600; z1 = 200; }
     var pad = 600, b = { x0: Math.floor((x0 - pad) / 500) * 500, x1: Math.ceil((x1 + pad) / 500) * 500, z0: Math.floor((z0 - pad) / 500) * 500, z1: Math.ceil((z1 + pad) / 500) * 500 };
+    if (S.terrain === 'sunset') { b.x0 = Math.min(b.x0, -9500); b.x1 = Math.max(b.x1, 9500); b.z0 = Math.min(b.z0, -18500); b.z1 = Math.max(b.z1, 500); }   // Sunset Hill is read whole (the Giant Hill's footprint: 9,000 units round a centre 9,000 ahead of the start), however small the layout
     var o = TER.key === S.terrain && TER.b; if (o) { b.x0 = Math.min(b.x0, o.x0); b.x1 = Math.max(b.x1, o.x1); b.z0 = Math.min(b.z0, o.z0); b.z1 = Math.max(b.z1, o.z1); }   // it only ever grows, so dragging things about does not keep rebuilding it
     return b;
   }
