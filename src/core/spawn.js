@@ -58,7 +58,7 @@
     timeLeft = (cpNo > 0 && cpTime[cpNo] !== undefined) ? cpTime[cpNo] : TIME_LIMIT; shownSec = -1; showTime();   // from a checkpoint the clock goes back to what it read when she reached it
     setBall(false, true); fpOn = false;
     wallOn = false; speed = 0; heading = face; yaw = face; pitch = 0.35; vy = 0; sgx = 0; sgz = 0; grounded = true; turnRate = 0; leanZ = 0; jumpBuf = 0;
-    player.position.set(sx, groundH(sx, sz), sz);
+    player.position.set(sx, sbFoot(sx, sz), sz);                 // the ground there whatever her old height (her feet would hide a deck above them)
     player.rotation.y = face;
     updateChunks(sx, sz, 99);
     builtAtZ = 1e9; builtAtX = 1e9; updateTrees(sx, sz);

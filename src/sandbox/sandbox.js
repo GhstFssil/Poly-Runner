@@ -1395,7 +1395,7 @@
   var wSt = 0, wPl = 0;    // set by worldH: 1 if this spot is bare rock, 1 if it is plateau grass
   // Full height of the world at a point on the mesh grid: rolling ground, ledges, floor lift, rock walls, plateau hills and
   // the cliff at the plateau's edges.
-  function worldH0(x, z) { return level === 3 && SB ? level3H(x, z) : oldWorldH(x, z); }   // the play world: the loaded layout (before one is picked, the old Grass Canyon)
+  function worldH0(x, z) { return level3H(x, z); }               // the play world: the loaded layout (flat 0 before one is loaded); the old levels' terrain is oldWorldH
   function oldWorldH(x, z) {                                       // the old hand-made levels' ground, in their own coordinates (Oceana Crags past L2_MIN): the terrain the layouts' level1 and level2 grounds sample
     if (x > L2_MIN) { wSt = 0; wPl = 0; wMud = 0; wF = 0; var yl2 = level2H(x, z); wL2 = l2Kind === 2 && ovTox ? 3 : l2Kind; return yl2; }
     wL2 = 0;
@@ -1466,7 +1466,7 @@
   var chunks = {};
   // Where a cave's mouth meets the terrain, the ground's own triangles that cross the tunnel's opening are left out, so the opening is real. (wx, wz world; y0..y1 the triangle's heights.)
   function caveHole(wx, wz, y0, y1) {
-    if (level !== 3 || !SB) return false;
+    if (!SB) return false;
     if (SB.shafts.length && sbShaftIn(wx, wz, -0.1)) return true;   // a shaft's opening: the ground over it is left out
     if (!SB.caveZone) return false;
     var q = sbCaveQ(SB.caveZone, wx, wz, -0.1); if (!q) return false;   // a hair narrower than the tunnel, so the ground's cut edge tucks in behind its walls and no sky shows between them
@@ -1489,15 +1489,15 @@
         var gx = x0 + i * GRID, gz = z0 + j * GRID;
         var ix = ci * NX + i, jz = cj * NZ + j;
         l3Bk = 0; var y = worldH0(gx, gz), kind = wL2 === 3 ? 6 : wL2 === 2 ? 5 : wL2 ? 4 : wSt ? 1 : wPl ? 2 : wMud ? 3 : 0, px = gx, pz = gz;
-        if (kind === 4 && level === 3 && l3Tx) kind = 6 + l3Tx;
-        if (level === 3 && SB && SB.toxLedge && kind !== 6) { var tlg = sbLedge(gx, gz); if (ledTox && Math.abs(tlg) > 0.4) kind = 6; }   // the top of a toxic ledge: poisoned ground   // a sandbox path segment with its own surface: 7 planks, 8 metal, 9 grass
+        if (kind === 4 && l3Tx) kind = 6 + l3Tx;
+        if (SB && SB.toxLedge && kind !== 6) { var tlg = sbLedge(gx, gz); if (ledTox && Math.abs(tlg) > 0.4) kind = 6; }   // the top of a toxic ledge: poisoned ground   // a sandbox path segment with its own surface: 7 planks, 8 metal, 9 grass
         vTs[j * W + i] = l3Ps; vTu[j * W + i] = l3Pu;
         if (kind === 1) {
           px += (rand01(ix, jz, 2) * 2 - 1) * 0.9; pz += (rand01(ix, jz, 3) * 2 - 1) * 0.9;
         }
         var k = j * W + i;
-        vB[k] = level === 3 && l3Bk ? 1 : 0;
-        if (IND) { if (level === 3) { vA[k] = l3A; vP[k] = l3P; vN[k] = l3N; vS[k] = l3S0; } else vS[k] = NaN; }
+        vB[k] = l3Bk ? 1 : 0;
+        if (IND) { vA[k] = l3A; vP[k] = l3P; vN[k] = l3N; vS[k] = l3S0; }
         vx[k] = px - x0; vy[k] = y; vz[k] = pz - z0; vd[k] = kind; vf[k] = wF;   // x and z are stored relative to the tile to keep precision far from the start
       }
     }
@@ -1524,9 +1524,9 @@
       tOv = -1; riseOv = -1;
     }
     function emit(a, b, c, ha, hb, hc, face, sub) {
-      if (!sub && !face && level === 3 && SB && ((SB.caveZone && sbCaveQ(SB.caveZone, x0 + (vx[a] + vx[b] + vx[c]) / 3, z0 + (vz[a] + vz[b] + vz[c]) / 3, 4.5)) || (SB.shafts.length && sbShaftIn(x0 + (vx[a] + vx[b] + vx[c]) / 3, z0 + (vz[a] + vz[b] + vz[c]) / 3, 4.5)))) { emitSub(a, b, c, ha, hb, hc); return; }
+      if (!sub && !face && SB && ((SB.caveZone && sbCaveQ(SB.caveZone, x0 + (vx[a] + vx[b] + vx[c]) / 3, z0 + (vz[a] + vz[b] + vz[c]) / 3, 4.5)) || (SB.shafts.length && sbShaftIn(x0 + (vx[a] + vx[b] + vx[c]) / 3, z0 + (vz[a] + vz[b] + vz[c]) / 3, 4.5)))) { emitSub(a, b, c, ha, hb, hc); return; }
       if ((t + 1) * 9 > pos.length) { var np = new Float32Array(pos.length * 2), nc = new Float32Array(pos.length * 2); np.set(pos); nc.set(col); pos = np; col = nc; }
-      if (!face && level === 3 && caveHole(x0 + (vx[a] + vx[b] + vx[c]) / 3, z0 + (vz[a] + vz[b] + vz[c]) / 3, Math.min(ha, hb, hc), Math.max(ha, hb, hc))) return;
+      if (!face && caveHole(x0 + (vx[a] + vx[b] + vx[c]) / 3, z0 + (vz[a] + vz[b] + vz[c]) / 3, Math.min(ha, hb, hc), Math.max(ha, hb, hc))) return;
       var o = t * 9, idx = [a, b, c], hh3 = [ha, hb, hc];
       for (var q = 0; q < 3; q++) {
         pos[o + q * 3] = vx[idx[q]]; pos[o + q * 3 + 1] = hh3[q]; pos[o + q * 3 + 2] = vz[idx[q]];
@@ -1583,7 +1583,7 @@
         faceTri(s0, vy[s0] + plo, s1, vy[s1] + phi1, s0, vy[s0] + phi, nx, nz);
       }
       var zq = null;
-      if (level === 3 && SB && SB.caveZone) zq = sbCaveQ(SB.caveZone, x0 + (vx[a] + vx[b]) / 2, z0 + (vz[a] + vz[b]) / 2, 2);
+      if (SB && SB.caveZone) zq = sbCaveQ(SB.caveZone, x0 + (vx[a] + vx[b]) / 2, z0 + (vz[a] + vz[b]) / 2, 2);
       if (!zq) { piece(0, 1, lo, hi, loB, hiB); return; }
       if (two) { lo = (lo + loB) / 2; hi = (hi + hiB) / 2; }
       // a cliff face with a cave in it: the opening's height range is left out, and only where the edge is within the opening's width
@@ -1646,26 +1646,7 @@
     mesh.userData.ci = ci; mesh.userData.cj = cj;
     chunks[chunkKey(ci, cj)] = mesh;
   }
-  // A tile is worth building only if some open ground lies within 150 units of it (deeper rock is never seen).
-  var tileUseful = {};
-  function useful(ci, cj) {
-    if (level === 3 && SB) return true;                         // a layout: every tile
-    var key = chunkKey(ci, cj), u = tileUseful[key];
-    if (u === undefined) {
-      var tx = (ci + 0.5) * CHUNK, tz = (cj + 0.5) * CHUNK;
-      wallField(tx, tz);
-      u = wd < 150 + CHUNK * 0.71 ||
-          (tx >= PXW - 150 && tx <= PX1 + 75 && tz >= PZ0 - 150 && tz <= PZ1 + 150) ||   // all of the plateau, and a little past its cliffs
-          (tx >= PX0 - RMP_END - RMP_PLAT - 100 && tx <= PX0 + 100 && Math.abs(tz - RMP_ZC) <= RMP_PLAT / 2 + 100) ||   // and the ramp up to the platform
-          (tx > L2_MIN && tx >= L2_BOX[0] - 100 && tx <= L2_BOX[1] + 100 && tz >= L2_BOX[2] - 100 && tz <= L2_BOX[3] + 100 && l2Dist(tx, tz, true) < L2_HW + 130) ||
-          (tx > L2_MIN && mtDist(tx, tz) < MT_SKIRT + 90) ||               // the Crags   // level 2's runway
-          (tx >= CAVE_X0 - 120 && tx <= CH_X + CH_R + 250 && tz <= CAVE_Z0 + 200 && tz >= CH_Z - CH_R - 250 && (pathDist(CAVE_PIECES, tx, tz) < CAVE_BAND + 150 || Math.hypot(tx - CH_X, tz - CH_Z) < CH_R + 250)) ||   // and the cave
-          (tx >= CH_X && tx <= DR_XE + FIELD_HW + 250 && tz >= DR_ZE - FIELD_LEN - 250 && tz <= CH_Z + 250) ||   // and the doorway, ramp and field
-          (tx >= V2_BOX[0] - 300 && tx <= V2_BOX[1] + 300 && tz >= V2_BOX[2] - 300 && tz <= V2_BOX[3] + 300 && valley2Dist(tx, tz) < V2_HALF + V2_RIM + 150);   // and the second valley
-      tileUseful[key] = u;
-    }
-    return u;
-  }
+  function useful(ci, cj) { return true; }                       // every tile around her is built (the layout's ground is all open)
   // Build the tiles around her (at most `budget` per call, nearest first) and drop the ones that fell out of range.
   function updateChunks(px, pz, budget) {
     var VIEW = Math.max(VIEW_AHEAD, VIEW_BEHIND);

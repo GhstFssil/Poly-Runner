@@ -9,7 +9,7 @@ bad=0
 for r,h,mode in [(10,-20,'drop'),(6,-15,'drop'),(4,-10,'drop'),(6,-15,'run')]:
   J={'width':9,'pieces':[{'t':'straight','len':300}],'objects':[{'type':'hill','id':1,'x':0,'z':-150,'radius':r,'height':h,'surface':'grass'}]}
   pg.evaluate("j=>__sbStart(j)",J); pg.wait_for_timeout(1200)
-  if mode=='drop': pg.evaluate("()=>{__pos(60001.5,__gh(60001.5,-150)+6,-150);__st({vy:0,speed:0})}")
+  if mode=='drop': pg.evaluate("()=>{__pos(1.5,__gh(1.5,-150)+6,-150);__st({vy:0,speed:0})}")
   else:
     pg.evaluate("r=>{__pos(0,__gh(0,-147+r),-147+r);__st({vy:0,speed:30,heading:0,yaw:0});__keys({KeyW:true,w:true,ArrowUp:true})}",r)
     pg.wait_for_timeout(600); pg.evaluate("__keys({KeyW:false,w:false,ArrowUp:false})")

@@ -37,7 +37,7 @@ G=gz(); print('gazers:',[(q['gm'],round(q['x']-0,1),round(q['z'],1)) for q in G]
 # idle: stays home, hovers 9 up
 pg.evaluate("()=>document.getElementById('dvinvBtn').click()")   # invulnerable on, so lasers don't muddy these checks
 pg.evaluate("()=>__put(0, 0, -60)"); pg.wait_for_timeout(2500)
-I=[q for q in gz() if q['gm']=='idle'][0]; print('idle at',round(I['x']-0,2),round(I['z'],2),'fy',round(I['fy'],2)); assert abs(I['x']-59980)<0.01 and abs(I['z']+100)<0.01 and abs(I['fy']-9)<0.6
+I=[q for q in gz() if q['gm']=='idle'][0]; print('idle at',round(I['x']-0,2),round(I['z'],2),'fy',round(I['fy'],2)); assert abs(I['x']--20)<0.01 and abs(I['z']+100)<0.01 and abs(I['fy']-9)<0.6
 # chase: within ~10-13 of her, above her head
 import math
 for i in range(60):
@@ -55,12 +55,12 @@ e=[q for q in gz() if q['gm']=='idle'][0]
 r=pg.evaluate("a=>{var h0=__state().hp;for(var i=0;i<6;i++){__put(a[0],a[1],a[2]);__enUpd(0.016);}var s=__state();return [h0,s.hp,Math.hypot(s.x-a[0]+0.2,s.z-a[2])]}",[e['x']+0.2,e['fy']+0.2,e['z']])
 print('contact hp',r[0],'->',r[1],'pushed out to',round(r[2],2)); assert r[1]==r[0] and r[2]>0.5
 # laser: standing in range of the idle gazer costs half hearts (a half heart on the display)
-pg.evaluate("()=>__put(59980, 0, -85)"); pg.wait_for_timeout(5000)
+pg.evaluate("()=>__put(-20, 0, -85)"); pg.wait_for_timeout(5000)
 hp=pg.evaluate("()=>__state().hp"); print('hp after 5 s in laser range:',hp); assert hp<3 and (hp*2)%1==0 and hp!=int(hp) or hp<=2
 half=pg.evaluate("()=>document.querySelectorAll('#hp .heart-crack').length"); print('cracked hearts shown:',half)
 # Barrier: absorbed
 pg.evaluate("()=>{document.getElementById('dvpower').click(); __setHp(3)}"); pg.keyboard.press('Digit2'); pg.wait_for_timeout(300)
-pg.evaluate("()=>__put(59980, 0, -85)"); pg.wait_for_timeout(4500); hb=pg.evaluate("()=>[__state().hp,__ballLean()[2]]"); print('hp with Barrier on:',hb); assert hb[1] and hb[0]==3
+pg.evaluate("()=>__put(-20, 0, -85)"); pg.wait_for_timeout(4500); hb=pg.evaluate("()=>[__state().hp,__ballLean()[2]]"); print('hp with Barrier on:',hb); assert hb[1] and hb[0]==3
 # Barrier hit at speed defeats it
 e=[q for q in gz() if q['gm']=='idle'][0]
 pg.evaluate("a=>{__st({ballOn:true,speed:120*2});for(var i=0;i<4;i++){__put(a[0],a[1]-0.5,a[2]);__st({speed:240});__enUpd(0.016);}}",[e['x']+0.2,e['fy'],e['z']])
