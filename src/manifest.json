@@ -42,6 +42,7 @@
     "level2/level2.js",
     "sandbox/sandbox.js",
     "level1/trees.js",
+    "characters/character-stats.js",
     "level1/props.js",
     "ui/health.js",
     "characters/molly.js",
