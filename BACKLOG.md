@@ -2,10 +2,6 @@
 Open work only, in focused groups. Ricky decides priority and version numbers (see CLAUDE.md). Either of us adds items. Delete an item when it's done (HISTORY.md records the change; add a CHANGELOG entry too if players see it). Items marked **Decision** need Ricky's answer first.
 Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to reproduce`. The sweeps tag theirs `(nightly/<name>)`. Older entries below have no who or date.
 
-## Now (v195): rename cleanup and star fixes
-- [ ] (Ricky, 2026-11-23) Star throw's angle is too low. Ricky (2026-11-24): bring it about 50% closer to the camera's aim; he plays with the camera close to level.
-- [ ] (Ricky, 2026-11-23) Big star when flying should be tilted horizontal compared to its orientation when it's on her back.
-
 ## Next: camera and controls
 - [ ] (Ricky, 2026-11-23) Scroll wheel on the mouse moves the camera in or out. Camera also moves out slightly as you go faster.
 - [ ] (Ricky, 2026-11-23) Caps lock allows you to move the camera without changing the character's heading.

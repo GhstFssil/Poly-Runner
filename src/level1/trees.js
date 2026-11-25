@@ -130,7 +130,7 @@
     'comet.star.cMax': 3, 'comet.star.cCost': 2, 'comet.star.cSize': 0.5, 'comet.star.cDmg': 0.5, 'comet.star.cRange': 50, 'comet.cStar': '#4fc3ff', 'comet.cGlow': '#a8e6ff',
     // her animations (the Rig Editor's Star throw, Hover and Fly modes), with the Rig Editor's key stats in degrees. Groups: pc the charging pose (right hand; Q mirrors it), pt the follow-through, pf Fly's arms and body, ho the changes while hovering, fl Fly's changes to her legs
     'comet.throw.in': 0.15, 'comet.throw.swing': 0.14, 'comet.throw.rel': 0.6, 'comet.throw.hold': 0.12, 'comet.throw.out': 0.3, 'comet.hold.scale': 0.8, 'comet.hold.out': 0.15,
-    'comet.hov.bob': 0.08, 'comet.hov.bobT': 1.6, 'comet.hov.ankleY': 0, 'comet.hov.ankleTilt': 0, 'comet.hov.backD': 0.55, 'comet.hov.backY': 0.15, 'comet.hov.backTilt': 0, 'comet.fly.starY': 0.25, 'comet.fly.starS': 1 };
+    'comet.hov.bob': 0.08, 'comet.hov.bobT': 1.6, 'comet.hov.ankleY': 0, 'comet.hov.ankleTilt': 0, 'comet.hov.backD': 0.55, 'comet.hov.backY': 0.15, 'comet.hov.backTilt': 0, 'comet.fly.starY': 0.25, 'comet.fly.starS': 1, 'comet.fly.starTilt': 90 };
   var CQ_KEYS = ['hyf', 'hz', 'hp', 'sp', 'hd', 'aLp', 'aLr', 'aLe', 'aRp', 'aRr', 'aRe', 'hL', 'kL', 'dL', 'hR', 'kR', 'dR', 'p1', 'p2', 'p3'];
   (function () {
     var P0 = { pc: { sp: 24, hd: -14, aLp: 45, aLr: 18, aLe: 35, aRp: -55, aRr: 25, aRe: 75 }, pt: { sp: 32, hd: -10, aLp: -25, aLr: 12, aLe: 30, aRp: 115, aRr: 8, aRe: 12 }, pf: { sp: 0, hd: 0, aLp: 170, aLr: 8, aLe: 8, aRp: 170, aRr: 8, aRe: 8 } };

@@ -68,3 +68,5 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-24 18:05 | main | BACKLOG regrouped by project (Now v195, camera and controls, characters, editor tools, new mechanics, infrastructure); install warnings moved to infrastructure; star throw clarification (docs only)
 - 2026-11-24 18:12 | next | removed the v194 one-time copy of saves from the old polyrun names (idbMigrate in molly.js, localStorage copy in core/start.html and path-editor.html, test fu/rename_saves.py); GLOSSARY, ARCHITECTURE
 - 2026-11-24 18:14 | next | retired tools/mk_sweep_docs.py (behind the hand-edited SWEEP-*.md docs; it also wrote the nightly scheduled-task prompts: restore it from git history before 6e71b76+1 if the sweeps return)
+- 2026-11-24 18:20 | next | correction to the 18:14 line: restore tools/mk_sweep_docs.py from commit 6e71b76 (or earlier) if the sweeps return
+- 2026-11-24 18:20 | next | Comet: Star Throw aims 10° above the camera (was 20°); the big star tips back flat like a halo while she flies (new stat comet.fly.starTilt, 90°; tilt now turns with her heading)

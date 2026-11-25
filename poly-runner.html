@@ -4655,7 +4655,7 @@ var P=JSON.parse(JSON.stringify(DEF));
 var HOLDS=[[/\.len$/,.5,400],[/\.dia$/,.2,400],[/\.depth$/,.02,20],[/\.peak$/,.005,.995],[/\.t[SE]$/,.005,20],[/\.c[SE]$/,.05,50],
  [/\.u[12]w[lr]$/,.5,360],[/\.u[12]w[se]$/,.002,5],[/\.u[12]d$/,-100,100],[/\.u[12]p$/,-1,2],[/\.u[12]k[lrse]$/,-4,4],[/^Foot\.flat$/,0,.98],[/\.band[AL]$|^Shin\.pad$|^Foot\.(heel|sole|ankleH)$/,0,400],
  [/^scale$/,.05,20],[/^sides$/,5,48,1],[/^rings$/,1,8,1],[/^ringGap$/,0,20],[/^fmt$/,2,2],[/^hairVol$/,.05,10],[/^bangL$/,0,10],[/^j[A-Z]/,0,100],[/^(jit|irr|irrC)$/,0,5],
- [/\.dur$/,.05,600],[/^comet\.(pc|pt|pf|fl|ho)\.(hyf|hz)$/,-2,2],[/^comet\.(pc|pt|pf|fl|ho)\./,-180,180],[/^comet\.hov\.(ankleY|backY)$/,-5,5],[/^comet\.hov\.(ankleTilt|backTilt)$/,-180,180],[/^comet\./,0,1e4],[/^dA\.(hyf|hz)$/,-1,1],[/^dA\./,-180,180],[/^m\.drift\.time$/,.02,10],[/^m\.drift\.rate$/,.1,200],[/^m\.drift\.(cool|minZips)$/,0,1000],
+ [/\.dur$/,.05,600],[/^comet\.(pc|pt|pf|fl|ho)\.(hyf|hz)$/,-2,2],[/^comet\.(pc|pt|pf|fl|ho)\./,-180,180],[/^comet\.hov\.(ankleY|backY)$/,-5,5],[/^comet\.(hov\.(ankleTilt|backTilt)|fly\.starTilt)$/,-180,180],[/^comet\./,0,1e4],[/^dA\.(hyf|hz)$/,-1,1],[/^dA\./,-180,180],[/^m\.drift\.time$/,.02,10],[/^m\.drift\.rate$/,.1,200],[/^m\.drift\.(cool|minZips)$/,0,1000],
  [/^barrier\.radius$/,.2,20],[/^barrier\.squeezeLen$/,.5,1e4],[/^barrier\.squeeze$/,-2,.95],[/^barrier\.stretch$/,-.95,10],[/^barrier\.glow$/,0,1],[/^barrier\.glowSize$/,.1,10],[/^barrier\.dash(Len|Gap)$/,.005,20],
  [/^stat\.top$/,1,1e4],[/^stat\.accelT$/,.5,1e4],[/^stat\.(brake|jumpH|wallGrip|fric)$/,0,1e4],[/^stat\.gripZ$/,.5,5e5],[/^stat\.grav$/,1,1e4],[/^stat\.fade(Wall|Slope)$/,0,1,1],[/^stat\.driftGrip$/,0,10],[/^stat\.fall$/,1,1e4],[/^stat\.slam(Acc|Max)$/,1,1e4],[/^mn\.\w+\.(scale|head[WHD]|torso[WHD]|arm[WL]|leg[WDL])$/,.05,100],[/^mn\.\w+\.hearts$/,1,99,1],[/^mn\.\w+\.dmg$/,0,99,1],[/^mn\.\w+\.(radius|top|acc|see|cool|k[123]|stomp|stride|bob)$/,0,1e4],[/^mn\.\w+\.(wing|flap|orbit|range|fire|bolt|bdmg)$/,0,1e4],[/^mn\.\w+\.(legSwing|armSwing|armRaise)$/,-180,180],[/^stat\.hearts$/,1,12,1],[/^stat\.colH$/,1.2,100],[/^stat\.colW$/,.2,100]];
 function hold(key,v){
@@ -5663,7 +5663,7 @@ function renderAnim(){
       KEYGROUPS.forEach(function(g){grp(g[0]+' (changes while hovering)',g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['comet.ho.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}));});
     }else{
       $('#animNote').textContent='Fly (Space held in the air while hovering). This pose takes over her arms, spine and head; the leg stats are changes to her jump. The star from her back goes up to her hands.';
-      addRows(rows,[['comet.fly.arms','How Fast She Goes Into It','x',1,30,.5],['comet.fly.starY','Star Above Her Hands','units',-1,2,.01],['comet.fly.starS','Star Size There (× the back star)','x',.2,3,.05]],{anim:1});
+      addRows(rows,[['comet.fly.arms','How Fast She Goes Into It','x',1,30,.5],['comet.fly.starY','Star Above Her Hands','units',-1,2,.01],['comet.fly.starS','Star Size There (× the back star)','x',.2,3,.05],['comet.fly.starTilt','Star Tilt There (90 = flat, a halo)','°',-180,180,1]],{anim:1});
       grp('Arms, Spine and Head',poseRows('comet.pf.',UBR));
       grp('Legs (changes to her jump)',[['hL','Left Thigh Forward'],['kL','Left Knee Bend'],['dL','Left Toes Up'],['hR','Right Thigh Forward'],['kR','Right Knee Bend'],['dR','Right Toes Up']].map(function(r){return ['comet.fl.'+r[0],r[1],'deg',-120,120,1];}));
     }
@@ -5748,7 +5748,7 @@ function minPreview(dt){
 }
 $('#resetAnim').addEventListener('click',function(){var pre=animPrefix(ui.mode),key;for(key in DEF){if(key.indexOf(pre)===0)P[key]=DEF[key];}
   if(ui.mode==='drift'){P['slope.side']=DEF['slope.side'];for(key in DEF)if(key.indexOf('dA.')===0)P[key]=DEF[key];}
-  var CRS={cThrow:/^comet\.(pc\.|pt\.|throw\.|hold\.)/,cHover:/^comet\.(ho\.|hov\.(height|bob|bobT|spinS|ankle|ankleY|ankleTilt|back|backD|backY|backTilt)$)/,cFly:/^comet\.(pf\.|fl\.|fly\.(arms|starY|starS)$)/};
+  var CRS={cThrow:/^comet\.(pc\.|pt\.|throw\.|hold\.)/,cHover:/^comet\.(ho\.|hov\.(height|bob|bobT|spinS|ankle|ankleY|ankleTilt|back|backD|backY|backTilt)$)/,cFly:/^comet\.(pf\.|fl\.|fly\.(arms|starY|starS|starTilt)$)/};
   if(CRS[ui.mode])for(key in DEF)if(CRS[ui.mode].test(key))P[key]=DEF[key];   /* the sideways-slope tilt and the changes to her run sit with the drift stats */
   barrierDirty=true;save();renderAnim();statCardRefresh();status('Animation reset.');});
 
@@ -5830,7 +5830,7 @@ function cometPreview(dt){
     cpv.B.visible=true;
     if(m==='cFly'){var wl=wp('WristL'),wr=wp('WristR');cpv.B.position.copy(wl.add(wr).multiplyScalar(.5)).add(new THREE.Vector3(0,P['comet.fly.starY']*k,0));cpv.B.scale.setScalar(Math.max(.001,P['comet.hov.back']*P['comet.fly.starS']*k));}
     else{cpv.B.position.set(spn.x,spn.y+P['comet.hov.backY']*k,spn.z-P['comet.hov.backD']*k);cpv.B.scale.setScalar(Math.max(.001,P['comet.hov.back']*k));}
-    cpv.B.spin.rotation.set(P['comet.hov.backTilt']*rad,0,0);cpv.B.spin.children[0].rotation.z=cpvA*.7*P['comet.hov.spinS'];
+    cpv.B.spin.rotation.set((m==='cFly'?-P['comet.fly.starTilt']:P['comet.hov.backTilt'])*rad,0,0);cpv.B.spin.children[0].rotation.z=cpvA*.7*P['comet.hov.spinS'];
   }
   if(m==='cThrow'&&cThrowAt(u).held){var w=wp('WristR'),e=wp('ElbowR'),hp=w.clone().add(w.clone().sub(e).normalize().multiplyScalar(P['comet.hold.out']*k));
     cpv.H.visible=true;cpv.H.position.copy(hp);cpv.H.scale.setScalar(Math.max(.001,P['comet.star.size']*P['comet.hold.scale']*k));cpv.H.spin.children[0].rotation.z=cpvA*P['comet.star.spin']*.5;}
@@ -8510,7 +8510,7 @@ requestAnimationFrame(tick);
     'comet.star.cMax': 3, 'comet.star.cCost': 2, 'comet.star.cSize': 0.5, 'comet.star.cDmg': 0.5, 'comet.star.cRange': 50, 'comet.cStar': '#4fc3ff', 'comet.cGlow': '#a8e6ff',
     // her animations (the Rig Editor's Star throw, Hover and Fly modes), with the Rig Editor's key stats in degrees. Groups: pc the charging pose (right hand; Q mirrors it), pt the follow-through, pf Fly's arms and body, ho the changes while hovering, fl Fly's changes to her legs
     'comet.throw.in': 0.15, 'comet.throw.swing': 0.14, 'comet.throw.rel': 0.6, 'comet.throw.hold': 0.12, 'comet.throw.out': 0.3, 'comet.hold.scale': 0.8, 'comet.hold.out': 0.15,
-    'comet.hov.bob': 0.08, 'comet.hov.bobT': 1.6, 'comet.hov.ankleY': 0, 'comet.hov.ankleTilt': 0, 'comet.hov.backD': 0.55, 'comet.hov.backY': 0.15, 'comet.hov.backTilt': 0, 'comet.fly.starY': 0.25, 'comet.fly.starS': 1 };
+    'comet.hov.bob': 0.08, 'comet.hov.bobT': 1.6, 'comet.hov.ankleY': 0, 'comet.hov.ankleTilt': 0, 'comet.hov.backD': 0.55, 'comet.hov.backY': 0.15, 'comet.hov.backTilt': 0, 'comet.fly.starY': 0.25, 'comet.fly.starS': 1, 'comet.fly.starTilt': 90 };
   var CQ_KEYS = ['hyf', 'hz', 'hp', 'sp', 'hd', 'aLp', 'aLr', 'aLe', 'aRp', 'aRr', 'aRe', 'hL', 'kL', 'dL', 'hR', 'kR', 'dR', 'p1', 'p2', 'p3'];
   (function () {
     var P0 = { pc: { sp: 24, hd: -14, aLp: 45, aLr: 18, aLe: 35, aRp: -55, aRr: 25, aRe: 75 }, pt: { sp: 32, hd: -10, aLp: -25, aLr: 12, aLe: 30, aRp: 115, aRr: 8, aRe: 12 }, pf: { sp: 0, hd: 0, aLp: 170, aLr: 8, aLe: 8, aRp: 170, aRr: 8, aRe: 8 } };
@@ -9239,7 +9239,7 @@ requestAnimationFrame(tick);
     thrPh = 1; thrT = 0; thrW = 0; thrMir = code === 'KeyQ'; thrPend = null;          // E throws with her right hand, Q with her left
   }
   function starParams(lvl) { return { size: cometC('star.size') * (1 + cometC('star.cSize') * lvl), dmg: cometC('star.dmg') + cometC('star.cDmg') * lvl, range: cometC('star.range') + cometC('star.cRange') * lvl }; }
-  function starAimDir() { var ev = Math.max(-1.4, Math.min(1.4, 0.35 - pitch)); return new THREE.Vector3(-Math.sin(yaw) * Math.cos(ev), Math.sin(ev), -Math.cos(yaw) * Math.cos(ev)); }   // where the camera faces; level at the camera's resting tilt (it looks down at her), up or down as the camera tilts from there
+  function starAimDir() { var ev = Math.max(-1.4, Math.min(1.4, 0.175 - pitch)); return new THREE.Vector3(-Math.sin(yaw) * Math.cos(ev), Math.sin(ev), -Math.cos(yaw) * Math.cos(ev)); }   // where the camera faces, raised 0.175 rad (10°) above it (0.35 until v195: level at the camera's resting tilt); up or down as the camera tilts
   function starRelease() {                                       // let go (or out of Power, or 3 s): the swing starts, and the star leaves her hand part way through it
     if (!starCharging) return; starCharging = false; starKey = null;
     thrPend = starParams(starLvl); thrPh = 2; thrT = 0; thrW = 1;
@@ -9348,7 +9348,8 @@ requestAnimationFrame(tick);
     var bd = cometC('hov.backD'), back = new THREE.Vector3(sp.x - fx * bd, sp.y + cometC('hov.backY'), sp.z - fz * bd);
     var top = wL && wR ? wL.clone().add(wR).multiplyScalar(0.5).add(new THREE.Vector3(0, cometC('fly.starY'), 0)) : new THREE.Vector3(pp.x, pp.y + lift + H + 0.9, pp.z);
     hovFx.B.position.copy(back.lerp(top, flyBlend));
-    hovFx.B.spin.rotation.set(cometC('hov.backTilt') * Math.PI / 180, rot, 0); hovFx.B.spin.children[0].rotation.z = hovFx.a * 0.7;   // upright behind her, facing back, turning slowly
+    var bt = cometC('hov.backTilt'); bt += (-cometC('fly.starTilt') - bt) * flyBlend;   // upright behind her, facing back; tipped back toward flat (a halo) as she flies
+    hovFx.B.spin.rotation.set(bt * Math.PI / 180, rot, 0, 'YXZ'); hovFx.B.spin.children[0].rotation.z = hovFx.a * 0.7;   // YXZ: the tilt is about her own left-right line, whichever way she faces; turning slowly
   }
   function cometAim(on) {                                        // while she charges a throw: a marker where the star will go (its range at this charge), or where it would hit the ground
     if (!aimEl) {

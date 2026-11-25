@@ -32,7 +32,7 @@
     thrPh = 1; thrT = 0; thrW = 0; thrMir = code === 'KeyQ'; thrPend = null;          // E throws with her right hand, Q with her left
   }
   function starParams(lvl) { return { size: cometC('star.size') * (1 + cometC('star.cSize') * lvl), dmg: cometC('star.dmg') + cometC('star.cDmg') * lvl, range: cometC('star.range') + cometC('star.cRange') * lvl }; }
-  function starAimDir() { var ev = Math.max(-1.4, Math.min(1.4, 0.35 - pitch)); return new THREE.Vector3(-Math.sin(yaw) * Math.cos(ev), Math.sin(ev), -Math.cos(yaw) * Math.cos(ev)); }   // where the camera faces; level at the camera's resting tilt (it looks down at her), up or down as the camera tilts from there
+  function starAimDir() { var ev = Math.max(-1.4, Math.min(1.4, 0.175 - pitch)); return new THREE.Vector3(-Math.sin(yaw) * Math.cos(ev), Math.sin(ev), -Math.cos(yaw) * Math.cos(ev)); }   // where the camera faces, raised 0.175 rad (10°) above it (0.35 until v195: level at the camera's resting tilt); up or down as the camera tilts
   function starRelease() {                                       // let go (or out of Power, or 3 s): the swing starts, and the star leaves her hand part way through it
     if (!starCharging) return; starCharging = false; starKey = null;
     thrPend = starParams(starLvl); thrPh = 2; thrT = 0; thrW = 1;
@@ -141,7 +141,8 @@
     var bd = cometC('hov.backD'), back = new THREE.Vector3(sp.x - fx * bd, sp.y + cometC('hov.backY'), sp.z - fz * bd);
     var top = wL && wR ? wL.clone().add(wR).multiplyScalar(0.5).add(new THREE.Vector3(0, cometC('fly.starY'), 0)) : new THREE.Vector3(pp.x, pp.y + lift + H + 0.9, pp.z);
     hovFx.B.position.copy(back.lerp(top, flyBlend));
-    hovFx.B.spin.rotation.set(cometC('hov.backTilt') * Math.PI / 180, rot, 0); hovFx.B.spin.children[0].rotation.z = hovFx.a * 0.7;   // upright behind her, facing back, turning slowly
+    var bt = cometC('hov.backTilt'); bt += (-cometC('fly.starTilt') - bt) * flyBlend;   // upright behind her, facing back; tipped back toward flat (a halo) as she flies
+    hovFx.B.spin.rotation.set(bt * Math.PI / 180, rot, 0, 'YXZ'); hovFx.B.spin.children[0].rotation.z = hovFx.a * 0.7;   // YXZ: the tilt is about her own left-right line, whichever way she faces; turning slowly
   }
   function cometAim(on) {                                        // while she charges a throw: a marker where the star will go (its range at this charge), or where it would hit the ground
     if (!aimEl) {
