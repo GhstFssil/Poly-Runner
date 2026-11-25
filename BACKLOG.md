@@ -3,7 +3,6 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to reproduce`. The sweeps tag theirs `(nightly/<name>)`. Older entries below have no who or date.
 
 ## Now (v195): rename cleanup and star fixes
-- [ ] (Claude, 2026-11-21) `tools/mk_sweep_docs.py` is behind the three SWEEP-*.md docs (they were edited by hand on 2026-11-20: the HISTORY.md lines, the version wording), so `--check` fails and running it would delete those lines. Sync the generator from the docs, or retire it. Also carry over the 2026-11-21 wording change (dial -> stat).
 - [ ] (Ricky, 2026-11-23) Star throw's angle is too low. Ricky (2026-11-24): bring it about 50% closer to the camera's aim; he plays with the camera close to level.
 - [ ] (Ricky, 2026-11-23) Big star when flying should be tilted horizontal compared to its orientation when it's on her back.
 
