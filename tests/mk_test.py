@@ -40,7 +40,7 @@ hooks=r"""
 s=s.replace(a,hooks+a)
 a2="initScene();buildStatic();renderPart();setMode('run');applyTheme();"
 assert s.count(a2)==1
-s=s.replace(a2,"HOST.__rigdbg=function(){return {P:P,DEF:DEF,ui:ui,sk:skMesh,bones:bones,scene:scene,rigRoot:rigRoot,barrier:barrierGroup,camera:camera,renderer:renderer,controls:controls,tList:tList,ringAt:ringAt,SEGS:SEGS,ranges:ranges,setP:function(k,v){P[k]=v;dirty=true;},isDirty:function(){return dirty;},rebuildMs:function(){return rebuild.ms;}};};"+a2)
+s=s.replace(a2,"HOST.__rigdbg=function(){return {P:P,DEF:DEF,ui:ui,sk:skMesh,bones:bones,scene:scene,rigRoot:rigRoot,barrier:barrierGroup,camera:camera,renderer:renderer,controls:controls,tList:tList,ringAt:ringAt,SEGS:SEGS,ranges:ranges,setP:function(k,v){P[k]=v;dirty=true;},isDirty:function(){return dirty;},rebuildMs:function(){return rebuild.ms;},hairLocks:function(){return HAIRLOCKS;},pickLock:function(i){ui.lock=i;select('Head');},lockAt:lockAt};};"+a2)
 a3="    renderer.render(scene, camera);"
 assert s.count(a3)==1
 s=s.replace(a3,"    if (!window.__noRender) renderer.render(scene, camera);")

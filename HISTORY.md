@@ -79,3 +79,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-25 15:22 | next | Rig Editor: skin quads cut along a mirror-invariant diagonal (quadSplit/diagPick), hair too; Shading Variation from smooth position noise (shadeAt) so both sides match; built-in models re-baked; tests/fu/mirror1.py
 - 2026-11-25 16:20 | next | HANDOFF: approved plan for step 4 (hair locks, no separate bangs)
 - 2026-11-25 16:24 | next | Moved the character setup out of level1/trees.js into characters/character-stats.js (no change to the game)
+- 2026-11-25 16:45 | next | Hair locks: the three bangs became a ring of hair locks with shared and per-lock stats in the Rig Editor (old Bang Length carries over); models re-baked; test fu/hair1.py

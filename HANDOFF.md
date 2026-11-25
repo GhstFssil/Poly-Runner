@@ -11,18 +11,22 @@ Everything in BACKLOG's Characters and looks group, on `next`, one item at a tim
 
 - Faceting (step 3, partly): ring quads tagged in `buildSeg` and re-cut in model space by `quadSplit`/`diagPick` (soupOf); hair quads use `diagPick`; Shading Variation is `shadeAt` (smooth noise of |x|,y,z, seeded per part id without side). Facets mirrored 492 -> 2696 of 3558; limbs and shades exact. Built-in models re-baked. Test `tests/fu/mirror1.py`. rw4 welds: default/sides7 unchanged (0 odd); irr 0.6: arms 4 open/2 odd (was 3 open, broken loops).
 
+- Split (2026-11-25): character setup moved from level1/trees.js to characters/character-stats.js (loads right after it; game unchanged).
+- Hair locks (step 4): bangs replaced by a ring of `hair.count` locks (rig-editor.html `hairLocks`, after `headFeatures`); shared `hair.*` stats on the Head page; click a lock -> `ui.lock`, rows for `hair.L<k>.len/curl/ang` (k = pair from the front; partners share, right one built as the left's mirror when Part Position is 0). Defaults: 14 locks, only the front 3 long enough to build (front length 1, sides/back 0; pair 1 length 1.3 to keep the old side bangs' length). Old `bangL` -> `hair.lenF` in `upgrade()`; shipped settings renamed. Models re-baked. Test `tests/fu/hair1.py` ALL PASS.
+
 ## In progress
 - Faceting review with Ricky: welded shoulders/hips and centre-line strips still not mirrored (BACKLOG entry kept). Cutting centre-line quads at x=0 was tried and reverted: it made 7 odd edges at the crotch weld.
 
 ## Decisions
 - Path Editor test play and Dev sandboxes keep the current character (no prompt); only Level Select asks (my call).
 - Faceting (step 3): if nothing is found wrong, keep the backlog item and review with Ricky (Ricky).
+- Hair: Spread = lean out from the head (not how far round the front length reaches); length blends front 0-30°, to sides by 60°, sides to 120°, to back by 150°; locks under 0.25x are left out (my calls).
 
 ## Next steps
-- Step 4 plan (Ricky approved 2026-11-25; start in a fresh session). Hair = cap + one ring of locks on the hairline, all built alike; NO separate bangs (Ricky): the 3 bang spikes become the front locks. Shared stats: lock count, thickness, taper, curl amount, curl tightness, spread, part position, length at front/sides/back (blended). Per-lock overrides (click a lock: length, curl, angle), L/R partners edited together (keep faceting mirrored: use `diagPick`). Ponytail keeps its own bones; locks skinned to Head. Migration: old `bangL` sets front length; defaults match today's look (check GLOSSARY for frozen names). Code: hair builder in rig-editor.html (~line 204, `hairVol`, `bangL`), stats in rig-editor-start.html (`GLOBAL`, line ~122).
-1. Faceting review (Ricky). 2. Fine-grained hair control. 3. Comet ringlets. 4. Face pieces (ask Ricky about style first).
+1. Ricky reviews the hair locks (look and stat ranges). 2. Faceting review (Ricky). 3. Comet ringlets (build on the locks: curl + tightness). 4. Face pieces (ask Ricky about style first).
 
 ## Gotchas
+- A front-middle lock's underside strip straddles the centre line and is not mirrored (same as the BACKLOG faceting item); hair1.py allows for it.
 - rx8.py logs "Molly model turned away" on purpose-made odd stats; it does that on the old build too.
 - Headless Chrome sends its own mousemoves with Caps Lock off; cam1.py stubs `getModifierState` for that.
 - Shallow clone: `git -c push.negotiate=true push`. Tests leave `shots/` and `tests/fu/new_*` behind; don't commit them.

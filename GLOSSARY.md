@@ -131,6 +131,8 @@ Path Editor panel words: inspector, next-stamp panel, presets (`polyrunner-pe-pr
 | built-in | the numbers written in the code | `RIGCFG`, `COMET_DEF` |
 | lookup order | saved, then shipped, then built-in | `rigPick` |
 | bake | write the shipped models into the game file | `tools/bake_models.py` |
+| hair lock | one of the ring of locks round a character's hairline, all built alike from the shared hair stats (Lock Count, Thickness, Taper, Curl Amount, Curl Tightness, Spread, Part Position, Lock Length at the Front / Sides / Back). The old three bangs are the front locks; "bangs" is retired. Click one in the Rig Editor to give it (and its partner) its own Length, Extra Curl and Angle | `hair.*`, `hair.L<k>.*` (k: pairs counted from the front), `hairLocks`, `HAIRLOCKS`; old saved `bangL` becomes `hair.lenF` |
+| partner | a hair lock's mirror-image lock on the other side; the two share their own stats | `hairPair` |
 
 ## Build, repo and process
 The rows for src, part, build and the game file describe the source split, which is on `next` until the next version ships. On `main` the game file is still edited directly.

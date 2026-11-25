@@ -40,7 +40,7 @@ var SD={
  Pony2:{len:15,dia:19,depth:.58,peak:.47,tS:.95,tE:.74,cS:1,cE:1},
  Pony3:{len:17,dia:14,depth:.64,peak:.1,tS:1,tE:.05,cS:1,cE:2}
 };
-var GLOBAL={scale:1,pelvisDrop:10,shoulderX:20,shoulderY:31,hipX:6.5,shoulderOver:4,armSpread:9,hairVol:1,bangL:1,ponyAng:118,ponyCurl:50,
+var GLOBAL={scale:1,pelvisDrop:10,shoulderX:20,shoulderY:31,hipX:6.5,shoulderOver:4,armSpread:9,hairVol:1,'hair.count':14,'hair.thick':1.1,'hair.taper':1,'hair.curl':0,'hair.tight':1,'hair.spread':4,'hair.part':0,'hair.lenF':1,'hair.lenS':0,'hair.lenB':0,ponyAng:118,ponyCurl:50,
   jShoulder:5,jHip:4,jAnkle:3,jPony:2.5,jElbow:8,jWrist:3,jKnee:8,jWaist:6,jNeckBase:4,jNeckTop:4,
   sides:8,rings:2,ringGap:.8,jit:.18,irr:0,irrC:0,fmt:2,
   cSuit:'#d9232b',cHair:'#e0202a',cSkin:'#f2a978',cBlk:'#2a1f22',cWht:'#f4f1ee',cEye:'#2f8fd0'};
@@ -96,6 +96,7 @@ Object.keys(MOVES).forEach(function(n){var cur={},k;for(k in KD)cur[k]=KD[k];
   MOVEX[n]=MOVES[n].map(function(e){var v={};for(k in cur)v[k]=cur[k];for(k in e[1])v[k]=e[1][k];cur=v;return [e[0],v];});});
 var DEF={},k,q;
 for(k in GLOBAL)DEF[k]=GLOBAL[k];
+for(k=0;k<=12;k++){DEF['hair.L'+k+'.len']=1;DEF['hair.L'+k+'.curl']=0;DEF['hair.L'+k+'.ang']=0;}DEF['hair.L1.len']=1.3;   /* a hair lock's own changes (hair.L<k>: k counts the pairs from the front lock, 0, to the back; a left lock and its right partner share one) */
 Object.keys(MOVEX).forEach(function(n){DEF['m.'+n+'.dur']=MOVEDUR[n];MOVEX[n].forEach(function(e,i){DEF['m.'+n+'.'+i+'.t']=e[0];for(var f in KD)DEF['m.'+n+'.'+i+'.'+f]=e[1][f];});});
 for(k in KD){if(k!=='fl')DEF['dA.'+k]=0;}   /* Drift: changes laid over her fast run while she drifts (all 0: just the run, as the game has done since v170) */
 DEF['stat.top']=80;DEF['stat.accelT']=7;DEF['stat.brake']=3;DEF['stat.jumpH']=7.2;DEF['stat.grav']=20;DEF['stat.gripZ']=20;DEF['stat.fadeSlope']=0;DEF['stat.fadeWall']=1;DEF['stat.driftGrip']=1;DEF['stat.fall']=50;DEF['stat.hearts']=3;DEF['stat.colH']=3.6;DEF['stat.colW']=1;DEF['stat.wallGrip']=1;DEF['stat.fric']=11.4;var MNE={scale:[1,5],radius:[1,3],headW:[.9,.9],headH:[.9,.9],headD:[.9,.9],torsoW:[.7,.7],torsoH:[1.35,1.35],torsoD:[.45,.45],armW:[.3,.3],armL:[1.35,1.35],legW:[.33,.33,.15],legD:[.4,.4,.2],legL:[1.35,1.35,.4],cHead:['#45484e','#45484e','#5b4b73'],cBody:['#2f3237','#2f3237'],cLimb:['#26282c','#26282c','#3a3148'],cEye:['#ff2a1a','#ff2a1a','#e8a020'],stride:[.9,.9],legSwing:[45.8,45.8,20],armSwing:[13.8,13.8],armRaise:[83.1,83.1],bob:[0,0,.12],top:[10,10,14],acc:[5,5,10],see:[100,100],hearts:[1,3],dmg:[1,2],cool:[1.2,1.2],k1:[20,20],k2:[0,0],k3:[0,0],stomp:[8,17],cWing:['#808080','#808080','#b8aed0'],wing:[1.5,1.5,1.5],flap:[5,5,5],orbit:[10,10,10],range:[30,30,30],fire:[2,2,2],bolt:[40,40,40],bdmg:[.5,.5,.5]};for(var mnk in MNE){DEF['mn.min.'+mnk]=MNE[mnk][0];DEF['mn.big.'+mnk]=MNE[mnk][1];DEF['mn.gaz.'+mnk]=MNE[mnk].length>2?MNE[mnk][2]:MNE[mnk][0];}   /* the minions' own stats (the game's MN_DEF) */DEF['stat.slamAcc']=40;DEF['stat.slamMax']=60;DEF['stat.strafe']=2;DEF['stat.sidestep']=6;DEF['m.drift.lean']=28.6;DEF['m.drift.angle']=15;DEF['m.drift.time']=.15;DEF['m.drift.minZips']=30;DEF['m.drift.cool']=1;DEF['m.drift.rate']=9;DEF['slope.side']=.85;
@@ -119,7 +120,9 @@ var EXTRA={
  Foot:[['Foot.heel','Heel Behind the Ankle','cm',0,16,.5],['Foot.sole','Sole Thickness','cm',0,8,.25],['Foot.ankleH','Ankle Height Above Floor','cm',4,18,.5],['Foot.flat','Toe Flattening','pct',0,.9,.01]],
  Shin:[['Shin.pad','Knee Pad Size (0 = none)','cm',0,16,.2]].concat(band('Shin')),
  LowerTorso:band('LowerTorso'),
- Head:[['hairVol','Hair Volume','x',.9,1.5,.01],['bangL','Bang Length','x',.3,2,.05]],
+ Head:[['hairVol','Hair Volume','x',.9,1.5,.01],['hair.count','Lock Count (round the hairline)','n',4,24,1],['hair.thick','Lock Thickness (1 = locks just touch)','x',.3,2.5,.05],['hair.taper','Lock Taper (100% = to a point)','pct',0,1,.01],
+  ['hair.curl','Curl Amount (bend out toward the tip)','deg',-90,360,1],['hair.tight','Curl Tightness (higher = bend nearer the tip)','x',.3,4,.05],['hair.spread','Spread (lean out from the head)','deg',-10,60,1],['hair.part','Part Position (turns the ring of locks)','deg',-45,45,1],
+  ['hair.lenF','Lock Length at the Front','x',0,4,.05],['hair.lenS','Lock Length at the Sides','x',0,4,.05],['hair.lenB','Lock Length at the Back','x',0,4,.05]],
  UpperArm:band('UpperArm'),
  Forearm:band('Forearm')
 };

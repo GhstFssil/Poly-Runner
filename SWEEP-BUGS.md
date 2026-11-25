@@ -52,7 +52,7 @@ Every slice has code to read, so this sweep never skips one.
 - Path Editor (`path-editor.html`): `peobj.py`, `pesave.py`, `pecycle.py`, `pegho.py`, `pefuzz.py` (several minutes: run it last).
 - Sandbox and levels (`sbBuild`, footprints, caves, walls): `fu/ends1.py` plus a test of your own for what you touched.
 - Stats and movement details: `fu/fu1.py`, `fu/fu1b.py`. Camera Zoom and Free Look: `fu/cam1.py`; Sidestep: `fu/side1.py`.
-- Character Select and the Characters page: `fu/pick1.py`, `fu/comet1.py`. Comet's Hover pose: `fu/hov1.py`, `fu/comet_anim.py`. Mirrored faceting: `fu/mirror1.py` (with `rw4.py` for the welds).
+- Character Select and the Characters page: `fu/pick1.py`, `fu/comet1.py`. Comet's Hover pose: `fu/hov1.py`, `fu/comet_anim.py`. Mirrored faceting: `fu/mirror1.py` (with `rw4.py` for the welds). Hair locks: `fu/hair1.py`.
 - Rig Editor stats, loading and settings: `rx8.py`; model build, welds and weights: `rw4.py`, `rm1.py`, `fu/fu3.py`; saved model storage: `fu/fu6.py`.
 - Plus every test in the state file's "Tests added by nights" for the area.
 
