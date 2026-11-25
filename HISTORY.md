@@ -80,3 +80,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-25 16:20 | next | HANDOFF: approved plan for step 4 (hair locks, no separate bangs)
 - 2026-11-25 16:24 | next | Moved the character setup out of level1/trees.js into characters/character-stats.js (no change to the game)
 - 2026-11-25 16:45 | next | Hair locks: the three bangs became a ring of hair locks with shared and per-lock stats in the Rig Editor (old Bang Length carries over); models re-baked; test fu/hair1.py
+- 2026-11-25 16:47 | v196 | Published v196 (Characters and looks): next merged into main, label v195 -> v196

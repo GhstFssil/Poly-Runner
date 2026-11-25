@@ -1,7 +1,7 @@
 # Handoff (2026-11-25)
 
 ## Goal
-Everything in BACKLOG's Characters and looks group, on `next`, one item at a time (CHANGELOG entry v196, label still v195 until publish).
+Everything in BACKLOG's Characters and looks group, on `next`, one item at a time (published as v196 on 2026-11-25).
 
 ## Done
 - Character Select (step 1): choosing a level opens `scr-pickchar` (ui/page-body.html); two compact stat cards with Play buttons; the last pick is marked "(last time)", focused, id `pcLast`. Back returns to Level Select. The Characters page shows both full cards, no buttons. Wiring: `pickThen`/`__pickChar` in ui/screens.js; cards in `refreshStatCards` (level1/trees.js).
