@@ -321,6 +321,7 @@
     updateMobs(sdt, now);
     if (level === 3) sbTargetHit(now);
     cometStars(sdt, now);
+    sidestepTick(fpOn ? 0 : sdt);
     updateStreaks(dt);
     updateChunks(player.position.x, player.position.z, 1);
     updateTrees(player.position.x, player.position.z);

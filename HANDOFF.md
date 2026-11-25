@@ -1,20 +1,27 @@
-# Handoff (2026-11-24)
+# Handoff (2026-11-25)
 
 ## Goal
-v195: rename cleanup plus two Comet star fixes, from the BACKLOG regroup of 2026-11-24.
+The camera and controls group from BACKLOG (now done and removed from it), on `next`, with the unreleased v195 work.
 
-## Done (on `next`, not yet on `main`)
-- Removed the v194 one-time save copy (`idbMigrate` in molly.js; localStorage copy in core/start.html and path-editor.html; test `fu/rename_saves.py`). Ricky confirmed his saves; he is the only player.
-- Retired `tools/mk_sweep_docs.py` (it also wrote the nightly task prompts; restore from git history if the sweeps return).
-- Comet: Star Throw aims 0.175 rad (10°) above the camera, was 0.35 (`starAimDir` in comet.js).
-- Comet: big star tips back flat (halo) while flying: stat `comet.fly.starTilt` (default 90, in trees.js defaults; Fly page row and preview in rig-editor.html). The back star's rotation is now order YXZ, so a tilt turns with her heading.
-- v195 CHANGELOG entry written; label still v194.
+## Done (on `next`, not yet on `main`; label still v194, CHANGELOG entry is v195)
+- v195 work from 11-24 (save-copy removal, mk_sweep_docs retired, Comet star fixes).
+- Camera Zoom: the mouse wheel sets the boom 4 to 20 (default 8.5, saved as `pr_camzoom`); it stretches up to 30% with speed (`CAM_PULL` 0.2, capped at 1.5x top speed). input.js, loop.js.
+- Free Look: Caps Lock on, the mouse turns only the camera (no steering, no turning to face it when standing); turned off, `lookBack` swings the camera behind her, then steering resumes. Caps Lock is read via `getModifierState` on every key and mouse event.
+- Drag-to-look removed from F4 (Ricky). A saved 'drag' falls back to locked. The in-game Path Editor still sets `mouseMode = 'drag'` internally (the pointer must stay free there), and Sidestep is off in that mode.
+- Sidestep: left or right mouse button held walks her sideways relative to her heading at `stat.sidestep` (6 Zips; Rig Editor Stats). Same wall and ledge checks as Strafe (shared `sideMove` in molly-moves.js); ground only, not in the Barrier or a face-plant. Both characters.
+- Sidestep animation: new Rig Editor page (stats `step.*`), clips `Step_L`, `Step_R`; shown only instead of Idle, so running forward the run wins (Ricky). Built-in models re-baked (`tools/bake_models.py`). A model saved before this has no Step clips: she idles while stepping until it is saved again in the Rig Editor.
+- Q/E is now labelled Strafe (a quick hop) on the controls page; GLOSSARY has Camera Zoom, Free Look, Sidestep.
+- Tests: `tests/fu/cam1.py`, `tests/fu/side1.py` (both ALL PASS); reg2, fu1, fu1b, fu3, fu6, rx8 run clean apart from known noise.
+
+## Decisions
+- Caps Lock off: the camera swings back (Ricky). Drag mode: removed (Ricky). Sidestep anim: only when not running forward (Ricky).
+- Sidestep in the air or while hovering: not allowed (my call; easy to change in `sidestepTick`).
 
 ## Next steps
-1. Ricky tries it on `next`; on his go-ahead, bump the label to v195 and merge `next` into `main`.
-2. Then: camera and controls group (BACKLOG).
+1. Ricky tries it on `next` (re-save his Molly and Comet in the Rig Editor to get the Sidestep clips into his saved models); tune the Sidestep page and speed.
+2. On his go-ahead: bump the label to v195 and merge `next` into `main`.
 
 ## Gotchas
-- Nightly sweeps are paused (Anthropic-side scheduling trouble); their last branches (11-15 to 11-17) are merged.
-- `tools/mk_electron.py` reads fonts from a hard-coded `/tmp/fx`; the release workflow uses `build_release.py`.
+- rx8.py logs "Molly model turned away" on purpose-made odd stats; it does that on the old build too.
+- Headless Chrome sends its own mousemoves with Caps Lock off; cam1.py stubs `getModifierState` for that.
 - Shallow clone: `git -c push.negotiate=true push`. Tests leave `shots/` and `tests/fu/new_*` behind; don't commit them.

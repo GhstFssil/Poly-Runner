@@ -33,7 +33,7 @@
   var STEP_UP = 1;          // a ledge this small or smaller she just steps up, with no loss of speed
   var CLIMB_SLOPE = 1.05;   // ground steeper than this (rise per unit run, a little over 45 degrees) stops her like a wall
   var DROP_SLOPE = 0.35;   // ground that falls away faster than this leaves her in the air
-  var BOUNCE_KEEP = 0.5, BOUNCE_MIN = 8, SLAM_ACC = 40 * TILE, SLAM_MAX = 60 * TILE, STRAFE_DIST = TILE;   // the Barrier: it bounces back up at half the speed it landed at, and S in the air drives it straight down (40 Zips/s^2, 60 Zips at most)
+  var BOUNCE_KEEP = 0.5, BOUNCE_MIN = 8, SLAM_ACC = 40 * TILE, SLAM_MAX = 60 * TILE, STRAFE_DIST = TILE, SIDESTEP_SPEED = 6 * TILE;   // the Barrier: it bounces back up at half the speed it landed at, and S in the air drives it straight down (40 Zips/s^2, 60 Zips at most)
   var FALL_MAX = 100;      // free-fall speed limit: 50 Zips (units/s)
   var MIN_UP = 60;         // running uphill, the slope bleeds her speed down to 30 Zips and no further
   var FRIC = 160 / 7;       // friction (units/s^2): her slowdown whenever she is not driving herself (coasting, braking, or past her own top speed). Set by the Friction stat

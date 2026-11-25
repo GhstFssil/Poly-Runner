@@ -86,7 +86,8 @@ Path Editor panel words: inspector, next-stamp panel, presets (`polyrunner-pe-pr
 |---|---|---|
 | Brake | S: slide to a stop | |
 | Drift | A or D while fast: a quick swing to that side. "Grip while drifting" is a stat | |
-| Strafe | Q or E sidestep (Molly only). Its distance is a stat | |
+| Strafe | Q or E: an instant hop to the side (Molly only). Its distance is a stat | `strafe`, `stat.strafe` |
+| Sidestep | left or right mouse button held: she walks to her left or right of her heading, at a stat speed; its own animation (Rig Editor page Sidestep, clips `Step_L`, `Step_R`) shows only while she is not running forward | `sidestepTick`, `sideKeys`, `sideNow`, `stat.sidestep`, `step.*` |
 | Camera Zoom | the mouse wheel: how far the camera sits behind her (4 to 20, saved), stretched up to 30% by her speed | `camZoom`, `camPull`, `CAM_PULL`, `pr_camzoom` |
 | Free Look | Caps Lock on: the mouse turns only the camera, not her; turned off, the camera swings back behind her | `freeLook`, `lookBack` |
 | Runner's Pose | hold S standing still, then let go to launch | `RP_DROP` |

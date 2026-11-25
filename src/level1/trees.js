@@ -113,7 +113,7 @@
     'barrier.chargeSphere': 2, 'barrier.chargeSqueeze': 3.5, 'barrier.glow': 0.2, 'barrier.glowSize': 1.14, 'barrier.dashLen': 0.32, 'barrier.dashGap': 0.22,
     'barrier.cBody': '#ff2a1f', 'barrier.cEmis': '#b3140c', 'barrier.cEdge': '#ffc7b8', 'barrier.cDash': '#ff9a88', 'barrier.cGlow': '#ff3a2a',
     'm.drift.lean': 28.6, 'm.drift.angle': 15, 'm.drift.time': 0.15, 'm.drift.minZips': 30, 'm.drift.cool': 1, 'm.drift.rate': 9, 'slope.side': 0.85,
-    'stat.top': 80, 'stat.accelT': 7, 'stat.brake': 3, 'stat.jumpH': 7.2, 'stat.grav': 20, 'stat.gripZ': 20, 'stat.fadeSlope': 0, 'stat.driftGrip': 1, 'stat.fall': 50, 'stat.hearts': 3, 'stat.colH': 3.6, 'stat.colW': 1, 'stat.wallGrip': 1, 'stat.fadeWall': 1, 'stat.fric': 11.4, 'stat.slamAcc': 40, 'stat.slamMax': 60, 'stat.strafe': 2
+    'stat.top': 80, 'stat.accelT': 7, 'stat.brake': 3, 'stat.jumpH': 7.2, 'stat.grav': 20, 'stat.gripZ': 20, 'stat.fadeSlope': 0, 'stat.driftGrip': 1, 'stat.fall': 50, 'stat.hearts': 3, 'stat.colH': 3.6, 'stat.colW': 1, 'stat.wallGrip': 1, 'stat.fadeWall': 1, 'stat.fric': 11.4, 'stat.slamAcc': 40, 'stat.slamMax': 60, 'stat.strafe': 2, 'stat.sidestep': 6
   };
   var MAXHP = 3;
   var mollyScale = 1, SLIDE_H = 1, mollyDriftRun = false;   // mollyScale: the Overall scale the model in use was saved with (the Rig Editor's stat). She stands 3.6 units x this, and her collision box (standing and sliding) is multiplied by it too
@@ -187,7 +187,7 @@
     var C = RIGCFG;
     // any number can be typed into a stat, so the ones that would break the game (a negative jump, no grip at all, a top speed below nothing) are held to the nearest value that still works
     RUN_SPEED = Math.max(1, C['stat.top']) * TILE; ACCEL_TIME = Math.max(0.5, C['stat.accelT']); ACCEL = RUN_SPEED / ACCEL_TIME; BRAKE_MULT = Math.max(0, C['stat.brake']);
-    GRAV = Math.max(1, C['stat.grav']) * TILE; GRIP = Math.max(0.5, C['stat.gripZ']) * TILE; JUMP_H = Math.max(0, C['stat.jumpH']); JUMP_V = Math.sqrt(2 * GRAV * JUMP_H); FALL_MAX = Math.max(1, C['stat.fall']) * TILE; SLAM_ACC = Math.max(1, C['stat.slamAcc']) * TILE; SLAM_MAX = Math.max(1, C['stat.slamMax']) * TILE; STRAFE_DIST = Math.max(0.25, C['stat.strafe']);   // (Grass Canyon's big curve keeps the radius it was built with, TURN_R: it is part of the level, not of her stats)
+    GRAV = Math.max(1, C['stat.grav']) * TILE; GRIP = Math.max(0.5, C['stat.gripZ']) * TILE; JUMP_H = Math.max(0, C['stat.jumpH']); JUMP_V = Math.sqrt(2 * GRAV * JUMP_H); FALL_MAX = Math.max(1, C['stat.fall']) * TILE; SLAM_ACC = Math.max(1, C['stat.slamAcc']) * TILE; SLAM_MAX = Math.max(1, C['stat.slamMax']) * TILE; STRAFE_DIST = Math.max(0.25, C['stat.strafe']); SIDESTEP_SPEED = Math.max(0.5, C['stat.sidestep']) * TILE;   // (Grass Canyon's big curve keeps the radius it was built with, TURN_R: it is part of the level, not of her stats)
     WALL_FADE = C['stat.fadeWall'] ? 1 : 0; SLOPE_FADE = C['stat.fadeSlope'] ? 1 : 0; DRIFT_GRIP = C['stat.driftGrip'] === undefined ? 1 : Math.max(0, C['stat.driftGrip']);
     MAXHP = Math.max(1, Math.min(12, Math.round(C['stat.hearts']))); WALL_GRIP = Math.max(0, C['stat.wallGrip']); FRIC = Math.max(0, C['stat.fric']) * TILE;
     PLAYER_H = Math.max(1.2, C['stat.colH']) * mollyScale; PLAYER_RADIUS = Math.max(0.1, C['stat.colW'] / 2) * mollyScale; SLIDE_H = mollyScale;   // her collision box: how tall standing (a slide squeezes it to 1) and how wide, all times the model's Overall scale

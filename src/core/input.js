@@ -23,7 +23,11 @@
       if (!grounded && vy > 0) vy = 0;       // let go early and she stops rising and starts to fall at once
     }
   });
-  window.addEventListener('blur', function () { keys.w = false; keys.s = false; keys.a = false; keys.d = false; spaceDown = false; });
+  window.addEventListener('blur', function () { keys.w = false; keys.s = false; keys.a = false; keys.d = false; spaceDown = false; sideKeys.l = sideKeys.r = false; });
+  // Sidestep: left mouse button to her left, right button to her right, while held (not while the in-game Path Editor has the mouse)
+  document.addEventListener('mousedown', function (e) { if (!playing || mouseMode === 'drag') return; if (e.button === 0) sideKeys.l = true; else if (e.button === 2) sideKeys.r = true; });
+  window.addEventListener('mouseup', function (e) { if (e.button === 0) sideKeys.l = false; else if (e.button === 2) sideKeys.r = false; });
+  document.addEventListener('contextmenu', function (e) { if (playing) e.preventDefault(); });
 
   // ---- Camera zoom (the mouse wheel; saved) and Free Look (Caps Lock on: the mouse turns only the camera, not her) ----
   var CAM_MIN = 4, CAM_MAX = 20, CAM_PULL = 0.2;               // zoom limits, and how far the camera moves out with speed (0.2 = 20% farther at her top speed, 30% at 1.5 times it)

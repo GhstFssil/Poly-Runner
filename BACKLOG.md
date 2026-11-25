@@ -2,9 +2,6 @@
 Open work only, in focused groups. Ricky decides priority and version numbers (see CLAUDE.md). Either of us adds items. Delete an item when it's done (HISTORY.md records the change; add a CHANGELOG entry too if players see it). Items marked **Decision** need Ricky's answer first.
 Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to reproduce`. The sweeps tag theirs `(nightly/<name>)`. Older entries below have no who or date.
 
-## Next: camera and controls
-- [ ] (Ricky, 2026-11-23) Sidestep. The character moves to the left or right relative to the character's heading and independent of the camera; left mouse and right mouse buttons, respectively.
-
 ## Characters and looks
 - [ ] Runner model faceting should be mirrored down the center line.
 - [ ] (Ricky, 2026-11-23) Give comet her own hair (ringlet curls)

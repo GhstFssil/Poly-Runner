@@ -674,6 +674,17 @@ function poseIdle(ph){
   o.Pony1={q:qx(4*pm*rad*s)};o.Pony2={q:qx(5*pm*rad*Math.sin(ph-.6))};o.Pony3={q:qx(7*pm*rad*Math.sin(ph-1.2))};
   return o;
 }
+function poseStep(ph,right){   /* Sidestep: a sideways shuffle to her left (right: mirrored). The lead leg reaches out and lifts, the trailing leg closes in after it */
+  var o={},g=right?-1:1,W=P['step.width'],K=P['step.knee'],out=.5-.5*Math.cos(ph),lift=Math.max(0,Math.sin(ph)),lift2=Math.max(0,-Math.sin(ph));
+  var lead=right?'R':'L',trail=right?'L':'R',gl=lead==='L'?1:-1,gt=-gl;
+  o.Hips={pos:[0,hipsBase[1]-.03+P['step.bounce']/100*Math.cos(2*ph),0],q:qz(g*P['step.lean']*.4*rad)};
+  o.Spine={q:qz(-g*P['step.lean']*rad)};o.Head={q:qz(g*P['step.lean']*.6*rad)};
+  o['Hip'+lead]={q:qz(gl*W*out*rad).multiply(qx(-8*rad*lift))};o['Knee'+lead]={q:qx((14+K*lift)*rad)};o['Ankle'+lead]={q:qx(-(6+K*.45*lift)*rad).multiply(qz(-gl*W*.6*out*rad))};
+  o['Hip'+trail]={q:qz(gt*W*.35*(1-out)*rad).multiply(qx(-6*rad*lift2))};o['Knee'+trail]={q:qx((14+K*.7*lift2)*rad)};o['Ankle'+trail]={q:qx(-(6+K*.3*lift2)*rad)};
+  [['L',1],['R',-1]].forEach(function(e){var S=e[0],a=e[1];o['Shoulder'+S]={q:qz(a*(P['step.arm']+4*out)*rad).multiply(qx(6*rad))};o['Elbow'+S]={q:qx(-30*rad)};});
+  o.Pony1={q:qx(-8*rad).multiply(qz(-g*6*out*rad))};o.Pony2={q:qz(-g*8*Math.sin(ph-.6)*rad)};o.Pony3={q:qz(-g*10*Math.sin(ph-1.2)*rad)};
+  return o;
+}
 function poseRest(){return {Hips:{pos:hipsBase.slice(),q:new THREE.Quaternion()}};}
 
 function moveAt(name,u){
@@ -706,6 +717,7 @@ function modeDur(m){
   if(m==='cFly')return 2;
   if(m==='drift')return P['runF.dur'];   /* a drift is her fast run with changes laid over it, stride for stride */
   if(m==='idle')return P['idle.dur'];
+  if(m==='step')return P['step.dur'];
   if(m==='runS'||m==='run'||m==='runF')return P['run'+(m==='runS'?'S':m==='runF'?'F':'M')+'.dur'];
   if(MOVEX[m])return P['m.'+m+'.dur'];
   return 3;
@@ -742,6 +754,7 @@ function poseFor(mode,ph){
   if(mode==='drift')return poseDrift(ph,false);
   if(mode==='run')return poseRun(ph,'M');if(mode==='runS')return poseRun(ph,'S');if(mode==='runF')return poseRun(ph,'F');
   if(mode==='idle')return poseIdle(ph);
+  if(mode==='step')return poseStep(ph,false);
   if(mode==='set'){var v=moveAt('set',ph/(2*Math.PI)),b=Math.sin(ph),rk=P['m.set.rock'];
     v.hyf+=P['m.set.bob']/100/hipsBase[1]*b;v.hp+=rk*b;v.sp+=rk*b;v.hd-=P['m.set.nod']*b;v.p1-=2*rk*b;v.p2+=2*rk*b;v.p3+=2*rk*b;return toPose(v);}
   if(MOVES[mode])return toPose(moveAt(mode,ph/(2*Math.PI)));
@@ -980,7 +993,7 @@ $('#resetAll').addEventListener('click',function(){P=JSON.parse(JSON.stringify(D
 
 /* ================= animation stats ================= */
 var STAGES={jump:['Ready','Crouch','Takeoff','Peak','Fall','Land','Recover'],slide:['Run in','Drop','Slide','Get Up'],fall:['Run','Trip','Fall','Impact','Bounce','Settle'],set:['Pose'],drift:['Pose']};
-var MOVELABEL={jump:'Jump',slide:'Slide',fall:'Faceplant',set:"Runner's Pose",drift:'Drift',barrier:'Barrier',cThrow:'Star Throw',cHover:'Hover',cFly:'Fly'};
+var MOVELABEL={jump:'Jump',slide:'Slide',fall:'Faceplant',set:"Runner's Pose",drift:'Drift',step:'Sidestep',barrier:'Barrier',cThrow:'Star Throw',cHover:'Hover',cFly:'Fly'};
 var KEYGROUPS=[
  ['Body',[['hyf','Hips Height (1 = standing)','x',.1,1.7,.01],['hz','Hips Forward (m)','x',-1,1,.01],['hp','Body Lean (+ forward)','deg',-110,110,1],['sp','Spine Bend','deg',-60,60,1],['hd','Head Tilt','deg',-70,70,1]]],
  ['Arms',[['aLp','Left Arm Raise','deg',-120,180,1],['aLr','Left Arm Out','deg',-20,120,1],['aLe','Left Elbow Bend','deg',0,150,1],['aRp','Right Arm Raise','deg',-120,180,1],['aRr','Right Arm Out','deg',-20,120,1],['aRe','Right Elbow Bend','deg',0,150,1]]],
@@ -989,7 +1002,7 @@ var KEYGROUPS=[
 ];
 var animKey={jump:0,slide:0,fall:0,set:0,drift:0};
 function pausePlay(){ui.playing=false;var p=$('#play');p.textContent='Play';p.setAttribute('aria-pressed','true');$('#phase').value=ui.phase;}
-function animPrefix(m){return m==='barrier'?'barrier.':m==='idle'?'idle.':m==='runS'?'runS.':m==='run'?'runM.':m==='runF'?'runF.':'m.'+m+'.';}
+function animPrefix(m){return m==='barrier'?'barrier.':m==='idle'?'idle.':m==='step'?'step.':m==='runS'?'runS.':m==='run'?'runM.':m==='runF'?'runF.':'m.'+m+'.';}
 function renderAnim(){
   var m=ui.mode,sec=$('#animSec'),rows=$('#animRows'),st=$('#animStages'),kh=$('#animKey');
   rows.innerHTML='';st.innerHTML='';kh.innerHTML='';
@@ -1001,6 +1014,9 @@ function renderAnim(){
   if(m==='idle'){
     $('#animNote').textContent='A gentle standing loop.';
     addRows(rows,[[pre+'dur','Loop Length','s',1,6,.05],[pre+'breath','Breathing Bob','cm',0,2,.1],[pre+'sway','Torso Sway','deg',0,6,.1],[pre+'arm','Arm Sway','deg',0,8,.1],[pre+'pony','Ponytail Sway','x',0,3,.05]],{anim:1});
+  }else if(m==='step'){
+    $('#animNote').textContent='Sidestep (left or right mouse button held): she walks sideways, to her left here; to her right is this mirrored. The game only shows it while she is not running forward (running, her run wins).';
+    addRows(rows,[[pre+'dur','Time per Step Cycle','s',.2,2,.01],[pre+'width','Step Width','deg',0,50,1],[pre+'knee','Knee Lift','deg',0,90,1],[pre+'lean','Lean Into the Step','deg',-20,20,.5],[pre+'arm','Arms Out','deg',0,45,1],[pre+'bounce','Bounce','cm',0,8,.5]],{anim:1});
   }else if(isRun){
     $('#animNote').textContent='A run cycle. Each of the three speeds has its own stats.';
     addRows(rows,[[pre+'dur','Time per Stride Cycle','s',.25,2,.01],[pre+'stride','Stride','deg',5,62,1],[pre+'knee','Knee Lift','deg',20,125,1],[pre+'arm','Arm Swing','deg',0,78,1],[pre+'elbow','Elbow Bend','deg',20,125,1],[pre+'lean','Forward Lean','deg',0,30,1],[pre+'bounce','Bounce','cm',0,8,.5]],{anim:1});
@@ -1056,7 +1072,7 @@ function renderAnim(){
       addRows(d,g[1].map(function(r){return [kp+r[0]].concat(r.slice(1));}),{anim:1});});
   }
 }
-var STAT_ROWS=[['stat.top','Top Speed','Zips',20,160,1],['stat.accelT','Time From 0 to Top Speed','s',1,20,.1],['stat.brake','Braking Strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump Height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways Grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip Fades on Slopes (× the cosine of the slope)','tog'],['stat.driftGrip','Grip While Drifting (x her grip)','x',0,3,.05],['stat.fall','Max Fall Speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision Box Height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision Box Width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall Grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier Slam: Top Speed','Zips',10,200,1],['stat.strafe','Strafe Distance (Q/E sidestep; 2 = one tile)','units',0.5,12,.1]];
+var STAT_ROWS=[['stat.top','Top Speed','Zips',20,160,1],['stat.accelT','Time From 0 to Top Speed','s',1,20,.1],['stat.brake','Braking Strength (x coasting)','x',1,8,.1],['stat.jumpH','Jump Height','units',2,20,.1],['stat.grav','Gravity','Zips/s²',5,60,.5],['stat.gripZ','Sideways Grip (turning)','Zips/s²',5,60,.5],['stat.fadeSlope','Grip Fades on Slopes (× the cosine of the slope)','tog'],['stat.driftGrip','Grip While Drifting (x her grip)','x',0,3,.05],['stat.fall','Max Fall Speed','Zips',20,120,1],['stat.hearts','Hearts','n',1,8,1],['stat.colH','Collision Box Height (standing; × her Overall scale)','units',1.5,8,.1],['stat.colW','Collision Box Width (× her Overall scale)','units',.4,4,.05],['stat.wallGrip','Wall Grip (x her grip)','x',0,2,.05],['stat.fadeWall','Wall grip fades with the bank (× its cosine: none on a vertical wall)','tog'],['stat.fric','Friction (slowdown when not driving)','Zips/s²',0,40,.1],['stat.slamAcc','Barrier slam: how hard S in the air drives it down','Zips/s²',5,200,1],['stat.slamMax','Barrier Slam: Top Speed','Zips',10,200,1],['stat.strafe','Strafe Distance (Q/E hop; 2 = one tile)','units',0.5,12,.1],['stat.sidestep','Sidestep Speed (mouse buttons held)','Zips',1,40,.5]];
 function renderStats(){var h=$('#statRows');if(!h)return;h.innerHTML='';addRows(h,STAT_ROWS,{anim:1,stat:1});var sc=document.createElement('div');sc.id='statLive';sc.style.cssText='margin-top:10px;max-width:460px';h.appendChild(sc);statCardRefresh();}   /* the Stats menu at the top of the panel */
 try{renderStats();}catch(e){}
 var COMET_HOV=[['comet.hov.cost','Power to Switch It on','n',0,50,1],['comet.hov.drain','Power a Second While on','n',0,20,.1],['comet.hov.height','Floats Above the Ground by','units',0,3,.05],
@@ -1141,7 +1157,7 @@ $('#exportGlb').addEventListener('click',function(){
   var cur=NAMES.map(function(n){return [bones[n].position.clone(),bones[n].quaternion.clone()];});
   NAMES.forEach(function(n){bones[n].quaternion.copy(rest[n]);});bones.Hips.position.set(hipsBase[0],hipsBase[1],hipsBase[2]);
   var clips=[clipFrom('Idle',poseIdle,modeDur('idle'),24),clipFrom('Run_Slow',function(p){return poseRun(p,'S');},modeDur('runS'),20),clipFrom('Run_Mid',function(p){return poseRun(p,'M');},modeDur('run'),16),clipFrom('Run',function(p){return poseRun(p,'M');},modeDur('run'),16),clipFrom('Run_Fast',function(p){return poseRun(p,'F');},modeDur('runF'),12),
-    clipFrom('Jump',function(p){return poseFor('jump',p);},modeDur('jump'),40),clipFrom('Slide',function(p){return poseFor('slide',p);},modeDur('slide'),40),clipFrom('Faceplant',function(p){return poseFor('fall',p);},modeDur('fall'),56),clipFrom('Drift_L',function(p){return poseDrift(p,false);},modeDur('drift'),16),clipFrom('Drift_R',function(p){return poseDrift(p,true);},modeDur('drift'),16),clipFrom('RunnersPose',function(p){return poseFor('set',p);},modeDur('set'),24)];
+    clipFrom('Jump',function(p){return poseFor('jump',p);},modeDur('jump'),40),clipFrom('Slide',function(p){return poseFor('slide',p);},modeDur('slide'),40),clipFrom('Faceplant',function(p){return poseFor('fall',p);},modeDur('fall'),56),clipFrom('Drift_L',function(p){return poseDrift(p,false);},modeDur('drift'),16),clipFrom('Drift_R',function(p){return poseDrift(p,true);},modeDur('drift'),16),clipFrom('Step_L',function(p){return poseStep(p,false);},modeDur('step'),16),clipFrom('Step_R',function(p){return poseStep(p,true);},modeDur('step'),16),clipFrom('RunnersPose',function(p){return poseFor('set',p);},modeDur('set'),24)];
   rigRoot.updateMatrixWorld(true);
   var restore=function(){NAMES.forEach(function(n,i){bones[n].position.copy(cur[i][0]);bones[n].quaternion.copy(cur[i][1]);});
     hid.forEach(function(h){h[0].visible=h[1];});btn.disabled=false;};

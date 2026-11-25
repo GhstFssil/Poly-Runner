@@ -14,7 +14,7 @@
     else if (rpBlend > 0.5) want = 'RunnersPose';
     // (a drift no longer switches to the held Drift pose: she keeps her run cycle, legs moving, and the drift's lean into the corner is laid over it, as it first was)
     else if (!grounded) want = 'Jump';
-    else if (zp < 0.75) want = 'Idle';
+    else if (zp < 0.75) want = sideNow && mollyAct.Step_L && mollyAct.Step_R ? (sideNow < 0 ? 'Step_L' : 'Step_R') : 'Idle';   // the Sidestep shows only while she is not running forward (a model saved before v195 has no Sidestep clips: she idles)
     else want = zp <= 15 ? 'Run_Slow' : zp < 45 ? 'Run_Mid' : 'Run_Fast';
     if (mollyDriftRun && driftBlend > 0.5 && grounded && want.indexOf('Run_') === 0 && mollyAct.Drift_L && mollyAct.Drift_R) want = driftSide > 0 ? 'Drift_L' : 'Drift_R';   // her run with the Drift stats' changes, stride for stride
     if (!grounded && mollyPrevGround) mollyV0 = 0;
@@ -33,6 +33,7 @@
       var d = a.getClip().duration;
       if (n.indexOf('Run_') === 0 || (mollyDriftRun && n.indexOf('Drift_') === 0)) a.time = mollyRunPh * d;
       else if (n === 'Idle') { mollyT.Idle = (mollyT.Idle + dt) % d; a.time = mollyT.Idle; }
+      else if (n === 'Step_L' || n === 'Step_R') { mollyT[n] = (mollyT[n] + dt) % d; a.time = mollyT[n]; }
       else if (n === 'Jump') {                                // the leap follows her real height: launch (27% of the clip) to apex (50%) while she rises, apex to touchdown (72%) while she falls
         var jf = vy > 0 && mollyV0 > 0 ? 0.27 + 0.23 * Math.max(0, 1 - vy / mollyV0) : 0.5 + 0.22 * Math.min(1, -vy / JUMP_V);
         a.time = Math.max(0, Math.min(0.999, jf)) * d;

@@ -8,7 +8,9 @@
         "Added",
         [
           "The mouse wheel moves the camera in and out (it remembers where you left it), and the camera pulls back a little as you speed up.",
-          "Free Look: with Caps Lock on, the mouse turns only the camera, so you can look round without steering. Turn Caps Lock off and the camera swings back behind you."
+          "Free Look: with Caps Lock on, the mouse turns only the camera, so you can look round without steering. Turn Caps Lock off and the camera swings back behind you.",
+          "Sidestep: hold the left or right mouse button to walk to her left or right of the way she is heading (the camera does not change it). Standing, it has its own sidestep animation; while running, your run keeps going and you drift across. Its speed is a new stat (Sidestep Speed, 6 Zips), and the Rig Editor has a Sidestep animation page.",
+          "Q and E are now called Strafe (a quick hop) on the controls page, to tell them apart from the Sidestep."
         ]
       ],
       [

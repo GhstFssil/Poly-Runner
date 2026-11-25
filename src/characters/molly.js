@@ -174,7 +174,7 @@
     new THREE.MeshBasicMaterial({ color: 0xff3a2a, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide })));
   // ---- Molly's model: a low-poly rigged runner (a .glb embedded in the page) whose clips are driven by what she is doing. ----
   var MOLLY_YAW = Math.PI, mollyOn = false, mollyMix = null, mollyAct = {}, mollyW = {}, mollyT = {}, mollyRunPh = 0, mollyPrevGround = true, mollyMesh = null, mollyV0 = 0;
-  var MOLLY_CLIPS = ['Idle', 'Run_Slow', 'Run_Mid', 'Run_Fast', 'Jump', 'Slide', 'Faceplant', 'RunnersPose', 'Drift_L', 'Drift_R'];
+  var MOLLY_CLIPS = ['Idle', 'Run_Slow', 'Run_Mid', 'Run_Fast', 'Jump', 'Slide', 'Faceplant', 'RunnersPose', 'Drift_L', 'Drift_R', 'Step_L', 'Step_R'];
   var mollyRoot = null;
   function mollyLoad(buf, onFail, onOk) {                       // build (or rebuild) her from a .glb: the embedded one, or one saved from the Rig Editor
     if (!THREE.GLTFLoader) return;
