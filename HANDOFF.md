@@ -3,7 +3,7 @@
 ## Goal
 The camera and controls group from BACKLOG (now done and removed from it), on `next`, with the unreleased v195 work.
 
-## Done (on `next`, not yet on `main`; label still v194, CHANGELOG entry is v195)
+## Done (published as v195 on 2026-11-25: `next` merged into `main`)
 - v195 work from 11-24 (save-copy removal, mk_sweep_docs retired, Comet star fixes).
 - Camera Zoom: the mouse wheel sets the boom 4 to 20 (default 8.5, saved as `pr_camzoom`); it stretches up to 30% with speed (`CAM_PULL` 0.2, capped at 1.5x top speed). input.js, loop.js.
 - Free Look: Caps Lock on, the mouse turns only the camera (no steering, no turning to face it when standing); turned off, `lookBack` swings the camera behind her, then steering resumes. Caps Lock is read via `getModifierState` on every key and mouse event.
@@ -18,8 +18,8 @@ The camera and controls group from BACKLOG (now done and removed from it), on `n
 - Sidestep in the air or while hovering: not allowed (my call; easy to change in `sidestepTick`).
 
 ## Next steps
-1. Ricky tries it on `next` (re-save his Molly and Comet in the Rig Editor to get the Sidestep clips into his saved models); tune the Sidestep page and speed.
-2. On his go-ahead: bump the label to v195 and merge `next` into `main`.
+1. Ricky re-saves his Molly and Comet in the Rig Editor to get the Sidestep clips into his saved models; tune the Sidestep page and speed.
+2. Next interactive work goes on `next` from v195.
 
 ## Gotchas
 - rx8.py logs "Molly model turned away" on purpose-made odd stats; it does that on the old build too.
