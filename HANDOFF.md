@@ -19,6 +19,7 @@ Everything in BACKLOG's Characters and looks group, on `next`, one item at a tim
 - Faceting (step 3): if nothing is found wrong, keep the backlog item and review with Ricky (Ricky).
 
 ## Next steps
+- Step 4 plan (Ricky approved 2026-11-25; start in a fresh session). Hair = cap + one ring of locks on the hairline, all built alike; NO separate bangs (Ricky): the 3 bang spikes become the front locks. Shared stats: lock count, thickness, taper, curl amount, curl tightness, spread, part position, length at front/sides/back (blended). Per-lock overrides (click a lock: length, curl, angle), L/R partners edited together (keep faceting mirrored: use `diagPick`). Ponytail keeps its own bones; locks skinned to Head. Migration: old `bangL` sets front length; defaults match today's look (check GLOSSARY for frozen names). Code: hair builder in rig-editor.html (~line 204, `hairVol`, `bangL`), stats in rig-editor-start.html (`GLOBAL`, line ~122).
 1. Faceting review (Ricky). 2. Fine-grained hair control. 3. Comet ringlets. 4. Face pieces (ask Ricky about style first).
 
 ## Gotchas
