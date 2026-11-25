@@ -107,7 +107,7 @@
     if (hovBlend > 0.001) body.position.y += (cometC('hov.height') + cometC('hov.bob') * Math.sin(now / 1000 * 2 * Math.PI / Math.max(0.1, cometC('hov.bobT')))) * hovBlend;   // she floats over whatever she would be standing on, bobbing gently
     var bn = com && mollyOn && mollyRoot && cometRest ? mollyRoot : null;
     if (bn) {
-      if (hovBlend > 0.001) { var hvv = cqVals('comet.ho.'); cqAdd(bn, CQ_ALL, hvv, hovBlend); var hb = bn.getObjectByName('Hips'); if (hb && cometRestPos) { hb.position.y += cometRestPos.y * hvv.hyf * hovBlend; hb.position.z += hvv.hz * hovBlend; } }
+      if (hovBlend > 0.001) { var hvv = cqVals('comet.ho.'); hvv.hp += cometC('hov.lean') * Math.min(1, Math.abs(speed) / Math.max(1, RUN_SPEED)); cqAdd(bn, CQ_ALL, hvv, hovBlend); var hb = bn.getObjectByName('Hips'); if (hb && cometRestPos) { hb.position.y += cometRestPos.y * hvv.hyf * hovBlend; hb.position.z += hvv.hz * hovBlend; } }
       if (flyBlend > 0.001) { cqOver(bn, CQ_UB, cqVals('comet.pf.'), flyBlend); cqAdd(bn, CQ_LEGS, cqVals('comet.fl.'), flyBlend); }
       if (thrPh) { var sw = thrPh === 1 ? 0 : thrPh === 2 ? smooth01(Math.min(1, thrT / Math.max(0.01, cometC('throw.swing')))) : 1; cqOver(bn, CQ_UB, cqVals('comet.pc.', thrMir), thrW, cqVals('comet.pt.', thrMir), sw); }
     }

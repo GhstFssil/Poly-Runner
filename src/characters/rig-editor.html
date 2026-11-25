@@ -745,7 +745,7 @@ function cThrowAt(u){var p=cThrowParts(),T=p.reduce(function(a,b){return a+b;},0
 function poseComet(mode,ph){
   if(!window.__cometQ)return poseRun(ph,'M');
   var o,u=ph/(2*Math.PI);
-  if(mode==='cHover'){o=poseRun(2*Math.PI*((u*modeDur('cHover')/Math.max(.05,P['runM.dur']))%1),'M');var v=cqV('comet.ho.');cqAd(o,CQALL,v,1);var hp=(o.Hips&&o.Hips.pos)||hipsBase;o.Hips.pos=[hp[0],hp[1]+hipsBase[1]*v.hyf,hp[2]+v.hz];return o;}
+  if(mode==='cHover'){o=poseIdle(2*Math.PI*((u*modeDur('cHover')/Math.max(.05,P['idle.dur']))%1));var v=cqV('comet.ho.');v.hp+=P['comet.hov.lean']||0;cqAd(o,CQALL,v,1);var hp=(o.Hips&&o.Hips.pos)||hipsBase;o.Hips.pos=[hp[0],hp[1]+hipsBase[1]*v.hyf,hp[2]+v.hz];return o;}
   if(mode==='cFly'){o=toPose(moveAt('jump',.45));o.Hips.pos=[hipsBase[0],hipsBase[1],0];cqOv(o,CQUB,cqV('comet.pf.'),1);cqAd(o,CQLEG,cqV('comet.fl.'),1);return o;}
   var st=cThrowAt(u);o=poseRun(2*Math.PI*((u*modeDur('cThrow')/Math.max(.05,P['runM.dur']))%1),'M');if(st.w>0)cqOv(o,CQUB,cqV('comet.pc.'),st.w,cqV('comet.pt.'),st.s);return o;
 }
@@ -1040,8 +1040,8 @@ function renderAnim(){
       addRows(rows,[['comet.throw.in','Into the Charging Pose','s',.02,1,.01],['comet.throw.swing','The Swing','s',.02,1,.01],['comet.throw.rel','Star Leaves Her Hand at (% of the swing)','pct',0,1,.01],['comet.throw.hold','Follow-Through Held','s',0,1,.01],['comet.throw.out','Back to Running','s',.02,2,.01],['comet.hold.scale','Star in Her Hand (× the star she will throw)','x',.1,2,.05],['comet.hold.out','Star in her hand: out from her wrist','units',-1,1,.01]],{anim:1});
       grp('Charging Pose (holding the star behind her)',poseRows('comet.pc.',UBR));grp('Throw Pose (the arm swung through)',poseRows('comet.pt.',UBR));
     }else if(m==='cHover'){
-      $('#animNote').textContent='Hover. She floats over the ground doing whatever she would be doing; the changes below are laid over it (all 0: just her run). Two stars at her ankles and a bigger one behind her back.';
-      addRows(rows,[['comet.hov.height','Floats Above the Ground by','units',0,3,.05],['comet.hov.bob','Bob','units',0,1,.01],['comet.hov.bobT','Bob: Seconds a Cycle','s',.2,6,.05],['comet.hov.spinS','Stars: Turns a Second','x',0,6,.1],['comet.hov.ankle','Ankle Stars: Size','units',.05,2,.01],['comet.hov.ankleY','Ankle Stars: Up or Down','units',-1,1,.01],['comet.hov.ankleTilt','Ankle Stars: Tilt','deg',-90,90,1],['comet.hov.back','Back Star: Size','units',.1,3,.01],['comet.hov.backD','Back Star: Behind Her by','units',0,2,.01],['comet.hov.backY','Back Star: Up or Down','units',-2,2,.01],['comet.hov.backTilt','Back Star: Tilt','deg',-90,90,1]],{anim:1});
+      $('#animNote').textContent='Hover. She stands as she floats (her Idle), leaning forward as she speeds up; the changes below are laid over it (all 0: just her Idle and the lean). The preview shows the lean at top speed. Two stars at her ankles and a bigger one behind her back.';
+      addRows(rows,[['comet.hov.height','Floats Above the Ground by','units',0,3,.05],['comet.hov.lean','Lean Forward at Top Speed','deg',-30,60,1],['comet.hov.bob','Bob','units',0,1,.01],['comet.hov.bobT','Bob: Seconds a Cycle','s',.2,6,.05],['comet.hov.spinS','Stars: Turns a Second','x',0,6,.1],['comet.hov.ankle','Ankle Stars: Size','units',.05,2,.01],['comet.hov.ankleY','Ankle Stars: Up or Down','units',-1,1,.01],['comet.hov.ankleTilt','Ankle Stars: Tilt','deg',-90,90,1],['comet.hov.back','Back Star: Size','units',.1,3,.01],['comet.hov.backD','Back Star: Behind Her by','units',0,2,.01],['comet.hov.backY','Back Star: Up or Down','units',-2,2,.01],['comet.hov.backTilt','Back Star: Tilt','deg',-90,90,1]],{anim:1});
       KEYGROUPS.forEach(function(g){grp(g[0]+' (changes while hovering)',g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['comet.ho.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}));});
     }else{
       $('#animNote').textContent='Fly (Space held in the air while hovering). This pose takes over her arms, spine and head; the leg stats are changes to her jump. The star from her back goes up to her hands.';
@@ -1130,7 +1130,7 @@ function minPreview(dt){
 }
 $('#resetAnim').addEventListener('click',function(){var pre=animPrefix(ui.mode),key;for(key in DEF){if(key.indexOf(pre)===0)P[key]=DEF[key];}
   if(ui.mode==='drift'){P['slope.side']=DEF['slope.side'];for(key in DEF)if(key.indexOf('dA.')===0)P[key]=DEF[key];}
-  var CRS={cThrow:/^comet\.(pc\.|pt\.|throw\.|hold\.)/,cHover:/^comet\.(ho\.|hov\.(height|bob|bobT|spinS|ankle|ankleY|ankleTilt|back|backD|backY|backTilt)$)/,cFly:/^comet\.(pf\.|fl\.|fly\.(arms|starY|starS|starTilt)$)/};
+  var CRS={cThrow:/^comet\.(pc\.|pt\.|throw\.|hold\.)/,cHover:/^comet\.(ho\.|hov\.(height|lean|bob|bobT|spinS|ankle|ankleY|ankleTilt|back|backD|backY|backTilt)$)/,cFly:/^comet\.(pf\.|fl\.|fly\.(arms|starY|starS|starTilt)$)/};
   if(CRS[ui.mode])for(key in DEF)if(CRS[ui.mode].test(key))P[key]=DEF[key];   /* the sideways-slope tilt and the changes to her run sit with the drift stats */
   barrierDirty=true;save();renderAnim();statCardRefresh();status('Animation reset.');});
 

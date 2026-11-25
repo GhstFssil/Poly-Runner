@@ -2918,6 +2918,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
  "comet.hov.ankle": 0.35,
  "comet.hov.back": 0.75,
  "comet.hov.spinS": 1.5,
+ "comet.hov.lean": 12,
  "comet.fly.drain": 4,
  "comet.fly.lift": 1,
  "comet.fly.arms": 8,
@@ -4055,6 +4056,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
  "comet.hov.ankle": 0.35,
  "comet.hov.back": 0.75,
  "comet.hov.spinS": 1.5,
+ "comet.hov.lean": 12,
  "comet.fly.drain": 4,
  "comet.fly.lift": 1,
  "comet.fly.arms": 8,
@@ -5389,7 +5391,7 @@ function cThrowAt(u){var p=cThrowParts(),T=p.reduce(function(a,b){return a+b;},0
 function poseComet(mode,ph){
   if(!window.__cometQ)return poseRun(ph,'M');
   var o,u=ph/(2*Math.PI);
-  if(mode==='cHover'){o=poseRun(2*Math.PI*((u*modeDur('cHover')/Math.max(.05,P['runM.dur']))%1),'M');var v=cqV('comet.ho.');cqAd(o,CQALL,v,1);var hp=(o.Hips&&o.Hips.pos)||hipsBase;o.Hips.pos=[hp[0],hp[1]+hipsBase[1]*v.hyf,hp[2]+v.hz];return o;}
+  if(mode==='cHover'){o=poseIdle(2*Math.PI*((u*modeDur('cHover')/Math.max(.05,P['idle.dur']))%1));var v=cqV('comet.ho.');v.hp+=P['comet.hov.lean']||0;cqAd(o,CQALL,v,1);var hp=(o.Hips&&o.Hips.pos)||hipsBase;o.Hips.pos=[hp[0],hp[1]+hipsBase[1]*v.hyf,hp[2]+v.hz];return o;}
   if(mode==='cFly'){o=toPose(moveAt('jump',.45));o.Hips.pos=[hipsBase[0],hipsBase[1],0];cqOv(o,CQUB,cqV('comet.pf.'),1);cqAd(o,CQLEG,cqV('comet.fl.'),1);return o;}
   var st=cThrowAt(u);o=poseRun(2*Math.PI*((u*modeDur('cThrow')/Math.max(.05,P['runM.dur']))%1),'M');if(st.w>0)cqOv(o,CQUB,cqV('comet.pc.'),st.w,cqV('comet.pt.'),st.s);return o;
 }
@@ -5684,8 +5686,8 @@ function renderAnim(){
       addRows(rows,[['comet.throw.in','Into the Charging Pose','s',.02,1,.01],['comet.throw.swing','The Swing','s',.02,1,.01],['comet.throw.rel','Star Leaves Her Hand at (% of the swing)','pct',0,1,.01],['comet.throw.hold','Follow-Through Held','s',0,1,.01],['comet.throw.out','Back to Running','s',.02,2,.01],['comet.hold.scale','Star in Her Hand (× the star she will throw)','x',.1,2,.05],['comet.hold.out','Star in her hand: out from her wrist','units',-1,1,.01]],{anim:1});
       grp('Charging Pose (holding the star behind her)',poseRows('comet.pc.',UBR));grp('Throw Pose (the arm swung through)',poseRows('comet.pt.',UBR));
     }else if(m==='cHover'){
-      $('#animNote').textContent='Hover. She floats over the ground doing whatever she would be doing; the changes below are laid over it (all 0: just her run). Two stars at her ankles and a bigger one behind her back.';
-      addRows(rows,[['comet.hov.height','Floats Above the Ground by','units',0,3,.05],['comet.hov.bob','Bob','units',0,1,.01],['comet.hov.bobT','Bob: Seconds a Cycle','s',.2,6,.05],['comet.hov.spinS','Stars: Turns a Second','x',0,6,.1],['comet.hov.ankle','Ankle Stars: Size','units',.05,2,.01],['comet.hov.ankleY','Ankle Stars: Up or Down','units',-1,1,.01],['comet.hov.ankleTilt','Ankle Stars: Tilt','deg',-90,90,1],['comet.hov.back','Back Star: Size','units',.1,3,.01],['comet.hov.backD','Back Star: Behind Her by','units',0,2,.01],['comet.hov.backY','Back Star: Up or Down','units',-2,2,.01],['comet.hov.backTilt','Back Star: Tilt','deg',-90,90,1]],{anim:1});
+      $('#animNote').textContent='Hover. She stands as she floats (her Idle), leaning forward as she speeds up; the changes below are laid over it (all 0: just her Idle and the lean). The preview shows the lean at top speed. Two stars at her ankles and a bigger one behind her back.';
+      addRows(rows,[['comet.hov.height','Floats Above the Ground by','units',0,3,.05],['comet.hov.lean','Lean Forward at Top Speed','deg',-30,60,1],['comet.hov.bob','Bob','units',0,1,.01],['comet.hov.bobT','Bob: Seconds a Cycle','s',.2,6,.05],['comet.hov.spinS','Stars: Turns a Second','x',0,6,.1],['comet.hov.ankle','Ankle Stars: Size','units',.05,2,.01],['comet.hov.ankleY','Ankle Stars: Up or Down','units',-1,1,.01],['comet.hov.ankleTilt','Ankle Stars: Tilt','deg',-90,90,1],['comet.hov.back','Back Star: Size','units',.1,3,.01],['comet.hov.backD','Back Star: Behind Her by','units',0,2,.01],['comet.hov.backY','Back Star: Up or Down','units',-2,2,.01],['comet.hov.backTilt','Back Star: Tilt','deg',-90,90,1]],{anim:1});
       KEYGROUPS.forEach(function(g){grp(g[0]+' (changes while hovering)',g[1].filter(function(r){return r[0]!=='fl';}).map(function(r){var lim=r[0]==='hyf'?.5:r[0]==='hz'?1:90;return ['comet.ho.'+r[0],r[1].replace(' (1 = standing)',' (change)'),r[0]==='hyf'?'x':r[2],-lim,lim,r[5]];}));});
     }else{
       $('#animNote').textContent='Fly (Space held in the air while hovering). This pose takes over her arms, spine and head; the leg stats are changes to her jump. The star from her back goes up to her hands.';
@@ -5774,7 +5776,7 @@ function minPreview(dt){
 }
 $('#resetAnim').addEventListener('click',function(){var pre=animPrefix(ui.mode),key;for(key in DEF){if(key.indexOf(pre)===0)P[key]=DEF[key];}
   if(ui.mode==='drift'){P['slope.side']=DEF['slope.side'];for(key in DEF)if(key.indexOf('dA.')===0)P[key]=DEF[key];}
-  var CRS={cThrow:/^comet\.(pc\.|pt\.|throw\.|hold\.)/,cHover:/^comet\.(ho\.|hov\.(height|bob|bobT|spinS|ankle|ankleY|ankleTilt|back|backD|backY|backTilt)$)/,cFly:/^comet\.(pf\.|fl\.|fly\.(arms|starY|starS|starTilt)$)/};
+  var CRS={cThrow:/^comet\.(pc\.|pt\.|throw\.|hold\.)/,cHover:/^comet\.(ho\.|hov\.(height|lean|bob|bobT|spinS|ankle|ankleY|ankleTilt|back|backD|backY|backTilt)$)/,cFly:/^comet\.(pf\.|fl\.|fly\.(arms|starY|starS|starTilt)$)/};
   if(CRS[ui.mode])for(key in DEF)if(CRS[ui.mode].test(key))P[key]=DEF[key];   /* the sideways-slope tilt and the changes to her run sit with the drift stats */
   barrierDirty=true;save();renderAnim();statCardRefresh();status('Animation reset.');});
 
@@ -8531,7 +8533,7 @@ requestAnimationFrame(tick);
   for (var mnk in MN_DEF) { RIGCFG['mn.min.' + mnk] = MN_DEF[mnk][0]; RIGCFG['mn.big.' + mnk] = MN_DEF[mnk][1]; RIGCFG['mn.gaz.' + mnk] = MN_DEF[mnk].length > 2 ? MN_DEF[mnk][2] : MN_DEF[mnk][0]; }
   // Comet's moves (the Rig Editor's Comet page). Hover: its own movement stats while it is on. Star Throw: Q or E, held to charge (each second costs power and adds size, damage and range). Speeds in Zips
   var COMET_DEF = { 'comet.hov.cost': 6, 'comet.hov.drain': 1, 'comet.hov.height': 0.5, 'comet.hov.top': 80, 'comet.hov.accelT': 7, 'comet.hov.brake': 3, 'comet.hov.fric': 11.4, 'comet.hov.gripZ': 20, 'comet.hov.jumpH': 7.2,
-    'comet.hov.ankle': 0.35, 'comet.hov.back': 0.75, 'comet.hov.spinS': 1.5, 'comet.fly.drain': 4, 'comet.fly.lift': 1, 'comet.fly.arms': 8,
+    'comet.hov.ankle': 0.35, 'comet.hov.back': 0.75, 'comet.hov.spinS': 1.5, 'comet.hov.lean': 12, 'comet.fly.drain': 4, 'comet.fly.lift': 1, 'comet.fly.arms': 8,
     'comet.star.cost': 1, 'comet.star.range': 50, 'comet.star.dmg': 0.5, 'comet.star.cool': 2, 'comet.star.speed': 100, 'comet.star.size': 1.2, 'comet.star.spin': 4,
     'comet.star.cMax': 3, 'comet.star.cCost': 2, 'comet.star.cSize': 0.5, 'comet.star.cDmg': 0.5, 'comet.star.cRange': 50, 'comet.cStar': '#4fc3ff', 'comet.cGlow': '#a8e6ff',
     // her animations (the Rig Editor's Star throw, Hover and Fly modes), with the Rig Editor's key stats in degrees. Groups: pc the charging pose (right hand; Q mirrors it), pt the follow-through, pf Fly's arms and body, ho the changes while hovering, fl Fly's changes to her legs
@@ -9137,6 +9139,7 @@ requestAnimationFrame(tick);
     else if (rpBlend > 0.5) want = 'RunnersPose';
     // (a drift no longer switches to the held Drift pose: she keeps her run cycle, legs moving, and the drift's lean into the corner is laid over it, as it first was)
     else if (!grounded) want = 'Jump';
+    else if (typeof hovOn !== 'undefined' && hovOn && isComet()) want = 'Idle';   // Comet's Hover: she stands as she floats (her Hover changes and lean are laid over it in cometPose), not running
     else if (zp < 0.75) want = sideNow && mollyAct.Step_L && mollyAct.Step_R ? (sideNow < 0 ? 'Step_L' : 'Step_R') : 'Idle';   // the Sidestep shows only while she is not running forward (a model saved before v195 has no Sidestep clips: she idles)
     else want = zp <= 15 ? 'Run_Slow' : zp < 45 ? 'Run_Mid' : 'Run_Fast';
     if (mollyDriftRun && driftBlend > 0.5 && grounded && want.indexOf('Run_') === 0 && mollyAct.Drift_L && mollyAct.Drift_R) want = driftSide > 0 ? 'Drift_L' : 'Drift_R';   // her run with the Drift stats' changes, stride for stride
@@ -9352,7 +9355,7 @@ requestAnimationFrame(tick);
     if (hovBlend > 0.001) body.position.y += (cometC('hov.height') + cometC('hov.bob') * Math.sin(now / 1000 * 2 * Math.PI / Math.max(0.1, cometC('hov.bobT')))) * hovBlend;   // she floats over whatever she would be standing on, bobbing gently
     var bn = com && mollyOn && mollyRoot && cometRest ? mollyRoot : null;
     if (bn) {
-      if (hovBlend > 0.001) { var hvv = cqVals('comet.ho.'); cqAdd(bn, CQ_ALL, hvv, hovBlend); var hb = bn.getObjectByName('Hips'); if (hb && cometRestPos) { hb.position.y += cometRestPos.y * hvv.hyf * hovBlend; hb.position.z += hvv.hz * hovBlend; } }
+      if (hovBlend > 0.001) { var hvv = cqVals('comet.ho.'); hvv.hp += cometC('hov.lean') * Math.min(1, Math.abs(speed) / Math.max(1, RUN_SPEED)); cqAdd(bn, CQ_ALL, hvv, hovBlend); var hb = bn.getObjectByName('Hips'); if (hb && cometRestPos) { hb.position.y += cometRestPos.y * hvv.hyf * hovBlend; hb.position.z += hvv.hz * hovBlend; } }
       if (flyBlend > 0.001) { cqOver(bn, CQ_UB, cqVals('comet.pf.'), flyBlend); cqAdd(bn, CQ_LEGS, cqVals('comet.fl.'), flyBlend); }
       if (thrPh) { var sw = thrPh === 1 ? 0 : thrPh === 2 ? smooth01(Math.min(1, thrT / Math.max(0.01, cometC('throw.swing')))) : 1; cqOver(bn, CQ_UB, cqVals('comet.pc.', thrMir), thrW, cqVals('comet.pt.', thrMir), sw); }
     }
@@ -9421,7 +9424,8 @@ requestAnimationFrame(tick);
 var CHANGELOG = [
   { v: 'v196', d: 'Nov 25, 2026', t: 'Characters and looks', g: [
     ['Changed', [
-      'Character Select: after you choose a level, you pick who runs it, Molly or Comet. Your last pick is marked and ready on Enter. The Characters page now just shows both runners\' cards.'
+      'Character Select: after you choose a level, you pick who runs it, Molly or Comet. Your last pick is marked and ready on Enter. The Characters page now just shows both runners\' cards.',
+      'Comet\'s Hover: she now floats standing up instead of running in the air, leaning forward as she speeds up. The Rig Editor\'s Hover page has a new Lean Forward at Top Speed stat (12°), and its preview shows the standing pose.'
     ]]
   ] },
   { v: 'v195', d: 'Nov 25, 2026', t: 'Camera and controls', g: [

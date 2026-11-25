@@ -125,7 +125,7 @@
   for (var mnk in MN_DEF) { RIGCFG['mn.min.' + mnk] = MN_DEF[mnk][0]; RIGCFG['mn.big.' + mnk] = MN_DEF[mnk][1]; RIGCFG['mn.gaz.' + mnk] = MN_DEF[mnk].length > 2 ? MN_DEF[mnk][2] : MN_DEF[mnk][0]; }
   // Comet's moves (the Rig Editor's Comet page). Hover: its own movement stats while it is on. Star Throw: Q or E, held to charge (each second costs power and adds size, damage and range). Speeds in Zips
   var COMET_DEF = { 'comet.hov.cost': 6, 'comet.hov.drain': 1, 'comet.hov.height': 0.5, 'comet.hov.top': 80, 'comet.hov.accelT': 7, 'comet.hov.brake': 3, 'comet.hov.fric': 11.4, 'comet.hov.gripZ': 20, 'comet.hov.jumpH': 7.2,
-    'comet.hov.ankle': 0.35, 'comet.hov.back': 0.75, 'comet.hov.spinS': 1.5, 'comet.fly.drain': 4, 'comet.fly.lift': 1, 'comet.fly.arms': 8,
+    'comet.hov.ankle': 0.35, 'comet.hov.back': 0.75, 'comet.hov.spinS': 1.5, 'comet.hov.lean': 12, 'comet.fly.drain': 4, 'comet.fly.lift': 1, 'comet.fly.arms': 8,
     'comet.star.cost': 1, 'comet.star.range': 50, 'comet.star.dmg': 0.5, 'comet.star.cool': 2, 'comet.star.speed': 100, 'comet.star.size': 1.2, 'comet.star.spin': 4,
     'comet.star.cMax': 3, 'comet.star.cCost': 2, 'comet.star.cSize': 0.5, 'comet.star.cDmg': 0.5, 'comet.star.cRange': 50, 'comet.cStar': '#4fc3ff', 'comet.cGlow': '#a8e6ff',
     // her animations (the Rig Editor's Star throw, Hover and Fly modes), with the Rig Editor's key stats in degrees. Groups: pc the charging pose (right hand; Q mirrors it), pt the follow-through, pf Fly's arms and body, ho the changes while hovering, fl Fly's changes to her legs

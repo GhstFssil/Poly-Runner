@@ -7,7 +7,8 @@
       [
         "Changed",
         [
-          "Character Select: after you choose a level, you pick who runs it, Molly or Comet. Your last pick is marked and ready on Enter. The Characters page now just shows both runners' cards."
+          "Character Select: after you choose a level, you pick who runs it, Molly or Comet. Your last pick is marked and ready on Enter. The Characters page now just shows both runners' cards.",
+          "Comet's Hover: she now floats standing up instead of running in the air, leaning forward as she speeds up. The Rig Editor's Hover page has a new Lean Forward at Top Speed stat (12°), and its preview shows the standing pose."
         ]
       ]
     ]

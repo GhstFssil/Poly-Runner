@@ -685,6 +685,7 @@
  "comet.hov.ankle": 0.35,
  "comet.hov.back": 0.75,
  "comet.hov.spinS": 1.5,
+ "comet.hov.lean": 12,
  "comet.fly.drain": 4,
  "comet.fly.lift": 1,
  "comet.fly.arms": 8,

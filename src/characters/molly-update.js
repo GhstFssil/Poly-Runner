@@ -14,6 +14,7 @@
     else if (rpBlend > 0.5) want = 'RunnersPose';
     // (a drift no longer switches to the held Drift pose: she keeps her run cycle, legs moving, and the drift's lean into the corner is laid over it, as it first was)
     else if (!grounded) want = 'Jump';
+    else if (typeof hovOn !== 'undefined' && hovOn && isComet()) want = 'Idle';   // Comet's Hover: she stands as she floats (her Hover changes and lean are laid over it in cometPose), not running
     else if (zp < 0.75) want = sideNow && mollyAct.Step_L && mollyAct.Step_R ? (sideNow < 0 ? 'Step_L' : 'Step_R') : 'Idle';   // the Sidestep shows only while she is not running forward (a model saved before v195 has no Sidestep clips: she idles)
     else want = zp <= 15 ? 'Run_Slow' : zp < 45 ? 'Run_Mid' : 'Run_Fast';
     if (mollyDriftRun && driftBlend > 0.5 && grounded && want.indexOf('Run_') === 0 && mollyAct.Drift_L && mollyAct.Drift_R) want = driftSide > 0 ? 'Drift_L' : 'Drift_R';   // her run with the Drift stats' changes, stride for stride

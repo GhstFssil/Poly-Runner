@@ -5,7 +5,6 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 ## Characters and looks
 - [ ] Runner model faceting should be mirrored down the center line.
 - [ ] (Ricky, 2026-11-23) Give comet her own hair (ringlet curls)
-- [ ] (Ricky, 2026-11-23) Comet's hover animation should be more of a standing-style animation, not a running-style animation.
 - [ ] (Ricky, 2026-11-23) Give fine-grained control of hair.
 - [ ] (Ricky, 2026-11-23) Add special assets for the faces (eyes, mouth, nose).
 
