@@ -8,7 +8,7 @@ def find(pg):
 res={}
 for h in ['aud_main.html','aud.html']:
     g=Rig(w=480,h=320,draw=False,html=h); pg=g.pg
-    pg.evaluate("(ids)=>ids.forEach(function(i){var e=document.getElementById(i);if(e)e.click()})",['bTitle','bLevels','bLevel1']); pg.wait_for_timeout(6000)
+    pg.evaluate("(ids)=>ids.forEach(function(i){var e=document.getElementById(i);if(e)e.click()})",['bTitle','bLevels','bLevel1','pcLast']); pg.wait_for_timeout(6000)
     pts=res.get('pts') or find(pg); res['pts']=pts; out=[]
     for x,z,y,a in pts:
         pg.evaluate("([x,y,z])=>{__put(x,y,z);__spd(0)}",[x,y,z]); pg.wait_for_timeout(4000)

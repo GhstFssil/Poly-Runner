@@ -257,7 +257,7 @@
     mollyFetch(function (buf) { if (buf) { mollySavedBytes = buf.byteLength; mollyLoad(buf, dflt); } else dflt(); }, 'molly');
   }
   loadCharModel();
-  function setChar(ch) {                                         // the Characters page's Play as buttons
+  function setChar(ch) {                                         // Character Select's Play as buttons (after a level is chosen)
     if (ch !== 'comet') ch = 'molly'; if (ch === CHAR) { refreshStatCards(); return; }
     CHAR = ch; try { localStorage.setItem('pr_char', ch); } catch (e) {}
     if (ballOn) setBall(false, true); if (typeof setHover === 'function') setHover(false, true);

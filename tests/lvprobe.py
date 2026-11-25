@@ -12,7 +12,7 @@ g = Rig(w=640, h=400, draw=True); pg = g.pg
 GRIDS = {'bLevel1': (range(-300, 301, 30), range(200, -7700, -60)), 'bLevel2': (range(-400, 2601, 50), range(500, -3001, -50))}
 out = {}
 for bid, (xs, zs) in GRIDS.items():
-    pg.evaluate("()=>{try{showScreen('levels')}catch(e){}}"); pg.evaluate("b=>document.getElementById(b).click()", bid); pg.wait_for_timeout(3000)
+    pg.evaluate("()=>{try{showScreen('levels')}catch(e){}}"); pg.evaluate("b=>document.getElementById(b).click()", bid); pg.evaluate("document.getElementById('pcLast').click()"); pg.wait_for_timeout(3000)
     r = pg.evaluate("""([xs,zs])=>{var d=__dbg(),S=d.SB,OX=d.x-(S&&S.startPt?S.startPt.x:0),h=[],gr=[],m=[];
       for(var x of xs)for(var z of zs){var X=OX+x;h.push(+__gh(X,z).toFixed(3));var q=__gg(X,z);gr.push(+q[0].toFixed(3),+q[1].toFixed(3));m.push(__mudAt(X,z)?1:0);}
       return {OX:OX,start:[d.x-OX,d.y,d.z],h:h,gr:gr,m:m}}""", [list(xs), list(zs)])

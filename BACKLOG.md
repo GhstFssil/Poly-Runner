@@ -8,7 +8,6 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 - [ ] (Ricky, 2026-11-23) Comet's hover animation should be more of a standing-style animation, not a running-style animation.
 - [ ] (Ricky, 2026-11-23) Give fine-grained control of hair.
 - [ ] (Ricky, 2026-11-23) Add special assets for the faces (eyes, mouth, nose).
-- [ ] (Ricky, 2026-11-23) Character select should be a choice each time after selecting a level to play, not a switch that must be flipped on the characters page.
 
 ## Editor tools
 - [ ] Add a save to game button on the mobs tab.

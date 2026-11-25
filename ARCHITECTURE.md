@@ -21,7 +21,7 @@
 - `audit-notes.md`: the long log, frozen on 2026-11-20 (last entry v184); `HISTORY.md` continues it. The `var CHANGELOG` in the game is the player-facing log.
 
 ## Characters
-- `CHAR` is 'molly' or 'comet' (localStorage `pr_char`), picked on the Characters page; `setChar` switches.
+- `CHAR` is 'molly' or 'comet' (localStorage `pr_char`), picked on Character Select after a level is chosen (the Characters page only shows the cards); `setChar` switches.
 - Stats are stored in `runnerRig2` (Molly, plus the `mn.*` mob stats) and `cometRig` (Comet, never `mn.*`).
 - Lookup order is `rigPick`: what's stored, then `SHIPPED[ch]`, then the built-in RIGCFG / COMET_DEF numbers.
 - Saved models are in IndexedDB `polyrunner` / `kv` (`polyrun` until v194; v194 copied it across once, removed in v195) under `mollyGlb` and `cometGlb`; `loadCharModel` falls back to the built-in model.

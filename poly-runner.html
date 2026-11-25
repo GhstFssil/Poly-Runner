@@ -359,6 +359,13 @@
         <button class="go2 back" id="bLevelsBack" type="button">Back</button>
       </div>
     </section>
+    <section class="scr" id="scr-pickchar" aria-label="Character Select">
+      <div class="card narrow" style="width:min(560px,100%)">
+        <h1>Who's Running?</h1>
+        <div id="pickCards"></div>
+        <button class="go2 back" id="pcBack" type="button">Back</button>
+      </div>
+    </section>
     <section class="scr" id="scr-pause" aria-label="Paused">
       <div class="card narrow">
         <h1>Paused</h1>
@@ -8621,14 +8628,15 @@ requestAnimationFrame(tick);
   function refreshStatCards() {
     var a = document.getElementById('charStats'), b = document.getElementById('pauseStats'), c = {}; for (var k in RIGCFG) c[k] = RIGCFG[k]; c.scale = mollyScale; c.__who = CHAR;
     if (b) b.innerHTML = window.__statCardHTML(c, true);
-    if (a) {                                                    // the Characters page: both runners, and which one she plays as
-      var h = '';
-      ['molly', 'comet'].forEach(function (ch) {
-        var cc = ch === CHAR ? c : rigCfgFor(ch), on = ch === CHAR;
-        h += '<div style="margin:0 0 14px">' + window.__statCardHTML(cc, false) + '<button class="go2 pickChar" type="button" data-ch="' + ch + '" aria-pressed="' + on + '" style="margin-top:6px;width:100%' + (on ? ';opacity:.75' : '') + '">' + (on ? 'Playing as ' : 'Play as ') + (ch === 'comet' ? 'Comet' : 'Molly') + '</button></div>';
-      });
-      a.innerHTML = h;
-      a.querySelectorAll('.pickChar').forEach(function (bt) { bt.onclick = function () { setChar(bt.getAttribute('data-ch')); }; });
+    var pk = document.getElementById('pickCards');
+    var cfgOf = function (ch) { return ch === CHAR ? c : rigCfgFor(ch); }, nm = function (ch) { return ch === 'comet' ? 'Comet' : 'Molly'; };
+    if (a) a.innerHTML = ['molly', 'comet'].map(function (ch) { return '<div style="margin:0 0 14px">' + window.__statCardHTML(cfgOf(ch), false) + '</div>'; }).join('');   // the Characters page: both runners' full cards (who runs is picked after choosing a level)
+    if (pk) {                                                   // Character Select: both runners' short cards, each with its Play button; the last pick is marked and gets the focus
+      pk.innerHTML = ['molly', 'comet'].map(function (ch) {
+        var last = ch === CHAR;
+        return '<div style="margin:0 0 14px">' + window.__statCardHTML(cfgOf(ch), true) + '<button class="' + (last ? 'go' : 'go2') + ' pickChar" type="button" data-ch="' + ch + '"' + (last ? ' data-last id="pcLast"' : '') + ' style="margin-top:6px;width:100%">Play as ' + nm(ch) + (last ? ' (last time)' : '') + '</button></div>';
+      }).join('');
+      pk.querySelectorAll('.pickChar').forEach(function (bt) { bt.onclick = function (e) { e.stopPropagation(); window.__pickChar(bt.getAttribute('data-ch')); }; });
     }
   }  // (the cards show her collision box as it really is: times the Overall scale of the model in use)
   // ---- Signs: a wooden post and board (the Sandbox's sign stamps) ----
@@ -9107,7 +9115,7 @@ requestAnimationFrame(tick);
     mollyFetch(function (buf) { if (buf) { mollySavedBytes = buf.byteLength; mollyLoad(buf, dflt); } else dflt(); }, 'molly');
   }
   loadCharModel();
-  function setChar(ch) {                                         // the Characters page's Play as buttons
+  function setChar(ch) {                                         // Character Select's Play as buttons (after a level is chosen)
     if (ch !== 'comet') ch = 'molly'; if (ch === CHAR) { refreshStatCards(); return; }
     CHAR = ch; try { localStorage.setItem('pr_char', ch); } catch (e) {}
     if (ballOn) setBall(false, true); if (typeof setHover === 'function') setHover(false, true);
@@ -9411,6 +9419,11 @@ requestAnimationFrame(tick);
   }
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
+  { v: 'v196', d: 'Nov 25, 2026', t: 'Characters and looks', g: [
+    ['Changed', [
+      'Character Select: after you choose a level, you pick who runs it, Molly or Comet. Your last pick is marked and ready on Enter. The Characters page now just shows both runners\' cards.'
+    ]]
+  ] },
   { v: 'v195', d: 'Nov 25, 2026', t: 'Camera and controls', g: [
     ['Added', [
       'The mouse wheel moves the camera in and out (it remembers where you left it), and the camera pulls back a little as you speed up.',
@@ -10455,7 +10468,7 @@ function showScreen(name) {                                // the menu shows one
     var all = startEl.querySelectorAll('.scr');
     for (var q = 0; q < all.length; q++) all[q].classList.toggle('on', all[q].id === 'scr-' + name);
     startEl.classList.toggle('splash', !(name === 'pause' || name === 'dev' || name === 'cps' || name === 'controls' && controlsBack === 'pause' || name === 'settings' && settingsBack === 'pause'));   // every menu screen has the checks; only the pause screen and what opens from it stay see-through over the game
-    if (name === 'pause' || name === 'chars') refreshStatCards();
+    if (name === 'pause' || name === 'chars' || name === 'pickchar') refreshStatCards();
     if (name === 'pause') { document.getElementById('bPE').hidden = level !== 3 || !!(SB && SB.official); document.getElementById('bCps').hidden = false; }
     if (name === 'dev') { if (typeof updateCoords === 'function') updateCoords(); cpFill(document.getElementById('dvDyn')); }     // Oceana Crags has just the one checkpoint so far
     if (name === 'cps') {                                    // only checkpoints reached this run can be restarted from
@@ -10539,8 +10552,12 @@ function showScreen(name) {                                // the menu shows one
   on('dtSaves', function () { fillSaves(); showScreen('saves'); });
   on('svBack', function () { showScreen('devt'); });
   on('bLevelsBack', function () { showScreen('main'); });
-  on('bLevel1', function () { startSandbox(JSON.parse(JSON.stringify(OFFICIAL_L1))); SB.official = true; document.getElementById('bPE').hidden = true; });                      // Grass Canyon, Act 1: the layout built in the Path Editor, played on the Sandbox's engine                      // Grass Canyon, Act 1
-  on('bLevel2', function () { startSandbox(JSON.parse(JSON.stringify(OFFICIAL_L2))); SB.official = true; document.getElementById('bPE').hidden = true; });                  // Oceana Crags, Act 1
+  var pickGo = null;                                            // Character Select: after a level is chosen, who runs it (the last pick is ready on the first button)
+  function pickThen(go) { pickGo = go; showScreen('pickchar'); var f = document.querySelector('#pickCards .pickChar[data-last]'); if (f) f.focus(); }
+  window.__pickChar = function (ch) { var go = pickGo; pickGo = null; setChar(ch); if (go) go(); };
+  on('pcBack', function () { pickGo = null; showScreen('levels'); });
+  on('bLevel1', function () { pickThen(function () { startSandbox(JSON.parse(JSON.stringify(OFFICIAL_L1))); SB.official = true; document.getElementById('bPE').hidden = true; }); });                      // Grass Canyon, Act 1: the layout built in the Path Editor, played on the Sandbox's engine                      // Grass Canyon, Act 1
+  on('bLevel2', function () { pickThen(function () { startSandbox(JSON.parse(JSON.stringify(OFFICIAL_L2))); SB.official = true; document.getElementById('bPE').hidden = true; }); });                  // Oceana Crags, Act 1
   on('bResume', function () { begin(); });
   on('bCps', function () { showScreen('cps'); });
   on('bDev', function () { showScreen('dev'); });

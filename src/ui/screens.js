@@ -1,5 +1,9 @@
-  on('bLevel1', function () { startSandbox(JSON.parse(JSON.stringify(OFFICIAL_L1))); SB.official = true; document.getElementById('bPE').hidden = true; });                      // Grass Canyon, Act 1: the layout built in the Path Editor, played on the Sandbox's engine                      // Grass Canyon, Act 1
-  on('bLevel2', function () { startSandbox(JSON.parse(JSON.stringify(OFFICIAL_L2))); SB.official = true; document.getElementById('bPE').hidden = true; });                  // Oceana Crags, Act 1
+  var pickGo = null;                                            // Character Select: after a level is chosen, who runs it (the last pick is ready on the first button)
+  function pickThen(go) { pickGo = go; showScreen('pickchar'); var f = document.querySelector('#pickCards .pickChar[data-last]'); if (f) f.focus(); }
+  window.__pickChar = function (ch) { var go = pickGo; pickGo = null; setChar(ch); if (go) go(); };
+  on('pcBack', function () { pickGo = null; showScreen('levels'); });
+  on('bLevel1', function () { pickThen(function () { startSandbox(JSON.parse(JSON.stringify(OFFICIAL_L1))); SB.official = true; document.getElementById('bPE').hidden = true; }); });                      // Grass Canyon, Act 1: the layout built in the Path Editor, played on the Sandbox's engine                      // Grass Canyon, Act 1
+  on('bLevel2', function () { pickThen(function () { startSandbox(JSON.parse(JSON.stringify(OFFICIAL_L2))); SB.official = true; document.getElementById('bPE').hidden = true; }); });                  // Oceana Crags, Act 1
   on('bResume', function () { begin(); });
   on('bCps', function () { showScreen('cps'); });
   on('bDev', function () { showScreen('dev'); });

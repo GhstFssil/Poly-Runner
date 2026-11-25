@@ -222,13 +222,14 @@
   function refreshStatCards() {
     var a = document.getElementById('charStats'), b = document.getElementById('pauseStats'), c = {}; for (var k in RIGCFG) c[k] = RIGCFG[k]; c.scale = mollyScale; c.__who = CHAR;
     if (b) b.innerHTML = window.__statCardHTML(c, true);
-    if (a) {                                                    // the Characters page: both runners, and which one she plays as
-      var h = '';
-      ['molly', 'comet'].forEach(function (ch) {
-        var cc = ch === CHAR ? c : rigCfgFor(ch), on = ch === CHAR;
-        h += '<div style="margin:0 0 14px">' + window.__statCardHTML(cc, false) + '<button class="go2 pickChar" type="button" data-ch="' + ch + '" aria-pressed="' + on + '" style="margin-top:6px;width:100%' + (on ? ';opacity:.75' : '') + '">' + (on ? 'Playing as ' : 'Play as ') + (ch === 'comet' ? 'Comet' : 'Molly') + '</button></div>';
-      });
-      a.innerHTML = h;
-      a.querySelectorAll('.pickChar').forEach(function (bt) { bt.onclick = function () { setChar(bt.getAttribute('data-ch')); }; });
+    var pk = document.getElementById('pickCards');
+    var cfgOf = function (ch) { return ch === CHAR ? c : rigCfgFor(ch); }, nm = function (ch) { return ch === 'comet' ? 'Comet' : 'Molly'; };
+    if (a) a.innerHTML = ['molly', 'comet'].map(function (ch) { return '<div style="margin:0 0 14px">' + window.__statCardHTML(cfgOf(ch), false) + '</div>'; }).join('');   // the Characters page: both runners' full cards (who runs is picked after choosing a level)
+    if (pk) {                                                   // Character Select: both runners' short cards, each with its Play button; the last pick is marked and gets the focus
+      pk.innerHTML = ['molly', 'comet'].map(function (ch) {
+        var last = ch === CHAR;
+        return '<div style="margin:0 0 14px">' + window.__statCardHTML(cfgOf(ch), true) + '<button class="' + (last ? 'go' : 'go2') + ' pickChar" type="button" data-ch="' + ch + '"' + (last ? ' data-last id="pcLast"' : '') + ' style="margin-top:6px;width:100%">Play as ' + nm(ch) + (last ? ' (last time)' : '') + '</button></div>';
+      }).join('');
+      pk.querySelectorAll('.pickChar').forEach(function (bt) { bt.onclick = function (e) { e.stopPropagation(); window.__pickChar(bt.getAttribute('data-ch')); }; });
     }
   }  // (the cards show her collision box as it really is: times the Overall scale of the model in use)

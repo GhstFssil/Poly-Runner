@@ -8,7 +8,7 @@ pg.click('#bDevT'); pg.click('#dtRig'); pg.wait_for_timeout(2000)
 print('rig open',pg.evaluate("!document.getElementById('rigHost').hidden"),'mesh',g.mesh())
 g.click('#rigClose',400)
 pg.click('#dtBlank'); pg.wait_for_timeout(4000); a=st(); b=run_for(2500); print('blank sandbox',a,'-> after 2.5 s of W',b)
-for name,ids in [('level 2',['bTitle','bLevels','bLevel2']),('level 1',['bTitle','bLevels','bLevel1'])]:
+for name,ids in [('level 2',['bTitle','bLevels','bLevel2','pcLast']),('level 1',['bTitle','bLevels','bLevel1','pcLast'])]:
     pg.keyboard.press('Escape'); pg.wait_for_timeout(300)
     pg.evaluate("(ids)=>ids.forEach(function(i){var e=document.getElementById(i);if(e)e.click()})",ids); pg.wait_for_timeout(6000); a=st(); b=run_for(3000); print(name,a,'-> after 3 s of W',b)
 m=json.loads(pg.evaluate("JSON.stringify(__molly())")); print('molly',m['on'],m['verts'],m['nan'],m['clips'])

@@ -3,10 +3,8 @@ import sys; sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
 g=Rig(w=640,h=420,draw=False); pg=g.pg
 C=lambda: pg.evaluate("__comet()")
-pg.click('#bChars'); pg.wait_for_timeout(400)
-print('cards:',pg.evaluate("[...document.querySelectorAll('#charStats .pickChar')].map(b=>b.textContent)"))
-pg.evaluate("document.querySelector('#charStats .pickChar[data-ch=comet]').click()"); pg.wait_for_timeout(1500)
-print('after Play as Comet:',pg.evaluate("[...document.querySelectorAll('#charStats .pickChar')].map(b=>b.textContent)"),'char',C()['char'],'saved',pg.evaluate("localStorage.getItem('pr_char')"))
+pg.evaluate("__setChar('comet')"); pg.wait_for_timeout(1500)   # (picking her through Character Select is tests/fu/pick1.py)
+print('after Play as Comet:','char',C()['char'],'saved',pg.evaluate("localStorage.getItem('pr_char')"))
 J={'width':9,'pieces':[{'t':'straight','len':400}],'objects':[{'type':'minion','id':1,'x':0,'z':-390},{'type':'target','id':2,'x':0,'z':-80,'size':6,'height':3},{'type':'plate','id':3,'x':0,'z':-10,'width':8,'length':8}]}
 pg.evaluate("document.getElementById('chBack').click()"); pg.evaluate("document.getElementById('bDevT').click()"); pg.evaluate("document.getElementById('dtBlank').click()"); pg.wait_for_timeout(2000)
 pg.evaluate("j=>__sbStart(j)",J); pg.wait_for_timeout(2000)

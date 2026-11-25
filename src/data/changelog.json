@@ -1,5 +1,18 @@
 [
   {
+    "v": "v196",
+    "d": "Nov 25, 2026",
+    "t": "Characters and looks",
+    "g": [
+      [
+        "Changed",
+        [
+          "Character Select: after you choose a level, you pick who runs it, Molly or Comet. Your last pick is marked and ready on Enter. The Characters page now just shows both runners' cards."
+        ]
+      ]
+    ]
+  },
+  {
     "v": "v195",
     "d": "Nov 25, 2026",
     "t": "Camera and controls",

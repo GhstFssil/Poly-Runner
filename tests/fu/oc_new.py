@@ -4,7 +4,7 @@ import sys,json
 sys.path.insert(0,'/home/claude/poly-runner/tests')
 from righ import *
 g=Rig(w=480,h=320,draw=False); pg=g.pg
-pg.evaluate("(ids)=>ids.forEach(function(i){var e=document.getElementById(i);if(e)e.click()})",['bTitle','bLevels','bLevel2']); pg.wait_for_timeout(8000)
+pg.evaluate("(ids)=>ids.forEach(function(i){var e=document.getElementById(i);if(e)e.click()})",['bTitle','bLevels','bLevel2','pcLast']); pg.wait_for_timeout(8000)
 st=lambda: pg.evaluate("(function(){var d=__dbg(),s=__state();return {level:d.level,playing:d.playing,hp:d.hp,x:+d.x.toFixed(1),y:+d.y.toFixed(2),ground:+d.ground.toFixed(2),speed:+s.speed.toFixed(1),grounded:s.grounded}})()")
 a=st(); pg.keyboard.down('KeyW'); pg.wait_for_timeout(4000); b=st(); pg.keyboard.up('KeyW')
 print('start',a); print('after 4 s of W',b)

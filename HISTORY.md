@@ -74,3 +74,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-25 09:55 | next | Camera Zoom (mouse wheel, saved, pulls out with speed) and Free Look (Caps Lock); drag-to-look removed from F4; test fu/cam1.py
 - 2026-11-25 10:40 | next | Sidestep (mouse buttons held, stat.sidestep), Rig Editor Sidestep page and Step_L/Step_R clips (shown only when not running forward), models re-baked; Q/E labelled Strafe; test fu/side1.py
 - 2026-11-25 13:20 | v195 | label v194 -> v195, CHANGELOG v195 titled Camera and controls; next merged into main
+- 2026-11-25 14:54 | next | Character Select: pick Molly or Comet after choosing a level (last pick marked, focused); Characters page shows cards only; tests/fu/pick1.py; level-starting tests click pcLast

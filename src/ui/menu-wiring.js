@@ -11,7 +11,7 @@ function showScreen(name) {                                // the menu shows one
     var all = startEl.querySelectorAll('.scr');
     for (var q = 0; q < all.length; q++) all[q].classList.toggle('on', all[q].id === 'scr-' + name);
     startEl.classList.toggle('splash', !(name === 'pause' || name === 'dev' || name === 'cps' || name === 'controls' && controlsBack === 'pause' || name === 'settings' && settingsBack === 'pause'));   // every menu screen has the checks; only the pause screen and what opens from it stay see-through over the game
-    if (name === 'pause' || name === 'chars') refreshStatCards();
+    if (name === 'pause' || name === 'chars' || name === 'pickchar') refreshStatCards();
     if (name === 'pause') { document.getElementById('bPE').hidden = level !== 3 || !!(SB && SB.official); document.getElementById('bCps').hidden = false; }
     if (name === 'dev') { if (typeof updateCoords === 'function') updateCoords(); cpFill(document.getElementById('dvDyn')); }     // Oceana Crags has just the one checkpoint so far
     if (name === 'cps') {                                    // only checkpoints reached this run can be restarted from

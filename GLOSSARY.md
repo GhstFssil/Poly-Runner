@@ -28,7 +28,8 @@ One source of truth for the game's words. Use these terms, spelled this way, in 
 | Poly Runner | the game | the game file is `poly-runner.html` (was `checker-run.html` until 2026-11-24) |
 | Molly | the main character | `CHAR = 'molly'` |
 | Comet | the second character: no Strafe, no Barrier; has Star Throw, Hover and Fly | `CHAR = 'comet'` |
-| character | Molly or Comet; picked on the Characters page | `CHAR`, `setChar`, `loadCharModel`, `pr_char` |
+| character | Molly or Comet; picked on Character Select | `CHAR`, `setChar`, `loadCharModel`, `pr_char` |
+| Character Select | the screen after choosing a level where you pick who runs it; the last pick is marked and focused | `scr-pickchar`, `pickThen`, `__pickChar`, `pcLast` |
 | Ricky | builds the levels; Claude builds the tools and mechanics | CLAUDE.md |
 
 ## Units and space
