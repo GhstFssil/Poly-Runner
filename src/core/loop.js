@@ -130,7 +130,11 @@
       if (driftHeld && driftKick > 0) { var kst = Math.min(driftKick, RIGCFG['m.drift.angle'] * Math.PI / 180 / Math.max(0.02, RIGCFG['m.drift.time']) * sdt); heading += driftSide * kst; yaw += driftSide * kst; driftKick -= kst; }
       if (driftHeld) driftNow = driftSide;
     }
-    if (playing && !mudStall && (keys.w || keys.s || speed > 0.5)) {   // she follows the camera whenever she is moving, key or no key
+    if (lookBack) {                                          // Free Look just ended: the camera swings back behind her before she steers by it again
+      var lbD = wrapA(heading - yaw); yaw += lbD * Math.min(1, dt * 8);
+      if (Math.abs(lbD) < 0.02) { yaw = heading; lookBack = false; }
+    }
+    if (playing && !mudStall && !freeLook && !lookBack && (keys.w || keys.s || speed > 0.5)) {   // she follows the camera whenever she is moving, key or no key (not in Free Look)
       var maxStep = Math.min(MAX_TURN, GRIP * (driftHeld ? DRIFT_GRIP : 1) / Math.max(speed, 1)) * sdt * (grounded ? 1 : AIR_GRIP) * (wallOn ? WALL_GRIP * (WALL_FADE ? Math.max(0, Math.cos(wallR)) : 1) : SLOPE_FADE && grounded ? Math.cos(Math.min(slDeg, 89) * Math.PI / 180) : 1);   // on a wall, and (if that stat is on) on a slope, her grip fades with the cosine of the angle
       if (plOn && grounded) {                                // on a slope the turn is made along the surface, exactly as it would be on flat ground
         var phA = toPl(wrapA(heading - plHu)), pyA = toPl(wrapA(yaw - plHu)), stP = Math.max(-maxStep, Math.min(maxStep, wrapA(pyA - phA)));
@@ -269,7 +273,7 @@
     // Her body faces the way she is moving, so it turns exactly as fast as her direction changes.
     // Standing still, she turns to face the camera instead.
     var prevRot = player.rotation.y;
-    if (speed > 0.05 || keys.w || keys.s || sliding) {
+    if (speed > 0.05 || keys.w || keys.s || sliding || freeLook || lookBack) {   // in Free Look she keeps facing her own way
       player.rotation.y = heading;
     } else {
       var diff = Math.atan2(Math.sin(yaw - prevRot), Math.cos(yaw - prevRot));
@@ -367,10 +371,11 @@
     sun.position.set(player.position.x + 24, player.position.y + 48, player.position.z + 16);
     sun.target.position.copy(player.position);
 
-    // Third-person camera orbiting the character on a boom that shortens whenever rock or a ledge would be in the way.
+    // Third-person camera orbiting the character. Its length is the wheel zoom, stretched a little with her speed.
+    camPull += (1 + CAM_PULL * Math.min(1.5, Math.abs(speed) / RUN_SPEED) - camPull) * Math.min(1, dt * 2);
     var cp = Math.cos(pitch), sp = Math.sin(pitch);
     var focus = new THREE.Vector3(player.position.x, player.position.y + 2.3 - 1.3 * slideBlend - 0.8 * rpBlend, player.position.z);
-    var bx = Math.sin(yaw) * cp, bz = Math.cos(yaw) * cp, boom = CAM_DIST;
+    var bx = Math.sin(yaw) * cp, bz = Math.cos(yaw) * cp, boom = camZoom * camPull;
     var camX = focus.x + bx * boom, camZ = focus.z + bz * boom;
     if (wallOn) { camX += wallNx * 3; camZ += wallNz * 3; }          // on a wall the camera stands a little out from its face
     camera.position.set(camX, focus.y + sp * boom, camZ);        // no ground check: the camera may clip into the ground

@@ -35,7 +35,7 @@ hooks=r"""
   window.__ballLean = function () { return [ballGroup.rotation.z, sideLean, ballOn, grounded, wallOn]; };
   window.__setHp = function (v) { hp = v; drawHearts(); };
   window.__solid = function (x, y, z) { return laserSolid(x, y, z, null); };
-  window.__state = function () { return { grounded: grounded, vy: vy, speed: speed, heading: heading, yaw: yaw, wallOn: wallOn, fpOn: fpOn, hp: hp, x: player.position.x, y: player.position.y, z: player.position.z, plOn: plOn, slDeg: slDeg }; };
+  window.__state = function () { return { grounded: grounded, vy: vy, speed: speed, heading: heading, yaw: yaw, wallOn: wallOn, fpOn: fpOn, hp: hp, x: player.position.x, y: player.position.y, z: player.position.z, plOn: plOn, slDeg: slDeg, camZoom: camZoom, camPull: camPull, freeLook: freeLook, lookBack: lookBack }; };
 """
 s=s.replace(a,hooks+a)
 a2="initScene();buildStatic();renderPart();setMode('run');applyTheme();"

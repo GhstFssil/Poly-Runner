@@ -3,8 +3,6 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to reproduce`. The sweeps tag theirs `(nightly/<name>)`. Older entries below have no who or date.
 
 ## Next: camera and controls
-- [ ] (Ricky, 2026-11-23) Scroll wheel on the mouse moves the camera in or out. Camera also moves out slightly as you go faster.
-- [ ] (Ricky, 2026-11-23) Caps lock allows you to move the camera without changing the character's heading.
 - [ ] (Ricky, 2026-11-23) Sidestep. The character moves to the left or right relative to the character's heading and independent of the camera; left mouse and right mouse buttons, respectively.
 
 ## Characters and looks

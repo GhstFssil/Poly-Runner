@@ -87,6 +87,8 @@ Path Editor panel words: inspector, next-stamp panel, presets (`polyrunner-pe-pr
 | Brake | S: slide to a stop | |
 | Drift | A or D while fast: a quick swing to that side. "Grip while drifting" is a stat | |
 | Strafe | Q or E sidestep (Molly only). Its distance is a stat | |
+| Camera Zoom | the mouse wheel: how far the camera sits behind her (4 to 20, saved), stretched up to 30% by her speed | `camZoom`, `camPull`, `CAM_PULL`, `pr_camzoom` |
+| Free Look | Caps Lock on: the mouse turns only the camera, not her; turned off, the camera swings back behind her | `freeLook`, `lookBack` |
 | Runner's Pose | hold S standing still, then let go to launch | `RP_DROP` |
 | Barrier | Molly's key 2: a red shell nothing can hurt (a ball you roll in). Costs Power | `ballOn`, `barrier*`, `BARRIER_COST` |
 | Dodecadash | hold S inside the Barrier, then let go to launch | |

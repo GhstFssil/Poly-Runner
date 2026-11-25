@@ -71,3 +71,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-24 18:20 | next | correction to the 18:14 line: restore tools/mk_sweep_docs.py from commit 6e71b76 (or earlier) if the sweeps return
 - 2026-11-24 18:20 | next | Comet: Star Throw aims 10° above the camera (was 20°); the big star tips back flat like a halo while she flies (new stat comet.fly.starTilt, 90°; tilt now turns with her heading)
 - 2026-11-24 18:24 | next | v195 CHANGELOG entry (Star Throw aim, flat flying star, save copy removed); label still v194
+- 2026-11-25 09:55 | next | Camera Zoom (mouse wheel, saved, pulls out with speed) and Free Look (Caps Lock); drag-to-look removed from F4; test fu/cam1.py

@@ -5,8 +5,16 @@
     "t": "Star tweaks",
     "g": [
       [
+        "Added",
+        [
+          "The mouse wheel moves the camera in and out (it remembers where you left it), and the camera pulls back a little as you speed up.",
+          "Free Look: with Caps Lock on, the mouse turns only the camera, so you can look round without steering. Turn Caps Lock off and the camera swings back behind you."
+        ]
+      ],
+      [
         "Changed",
         [
+          "The hold-and-drag mouse look mode is gone: F4 now switches between locked and locked with raw input.",
           "Comet's Star Throw flies closer to where the camera points: 10° above it instead of 20°, which suits a camera held near level.",
           "While Comet flies, the big star over her hands now lies flat like a halo. Its tilt is a new stat on the Fly animation page (Star Tilt There).",
           "The one-time copy of saves from the old names (added in v194) is gone, now that saves live under Poly Runner's names."
