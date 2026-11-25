@@ -70,3 +70,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-24 18:14 | next | retired tools/mk_sweep_docs.py (behind the hand-edited SWEEP-*.md docs; it also wrote the nightly scheduled-task prompts: restore it from git history before 6e71b76+1 if the sweeps return)
 - 2026-11-24 18:20 | next | correction to the 18:14 line: restore tools/mk_sweep_docs.py from commit 6e71b76 (or earlier) if the sweeps return
 - 2026-11-24 18:20 | next | Comet: Star Throw aims 10° above the camera (was 20°); the big star tips back flat like a halo while she flies (new stat comet.fly.starTilt, 90°; tilt now turns with her heading)
+- 2026-11-24 18:24 | next | v195 CHANGELOG entry (Star Throw aim, flat flying star, save copy removed); label still v194
