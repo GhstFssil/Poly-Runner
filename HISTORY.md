@@ -66,3 +66,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-24 17:34 | main | CLAUDE.md: session start skips nightly branches whose fixes are already on main (docs only)
 - 2026-11-24 17:46 | main | HANDOFF: Ricky confirmed the desktop 1.2 install and folder migration worked (docs only)
 - 2026-11-24 18:05 | main | BACKLOG regrouped by project (Now v195, camera and controls, characters, editor tools, new mechanics, infrastructure); install warnings moved to infrastructure; star throw clarification (docs only)
+- 2026-11-24 18:12 | next | removed the v194 one-time copy of saves from the old polyrun names (idbMigrate in molly.js, localStorage copy in core/start.html and path-editor.html, test fu/rename_saves.py); GLOSSARY, ARCHITECTURE

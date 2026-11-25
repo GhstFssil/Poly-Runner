@@ -57,7 +57,7 @@ One source of truth for the game's words. Use these terms, spelled this way, in 
 | Treeline | the height on Sunset Hill above which its own trees stop growing | `SH_TREES`, `shTrees` |
 | Valley, The Sink | names in the old hand-coded terrain code only: Level 1's original terrain, and the poisoned low ground in Oceana Crags. Not for players | code comments |
 | Dev Mode | the menu screen (title page and pause) with the Path Editor, Rig Editor, Sandbox buttons, Saved Sandboxes, the Change Log, and in-game tools (Fill Power Line, Invulnerable) | `bDevT`, `bDev` |
-| Saved Sandboxes | layouts kept in the browser | `polyrun-sandboxes` |
+| Saved Sandboxes | layouts kept in the browser | `polyrunner-sandboxes` |
 
 ## Things you place (Path Editor stamps)
 Each is a stamp. The first column is the exact label, as the Path Editor shows it.
@@ -79,7 +79,7 @@ Each is a stamp. The first column is the exact label, as the Path Editor shows i
 | Mud | `mud` | not "Mud stretch" |
 | Crags, Terrain Patch | `crag`, `patch` | Crags, not "Crag patch" |
 
-Path Editor panel words: inspector, next-stamp panel, presets (`polyrun-pe-presets`), Snap, Layer, Bend, Rise, Length, Width, Height, Rotation.
+Path Editor panel words: inspector, next-stamp panel, presets (`polyrunner-pe-presets`), Snap, Layer, Bend, Rise, Length, Width, Height, Rotation.
 
 ## Moves and the HUD
 | Term | Meaning | Code / notes |
@@ -152,6 +152,6 @@ Renaming any of these loses saved layouts, settings and models unless the game r
 
 Decided 2026-11-24 (Ricky), renamed in v194 (browser storage: copied on first load; desktop app folders: a one-time script) (fill the new name only when it is empty; the old data stays): IndexedDB `polyrun` -> `polyrunner`; localStorage `polyrun-*` -> `polyrunner-*`; `window.polyrun` and `polyrun-*` messages -> `polyrunner`; `~/PolyRun` -> `~/PolyRunner`; `~/.config/PolyRun` -> `~/.config/PolyRunner`; package `polyrunner`; app id `com.polyrunner.game`. `pr_char`, `pr_gfx`, `pr_mouse2`, `runnerRig2` and `cometRig` keep their names.
 
-- Browser storage: IndexedDB `polyrunner` (store `kv`, keys `mollyGlb`, `cometGlb`, and `__migrated`); localStorage `runnerRig2`, `cometRig`, `pr_char`, `pr_gfx`, `pr_mouse2`, `polyrunner-sandboxes`, `polyrunner-pe-presets`, `polyrunner-pe-clip`, `polyrunner-last-export`, `polyrunner-path-editor-v2` (and `-v1`), `polyrunner-migrated`. Until v194 these were `polyrun` / `polyrun-*`: on first load they are copied to the new names (`idbMigrate` in molly.js; the same localStorage copy at the top of core/start.html and path-editor.html), the old ones stay. Never reuse the old names.
+- Browser storage: IndexedDB `polyrunner` (store `kv`, keys `mollyGlb` and `cometGlb`); localStorage `runnerRig2`, `cometRig`, `pr_char`, `pr_gfx`, `pr_mouse2`, `polyrunner-sandboxes`, `polyrunner-pe-presets`, `polyrunner-pe-clip`, `polyrunner-last-export`, `polyrunner-path-editor-v2` (and `-v1`). Until v194 these were `polyrun` / `polyrun-*` (v194 copied them across once; that copy was removed in v195). Never reuse the old names, nor the retired markers `__migrated` and `polyrunner-migrated`.
 - Desktop app: the bridge `window.polyrunner` and its `polyrunner-backup`/`polyrunner-restore` messages, the folders `~/PolyRunner` and `~/.config/PolyRunner` (with the update folder `game`), the package name `polyrunner` and the app id `com.polyrunner.game`. Until desktop app 1.2 these were `polyrun` / `PolyRun` / `com.ricky.polyrun`; the app does not migrate them itself (Ricky copied his with a one-time script).
 - Saved layouts: a stamp's angle is `rot` (Rotation). Layouts saved before 2026-11-21 hold `heading` on gaps, ledges, platforms, mud and Seg Chains: both loaders (the game's and the Path Editor's) still read it, and the Path Editor writes `rot`. The shipped levels (`src/data/level1.js`, `level2.js`) still say `heading`; they load fine. `heading` also stays as the name for a path's own start angle (`extraPaths`) and for the direction the player faces in the game.

@@ -216,39 +216,8 @@
     var req, done = false, fin = function (db) { if (done) return; done = true; mollyDB = db; cb(db); };
     try { req = window.indexedDB.open('polyrunner', 1); } catch (e) { fin(null); return; }
     req.onupgradeneeded = function () { try { req.result.createObjectStore('kv'); } catch (e) {} };
-    req.onsuccess = function () { idbMigrate(req.result, fin); }; req.onerror = function () { fin(null); }; req.onblocked = function () { fin(null); };
+    req.onsuccess = function () { fin(req.result); }; req.onerror = function () { fin(null); }; req.onblocked = function () { fin(null); };
     setTimeout(function () { fin(null); }, 4000);                // a browser that never answers must not leave her without a model
-  }
-  // Until v194 the database was named 'polyrun'. Once per browser, every key the new database still lacks is copied across from it (the saved models); the old
-  // database is left as it was, and none is created where there was none. The key '__migrated' marks it done; if the copy is cut short, the next start tries again.
-  function idbMigrate(db, done) {
-    function write(rows) {
-      try {
-        var tx = db.transaction('kv', 'readwrite'), st = tx.objectStore('kv');
-        rows.forEach(function (r) { var g = st.get(r[0]); g.onsuccess = function () { if (g.result === undefined) st.put(r[1], r[0]); }; });
-        st.put(1, '__migrated');
-        tx.oncomplete = function () { done(db); }; tx.onerror = tx.onabort = function () { done(db); };
-      } catch (e) { done(db); }
-    }
-    try {
-      var q = db.transaction('kv', 'readonly').objectStore('kv').get('__migrated');
-      q.onerror = function () { done(db); };
-      q.onsuccess = function () {
-        if (q.result) { done(db); return; }
-        var o, fresh = false;
-        try { o = window.indexedDB.open('polyrun'); } catch (e) { done(db); return; }
-        o.onupgradeneeded = function () { fresh = true; o.transaction.abort(); };   // there was no old database: don't make one
-        o.onerror = function (ev) { if (ev && ev.preventDefault) ev.preventDefault(); if (fresh) write([]); else done(db); };
-        o.onblocked = function () { done(db); };
-        o.onsuccess = function () {
-          var od = o.result, rows = [];
-          if (!od.objectStoreNames.contains('kv')) { od.close(); write([]); return; }
-          var c = od.transaction('kv', 'readonly').objectStore('kv').openCursor();
-          c.onsuccess = function () { var cur = c.result; if (cur) { rows.push([cur.key, cur.value]); cur.continue(); } else { od.close(); write(rows); } };
-          c.onerror = function () { od.close(); done(db); };
-        };
-      };
-    } catch (e) { done(db); }
   }
   function mollyStoreLS(buf) {                                  // the old way, for a browser with no IndexedDB
     try {
