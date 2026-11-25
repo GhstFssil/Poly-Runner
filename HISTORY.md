@@ -76,3 +76,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-25 13:20 | v195 | label v194 -> v195, CHANGELOG v195 titled Camera and controls; next merged into main
 - 2026-11-25 14:54 | next | Character Select: pick Molly or Comet after choosing a level (last pick marked, focused); Characters page shows cards only; tests/fu/pick1.py; level-starting tests click pcLast
 - 2026-11-25 14:59 | next | Comet's Hover: stands (Idle) instead of running, new stat comet.hov.lean (12°) leans her with speed; Rig Editor Hover preview standing; tests/fu/hov1.py
+- 2026-11-25 15:22 | next | Rig Editor: skin quads cut along a mirror-invariant diagonal (quadSplit/diagPick), hair too; Shading Variation from smooth position noise (shadeAt) so both sides match; built-in models re-baked; tests/fu/mirror1.py

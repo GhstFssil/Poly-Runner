@@ -9,15 +9,17 @@ Everything in BACKLOG's Characters and looks group, on `next`, one item at a tim
 
 - Comet Hover pose (step 2): hovering plays Idle instead of a run clip (molly-update.js); `comet.ho.*` changes still laid over it, plus new stat `comet.hov.lean` (12°, scaled by speed / hover top speed, comet.js). Rig Editor Hover preview uses `poseIdle` with the lean at full. Test `tests/fu/hov1.py` ALL PASS.
 
+- Faceting (step 3, partly): ring quads tagged in `buildSeg` and re-cut in model space by `quadSplit`/`diagPick` (soupOf); hair quads use `diagPick`; Shading Variation is `shadeAt` (smooth noise of |x|,y,z, seeded per part id without side). Facets mirrored 492 -> 2696 of 3558; limbs and shades exact. Built-in models re-baked. Test `tests/fu/mirror1.py`. rw4 welds: default/sides7 unchanged (0 odd); irr 0.6: arms 4 open/2 odd (was 3 open, broken loops).
+
 ## In progress
-- Step 3: faceting mirror check.
+- Faceting review with Ricky: welded shoulders/hips and centre-line strips still not mirrored (BACKLOG entry kept). Cutting centre-line quads at x=0 was tried and reverted: it made 7 odd edges at the crotch weld.
 
 ## Decisions
 - Path Editor test play and Dev sandboxes keep the current character (no prompt); only Level Select asks (my call).
 - Faceting (step 3): if nothing is found wrong, keep the backlog item and review with Ricky (Ricky).
 
 ## Next steps
-1. Faceting check. 2. Fine-grained hair control. 3. Comet ringlets. 4. Face pieces (ask Ricky about style first).
+1. Faceting review (Ricky). 2. Fine-grained hair control. 3. Comet ringlets. 4. Face pieces (ask Ricky about style first).
 
 ## Gotchas
 - rx8.py logs "Molly model turned away" on purpose-made odd stats; it does that on the old build too.

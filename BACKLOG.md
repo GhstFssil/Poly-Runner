@@ -3,7 +3,7 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to reproduce`. The sweeps tag theirs `(nightly/<name>)`. Older entries below have no who or date.
 
 ## Characters and looks
-- [ ] Runner model faceting should be mirrored down the center line.
+- [ ] Runner model faceting should be mirrored down the center line. (Claude, 2026-11-25) Mostly done on `next`: limbs, hair and shading match; still not mirrored: the welded shoulders and hips (the weld cut differs side to side) and the strips straddling the centre line (front/back middle, ponytail). Review with Ricky.
 - [ ] (Ricky, 2026-11-23) Give comet her own hair (ringlet curls)
 - [ ] (Ricky, 2026-11-23) Give fine-grained control of hair.
 - [ ] (Ricky, 2026-11-23) Add special assets for the faces (eyes, mouth, nose).
