@@ -1,7 +1,7 @@
-# Handoff (2026-11-25)
+# Handoff (2026-11-25, evening)
 
 ## Goal
-Everything in BACKLOG's Characters and looks group, on `next`, one item at a time (published as v196 on 2026-11-25).
+BACKLOG's Editor tools group, on `next`, one item at a time (Characters and looks shipped as v196; its rest waits on Ricky's reviews).
 
 ## Done
 - Character Select (step 1): choosing a level opens `scr-pickchar` (ui/page-body.html); two compact stat cards with Play buttons; the last pick is marked "(last time)", focused, id `pcLast`. Back returns to Level Select. The Characters page shows both full cards, no buttons. Wiring: `pickThen`/`__pickChar` in ui/screens.js; cards in `refreshStatCards` (level1/trees.js).
@@ -13,6 +13,7 @@ Everything in BACKLOG's Characters and looks group, on `next`, one item at a tim
 
 - Split (2026-11-25): character setup moved from level1/trees.js to characters/character-stats.js (loads right after it; game unchanged).
 - Hair locks (step 4): bangs replaced by a ring of `hair.count` locks (rig-editor.html `hairLocks`, after `headFeatures`); shared `hair.*` stats on the Head page; click a lock -> `ui.lock`, rows for `hair.L<k>.len/curl/ang` (k = pair from the front; partners share, right one built as the left's mirror when Part Position is 0). Defaults: 14 locks, only the front 3 long enough to build (front length 1, sides/back 0; pair 1 length 1.3 to keep the old side bangs' length). Old `bangL` -> `hair.lenF` in `upgrade()`; shipped settings renamed. Models re-baked. Test `tests/fu/hair1.py` ALL PASS.
+- Mobs Save to Game (Editor tools 1): button on the Rig Editor Mobs page calls `rigHost.__apply` (rigRead + barrierBuild); `status()` writes to `#minStatus` on Mobs (Reset This One's message was invisible before). CHANGELOG v197 entry started. Test `tests/fu/mobsave1.py` ALL PASS.
 
 ## In progress
 - Faceting review with Ricky: welded shoulders/hips and centre-line strips still not mirrored (BACKLOG entry kept). Cutting centre-line quads at x=0 was tried and reverted: it made 7 odd edges at the crotch weld.
@@ -23,10 +24,11 @@ Everything in BACKLOG's Characters and looks group, on `next`, one item at a tim
 - Hair: Spread = lean out from the head (not how far round the front length reaches); length blends front 0-30°, to sides by 60°, sides to 120°, to back by 150°; locks under 0.25x are left out (my calls).
 
 ## Next steps
-1. Ricky reviews the hair locks (look and stat ranges). 2. Faceting review (Ricky). 3. Comet ringlets (build on the locks: curl + tightness). 4. Face pieces (ask Ricky about style first).
+0. Editor tools: Supersede stamps, then the draw/stretch tool (plans need Ricky's go-ahead). 1. Ricky reviews the hair locks (look and stat ranges). 2. Faceting review (Ricky). 3. Comet ringlets (build on the locks: curl + tightness). 4. Face pieces (ask Ricky about style first).
 
 ## Gotchas
 - A front-middle lock's underside strip straddles the centre line and is not mirrored (same as the BACKLOG faceting item); hair1.py allows for it.
+- rigpages.py prints an empty "comet save:" and star range 0 on main too (not a regression).
 - rx8.py logs "Molly model turned away" on purpose-made odd stats; it does that on the old build too.
 - Headless Chrome sends its own mousemoves with Caps Lock off; cam1.py stubs `getModifierState` for that.
 - Shallow clone: `git -c push.negotiate=true push`. Tests leave `shots/` and `tests/fu/new_*` behind; don't commit them.

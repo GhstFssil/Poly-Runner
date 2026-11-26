@@ -13,6 +13,7 @@
         if (ch !== CHAR) { mollyStore(buf, function (kept) { if (done) done(kept ? 'ok' : 'big'); }, ch); return; }   // the runner she is not playing as: kept for when she is
         mollyLoad(buf, function () { if (done) done('bad'); }, function () { rigRead(); barrierBuild(); mollyStore(buf, function (kept) { if (done) done(kept ? 'ok' : 'big'); }, ch); });
       };
+      rigHost.__apply = function () { rigRead(); barrierBuild(); };   // the Mobs page's Save to Game: the game rereads every stat now
       rigHost.__close = function () { rigHost.hidden = true; rigHost.__open = false; rigRead(); barrierBuild(); };
       ['keydown', 'keyup', 'keypress'].forEach(function (t) { rigHost.addEventListener(t, function (e) { e.stopPropagation(); }); });
       rigHost.hidden = false; rigHost.__open = true;

@@ -1042,7 +1042,8 @@ function setPage(pg){
   try{renderComet();statCardRefresh();}catch(e){}
 }
 SR.querySelectorAll('#pages button').forEach(function(b){b.addEventListener('click',function(){setPage(b.dataset.pg);});});
-function status(t,ms){var s=$('#status');s.textContent=t;clearTimeout(status.t);status.t=setTimeout(function(){s.textContent='';},ms||4500);}
+function status(t,ms){var s=$(PAGE==='mobs'?'#minStatus':'#status');   /* the Mobs page hides the Save and Export box, so it has its own line */
+s.textContent=t;clearTimeout(status.t);status.t=setTimeout(function(){s.textContent='';},ms||4500);}
 
 SR.querySelectorAll('#views button').forEach(function(b){b.addEventListener('click',function(){setView(b.dataset.v);});});
 function setMode(m){ui.mode=m;try{renderAnim();}catch(e){}SR.querySelectorAll('#modes button,#modes2 button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.m===m));});
@@ -1197,6 +1198,7 @@ function renderMinions(){
 }
 function minNoteSet(){var c=minCfgP(minTab),h=(c.legL+(c.gz?0:c.torsoH)+c.headH)*c.scale;$('#minNote').textContent=mobName(minTab)+': '+(Math.round(h*100)/100)+' units tall in the game (Molly is 3.6). The preview is drawn at her height.';}
 MOB_KINDS.forEach(function(m){var b=document.createElement('button');b.type='button';b.setAttribute('data-mt',m[0]);b.setAttribute('aria-pressed',String(m[0]===minTab));b.textContent=m[1];b.addEventListener('click',function(){minTab=m[0];minDirty=true;renderMinions();});$('#minTabs').appendChild(b);});
+$('#saveMobs').addEventListener('click',function(){save();try{HOST.__apply();status('Saved. The mobs are updated in the game.');}catch(e){status('Could not update the mobs in the game.',12000);}});   /* mobs need no model build: their stats are already kept with each change; this hands them to the game now */
 $('#resetMin').addEventListener('click',function(){for(var k in MNE)P['mn.'+minTab+'.'+k]=DEF['mn.'+minTab+'.'+k];save();minDirty=true;renderMinions();status(mobName(minTab)+' reset.');});
 try{renderMinions();}catch(e){}
 function minPreview(dt){

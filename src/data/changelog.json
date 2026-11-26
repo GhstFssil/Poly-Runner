@@ -1,5 +1,18 @@
 [
   {
+    "v": "v197",
+    "d": "Nov 25, 2026",
+    "t": "Editor tools",
+    "g": [
+      [
+        "Added",
+        [
+          "Rig Editor, Mobs page: a Save to Game button. It hands your mob changes to the game straight away and says so, without closing the editor (closing still works too). Reset This One now shows its message on the Mobs page as well."
+        ]
+      ]
+    ]
+  },
+  {
     "v": "v196",
     "d": "Nov 25, 2026",
     "t": "Characters and looks",

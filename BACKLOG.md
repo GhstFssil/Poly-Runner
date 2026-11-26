@@ -8,7 +8,6 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 - [ ] (Ricky, 2026-11-23) Add special assets for the faces (eyes, mouth, nose).
 
 ## Editor tools
-- [ ] Add a save to game button on the mobs tab.
 - [ ] Option for terrain stamps with heights to "Supersede", which cuts any other terrain or stamps touching them flat to their bottom where they touch.
 - [ ] (Ricky, 2026-11-24) Possibility of having a draw/stretch tool in the path/rig editor? Draw could create chained segments of objects and stretch could adjust the position of points.
 
