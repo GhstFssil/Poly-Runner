@@ -82,6 +82,8 @@ Each is a stamp. The first column is the exact label, as the Path Editor shows i
 
 Path Editor panel words: inspector, next-stamp panel, presets (`polyrunner-pe-presets`), Snap, Layer, Bend, Rise, Length, Width, Height, Rotation.
 
+Height With Others (Ledge, Hill, Crags): Additive (stacks on what it crosses), Independent (its own height, merges in; saved `heightMode: 'independent'`), Supersede (Hill and Crags only: everything under its footprint, ledges included, is cut or filled flat to its bottom, with a short slope at the edge; saved `heightMode: 'supersede'`, frozen; code `sbSupApply`). A stamp's bottom is its true Y, or the ground at its centre without it.
+
 ## Moves and the HUD
 | Term | Meaning | Code / notes |
 |---|---|---|

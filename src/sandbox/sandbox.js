@@ -64,7 +64,7 @@
   }
   function sbBuild(j) {
     j = j || {};
-    var B = { discs: [], width: j.width || 9, terrain: j.terrain || '', samples: [], total: 0, objs: [], trees: [], minions: [], gazers: [], toxic: [], segs: [], tips: [], goals: [], spawners: [], strips: [], meshes: [], tipDone: {}, ramps: [], hills: [], lakes: [], bigs: [], caves: [], shafts: [], patches: [], timeLimit: Math.max(0, +j.timeLimit || 0), ranks: null, noCave: false, caveOpen: null, caveCov: null, caveR: 8, cps: [], signs: [], movers: [], plates: [], targets: [], trig: {}, tgBits: [], T: 0, signDone: {}, waterY: null };
+    var B = { discs: [], width: j.width || 9, terrain: j.terrain || '', samples: [], total: 0, objs: [], trees: [], minions: [], gazers: [], toxic: [], segs: [], tips: [], goals: [], spawners: [], strips: [], meshes: [], tipDone: {}, ramps: [], hills: [], sups: [], lakes: [], bigs: [], caves: [], shafts: [], patches: [], timeLimit: Math.max(0, +j.timeLimit || 0), ranks: null, noCave: false, caveOpen: null, caveCov: null, caveR: 8, cps: [], signs: [], movers: [], plates: [], targets: [], trig: {}, tgBits: [], T: 0, signDone: {}, waterY: null };
     var sm = B.samples, x = 0, z = 0, th = 0, s = 0, y0b = (j.terrain === 'level2' ? L2_Y : 0), y = y0b, STEP = 4;      // Oceana Crags' path runs at 40
     var PATHS = [{ x: 0, z: 0, th: 0, y: 0, pieces: j.pieces || [] }].concat((j.extraPaths || []).map(function (e) { return { x: e.x || 0, z: e.z || 0, th: (e.heading || 0) * Math.PI / 180, y: e.rise || 0, pieces: e.pieces || [] }; }));
     B.pathStart = []; B.pathEnd = [];
@@ -139,7 +139,7 @@
     }
     // the objects
     (j.objects || []).forEach(function (r) {
-      var o = { t: r.type, rot: r.rot || 0, id: r.id, y: r.y || 0, ind: r.heightMode === 'independent', ya: typeof r.yAbs === 'number' ? r.yAbs : undefined, yc: r.yFrom && r.yFrom.length === 2 ? r.yFrom : null };   // ya: a true Y typed in the editor (measured from where her feet are at the start of the path); without one a stamp sits on the ground
+      var o = { t: r.type, rot: r.rot || 0, id: r.id, y: r.y || 0, ind: r.heightMode === 'independent', sup: r.heightMode === 'supersede' && (r.type === 'hill' || r.type === 'crag'), ya: typeof r.yAbs === 'number' ? r.yAbs : undefined, yc: r.yFrom && r.yFrom.length === 2 ? r.yFrom : null };   // ya: a true Y typed in the editor (measured from where her feet are at the start of the path); without one a stamp sits on the ground
       if (r.s !== undefined) { o.s = r.s; o.u = r.u; } else { o.x = r.x; o.z = r.z; }
       if (r.type === 'tree' && r.exact) { o.ex = true; o.tH = r.trunkHeight || 15.5; o.tW = r.trunkWidth || 1.6; o.cH = r.canopyHeight || 14.9; o.cW = r.canopyWidth || 7.4; }
       if (r.type === 'toxic') { o.w = r.width || 12; o.d = r.length || 12; }
@@ -208,6 +208,7 @@
         B.movers.push({ o: o, door: true, depth: 2, cx: p.x, cz: p.z, pts: [[p.x - dfx, p.z - dfz, p.th], [p.x + dfx, p.z + dfz, p.th]], half: o.w / 2, hgt: o.hgt, thick: o.hgt + 8, base: 0, off: [0, 0], dy: 0, sx: 0, sz: 0, k: o.cfgB.mode === 'open' ? 1 : 0, tx: 0, tz: 0, side: 0, th0: p.th, cfg: o.cfgB, minx: p.x - drr, maxx: p.x + drr, minz: p.z - drr, maxz: p.z + drr });
       }
       else if (o.t === 'ramp') B.ramps.push({ T: T, y: o.y, x: p.x, z: p.z, th: p.th, hw: o.w / 2, hl: o.len / 2, tn: Math.tan(o.ang * Math.PI / 180), boost: o.boost, rr: Math.hypot(o.w, o.len) / 2 + 1 });
+      else if (o.t === 'hill' && o.sup) B.sups.push({ k: 'hill', x: p.x, z: p.z, R: o.r, h: o.h, rock: o.rock, T: T });   // a superseding hill: kept apart, see sbSupApply
       else if (o.t === 'hill') B.hills.push({ x: p.x, z: p.z, r: o.r, h: o.h, rock: o.rock, ind: !!o.ind, T: T });
       else if (o.t === 'lake') B.lakes.push({ x: p.x, z: p.z, r: o.r, depth: o.depth, wl: o.wl || 0, T: T });
       else if (o.t === 'start') B.startPt = { x: p.x, z: p.z, th: p.th, T: T };
@@ -227,6 +228,7 @@
         else { n = Math.ceil(o.len / 3); for (k = 0; k <= n; k++) { q = shapeAt(o, Math.min(o.len, k * 3)); sbAdd(tgt, q.x, q.z, { x: q.x, z: q.z, half: half + mg, o: o }); } }
         if (o.t === 'gap') maxG = Math.max(maxG, half + 3); else if (o.t === 'mud') maxM = Math.max(maxM, half + 3); else maxL = Math.max(maxL, half + 3);
       }
+      else if (o.t === 'crag' && o.sup) { var cS = { k: 'crag', x: p.x, z: p.z, R: 0, T: T, cones: [] }; cragLayout(o).forEach(function (c) { var cxp = p.x + c.x, czp = p.z + c.z; cS.cones.push({ x: cxp, z: czp, rad: c.rad, h: c.h }); cS.R = Math.max(cS.R, Math.hypot(c.x, c.z) + c.rad); }); B.sups.push(cS); }   // superseding Crags: their rocks are kept apart, see sbSupApply
       else if (o.t === 'crag') { cragLayout(o).forEach(function (c) { var cxp = p.x + c.x, czp = p.z + c.z; sbAdd(coneH, cxp, czp, { x: cxp, z: czp, rad: c.rad, h: c.h, ind: !!o.ind, T: T }); }); }
       else if (o.t === 'patch') B.patches.push({ T: T, x: p.x, z: p.z, th: p.th, hw: o.w / 2, hd: o.d / 2, shape: o.shape, ground: o.ground, hard: o.hard, soft: Math.max(0.5, o.soft), rr: Math.hypot(o.w, o.d) / 2 + o.soft });
       else if (o.t === 'spawner') B.spawners.push({ x: p.x, z: p.z, r: o.r, every: o.every, max: o.max, t: 0, T: T });
@@ -497,7 +499,30 @@
     var dep = SH_RAV_D * (0.7 + 0.6 * vnoise(x / 350 - 2.2, z / 350 + 8.4, 67));
     return dep * smooth01((hw - d) / (0.6 * hw)) * smooth01((Math.hypot(x, z) - 150) / 100);   // walls over the outer 60% of each side; none right at the start
   }
+  // Supersede (a hill's or Crags' Height With Others): everything else under its footprint (terrain, path, other stamps, ledges) is cut or filled flat to its bottom, easing back over SUP_SL units outside it, and the stamp stands on that. Its bottom is its true Y, or the ground at its centre without any superseding stamp
+  var SUP_SL = 6, sbSupOff = false;
+  function sbSupInit(B) {
+    sbSupOff = true; try { B.sups.forEach(function (S) { S.bot = S.T !== undefined ? S.T : level3H(L3_X + S.x, S.z); }); } finally { sbSupOff = false; } B.supReady = true;
+  }
+  function sbSupK(B, ex, z) {                                     // how fully the superseding stamps own (ex, z): 1 inside a footprint, easing to 0 over SUP_SL outside
+    var k = 0; for (var i = 0; i < B.sups.length; i++) { var S = B.sups[i], d = Math.hypot(ex - S.x, z - S.z); if (d < S.R + SUP_SL) k = Math.max(k, 1 - smooth01((d - S.R) / SUP_SL)); } return k;
+  }
+  function sbSupApply(B, ex, z, y) {                              // the ground at (ex, z) with the superseding stamps applied (sets the colour flags where one owns it); sbSupHit: how fully
+    sbSupHit = 0;
+    for (var i = 0; i < B.sups.length; i++) {
+      var S = B.sups[i], d = Math.hypot(ex - S.x, z - S.z); if (d >= S.R + SUP_SL) continue;
+      var k = 1 - smooth01((d - S.R) / SUP_SL), own = 0, rk = false;
+      if (S.k === 'hill') { if (d < S.R) { own = S.h * (1 - smooth01(d / S.R)); rk = S.rock === 'rock' && d < S.R * 0.75; } }
+      else S.cones.forEach(function (c) { var dc = Math.hypot(c.x - ex, c.z - z); if (dc < c.rad) own = Math.max(own, c.h * (1 - dc / c.rad)); });
+      if (S.k !== 'hill') rk = own > 0.5;
+      y += (S.bot + own - y) * k; if (k > sbSupHit) sbSupHit = k;
+      if (k >= 0.5) { wSt = rk ? 1 : 0; wL2 = 0; wPl = 0; wMud = 0; wF = 0; }
+    }
+    return y;
+  }
+  var sbSupHit = 0;
   function level3H(x, z) {
+    if (SB && SB.sups.length && !SB.supReady && !sbSupOff) sbSupInit(SB);
     wSt = 0; wPl = 0; wMud = 0; wF = 0; wL2 = 0; l3A = 0; l3P = -Infinity; l3N = Infinity; l3S0 = 0; l3Bk = 0; l3Tx = 0; shCut = 0; l3Ed = 1e9;
     if (!SB) return 0;
     var ex = x - L3_X, y = 0, B = SB, HW = SB.hw, hwq = SB.hw, best = 1e9, py = 0, ing = false, tox = false, pov = false, i, d;
@@ -581,6 +606,7 @@
     for (i = 0; i < B.hillsT.length; i++) { var hT = B.hillsT[i]; d = Math.hypot(ex - hT.x, z - hT.z); if (d < hT.r) { var hkT = 1 - smooth01((d / hT.r - 0.85) / 0.15); y += (hT.T + hT.h * (1 - smooth01(d / hT.r)) - y) * hkT; wL2 = 0; if (hT.rock === 'rock' && d < hT.r * 0.75) wSt = 1; } }   // a hill with a true Y: built up from that height, not from the ground
     sbNear(B.coneH, ex, z, 16, function (c) { if (c.T === undefined) return; var dd = Math.hypot(c.x - ex, c.z - z); if (dd < c.rad) { var cs = c.T + c.h * (1 - dd / c.rad); if (cs > y) { y = cs; wL2 = 0; if (c.h * (1 - dd / c.rad) > 0.5) wSt = 1; } } });   // a crag with a true Y: its rocks rise from that height
     for (i = 0; i < B.lakes.length; i++) { var lk = B.lakes[i]; d = Math.hypot(ex - lk.x, z - lk.z); if (d < lk.r) { y -= lk.depth * (1 - smooth01((d - lk.r * 0.7) / (lk.r * 0.3))); if (d < lk.r * 0.9) { wSt = 1; wL2 = 0; } } }
+    if (B.sups.length && !sbSupOff) { y = sbSupApply(B, ex, z, y); if (sbSupHit > 0) { var sK = 1 - sbSupHit; l3A *= sK; if (l3P > -Infinity) l3P *= sK; if (l3N < Infinity) l3N *= sK; l3S0 *= sK; } }   // superseding stamps win over everything above (cornerY's stacked parts shrink with them)
     if (B.slabH) { var scut = sbSlabCut(ex, z, y); if (scut < y) { y = scut; wSt = 1; wL2 = 0; wPl = 0; wMud = 0; } }   // a floating slab spans a drop: any higher ground in its way is cut down to just under it
     if (!B.noCave && B.caves.length) { var Lp = sbLedge(x, z), cy0 = sbCaveCarve(ex, z, y + Lp) - Lp; if (cy0 < y) { y = cy0; wSt = 1; wL2 = 0; wPl = 0; wMud = 0; } }
     for (i = 0; i < (sbNoRamps || B.terrain === 'level2' ? 0 : B.ramps.length); i++) {   // (on Oceana a ramp is a wedge of its own on the path's deck: see sbDeckTop)
@@ -598,6 +624,7 @@
     var best = 0, bi = 0, bt = false, bit = false, ex = x - L3_X, base = 0; ledTox = false;
     if (SB.terrain === 'level1' || SB.terrain === 'level2') base = SB.terrain === 'level2' ? oldLedgeH(L2_X + ex, z + L2_SBZ) : oldLedgeH(ex, z);
     sbNear(SB.ledgeH, ex, z, SB.maxL, function (e) { if (sbIn(e, ex, z, 0)) { if (e.o.ind) { if (Math.abs(e.o.hgt) > Math.abs(bi)) { bi = e.o.hgt; bit = !!e.o.tox; } } else if (Math.abs(e.o.hgt) > Math.abs(best)) { best = e.o.hgt; bt = !!e.o.tox; } } });
+    if (SB.sups.length && !sbSupOff) { var sK2 = 1 - sbSupK(SB, ex, z); if (sK2 < 1) { best *= sK2; bi *= sK2; base *= sK2; } }   // a superseding stamp cuts ledges flat too
     ledA = base + best; ledI = bi === 0 ? NaN : bi; ledTox = ledI === ledI && Math.abs(ledI) > Math.abs(best) ? bit : bt;   // ledTox: the ledge whose top this is has a toxic surface
     return ledI === ledI && Math.abs(ledI) > Math.abs(best) ? ledI + (base ? base : 0) : base + best;   // for anything that only wants one number: the taller of the two
   }

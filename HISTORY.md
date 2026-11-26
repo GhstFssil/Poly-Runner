@@ -82,3 +82,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-25 16:45 | next | Hair locks: the three bangs became a ring of hair locks with shared and per-lock stats in the Rig Editor (old Bang Length carries over); models re-baked; test fu/hair1.py
 - 2026-11-25 16:47 | v196 | Published v196 (Characters and looks): next merged into main, label v195 -> v196
 - 2026-11-25 18:55 | next | Rig Editor Mobs page: Save to Game button (applies mob stats now via rigHost.__apply), its own status line so Reset This One shows; test fu/mobsave1.py
+- 2026-11-25 19:40 | next | Supersede Height With Others for Hill and Crags (sbSupApply; flattens terrain, path, stamps and ledges to the stamp bottom with a 6-unit slope); Path Editor option; test fu/sup1.py, hook __L3X

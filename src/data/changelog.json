@@ -7,7 +7,8 @@
       [
         "Added",
         [
-          "Rig Editor, Mobs page: a Save to Game button. It hands your mob changes to the game straight away and says so, without closing the editor (closing still works too). Reset This One now shows its message on the Mobs page as well."
+          "Rig Editor, Mobs page: a Save to Game button. It hands your mob changes to the game straight away and says so, without closing the editor (closing still works too). Reset This One now shows its message on the Mobs page as well.",
+          "Path Editor: Hills and Crags have a new Height With Others choice, Supersede. Everything under the stamp (ground, path, other hills, crags and ledges) is cut or filled flat to its bottom, with a short slope at the edge, and the stamp stands on that."
         ]
       ]
     ]

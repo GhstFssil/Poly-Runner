@@ -8,7 +8,7 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 - [ ] (Ricky, 2026-11-23) Add special assets for the faces (eyes, mouth, nose).
 
 ## Editor tools
-- [ ] Option for terrain stamps with heights to "Supersede", which cuts any other terrain or stamps touching them flat to their bottom where they touch.
+- [ ] (Claude, 2026-11-25) Supersede for Ledges too? Hill and Crags have it; a ledge's bottom follows the ground along its length, so "flat to its bottom" needs a rule (its start's height, or follow the ground). **Decision** (Ricky).
 - [ ] (Ricky, 2026-11-24) Possibility of having a draw/stretch tool in the path/rig editor? Draw could create chained segments of objects and stretch could adjust the position of points.
 
 ## New mechanics (design first)

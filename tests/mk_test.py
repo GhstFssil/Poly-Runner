@@ -22,6 +22,7 @@ hooks=r"""
   window.__chunks = function (x, z) { updateChunks(x, z, 99); scene.updateMatrixWorld(true); };
   window.__ray = function (x, z, y0) { var r = new THREE.Raycaster(new THREE.Vector3(x, y0 === undefined ? 2000 : y0, z), new THREE.Vector3(0, -1, 0)); return r.intersectObjects(scene.children, true).filter(function (h) { var o = h.object; while (o) { if (o === player) return false; o = o.parent; } return h.object.visible !== false; }).slice(0, 4).map(function (h) { var o = h.object, kind = o.userData && o.userData.ci !== undefined ? 'chunk' : (o.geometry && o.geometry.type === 'PlaneGeometry' && o.material === waterMesh.material) ? 'water' : (SB && SB.meshes.indexOf(o) >= 0) ? 'sb' + SB.meshes.indexOf(o) : o.type; return [+h.point.y.toFixed(3), kind]; }); };
   window.__l3m = function (x, z) { return level3H(x, z); };
+  window.__L3X = function () { return L3_X; };
   window.__l3f = function (x, z) { var y = level3H(x, z); return [y, sbDeckTop(x, z, null) > -1e8 ? 1 : 0, wL2, l3Tx, l3Bk]; };
   window.__tb = function (k, x, z, t) { return sbTerrBase(k, x, z, t); };
   window.__foot = function (x, z) { return sbFoot(x, z); };
