@@ -130,6 +130,7 @@ Height With Others (Ledge, Hill, Crags): Additive (stacks on what it crosses), I
 |---|---|---|
 | Path Editor | builds layouts. Source `path-editor.html`, embedded in the game | `__peBoot`, `PE-BEGIN`/`PE-END` |
 | Rig Editor | edits the characters' and mobs' models and stats. Pages: Molly, Comet, Mobs | `rig-tpl`, `__rigBoot`, `setPage` |
+| Mirror Bulge 1 | a part's toggle in the Rig Editor's Bulge 2 panel: bulge 2 is kept bulge 1's mirror image across the part's front / back (top / underside) line; with it on for both torso parts the body is its own mirror image, so the shoulder and hip welds are made mirrored too (`weldMirror`) | `<part>.umir`, `bulgeMirSync` |
 | model | a character's 3D body, a `.glb` file | |
 | stat | one number that changes how a character or mob plays or looks. The Rig Editor's Stats panel lists them. "Dials" is retired | `DEFM`, `DEFC` |
 | settings | a character's or the mobs' whole set of stats, as one bundle. Copy settings copies all three pages as a block | |

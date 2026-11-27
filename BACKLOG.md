@@ -3,7 +3,7 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to reproduce`. The sweeps tag theirs `(nightly/<name>)`. Older entries below have no who or date.
 
 ## Characters and looks
-- [ ] Runner model faceting should be mirrored down the center line. (Claude, 2026-11-25) Mostly done on `next`: limbs, hair and shading match; still not mirrored: the welded shoulders and hips (the weld cut differs side to side) and the strips straddling the centre line (front/back middle, ponytail). Review with Ricky.
+- [ ] Runner model faceting should be mirrored down the center line. (Claude, 2026-11-27) Done on `next` except: the shipped torso bulges are not mirror pairs (Lower Torso 154/-155 and widths 50/51; Upper Torso start/end widths 0.16/0.31 vs 0.2/0.2), so the welds fall back to the old way until Mirror Bulge 1 is on for both torso parts (Ricky's call: it changes her shape a little). With it on, 104 of 3776 facets are left: the hair locks at the head and ponytail top, and 24 on the spine. Review with Ricky.
 - [ ] (Ricky, 2026-11-23) Give comet her own hair (ringlet curls)
 - [ ] (Ricky, 2026-11-27) Give Comet her own Faceplant animation.
 - [ ] (Ricky, 2026-11-23) Add special assets for the faces (eyes, mouth, nose).

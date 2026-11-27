@@ -534,6 +534,26 @@ function clipSoup(T,field,thr,sx,fieldMid){
   });
   return {t:out,segs:segs};
 }
+/* Mirrored welds: the right weld made as the mirror image of the left (x to -x), so the two come out alike facet for facet. The cut, the tidying and the bridge each
+   depend on which way they walk round a cut edge, and a mirror reverses that, so making both the same way gave two different results. Used only when the body's
+   own triangles are their own mirror image and the right limb's are the left limb's mirror (else null: both are made as before). Mirrored points that land on a
+   point the right side already had take that point exactly, so the right side still meets its neighbouring parts. */
+function weldMirror(ws,par0,soups){
+  if(ws.length!==2)return null;var wL=ws[0].ch.s==='L'?ws[0]:ws[1],wR=wL===ws[0]?ws[1]:ws[0];if(wL.ch.s!=='L'||wR.ch.s!=='R')return null;
+  function ck(x,y,z){return Math.round(x*1e4)+','+Math.round(y*1e4)+','+Math.round(z*1e4);}
+  function tk(t,neg){return [0,1,2].map(function(i){var q=t[i];return ck(neg?-q[0]:q[0],q[1],q[2]);}).sort().join('|');}
+  function same(A,B){if(A.length!==B.length)return false;var h={},i,k;for(i=0;i<B.length;i++){k=tk(B[i],0);h[k]=(h[k]||0)+1;}
+    for(i=0;i<A.length;i++){k=tk(A[i],1);if(!h[k])return false;h[k]--;}return true;}
+  var chL=soups[wL.ch.key],chR=soups[wR.ch.key];if(!same(par0,par0)||!same(chL,chR))return null;
+  var snap={};function addS(T){T.forEach(function(t){for(var i=0;i<3;i++){var q=t[i];if(q[0]<-1e-9)snap[ck(q[0],q[1],q[2])]=q;}});}addS(par0);addS(chR);
+  var made={};
+  function pt(q){if(q[0]>-1e-9&&q[0]<1e-9)return q;var k=ck(-q[0],q[1],q[2]),o=snap[k];if(o){if(q.wp)o.wp=1;return o;}
+    var m=made[k];if(!m){m=made[k]=[-q[0],q[1],q[2]];if(q.kp!==undefined)m.kp=q.kp;if(q.wp)m.wp=q.wp;}return m;}
+  function tri(t){var n=t.slice();n[0]=pt(t[0]);n[1]=pt(t[2]);n[2]=pt(t[1]);return n;}   /* mirrored, so wound the other way round */
+  function side(t){var lo=Math.min(t[0][0],t[1][0],t[2][0]),hi=Math.max(t[0][0],t[1][0],t[2][0]);return lo>=-1e-9&&hi>1e-9?1:hi<=1e-9&&lo<-1e-9?-1:0;}
+  function body(T){var out=[];T.forEach(function(t){var sd=side(t);if(sd>=0)out.push(t);if(sd>0)out.push(tri(t));});return out;}   /* the left half and its mirror; what lies across the plane (untouched by the cut, so its own mirror) stays */
+  return {wL:wL,wR:wR,pt:pt,tri:tri,body:body};
+}
 /* join cut edges head to tail into loops */
 function chainLoops(segs){
   var from={},used=[],loops=[],i;
@@ -621,7 +641,8 @@ function rebuild(){bulgeMirSync();
     try{fPar=soupField(par0,.6);
       var fKid={},fMid=null;ws.forEach(function(w){fKid[w.ch.key]=soupField(soups[w.ch.key],.6);});
       if(ws.length===2)fMid=function(x,y,z){return Math.min(fKid[ws[0].ch.key](x,y,z),fKid[ws[1].ch.key](x,y,z));};
-      ws.forEach(function(w){if(!ok)return;                         /* first every cut is made */
+      var mir=weldMirror(ws,par0,soups);                           /* a left and right pair on a body that is its own mirror image: only the left weld is made, and the right is its mirror (weldMirror) */
+      (mir?[mir.wL]:ws).forEach(function(w){if(!ok)return;          /* first every cut is made */
         var ch=w.ch,ch0=soups[ch.key],fCh=fKid[ch.key],m=Math.max(.0025,w.K/2),sx=ch.s==='L'?1:ch.s==='R'?-1:0,Kg=Math.max(.02,w.K);
         function gate(p){if(!w.gate)return 1;var a=primLocal(ch,p[0],p[1],p[2])[0],t=(a-.2*Kg)/(1.6*Kg);return t<=0?1:t>=1?0:1-smooth(t);}
         function thr(p){var G=gate(p);return G>=1?m:G<=1e-4?-Infinity:m-.01*(1-G)/G;}   /* away from the pivot the cut backs off, through the surface and then to nothing: there the two parts simply overlap as they always did */
@@ -642,7 +663,9 @@ function rebuild(){bulgeMirSync();
         done.forEach(function(d){if(!ok)return;                     /* and each gap is bridged: the whole of both cut edges, the stretch that lies hidden inside the other part too. When the limb swings away from the body that stretch is what closes the gap (her armpit) */
           work=tidyLoop(d.A,work,.01);d.ct=tidyLoop(d.B,d.ct,.01);
           var br=d.A.pts.length>2&&d.B.pts.length>2?bridgeLoops(d.A,d.B,BASECOL[d.w.ch.id]):null;if(!br){ok=false;return;}
-          d.A.pts.forEach(function(q){q.wp=1;});d.t=d.ct.concat(br);});}
+          d.A.pts.forEach(function(q){q.wp=1;});d.t=d.ct.concat(br);});
+        if(ok&&mir){var dL=done[0];work=mir.body(work);
+          done.push({w:mir.wR,A:{pts:dL.A.pts.map(mir.pt)},t:dL.t.map(mir.tri),gate:function(p){return dL.gate([-p[0],p[1],p[2]]);},fCh:fKid[mir.wR.ch.key]});}}
     }catch(e){ok=false;}
     if(ok){soups[pk]=work;par.kidW=[];var bg0=BANDCOL[par.id]?bandRange(par.id):null;
       done.forEach(function(d){var R=Math.max(.06,d.w.soft*d.w.K),ch=d.w.ch;soups[ch.key]=d.t;

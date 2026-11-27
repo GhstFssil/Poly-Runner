@@ -1,5 +1,6 @@
 # Faceting mirrored down the centre line: each facet has a mirror image (x to -x) with the same shade. Limbs (elbows, wrists, knees, ankles) must match exactly;
-# the welded shoulders and hips and the strips across the centre plane are not mirrored yet (BACKLOG), so the whole figure is held to a share, not to all of it
+# quads across the centre plane are fanned into four round their middle; the welds are made mirrored when the body is its own mirror image, which with the shipped bulges it is not
+# (they differ side to side), so the shipped figure is held to a share; with Mirror Bulge 1 on for both torso parts nearly all of it (the hair locks are still not)
 import sys, os; sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from righ import *
 g=Rig(w=700,h=600,draw=False); g.open()
@@ -19,6 +20,9 @@ for page in ['molly','comet']:
         g.ev("j=>document.getElementById('rigHost').__rigdbg().setP('jit',j)",jit); g.pg.wait_for_timeout(800)
         r=g.ev(STAT)
         chk('%s jit %.1f: limbs mirrored, same shades'%(page,jit), r['limbOff']==0 and r['limbShade']==0, r)
-        chk('%s jit %.1f: at least 72%% of facets mirrored, shades all but a few'%(page,jit), r['mirrored']>=0.72*r['tris'] and r['shadeDiffers']<=0.03*r['tris'], r)
+        chk('%s jit %.1f: at least 84%% of facets mirrored, shades all but a few'%(page,jit), r['mirrored']>=0.84*r['tris'] and r['shadeDiffers']<=0.03*r['tris'], r)
+g.click('#pages button[data-pg="molly"]',2500)
+g.ev("()=>{var d=document.getElementById('rigHost').__rigdbg();d.setP('LowerTorso.umir',1);d.setP('UpperTorso.umir',1);d.setP('jit',0.2);}"); g.pg.wait_for_timeout(1500)
+r=g.ev(STAT); chk('Mirror Bulge 1 on both torso parts: the welds are mirrored too, at least 96% of facets', r['mirrored']>=0.96*r['tris'] and r['shadeDiffers']==0, r)
 print('ALL PASS' if ok else 'SOME FAILED')
 g.close()

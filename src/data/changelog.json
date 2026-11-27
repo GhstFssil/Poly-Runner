@@ -1,5 +1,24 @@
 [
   {
+    "v": "v198",
+    "d": "Nov 27, 2026",
+    "t": "Mirrored faceting",
+    "g": [
+      [
+        "Added",
+        [
+          "Rig Editor: each part's Bulge 2 panel has a Mirror Bulge 1 toggle. On, bulge 2 becomes bulge 1's mirror image and follows it as you change bulge 1."
+        ]
+      ],
+      [
+        "Changed",
+        [
+          "Molly and Comet's faceting is mirrored down the centre line: facets that cross it are split into four round their middle, and when the torso is its own mirror image (Mirror Bulge 1 on for both torso parts) the shoulder and hip joins come out mirrored too."
+        ]
+      ]
+    ]
+  },
+  {
     "v": "v197",
     "d": "Nov 27, 2026",
     "t": "Editor tools, Lock Heading",
