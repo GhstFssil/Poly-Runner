@@ -108,11 +108,14 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       <button data-tool="target">Target</button>
       <button data-tool="tip">Tip Area</button>
       <button data-tool="start">Player Start</button>
+      <button data-tool="pathdraw">Draw Path</button>
+      <button data-tool="stretch">Stretch</button>
       <button data-tool="erase">Erase</button>
     </div>
     <div id="clusterOpts" class="piece" hidden></div>
     <div class="row"><button class="small" id="undo">Undo</button><button class="small" id="dup">Duplicate</button><button class="small" id="cpy">Copy</button><button class="small" id="pst">Paste</button><button class="small" id="pv">▶ Preview motion</button></div>
     <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.35"><input type="checkbox" id="attach" checked style="margin-top:2px"><span>Attach to the path: stamps near it follow it when the path changes</span></label>
+    <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.35"><input type="checkbox" id="drawOn" style="margin-top:2px"><span>Draw: with Seg Chain, Ledge, Gap or Mud chosen, drag on the map to draw a chain of joined pieces that follows your stroke (a click still places one). Turn it off to pan by dragging.</span></label>
     <div class="stats" id="counts"></div>
     <h2>Presets</h2>
     <div class="row"><input type="text" id="prName" placeholder="Name for the selection" maxlength="40" style="flex:1;min-width:0"><button class="small" id="prSave">Save Selection</button></div>
@@ -154,7 +157,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
   var DEF = { tree: { tH: 15.5, tW: 1.6, cH: 14.9, cW: 7.4, ex: false }, forest: { shape: 'circle', r: 60, w: 120, d: 80, count: 20, gap: 4, gapV: 2, tH: 15.5, tHV: 3, tW: 1.6, tWV: 0.3, cH: 14.9, cHV: 3, cW: 7.4, cWV: 1.5 }, cave: { shape: 'rect', w: 8, h: 8, roll: 0, ang: 20, len: 60, bend: 0, slope: 0, carve: 0 }, bigminion: {}, gazer: { gm: 'chase', hgt: 6, move: 'side', dist: 40, period: 4, phase: 0 }, toxic: { w: 12, d: 12 }, ramp: { len: 45, w: 9, ang: 30, boost: 15 }, door: { w: 12, hgt: 10, mode: 'cycle', open: 3, shut: 3, phase: 0, speed: 0.5, slide: 'down', sTx: 0, sTz: 0, oTx: 0, oTz: 0 }, checkpoint: { w: 16 }, seg: { big: false, h: 0 }, ledge: { len: 80, w: 4, hgt: 5, bend: 0, ends: 'round', tox: false }, platform: { len: 40, w: 16, hgt: 10, thick: 2, bend: 0, move: 'none', dist: 40, period: 4, tox: false }, gap: { len: 30, bend: 0, ends: 'round' }, mud: { len: 150, slow: 50, ends: 'round', w: 12 }, crag: { r: 60, count: 25, base: 5.5, baseV: 2, hgt: 4, hgtV: 2, gap: 6, gapV: 3 }, patch: { shape: 'ellipse', w: 200, d: 150, ground: 'grass', edge: 'soft', soft: 30 }, spawner: { r: 40, every: 3, max: 6 }, hill: { r: 80, h: 20, rock: 'rock' }, lake: { r: 100, depth: 12 }, goal: { kind: 'regular', style: 'banner', w: 16 }, segchain: { big: false, len: 120, gap: 12, h: 0, rise: 0, arc: 0 }, tip: { shape: 'circle', r: 40, w: 80, d: 60, text: 'A tip!' }, sign: { text: 'Caution!' }, start: {}, plate: { shape: 'rect', w: 8, d: 8, r: 4, look: 'gray', whl: false }, target: { size: 6, post: true, h: 7, tilt: 0, spin: 0, hb: 1, k: 20, sd: 0, sp: 4, vd: 0, vp: 4, phase: 0 } };
   var S = { more: [], width: 9, pieces: [{ len: 300, ang: 0, r: 640, dy: 0, ov: 1 }, { len: 1005.3, ang: 90, r: 640, dy: 0, ov: 1 }, { len: 400, ang: 0, r: 640, dy: 20, ov: 1 }, { len: 502.65, ang: -45, r: 640, dy: 0, ov: 1 }, { len: 300, ang: 0, r: 640, dy: 0, ov: 1 }], objs: [] };
   var GH = null, DEFUSER = {};                                  // GH: the not-yet-placed stamp whose settings the panel shows while a stamp tool is chosen
-  function ghostMode() { return tool !== 'select' && tool !== 'erase' && tool !== 'preset' && tool !== 'forest'; }
+  function ghostMode() { return tool !== 'select' && tool !== 'erase' && tool !== 'preset' && tool !== 'forest' && !NOSTAMP[tool]; }
+  var NOSTAMP = { pathdraw: 1, stretch: 1 };                      // tools that place no stamp: no ghost, no next-stamp panel
   var tool = 'select', view = { cx: 300, cz: -300, zoom: 0.5 }, samples = [], total = 0, hist = [], hover = null, sel = -1, dpr = 1;
   var STRIPS = { segchain: 1, ledge: 1, platform: 1, gap: 1, mud: 1 };
   var MOB_KINDS = ['minion', 'bigminion'];                         // mob kinds that can be set Idle (add any new mob kind here)
@@ -511,6 +515,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     }
     allPaths().forEach(function (pth, pk) { if (!pathVis(pk)) return; var st = w2s(pth.x, pth.z); ctx.fillStyle = css('--accent'); ctx.beginPath(); ctx.arc(st[0], st[1], 6, 0, 7); ctx.fill(); ctx.fillText(pk ? 'PATH ' + (pk + 1) : 'START', st[0] + 9, st[1] + 4); });
     drawOrder(S.objs).forEach(function (o) { if (o.t === 'tip') return; if (objVis(o)) drawObj(o, isSel(o)); else if (ghostObj(o)) { ctx.save(); ctx.globalAlpha = 0.16; drawObj(o, false); ctx.restore(); } });   // layer by layer, back to front; hidden layers as faint shadows
+    if (tool === 'stretch') { ctx.save(); stHandles().forEach(function (h) { var q = w2s(h.x, h.z), r = h.o ? 6 : 5; ctx.fillStyle = h.o ? css('--accent') : '#fff'; ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.beginPath(); if (h.k === 'ps' || h.k === 'ss') ctx.arc(q[0], q[1], r, 0, 2 * Math.PI); else ctx.rect(q[0] - r, q[1] - r, 2 * r, 2 * r); ctx.fill(); ctx.stroke(); }); ctx.restore(); }   // Stretch: round handles at starts, square at ends
+    if (drawStroke && drawStroke.length > 1) { ctx.save(); ctx.strokeStyle = css('--accent'); ctx.lineWidth = 3; ctx.globalAlpha = 0.8; ctx.setLineDash([6, 4]); ctx.beginPath(); drawStroke.forEach(function (q, i) { var q2 = w2s(q[0], q[1]); if (i) ctx.lineTo(q2[0], q2[1]); else ctx.moveTo(q2[0], q2[1]); }); ctx.stroke(); ctx.restore(); }   // Draw: the stroke so far
     if (marq) { var ma = w2s(Math.min(marq.x0, marq.x1), Math.min(marq.z0, marq.z1)), mb = w2s(Math.max(marq.x0, marq.x1), Math.max(marq.z0, marq.z1)); ctx.fillStyle = css('--accent'); ctx.globalAlpha = 0.12; ctx.fillRect(ma[0], ma[1], mb[0] - ma[0], mb[1] - ma[1]); ctx.globalAlpha = 1; ctx.strokeStyle = css('--accent'); ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]); ctx.strokeRect(ma[0], ma[1], mb[0] - ma[0], mb[1] - ma[1]); ctx.setLineDash([]); }
     if (hover && tool === 'preset' && presets[armed]) { var pg0 = w2s(hover[0], hover[1]); ctx.strokeStyle = css('--accent'); ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.arc(pg0[0], pg0[1], 14, 0, 6.2832); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = css('--accent'); ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText(presets[armed].name + ' (' + presets[armed].items.length + ')', pg0[0] + 18, pg0[1] + 4); }
     else if (hover && tool === 'forest') {
@@ -518,7 +524,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (fd.shape === 'rect') ctx.strokeRect(-fd.w / 2 * view.zoom, -fd.d / 2 * view.zoom, fd.w * view.zoom, fd.d * view.zoom); else { ctx.beginPath(); ctx.arc(0, 0, fd.r * view.zoom, 0, 7); ctx.stroke(); }
       ctx.setLineDash([]); ctx.globalAlpha = 0.35; forestLayout(fd, 12345).forEach(function (c) { ctx.beginPath(); ctx.arc(c.x * view.zoom, c.z * view.zoom, Math.max(2, c.rad * view.zoom), 0, 7); ctx.fill(); }); ctx.restore();
     }
-    else if (hover && tool !== 'select' && tool !== 'erase' && tool !== 'preset') { var g = mk(tool, hover[0], hover[1]); ctx.globalAlpha = 0.5; drawObj(g, false); ctx.globalAlpha = 1; }
+    else if (hover && tool !== 'select' && tool !== 'erase' && tool !== 'preset' && !NOSTAMP[tool]) { var g = mk(tool, hover[0], hover[1]); ctx.globalAlpha = 0.5; drawObj(g, false); ctx.globalAlpha = 1; }
   }
   function cpKey(q) { if (q.s !== undefined) return q.s; var p = pos(q); return nearest(p.x, p.z).s; }           // how far along the path a checkpoint is (free-placed ones: the nearest bit of path)
   function cpNumber(o) { var n = 1, ko = cpKey(o), ix = S.objs.indexOf(o); S.objs.forEach(function (q, qi) { if (q !== o && q.t === 'checkpoint') { var kq = cpKey(q); if (kq < ko || (kq === ko && qi < ix)) n++; } }); return n; }
@@ -813,7 +819,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     var p = ghost ? { x: 0, z: 0, th: 0 } : pos(o), h = '<div class="head"><span>' + (ghost ? 'Next ' + NAMES[o.t].toLowerCase() : NAMES[o.t]) + '</span>' + (ghost ? '' : '<span class="row" style="gap:4px"><button class="small" data-oact="del">Delete</button></span>') + '</div><div class="fields std">';
     var joinedCave = !ghost && o.t === 'cave' && o.after !== undefined;
     if (!ghost) h += layerSelect(lyrOf(o).id, 'data-ok="layer"', 'Layer', false);
-    if (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag') h += '<label class="f">Height With Others<select data-ok="hm"><option value="add"' + (o.hm === 'ind' ? '' : ' selected') + '>Additive: Stacks on What It Crosses</option><option value="ind"' + (o.hm === 'ind' ? ' selected' : '') + '>Independent: Its Own Height, Merges in</option></select></label>';
+    if (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag') h += '<label class="f">Height With Others<select data-ok="hm"><option value="add"' + (o.hm === 'ind' || o.hm === 'sup' ? '' : ' selected') + '>Additive: Stacks on What It Crosses</option><option value="ind"' + (o.hm === 'ind' ? ' selected' : '') + '>Independent: Its Own Height, Merges in</option>' + (o.t === 'ledge' ? '' : '<option value="sup"' + (o.hm === 'sup' ? ' selected' : '') + '>Supersede: Cuts What It Touches Flat</option>') + '</select></label>';
     if (joinedCave) h += '<label class="f">Starts From<select data-ok="after"><option value="">Its Own Mouth</option>' + S.objs.filter(function (q) { return q !== o && q.t === 'cave'; }).map(function (q) { return '<option value="' + q.id + '"' + (o.after === q.id ? ' selected' : '') + '>End of Cave #' + (S.objs.indexOf(q) + 1) + '</option>'; }).join('') + '</select></label>';
     var isFree = o.noat || (!ghost && o.s === undefined);
     if (!STRIPS[o.t] && !joinedCave) h += '<label class="f">Snap to the Path<select data-ok="noat"><option value="0"' + (isFree ? '' : ' selected') + '>Snaps: Follows the Path When It Changes</option><option value="1"' + (isFree ? ' selected' : '') + '>Free: Stays Where It Is</option></select></label>';
@@ -945,7 +951,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     else if (k === 'mode' && o.t === 'door') { o.mode = t.value; }
     else if (k === 'slide' && o.t === 'door') { o.slide = t.value; delete o.sink; }
     else if (k === 'modeA' && o.t === 'door') { o.modeA = t.value; }
-    else if (k === 'hm') { o.hm = t.value === 'ind' ? 'ind' : 'add'; }
+    else if (k === 'hm') { o.hm = t.value === 'ind' ? 'ind' : t.value === 'sup' && o.t !== 'ledge' ? 'sup' : 'add'; }
     else if (k === 'angSet') { o.angSet = t.value === '1'; }
     else if (k === 'noat') {
       var free = t.value === '1', pn = ghost ? null : pos(o); o.noat = free; DEF[o.t] = DEF[o.t] || {}; DEF[o.t].noat = free;
@@ -988,7 +994,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     $('counts').textContent = Object.keys(NAMES).filter(function (k) { return c[k]; }).map(function (k) { return c[k] + ' ' + NAMES[k].toLowerCase() + (c[k] > 1 && k !== 'tip' ? 's' : ''); }).join(' · ') || 'No stamps yet';
     var R = function (v) { return Math.round(v * 10) / 10; };
     $('json').value = JSON.stringify({ version: 2, width: S.width, terrain: S.terrain || undefined, timeLimit: S.timeLimit || undefined, ranks: S.ranks && Object.keys(DEFR).some(function (k) { return S.ranks[k] !== undefined && S.ranks[k] !== DEFR[k]; }) ? S.ranks : undefined, pieces: S.pieces, extraPaths: S.more && S.more.length ? S.more.map(function (m) { return { x: m.x || 0, z: m.z || 0, heading: m.th || 0, rise: m.y || 0, layer: m.layer !== undefined && m.layer !== S.layers[0].id ? m.layer : undefined, pieces: m.pieces }; }) : undefined, layers: S.layers.length > 1 || S.layers[0].name !== 'Layer 1' || S.layers[0].vis === false || S.layers[0].lock ? S.layers.map(function (l) { return { id: l.id, name: l.name, visible: l.vis !== false, locked: !!l.lock }; }) : undefined, pathLayer: S.pathLayer !== undefined && S.pathLayer !== S.layers[0].id ? S.pathLayer : undefined, motion: { clock: 'the level\'s own clock, never time since a platform loaded', offset: 'travel / 2 * sin(2 * pi * (T + phase) / period)' }, objects: S.objs.map(function (o) {
-      var r = { type: o.t, id: o.id }; if (o.hm === 'ind' && (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag')) r.heightMode = 'independent'; if (o.layer !== undefined && o.layer !== S.layers[0].id) r.layer = o.layer; if (o.s !== undefined) { r.s = R(o.s); r.u = R(o.u); } else { r.x = R(o.x); r.z = R(o.z); }
+      var r = { type: o.t, id: o.id }; if (o.hm === 'ind' && (o.t === 'ledge' || o.t === 'hill' || o.t === 'crag')) r.heightMode = 'independent'; else if (o.hm === 'sup' && (o.t === 'hill' || o.t === 'crag')) r.heightMode = 'supersede'; if (o.layer !== undefined && o.layer !== S.layers[0].id) r.layer = o.layer; if (o.s !== undefined) { r.s = R(o.s); r.u = R(o.u); } else { r.x = R(o.x); r.z = R(o.z); }
       if (o.rot) r.rot = o.rot; if (o.y) r.y = o.y; if (o.ya !== undefined) r.yAbs = o.ya; if (o.noat) r.noAttach = true;
       if (o.t === 'tree' && o.ex) { r.exact = true; r.trunkHeight = o.tH; r.trunkWidth = o.tW; r.canopyHeight = o.cH; r.canopyWidth = o.cW; }
       if (o.t === 'toxic') { r.width = o.w; r.length = o.d; }
@@ -1200,7 +1206,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
         if (r.type === 'ledge' || r.type === 'platform') o.tox = !!r.toxic;
         if (r.type === 'mud') { o.slow = r.slowdown === undefined ? 50 : r.slowdown; o.len = r.length || 150; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.rot !== undefined ? r.rot : r.heading || 0; o.bend = r.bend || 0; o.w = r.width || 12; } }
         if (r.type === 'ledge' || r.type === 'platform' || r.type === 'gap') { o.len = r.length || 40; o.follow = r.s !== undefined; if (!o.follow) { o.th = r.rot !== undefined ? r.rot : r.heading || 0; o.bend = r.bend || 0; } }
-        if (r.id !== undefined) o.id = r.id; if (r.layer !== undefined) o.layer = r.layer; if (r.heightMode === 'independent') o.hm = 'ind';
+        if (r.id !== undefined) o.id = r.id; if (r.layer !== undefined) o.layer = r.layer; if (r.heightMode === 'independent') o.hm = 'ind'; else if (r.heightMode === 'supersede') o.hm = 'sup';
         if (typeof r.after === 'number' && r.type !== 'door') { o.after = r.after; o.turn = r.turn || 0; o.follow = false; }   // starts from the end of another piece (a door's "after" is its mode once beaten, not this)
         if (r.type === 'tree' && r.exact) { o.ex = true; o.tH = r.trunkHeight || 15.5; o.tW = r.trunkWidth || 1.6; o.cH = r.canopyHeight || 14.9; o.cW = r.canopyWidth || 7.4; }
         if (r.type === 'crag') { o.r = r.radius || 60; o.count = r.count || 25; o.seed = r.seed || (1 + Math.floor(Math.random() * 2000000000)); if (r.heightVar !== undefined) { o.base = r.baseRadius || 5.5; o.baseV = r.baseRadiusVar || 0; o.hgt = r.height || 4; o.hgtV = r.heightVar || 0; o.gap = r.spacing || 0; o.gapV = r.spacingVar || 0; } else { o.base = 5.5; o.baseV = 2; o.hgt = Math.round(0.675 * (r.height || 6) * 10) / 10; o.hgtV = Math.round(0.325 * (r.height || 6) * 10) / 10; o.gap = 0; o.gapV = 0; } }
@@ -1237,6 +1243,80 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (t === 'crag') { var parts = splitCrags(n0); parts.forEach(function (c) { S.objs.push(c); }); setSelList(parts); return; }   // a stamped cluster lands as separate crags, so each can be moved or tuned alone
     S.objs.push(n0); setSel(S.objs.length - 1);
   }
+  // Draw: a stroke becomes a chain of joined pieces (each an arc: Rotation from the last piece's end, Bend, Length), fitted so no stroke point strays more than DRAW_TOL from it
+  var DRAWABLE = { segchain: 1, ledge: 1, gap: 1, mud: 1 }, drawStroke = null, DRAW_TOL = 1.5, DRAW_MAXB = 120;
+  function hOf(dx, dz) { return Math.atan2(dx, -dz); }                    // heading of a direction (0 = north, + = east), as shapeAt uses
+  function wrapA(a) { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; }
+  function arcTo(x0, z0, h0, x1, z1) {                                    // the arc leaving (x0, z0) on heading h0 that ends at (x1, z1): its bend (radians) and length
+    var c = Math.hypot(x1 - x0, z1 - z0), ph = wrapA(hOf(x1 - x0, z1 - z0) - h0);
+    return { B: 2 * ph, L: Math.abs(ph) < 1e-4 ? c : c * ph / Math.sin(ph) };
+  }
+  function arcDev(x0, z0, h0, a, q) {                                     // how far point q is from that arc's circle (or line)
+    if (Math.abs(a.B) < 1e-4) return Math.abs((q[0] - x0) * -Math.cos(h0) - (q[1] - z0) * Math.sin(h0));
+    var R = a.L / a.B, cx = x0 + Math.cos(h0) * R, cz = z0 + Math.sin(h0) * R; return Math.abs(Math.hypot(q[0] - cx, q[1] - cz) - Math.abs(R));
+  }
+  function drawFit(pts, tol, h0) {                                        // pieces [{x, z, th (rad), turn (rad), B, L}]: each runs as far along the stroke as it still fits; h0: the heading it must leave on (a path being extended)
+    var out = [], i = 0, x = pts[0][0], z = pts[0][1], h = h0 !== undefined ? h0 : hOf(pts[Math.min(pts.length - 1, 2)][0] - x, pts[Math.min(pts.length - 1, 2)][1] - z), hard = h0 !== undefined;
+    while (i < pts.length - 1) {
+      var turn = 0, j0 = Math.min(pts.length - 1, i + 2), hd = hOf(pts[j0][0] - x, pts[j0][1] - z);
+      if ((out.length || hard) && Math.abs(wrapA(hd - h)) > 35 * Math.PI / 180) { turn = wrapA(hd - h); h = hd; }   // a sharp corner in the stroke: the next piece turns at the joint
+      var best = null, bj = i + 1;
+      for (var j = i + 1; j < pts.length; j++) {
+        var a = arcTo(x, z, h, pts[j][0], pts[j][1]); if (Math.abs(a.B) > DRAW_MAXB * Math.PI / 180 || !(a.L > 0)) break;
+        var okp = true; for (var k = i + 1; k < j; k++) if (arcDev(x, z, h, a, pts[k]) > tol) { okp = false; break; }
+        if (!okp) break; best = a; bj = j;
+      }
+      if (!best) best = arcTo(x, z, h, pts[i + 1][0], pts[i + 1][1]);
+      out.push({ x: x, z: z, th: h, turn: turn, B: best.B, L: best.L }); x = pts[bj][0]; z = pts[bj][1]; h = wrapA(h + best.B); i = bj;
+    }
+    return out;
+  }
+  function drawCommit(t, pts) {                                           // the stroke's pieces as joined stamps of kind t, selected; returns them
+    var sp = [pts[0]]; pts.forEach(function (q) { var l = sp[sp.length - 1]; if (Math.hypot(q[0] - l[0], q[1] - l[1]) >= Math.max(1, 3 / view.zoom)) sp.push(q); });   // evenly enough spaced (3 pixels, at least 1 unit)
+    if (sp.length < 2) return [];
+    var R1 = function (v) { return Math.round(v * 10) / 10; }, made = [], prev = null;
+    drawFit(sp, Math.max(DRAW_TOL, 4 / view.zoom)).forEach(function (f) {
+      if (f.L < 1) return;
+      var o = mk(t, f.x, f.z); o.len = R1(f.L); o.bend = R1(f.B * 180 / Math.PI);
+      if (prev) { delete o.x; delete o.z; o.after = prev.id; o.turn = R1(f.turn * 180 / Math.PI); o.th = 0; } else o.th = R1(f.th * 180 / Math.PI);
+      o.id = nextId++; S.objs.push(o); made.push(o); prev = o;
+    });
+    setSelList(made); return made;
+  }
+  function drawThin(pts) { var sp = [pts[0]]; pts.forEach(function (q) { var l = sp[sp.length - 1]; if (Math.hypot(q[0] - l[0], q[1] - l[1]) >= Math.max(1, 3 / view.zoom)) sp.push(q); }); return sp; }
+  function drawPath(pts) {                                                // Draw Path: a stroke starting at a path's end extends it, anywhere else starts a new path; returns how many pieces it made
+    var sp = drawThin(pts); if (sp.length < 2) return 0;
+    var R1 = function (v) { return Math.round(v * 10) / 10; }, hit = -1, hd = Math.max(6, 15 / view.zoom), bestD = hd;
+    INFO.forEach(function (inf, pk) { var l = inf[inf.length - 1]; if (l && !l.disc) { var d = Math.hypot(l.x1 - sp[0][0], l.z1 - sp[0][1]); if (d < bestD) { bestD = d; hit = pk; } } });
+    var list, fit;
+    if (hit >= 0) { var le = INFO[hit][INFO[hit].length - 1]; sp[0] = [le.x1, le.z1]; fit = drawFit(sp, Math.max(DRAW_TOL, 4 / view.zoom), le.th1); list = pcs(hit); }
+    else { fit = drawFit(sp, Math.max(DRAW_TOL, 4 / view.zoom)); S.more.push({ x: R1(sp[0][0]), z: R1(sp[0][1]), th: R1(fit[0].th * 180 / Math.PI), y: 0, pieces: [] }); hit = S.more.length; list = S.more[hit - 1].pieces; openPaths[hit] = true; }
+    var n = 0;
+    fit.forEach(function (f, i) {
+      if (f.L < 1) return;
+      var pc = { len: R1(f.L), ang: R1(f.B * 180 / Math.PI), r: 640, dy: 0, ov: 1 }; if (Math.abs(pc.ang) > 0.05) pc.r = R1(f.L / Math.abs(f.B));
+      if (f.turn) pc.sh = R1((f.th) * 180 / Math.PI);                     // a sharp corner: this piece starts on a heading of its own, from the same spot
+      list.push(pc); n++;
+    });
+    return n;
+  }
+  // Stretch: handles on every path joint and start, and on the selected strips' start and end; dragging one reshapes what it ends
+  var stretchH = null;
+  function stHandles() {
+    var out = [];
+    INFO.forEach(function (inf, pk) { if (inf[0]) out.push({ k: 'ps', pk: pk, x: inf[0].x0, z: inf[0].z0 }); inf.forEach(function (q, pi) { if (!q.disc) out.push({ k: 'pe', pk: pk, pi: pi, x: q.x1, z: q.z1 }); }); });
+    selList().forEach(function (o) { if (!STRIPS[o.t]) return; var a = shapeAt(o, 0), b = shapeAt(o, o.len); if (o.after === undefined) out.push({ k: 'ss', o: o, x: a.x, z: a.z }); out.push({ k: 'se', o: o, x: b.x, z: b.z }); });
+    return out;
+  }
+  function stPick(wx, wz) { var r = 9 / view.zoom, best = null; stHandles().forEach(function (h) { var d = Math.hypot(h.x - wx, h.z - wz); if (d < r && (!best || d < best.d || (h.o && !best.h.o && d < best.d + 0.01))) best = { d: d, h: h }; }); if (best && best.h.k === 'ss') { var e = shapeAt(best.h.o, best.h.o.len); best.h.end = [e.x, e.z, best.h.o.s + best.h.o.len]; } return best ? best.h : null; }
+  function stApply(h, w) {
+    var R1 = function (v) { return Math.round(v * 10) / 10; }, a, o = h.o;
+    if (h.k === 'pe') { var q = INFO[h.pk][h.pi], p = pcs(h.pk)[h.pi]; a = arcTo(q.x0, q.z0, q.th0, w[0], w[1]); if (!(a.L >= 1) || Math.abs(a.B) > 2 * Math.PI) return; p.len = R1(a.L); p.ang = R1(a.B * 180 / Math.PI); p.r = Math.abs(p.ang) > 0.05 ? R1(a.L / Math.abs(a.B)) : 640; return; }
+    if (h.k === 'ps') { var f0 = pcs(h.pk)[0]; if (h.pk === 0 || (f0 && f0.sx !== undefined)) { if (f0) { f0.sx = R1(w[0]); f0.sz = R1(w[1]); } } else { S.more[h.pk - 1].x = R1(w[0]); S.more[h.pk - 1].z = R1(w[1]); } return; }
+    var onPath = o.follow !== false && o.after === undefined;
+    if (h.k === 'se') { if (onPath) { o.len = Math.max(1, R1(nearest(w[0], w[1]).s - o.s)); return; } var b = base(o, 0); a = arcTo(b.x, b.z, b.th, w[0], w[1]); if (a.L >= 1) { o.len = R1(a.L); o.bend = R1(a.B * 180 / Math.PI); } return; }
+    if (h.k === 'ss') { if (onPath) { var nn = nearest(w[0], w[1]); if (h.end[2] - nn.s >= 1) { o.s = nn.s; o.u = o.t === 'mud' ? 0 : nn.u; o.len = R1(h.end[2] - nn.s); } return; } a = arcTo(w[0], w[1], (o.th || 0) * Math.PI / 180, h.end[0], h.end[1]); if (a.L >= 1) { o.x = R1(w[0]); o.z = R1(w[1]); o.len = R1(a.L); o.bend = R1(a.B * 180 / Math.PI); } }
+  }
   cv.addEventListener('pointerdown', function (e) {
     cv.setPointerCapture(e.pointerId);
     var r = cv.getBoundingClientRect(), w = s2w(e.clientX - r.left, e.clientY - r.top);
@@ -1244,10 +1324,12 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       drag = { x: e.clientX, y: e.clientY, marquee: true, add: e.altKey || e.ctrlKey || e.metaKey, base: selList().slice(), moved: false, obj: -1, hit: -1 };
       marq = { x0: w[0], z0: w[1], x1: w[0], z1: w[1] }; return;
     }
-    var all = tool === 'select' || tool === 'erase' ? pickAll(w[0], w[1]) : [], hi = all.length ? all[0] : -1, cur = selList(), prevSel = cur.length === 1 ? S.objs.indexOf(cur[0]) : -1;
+    if (tool === 'stretch') { var sh0 = stPick(w[0], w[1]); if (sh0) { drag = { x: e.clientX, y: e.clientY, moved: false, st: sh0, obj: -1, hit: -1, snapped: false }; return; } }
+    var all = tool === 'select' || tool === 'erase' || tool === 'stretch' ? pickAll(w[0], w[1]) : [], hi = all.length ? all[0] : -1, cur = selList(), prevSel = cur.length === 1 ? S.objs.indexOf(cur[0]) : -1;
     for (var k = 0; k < all.length; k++) if (isSel(S.objs[all[k]])) { hi = all[k]; break; }   // a stamp that is already selected wins, so one under others can still be dragged
     if ((e.altKey || e.ctrlKey || e.metaKey) && tool === 'select') { drag = { x: e.clientX, y: e.clientY, cx: view.cx, cz: view.cz, moved: false, obj: -1, hit: hi, alt: true, all: all }; return; }
     drag = { x: e.clientX, y: e.clientY, cx: view.cx, cz: view.cz, moved: false, obj: tool === 'select' && hi >= 0 ? hi : -1, hit: hi, all: all, prevSel: prevSel, snapped: false };
+    if (($('drawOn').checked && DRAWABLE[tool]) || tool === 'pathdraw') { drag.draw = true; drawStroke = [w]; }
     if (drag.obj >= 0) {
       if (cur.length > 1 && isSel(S.objs[drag.obj])) {           // a group: they all move together
         drag.group = cur.map(function (q) { var p = pos(q); return { o: q, x: p.x, z: p.z }; }); drag.w0 = w;
@@ -1260,6 +1342,8 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (drag) {
       var dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
       if (drag.marquee) { marq.x1 = w[0]; marq.z1 = w[1]; draw(); return; }
+      if (drag.st) { if (drag.moved) { if (!drag.snapped) { snap(); drag.snapped = true; } stApply(drag.st, w); afterEdit(false); renderInsp(); } return; }
+      if (drag.draw) { var lq = drawStroke[drawStroke.length - 1]; if (Math.hypot(w[0] - lq[0], w[1] - lq[1]) > 0.5) drawStroke.push(w); draw(); return; }
       if (drag.moved) {
         if (drag.group) { if (!drag.snapped) { snap(); drag.snapped = true; } drag.group.forEach(function (g) { if (g.o.after === undefined) place2(g.o, g.x + w[0] - drag.w0[0], g.z + w[1] - drag.w0[1]); }); afterEdit(false); return; }
         if (drag.obj >= 0) { if (S.objs[drag.obj].after !== undefined) return; if (!drag.snapped) { snap(); drag.snapped = true; } place2(S.objs[drag.obj], w[0] + drag.dx, w[1] + drag.dz); afterEdit(false); renderInsp(); return; }
@@ -1276,6 +1360,10 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (d.add) found = d.base.concat(found.filter(function (q) { return d.base.indexOf(q) < 0; }));
       setSelList(found); renderInsp(); draw(); if (found.length > 1) flashHint(found.length + ' stamps selected'); return;
     }
+    if (d && d.draw) { var st = drawStroke; drawStroke = null; if (d.moved && tool === 'pathdraw') { snap(); var np = drawPath(st); if (!np) hist.pop(); afterEdit(true); draw(); flashHint(np ? 'Drew ' + np + ' path piece' + (np > 1 ? 's' : '') : 'Stroke too short to draw'); return; }
+      if (d.moved) { snap(); var mm = drawCommit(tool, st); if (!mm.length) hist.pop(); afterEdit(false); renderInsp(); draw(); flashHint(mm.length ? 'Drew ' + mm.length + ' joined ' + NAMES[tool].toLowerCase() + ' piece' + (mm.length > 1 ? 's' : '') : 'Stroke too short to draw'); return; } draw(); }
+    if (d && d.st) { if (d.moved) { afterEdit(true); draw(); } else flashHint('Drag a handle to move that point'); return; }
+    if (d && tool === 'pathdraw' && !d.moved) { flashHint('Drag to draw a path: start at the end of one to extend it'); return; }
     if (!d || d.moved) return;
     var r = cv.getBoundingClientRect(), w = s2w(e.clientX - r.left, e.clientY - r.top);
     if (d.alt) {                                                 // alt/ctrl + click: add or remove one stamp
@@ -1284,7 +1372,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     }
     if (tool === 'erase') { if (d.hit >= 0) { snap(); removeAt(d.hit); setSel(-1); afterEdit(false); renderInsp(); } }
     else if (tool === 'preset') { if (presets[armed]) pasteSnap(presets[armed], w[0], w[1]); }
-    else if (tool === 'select') {
+    else if (tool === 'select' || tool === 'stretch') {
       var pick1 = d.hit;
       if (d.all.length > 1 && d.prevSel >= 0 && d.all.indexOf(d.prevSel) >= 0) pick1 = d.all[(d.all.indexOf(d.prevSel) + 1) % d.all.length];   // clicking the same spot again steps down through whatever is stacked there
       setSel(pick1);
