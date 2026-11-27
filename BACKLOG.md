@@ -9,7 +9,7 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 
 ## Editor tools
 - [ ] (Claude, 2026-11-25) Supersede for Ledges too? Hill and Crags have it; a ledge's bottom follows the ground along its length, so "flat to its bottom" needs a rule (its start's height, or follow the ground). **Decision** (Ricky).
-- [ ] (Claude, 2026-11-27) Editor tools, left from Ricky's draw/stretch item (plan approved 2026-11-25): Path Editor Stretch (drag a stamp's points), Draw for the path itself, Rig Editor Stretch, Rig Editor Draw for hair.
+- [ ] (Claude, 2026-11-27) Editor tools, left from Ricky's draw/stretch item (plan approved 2026-11-25): Rig Editor Stretch, Rig Editor Draw for hair.
 
 ## New mechanics (design first)
 - [ ] Wind: Placed kind of the same way as tunnels, but it has no collision, it's just an area that gives the runner a directional acceleration. The acceleration can be set in any direction including up/down. Should have some subtle and unobtrusive visual indicator

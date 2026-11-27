@@ -82,7 +82,7 @@ Each is a stamp. The first column is the exact label, as the Path Editor shows i
 
 Path Editor panel words: inspector, next-stamp panel, presets (`polyrunner-pe-presets`), Snap, Layer, Bend, Rise, Length, Width, Height, Rotation.
 
-Draw (Path Editor toggle under the tools): with Seg Chain, Ledge, Gap or Mud chosen, a drag becomes a chain of joined pieces (each starts from the one before: `after`, `turn`) fitted to the stroke; code `drawFit`, `drawCommit`. Stretch: dragging a stamp's points to reshape it (planned).
+Draw (Path Editor toggle under the tools): with Seg Chain, Ledge, Gap or Mud chosen, a drag becomes a chain of joined pieces (each starts from the one before: `after`, `turn`) fitted to the stroke; code `drawFit`, `drawCommit`. Draw Path (tool): a stroke from a path's end extends it, anywhere else starts a new path (`extraPaths`); a sharp corner sets the next piece's start heading (`sh`); code `drawPath`. Stretch (tool): handles on every path joint (square) and start (round), and on the selected strips' start and end; dragging one reshapes the piece it ends, what follows moves with it; code `stHandles`, `stApply`.
 
 Height With Others (Ledge, Hill, Crags): Additive (stacks on what it crosses), Independent (its own height, merges in; saved `heightMode: 'independent'`), Supersede (Hill and Crags only: everything under its footprint, ledges included, is cut or filled flat to its bottom, with a short slope at the edge; saved `heightMode: 'supersede'`, frozen; code `sbSupApply`). A stamp's bottom is its true Y, or the ground at its centre without it.
 

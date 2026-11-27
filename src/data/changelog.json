@@ -9,7 +9,9 @@
         [
           "Rig Editor, Mobs page: a Save to Game button. It hands your mob changes to the game straight away and says so, without closing the editor (closing still works too). Reset This One now shows its message on the Mobs page as well.",
           "Path Editor: Hills and Crags have a new Height With Others choice, Supersede. Everything under the stamp (ground, path, other hills, crags and ledges) is cut or filled flat to its bottom, with a short slope at the edge, and the stamp stands on that.",
-          "Path Editor: a Draw toggle. Turn it on, choose Seg Chain, Ledge, Gap or Mud, and drag on the map: your stroke becomes a chain of joined pieces that follows it, with a turn at any sharp corner. A click still places one piece, and one Undo takes the whole chain back."
+          "Path Editor: a Draw toggle. Turn it on, choose Seg Chain, Ledge, Gap or Mud, and drag on the map: your stroke becomes a chain of joined pieces that follows it, with a turn at any sharp corner. A click still places one piece, and one Undo takes the whole chain back.",
+          "Path Editor: a Draw Path tool. Start a stroke at the end of a path to extend it, or anywhere else to start a new path. The pieces follow your stroke, and a sharp corner becomes a turn.",
+          "Path Editor: a Stretch tool. It shows handles at every joint and start of the paths, and at the ends of the selected ledge, gap, mud, platform or Seg Chain. Drag one to move that point: the piece before it bends and stretches to meet it, and everything after follows."
         ]
       ]
     ]
