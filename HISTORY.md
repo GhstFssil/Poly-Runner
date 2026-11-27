@@ -88,3 +88,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-27 14:20 | v197 | Publish: Editor tools (Mobs Save to Game, Supersede, Draw, Draw Path, Stretch); label v196 -> v197
 - 2026-11-27 15:05 | next | Lock Heading (Caps Lock press turning Free Look on aligns Molly to the path; 1 s cooldown; trips over 30° above 20 Zips), Dash Line while a Dodecadash charges, Caps Lock now toggles Free Look per press; tests lh1.py, dl1.py, cam1.py updated
 - 2026-11-27 15:07 | main (docs) | CLAUDE.md: nightly sweeps paused indefinitely; no nightly branch check at session start
+- 2026-11-27 14:53 | next | BACKLOG: Comet Lock Heading and Comet Faceplant animation

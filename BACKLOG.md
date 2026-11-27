@@ -5,6 +5,7 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 ## Characters and looks
 - [ ] Runner model faceting should be mirrored down the center line. (Claude, 2026-11-25) Mostly done on `next`: limbs, hair and shading match; still not mirrored: the welded shoulders and hips (the weld cut differs side to side) and the strips straddling the centre line (front/back middle, ponytail). Review with Ricky.
 - [ ] (Ricky, 2026-11-23) Give comet her own hair (ringlet curls)
+- [ ] (Ricky, 2026-11-27) Give Comet her own Faceplant animation.
 - [ ] (Ricky, 2026-11-23) Add special assets for the faces (eyes, mouth, nose).
 
 ## Editor tools
@@ -13,6 +14,8 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 
 ## New mechanics (design first)
 - [ ] Wind: Placed kind of the same way as tunnels, but it has no collision, it's just an area that gives the runner a directional acceleration. The acceleration can be set in any direction including up/down. Should have some subtle and unobtrusive visual indicator
+
+- [ ] (Ricky, 2026-11-27) Comet should have Lock Heading too (needs her Faceplant animation for the trip first).
 
 ## Infrastructure
 - [ ] (Ricky, 2026-11-22) Tavern and Update Buttons:
