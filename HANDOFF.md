@@ -1,7 +1,7 @@
 # Handoff (2026-11-27)
 
 ## Goal
-Mirrored faceting (BACKLOG, Characters and looks), on `next` as v198 (CHANGELOG entry started; label still v197).
+Mirrored faceting (BACKLOG, Characters and looks): published as v198. Waiting on Ricky for Mirror Bulge 1 on the torso.
 
 ## Done
 - v197 published (Editor tools, Lock Heading, Dash Line, Mirror toggle not in it).
