@@ -6,9 +6,7 @@ BACKLOG's Editor tools group, on `next`, one item at a time (Characters and look
 ## Done
 - Character Select (step 1): choosing a level opens `scr-pickchar` (ui/page-body.html); two compact stat cards with Play buttons; the last pick is marked "(last time)", focused, id `pcLast`. Back returns to Level Select. The Characters page shows both full cards, no buttons. Wiring: `pickThen`/`__pickChar` in ui/screens.js; cards in `refreshStatCards` (level1/trees.js).
 - Tests: `tests/fu/pick1.py` ALL PASS; comet1 now uses `__setChar`; reg2/reg3/reg4/lvprobe/steep*/oc_new click `pcLast` after a level button.
-
 - Comet Hover pose (step 2): hovering plays Idle instead of a run clip (molly-update.js); `comet.ho.*` changes still laid over it, plus new stat `comet.hov.lean` (12°, scaled by speed / hover top speed, comet.js). Rig Editor Hover preview uses `poseIdle` with the lean at full. Test `tests/fu/hov1.py` ALL PASS.
-
 - Faceting (step 3, partly): ring quads tagged in `buildSeg` and re-cut in model space by `quadSplit`/`diagPick` (soupOf); hair quads use `diagPick`; Shading Variation is `shadeAt` (smooth noise of |x|,y,z, seeded per part id without side). Facets mirrored 492 -> 2696 of 3558; limbs and shades exact. Built-in models re-baked. Test `tests/fu/mirror1.py`. rw4 welds: default/sides7 unchanged (0 odd); irr 0.6: arms 4 open/2 odd (was 3 open, broken loops).
 
 - Split (2026-11-25): character setup moved from level1/trees.js to characters/character-stats.js (loads right after it; game unchanged).
