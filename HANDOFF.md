@@ -1,7 +1,7 @@
 # Handoff (2026-11-27)
 
 ## Goal
-Make paths that curve into walls easier to follow without changing physics (the old BACKLOG Decision): Lock Heading + Dash Line, on `next` inside v197 (Editor tools are already in that entry).
+v197 published (Editor tools, Lock Heading, Dash Line). Now: finish the faceting mirror (BACKLOG, Characters and looks), plan awaiting Ricky's go-ahead.
 
 ## Done
 - Dash Line (ui/dash-line.js, called from loop.js with `dashNow`): an InstancedMesh of 50 flat red dots, every 4 units out to 200 along her heading, each at `groundH` + 0.08; the last 8 shrink. Molly only. Test `tests/dl1.py` ALL PASS.
@@ -10,7 +10,8 @@ Make paths that curve into walls easier to follow without changing physics (the 
 - Docs: GLOSSARY (Free Look, Lock Heading, Faceplant, Dash Line), Controls screen text, CHANGELOG v197 entry, BACKLOG item removed, SWEEP-BUGS test map. CLAUDE.md: nightly sweeps paused (Ricky).
 
 ## In progress
-- Nothing. Ricky to playtest.
+- Faceting mirror diagnosis (jit 0.2, Molly): 860 of 3648 facets unmirrored. Straddling the centre plane ~200 (Head 56, Pony1-3 88, Spine 36, Hips 17): a quad across x=0 split by one diagonal. Beside/touching it ~600 (Spine 242, Hips 161, Shoulders 104, HipL/R 108): the welds. Cause: right weld cut after the left on the already-cut soup; chainLoops start, tidyLoop ("onto the one before") and bridgeLoops (closest pair, greedy `da<=db`) all depend on loop direction, and a mirror reverses it.
+- Plan: (1) straddling quads -> 4-triangle fan round the quad centre (no new edge points, so no T-junctions; the x=0 cut tried before made 7 odd crotch edges). (2) build the left weld only and make the right weld its mirror (cut edge, tidy, bridge, limb), when the right limb's unwelded soup is the exact mirror of the left's; else today's way. Then raise mirror1.py's 72% floor.
 
 ## Decisions
 - Caps Lock press toggles Free Look; Lock Heading only on the press that turns it on (Ricky). Any angle; over 30° above 20 Zips trips (Ricky). Not on wall paths (Ricky). Dash Line only for the Dodecadash (Ricky).
