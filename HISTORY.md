@@ -95,3 +95,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-27 16:05 | next | mirrored welds (weldMirror) when body and limbs are mirror images; models re-baked; v198 CHANGELOG entry; mirror1.py floors raised
 - 2026-11-27 16:10 | v198 | published: Mirror Bulge 1 toggle, centre-line facets fanned, mirrored welds
 - 2026-11-27 16:12 | main (docs) | HANDOFF: v198 published
+- 2026-11-27 15:46 | next | Mirrored faceting: diagPick breaks ties by |x|*y then z*y, so the neck's side quads mirror (Spine 24 -> 0; with Mirror Bulge 1 on both torso parts 104 -> 48 left, all hair; shipped 584 -> 528); mirror1.py floors 86%/98%; models re-baked

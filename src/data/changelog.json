@@ -1,5 +1,18 @@
 [
   {
+    "v": "v199",
+    "d": "Nov 27, 2026",
+    "t": "Rig Editor Stretch and Draw",
+    "g": [
+      [
+        "Changed",
+        [
+          "Molly and Comet's neck facets are mirrored down the centre line too, and a few more of the hair's."
+        ]
+      ]
+    ]
+  },
+  {
     "v": "v198",
     "d": "Nov 27, 2026",
     "t": "Mirrored faceting",

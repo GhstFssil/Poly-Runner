@@ -430,7 +430,10 @@ function quadSplit(L,k,extra){var t1=L[k],t2=L[k+1],fl=t1[1]===t2[2]||(t1[1][0]=
   var n1=[a,b,d,col],n2=[b,c,d,col];if(fl){n1=[a,d,b,col];n2=[b,d,c,col];}L[k]=n1;L[k+1]=n2;}
 function diagPick(a,b,c,d){   /* >= 0: split along a-b, else along c-d. Compares the two diagonals by things a mirror (x to -x) leaves alone: how far their corners are from the centre plane, then their height, then how far forward */
   var e=1e-7,t=(Math.abs(a[0])+Math.abs(b[0]))-(Math.abs(c[0])+Math.abs(d[0]));if(t>e||t<-e)return t;
-  t=(a[1]+b[1])-(c[1]+d[1]);if(t>e||t<-e)return t;return (a[2]+b[2])-(c[2]+d[2]);}
+  t=(a[1]+b[1])-(c[1]+d[1]);if(t>e||t<-e)return t;t=(a[2]+b[2])-(c[2]+d[2]);if(t>e||t<-e)return t;
+  /* an upright tube's side quad (the neck's) ties on all three: then which diagonal climbs away from the centre plane, then which climbs forward */
+  t=(Math.abs(a[0])*a[1]+Math.abs(b[0])*b[1])-(Math.abs(c[0])*c[1]+Math.abs(d[0])*d[1]);if(t>e||t<-e)return t;
+  return (a[2]*a[1]+b[2]*b[1])-(c[2]*c[1]+d[2]*d[1]);}
 function hashStr(s){var h=7,i;for(i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return h;}
 /* Shading Variation: a smooth noise of where a facet sits, read at |x| so a facet and its mirror image get the same shade (a random number per facet in
    build order shaded the two sides differently). Smooth, so a facet's shade drifts a little as a stat moves it instead of jumping. 0 to 1. */
