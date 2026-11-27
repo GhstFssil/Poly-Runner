@@ -4704,6 +4704,7 @@ for(k in BARRIER_DEF)DEF[k]=BARRIER_DEF[k];
 if(window.__COMET_DEF)for(k in window.__COMET_DEF)DEF[k]=window.__COMET_DEF[k];   /* Comet's moves (the game keeps their defaults); Molly's settings carry them too, unused */
 DEF['m.set.bob']=.5;DEF['m.set.rock']=1;DEF['m.set.nod']=1;DEF['idle.dur']=3;DEF['idle.breath']=.4;DEF['idle.sway']=1.2;DEF['idle.arm']=2;DEF['idle.pony']=1;DEF['step.dur']=.5;DEF['step.width']=22;DEF['step.knee']=35;DEF['step.lean']=5;DEF['step.arm']=12;DEF['step.bounce']=2;
 SEGS.forEach(function(s){for(q in SD[s.id])DEF[s.id+'.'+q]=SD[s.id][q];
+  DEF[s.id+'.umir']=0;   /* Mirror Bulges: bulge 2 is bulge 1 mirrored across the part's 0 / 180 line (rig-editor.html bulgeMirSync) */
   [1,2].forEach(function(n){var b=s.id+'.u'+n;DEF[b+'p']=n===1?.3:.7;DEF[b+'a']=n===1?0:180;DEF[b+'d']=0;DEF[b+'wl']=50;DEF[b+'wr']=50;DEF[b+'ws']=.2;DEF[b+'we']=.2;DEF[b+'kl']=0;DEF[b+'kr']=0;DEF[b+'ks']=0;DEF[b+'ke']=0;});});
 
 /* In-line joints share one cross-section and ease into it. Side joints blend like a fillet. */
@@ -5156,8 +5157,14 @@ function hex2lin(h){var c=new THREE.Color(h);c.convertSRGBToLinear();return [c.r
 /* A skin quad comes as two triangles (a,b,c) and (a,c,d), or the same flipped, (a,c,b) and (a,d,c). Once in the figure's own space it is cut along whichever
    diagonal diagPick prefers, keeping the way it faces, so a facet and its mirror image on the other side are cut alike: cut always from the same corner, the
    left side and the right side were split along opposite diagonals and their facets did not match. */
-function quadSplit(L,k){var t1=L[k],t2=L[k+1],fl=t1[1]===t2[2]||(t1[1][0]===t2[2][0]&&t1[1][1]===t2[2][1]&&t1[1][2]===t2[2][2]);
+function quadSplit(L,k,extra){var t1=L[k],t2=L[k+1],fl=t1[1]===t2[2]||(t1[1][0]===t2[2][0]&&t1[1][1]===t2[2][1]&&t1[1][2]===t2[2][2]);
   var a=t1[0],b=fl?t1[2]:t1[1],c=fl?t1[1]:t1[2],d=fl?t2[1]:t2[2],col=t1[3];
+  var xl=Math.min(a[0],b[0],c[0],d[0]),xh=Math.max(a[0],b[0],c[0],d[0]);
+  if(extra&&xl<-1e-6&&xh>1e-6){                                   /* across the centre plane: no diagonal can be its own mirror image, so the quad is fanned into four round its middle (its edges are untouched, so its neighbours still meet it exactly) */
+    var m=[(a[0]+b[0]+c[0]+d[0])/4,(a[1]+b[1]+c[1]+d[1])/4,(a[2]+b[2]+c[2]+d[2])/4];if(m[0]>-.002&&m[0]<.002)m[0]=0;   /* a hair off the centre plane (the corners are mirrored only to rounding): put it on it, or the welds' cut along the plane leaves a sliver beside it */
+    if(fl){L[k]=[b,a,m,col];L[k+1]=[c,b,m,col];extra.push([d,c,m,col],[a,d,m,col]);}
+    else{L[k]=[a,b,m,col];L[k+1]=[b,c,m,col];extra.push([c,d,m,col],[d,a,m,col]);}
+    return;}
   if(diagPick(a,c,b,d)>=0)return;
   var n1=[a,b,d,col],n2=[b,c,d,col];if(fl){n1=[a,d,b,col];n2=[b,d,c,col];}L[k]=n1;L[k+1]=n2;}
 function diagPick(a,b,c,d){   /* >= 0: split along a-b, else along c-d. Compares the two diagonals by things a mirror (x to -x) leaves alone: how far their corners are from the centre plane, then their height, then how far forward */
@@ -5313,7 +5320,7 @@ function bridgeLoops(A,B,col){
 }
 /* which side joints are welded, and whether the weld is kept to the stretch of the joint near its pivot (an arm lies against the torso far below the shoulder: welded all the way down, raising it would stretch a web of skin from her ribs) */
 var WELDJ={'LowerTorso>Thigh':{gate:0,soft:3},'UpperTorso>UpperArm':{gate:1,soft:1.5}};   /* soft: how far, in blend sizes, the hand-over from body to limb reaches each side of the weld. Wide at the hip, where the leg swings far and her belt marks where the pelvis must stay rigid; tighter at the shoulder, so a raised arm does not drag the collar off the neck */
-function rebuild(){
+function rebuild(){bulgeMirSync();
   var t0=performance.now();
   disposeRig();
   var pal={suit:hex2lin(P.cSuit),hair:hex2lin(P.cHair),skin:hex2lin(P.cSkin),blk:hex2lin(P.cBlk),wht:hex2lin(P.cWht),eye:hex2lin(P.cEye),mouth:hex2lin('#7a3a2c')};
@@ -5342,8 +5349,8 @@ function rebuild(){
   var tmp=new THREE.Vector3(),soups={};
   function soupOf(pr){var part=buildSeg(SEGBY[pr.id],pr.g),L=[];
     part.t.forEach(function(t){var tri=[null,null,null,t[3]];for(var i=0;i<3;i++){tmp.set(t[i][0],t[i][1],t[i][2]).applyMatrix4(pr.M);displace(pr,tmp);tri[i]=[tmp.x,tmp.y,tmp.z];if(t[i].kp!==undefined)tri[i].kp=t[i].kp;}L.push(tri);});
-    for(var qk=0;qk+1<part.t.length;qk++)if(part.t[qk][4]===1&&part.t[qk+1][4]===2)quadSplit(L,qk);
-    return L;}
+    var ext=[];for(var qk=0;qk+1<part.t.length;qk++)if(part.t[qk][4]===1&&part.t[qk+1][4]===2)quadSplit(L,qk,ext);
+    return ext.length?L.concat(ext):L;}
   prims.forEach(function(pr){soups[pr.key]=soupOf(pr);});
   function bandGuard(pr){var br=BANDCOL[pr.id]?bandRange(pr.id):null;if(!br)return null;var a0=br[0]/100-1e-6;return function(q){return primLocal(pr,q[0],q[1],q[2])[0]>=a0;};}   /* from where a part's trim band starts, onward */
   /* the welds: the body is cut back from each limb and the limb from the body, by half the joint's blend size, and the gap between the two cut edges is bridged */
@@ -5664,6 +5671,10 @@ function bulgeRows(seg,n){
    [b+'wl','Width: Radial Left','deg',5,180,1],[b+'wr','Width: Radial Right','deg',5,180,1],[b+'ws','Width: '+tcLabel(ls),'pct',.02,1,.01],[b+'we','Width: '+tcLabel(le),'pct',.02,1,.01],
    [b+'kl','Curvature: Radial Left (concave to convex)','x',-1,1,.05],[b+'kr','Curvature: Radial Right','x',-1,1,.05],[b+'ks','Curvature: '+tcLabel(ls),'x',-1,1,.05],[b+'ke','Curvature: '+tcLabel(le),'x',-1,1,.05]];
 }
+/* Mirror Bulges (a part's `umir` on): bulge 2 is kept a copy of bulge 1 mirrored across the part's 0 / 180 line: its direction negated, its left and right widths and curvatures swapped */
+function bulgeMirSync(){SEGS.forEach(function(sg){if(!P[sg.id+'.umir'])return;var a=sg.id+'.u1',b=sg.id+'.u2';
+  ['p','d','ws','we','ks','ke'].forEach(function(f){P[b+f]=P[a+f];});
+  var an=-P[a+'a'];P[b+'a']=an<=-180?an+360:an;P[b+'wl']=P[a+'wr'];P[b+'wr']=P[a+'wl'];P[b+'kl']=P[a+'kr'];P[b+'kr']=P[a+'kl'];});}
 function coreRows(seg){
   var id=seg.id,e=seg.ends,pre=id+'.';
   return {
@@ -5671,7 +5682,7 @@ function coreRows(seg){
    center:[[pre+'peak','Position Along Length (0% = '+e[0]+' end)','pct',.02,.98,.01]],
    start:[[pre+'tS','Taper at the '+tcLabel(e[0])+' End','pct',.03,1,.01],[pre+'cS','Curve From '+tcLabel(e[0])+' End to Max','x',.4,5,.05]],
    end:[[pre+'tE','Taper at the '+tcLabel(e[1])+' End','pct',.03,1,.01],[pre+'cE','Curve From Max to '+tcLabel(e[1])+' End','x',.4,5,.05]],
-   b1:bulgeRows(seg,1),b2:bulgeRows(seg,2)
+   b1:bulgeRows(seg,1),b2:[[id+'.umir','Mirror Bulge 1 (Bulge 2 becomes its mirror image across the '+(seg.kind==='fwd'?'top / underside':'front / back')+' line)','tog']].concat(P[id+'.umir']?[]:bulgeRows(seg,2))
   };
 }
 function renderPart(){
@@ -5681,7 +5692,7 @@ function renderPart(){
   $('#hStart').textContent='Start Taper and Curve ('+seg.ends[0]+')';
   $('#hEnd').textContent='End Taper and Curve ('+seg.ends[1]+')';
   $('#pvAcap').textContent=seg.lat?seg.lat[0]:'Front View';$('#pvBcap').textContent=seg.lat?seg.lat[1]:'Side View';
-  [['#rSize',r.size],['#rCenter',r.center],['#rStart',r.start],['#rEnd',r.end],['#rB1',r.b1],['#rB2',r.b2]].forEach(function(p){var h=$(p[0]);h.innerHTML='';addRows(h,p[1]);});
+  [['#rSize',r.size],['#rCenter',r.center],['#rStart',r.start],['#rEnd',r.end],['#rB1',r.b1],['#rB2',r.b2]].forEach(function(p){var h=$(p[0]);h.innerHTML='';addRows(h,p[1],{then:function(k){if(k===seg.id+'.umir'){bulgeMirSync();save();renderPart();}}});});
   var ex=EXTRA[seg.id],xh=$('#rExtra');xh.innerHTML='';$('#xWrap').hidden=!ex;
   if(ex)addRows(xh,ex);
   if(seg.id==='Head')lockRows(xh);
@@ -5760,7 +5771,7 @@ function syncAll(){
 /* Pages: Molly and Comet each have their own copy of every stat (kept in runnerRig2 and cometRig); Mobs are kept with Molly's. Comet starts as a copy of Molly. */
 var PAGE='molly',CHAR='molly',CHARKEY={molly:'runnerRig2',comet:'cometRig'},CHARNAME={molly:'Molly',comet:'Comet'};HOST.__char='molly';
 function noMobs(o){var r={},k;for(k in o)if(k.indexOf('mn.')!==0)r[k]=o[k];return r;}   /* Comet's stats never carry the mobs' (they live with Molly's) */
-function save(){try{localStorage.setItem(CHARKEY[CHAR],JSON.stringify(CHAR==='comet'?noMobs(P):P));}catch(e){}}
+function save(){bulgeMirSync();try{localStorage.setItem(CHARKEY[CHAR],JSON.stringify(CHAR==='comet'?noMobs(P):P));}catch(e){}}
 function loadChar(c){CHAR=c;HOST.__char=c;DEF=c==='comet'?DEFC:DEFM;P=JSON.parse(JSON.stringify(DEF));var sv=null;try{sv=localStorage.getItem(CHARKEY[c]);}catch(e){}
   if(sv){try{takeSettings(c==='comet'?noMobs(JSON.parse(sv)):JSON.parse(sv));}catch(e){}}
   if(c==='comet'){var m=pageOf('molly');for(var k in m)if(k.indexOf('mn.')===0)P[k]=m[k];}}   /* (the mob stats on Comet's page are Molly's, unused) */

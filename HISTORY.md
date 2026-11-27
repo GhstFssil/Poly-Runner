@@ -91,3 +91,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-27 14:53 | next | BACKLOG: Comet Lock Heading and Comet Faceplant animation
 - 2026-11-27 14:55 | v197 | published: next merged into main (Editor tools, Lock Heading, Dash Line)
 - 2026-11-27 15:10 | main (docs) | HANDOFF: v197 published; faceting mirror diagnosis and plan
+- 2026-11-27 15:40 | next | Rig Editor: Mirror Bulge 1 toggle per part (`umir`); quads across the centre plane fanned into four round their middle (mirrored faceting); test fu/bmir1.py
