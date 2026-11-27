@@ -756,6 +756,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     <div id="clusterOpts" class="piece" hidden></div>
     <div class="row"><button class="small" id="undo">Undo</button><button class="small" id="dup">Duplicate</button><button class="small" id="cpy">Copy</button><button class="small" id="pst">Paste</button><button class="small" id="pv">▶ Preview motion</button></div>
     <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.35"><input type="checkbox" id="attach" checked style="margin-top:2px"><span>Attach to the path: stamps near it follow it when the path changes</span></label>
+    <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.35"><input type="checkbox" id="drawOn" style="margin-top:2px"><span>Draw: with Seg Chain, Ledge, Gap or Mud chosen, drag on the map to draw a chain of joined pieces that follows your stroke (a click still places one). Turn it off to pan by dragging.</span></label>
     <div class="stats" id="counts"></div>
     <h2>Presets</h2>
     <div class="row"><input type="text" id="prName" placeholder="Name for the selection" maxlength="40" style="flex:1;min-width:0"><button class="small" id="prSave">Save Selection</button></div>
@@ -1154,6 +1155,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     }
     allPaths().forEach(function (pth, pk) { if (!pathVis(pk)) return; var st = w2s(pth.x, pth.z); ctx.fillStyle = css('--accent'); ctx.beginPath(); ctx.arc(st[0], st[1], 6, 0, 7); ctx.fill(); ctx.fillText(pk ? 'PATH ' + (pk + 1) : 'START', st[0] + 9, st[1] + 4); });
     drawOrder(S.objs).forEach(function (o) { if (o.t === 'tip') return; if (objVis(o)) drawObj(o, isSel(o)); else if (ghostObj(o)) { ctx.save(); ctx.globalAlpha = 0.16; drawObj(o, false); ctx.restore(); } });   // layer by layer, back to front; hidden layers as faint shadows
+    if (drawStroke && drawStroke.length > 1) { ctx.save(); ctx.strokeStyle = css('--accent'); ctx.lineWidth = 3; ctx.globalAlpha = 0.8; ctx.setLineDash([6, 4]); ctx.beginPath(); drawStroke.forEach(function (q, i) { var q2 = w2s(q[0], q[1]); if (i) ctx.lineTo(q2[0], q2[1]); else ctx.moveTo(q2[0], q2[1]); }); ctx.stroke(); ctx.restore(); }   // Draw: the stroke so far
     if (marq) { var ma = w2s(Math.min(marq.x0, marq.x1), Math.min(marq.z0, marq.z1)), mb = w2s(Math.max(marq.x0, marq.x1), Math.max(marq.z0, marq.z1)); ctx.fillStyle = css('--accent'); ctx.globalAlpha = 0.12; ctx.fillRect(ma[0], ma[1], mb[0] - ma[0], mb[1] - ma[1]); ctx.globalAlpha = 1; ctx.strokeStyle = css('--accent'); ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]); ctx.strokeRect(ma[0], ma[1], mb[0] - ma[0], mb[1] - ma[1]); ctx.setLineDash([]); }
     if (hover && tool === 'preset' && presets[armed]) { var pg0 = w2s(hover[0], hover[1]); ctx.strokeStyle = css('--accent'); ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.arc(pg0[0], pg0[1], 14, 0, 6.2832); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = css('--accent'); ctx.font = 'bold 11px ' + css('--font-d'); ctx.fillText(presets[armed].name + ' (' + presets[armed].items.length + ')', pg0[0] + 18, pg0[1] + 4); }
     else if (hover && tool === 'forest') {
@@ -1880,6 +1882,46 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (t === 'crag') { var parts = splitCrags(n0); parts.forEach(function (c) { S.objs.push(c); }); setSelList(parts); return; }   // a stamped cluster lands as separate crags, so each can be moved or tuned alone
     S.objs.push(n0); setSel(S.objs.length - 1);
   }
+  // Draw: a stroke becomes a chain of joined pieces (each an arc: Rotation from the last piece's end, Bend, Length), fitted so no stroke point strays more than DRAW_TOL from it
+  var DRAWABLE = { segchain: 1, ledge: 1, gap: 1, mud: 1 }, drawStroke = null, DRAW_TOL = 1.5, DRAW_MAXB = 120;
+  function hOf(dx, dz) { return Math.atan2(dx, -dz); }                    // heading of a direction (0 = north, + = east), as shapeAt uses
+  function wrapA(a) { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; }
+  function arcTo(x0, z0, h0, x1, z1) {                                    // the arc leaving (x0, z0) on heading h0 that ends at (x1, z1): its bend (radians) and length
+    var c = Math.hypot(x1 - x0, z1 - z0), ph = wrapA(hOf(x1 - x0, z1 - z0) - h0);
+    return { B: 2 * ph, L: Math.abs(ph) < 1e-4 ? c : c * ph / Math.sin(ph) };
+  }
+  function arcDev(x0, z0, h0, a, q) {                                     // how far point q is from that arc's circle (or line)
+    if (Math.abs(a.B) < 1e-4) return Math.abs((q[0] - x0) * -Math.cos(h0) - (q[1] - z0) * Math.sin(h0));
+    var R = a.L / a.B, cx = x0 + Math.cos(h0) * R, cz = z0 + Math.sin(h0) * R; return Math.abs(Math.hypot(q[0] - cx, q[1] - cz) - Math.abs(R));
+  }
+  function drawFit(pts, tol) {                                            // pieces [{x, z, th (rad), turn (rad), B, L}]: each runs as far along the stroke as it still fits
+    var out = [], i = 0, x = pts[0][0], z = pts[0][1], h = hOf(pts[Math.min(pts.length - 1, 2)][0] - x, pts[Math.min(pts.length - 1, 2)][1] - z);
+    while (i < pts.length - 1) {
+      var turn = 0, j0 = Math.min(pts.length - 1, i + 2), hd = hOf(pts[j0][0] - x, pts[j0][1] - z);
+      if (out.length && Math.abs(wrapA(hd - h)) > 35 * Math.PI / 180) { turn = wrapA(hd - h); h = hd; }   // a sharp corner in the stroke: the next piece turns at the joint
+      var best = null, bj = i + 1;
+      for (var j = i + 1; j < pts.length; j++) {
+        var a = arcTo(x, z, h, pts[j][0], pts[j][1]); if (Math.abs(a.B) > DRAW_MAXB * Math.PI / 180 || !(a.L > 0)) break;
+        var okp = true; for (var k = i + 1; k < j; k++) if (arcDev(x, z, h, a, pts[k]) > tol) { okp = false; break; }
+        if (!okp) break; best = a; bj = j;
+      }
+      if (!best) best = arcTo(x, z, h, pts[i + 1][0], pts[i + 1][1]);
+      out.push({ x: x, z: z, th: h, turn: turn, B: best.B, L: best.L }); x = pts[bj][0]; z = pts[bj][1]; h = wrapA(h + best.B); i = bj;
+    }
+    return out;
+  }
+  function drawCommit(t, pts) {                                           // the stroke's pieces as joined stamps of kind t, selected; returns them
+    var sp = [pts[0]]; pts.forEach(function (q) { var l = sp[sp.length - 1]; if (Math.hypot(q[0] - l[0], q[1] - l[1]) >= Math.max(1, 3 / view.zoom)) sp.push(q); });   // evenly enough spaced (3 pixels, at least 1 unit)
+    if (sp.length < 2) return [];
+    var R1 = function (v) { return Math.round(v * 10) / 10; }, made = [], prev = null;
+    drawFit(sp, Math.max(DRAW_TOL, 4 / view.zoom)).forEach(function (f) {
+      if (f.L < 1) return;
+      var o = mk(t, f.x, f.z); o.len = R1(f.L); o.bend = R1(f.B * 180 / Math.PI);
+      if (prev) { delete o.x; delete o.z; o.after = prev.id; o.turn = R1(f.turn * 180 / Math.PI); o.th = 0; } else o.th = R1(f.th * 180 / Math.PI);
+      o.id = nextId++; S.objs.push(o); made.push(o); prev = o;
+    });
+    setSelList(made); return made;
+  }
   cv.addEventListener('pointerdown', function (e) {
     cv.setPointerCapture(e.pointerId);
     var r = cv.getBoundingClientRect(), w = s2w(e.clientX - r.left, e.clientY - r.top);
@@ -1891,6 +1933,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     for (var k = 0; k < all.length; k++) if (isSel(S.objs[all[k]])) { hi = all[k]; break; }   // a stamp that is already selected wins, so one under others can still be dragged
     if ((e.altKey || e.ctrlKey || e.metaKey) && tool === 'select') { drag = { x: e.clientX, y: e.clientY, cx: view.cx, cz: view.cz, moved: false, obj: -1, hit: hi, alt: true, all: all }; return; }
     drag = { x: e.clientX, y: e.clientY, cx: view.cx, cz: view.cz, moved: false, obj: tool === 'select' && hi >= 0 ? hi : -1, hit: hi, all: all, prevSel: prevSel, snapped: false };
+    if ($('drawOn').checked && DRAWABLE[tool]) { drag.draw = true; drawStroke = [w]; }
     if (drag.obj >= 0) {
       if (cur.length > 1 && isSel(S.objs[drag.obj])) {           // a group: they all move together
         drag.group = cur.map(function (q) { var p = pos(q); return { o: q, x: p.x, z: p.z }; }); drag.w0 = w;
@@ -1903,6 +1946,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
     if (drag) {
       var dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
       if (drag.marquee) { marq.x1 = w[0]; marq.z1 = w[1]; draw(); return; }
+      if (drag.draw) { var lq = drawStroke[drawStroke.length - 1]; if (Math.hypot(w[0] - lq[0], w[1] - lq[1]) > 0.5) drawStroke.push(w); draw(); return; }
       if (drag.moved) {
         if (drag.group) { if (!drag.snapped) { snap(); drag.snapped = true; } drag.group.forEach(function (g) { if (g.o.after === undefined) place2(g.o, g.x + w[0] - drag.w0[0], g.z + w[1] - drag.w0[1]); }); afterEdit(false); return; }
         if (drag.obj >= 0) { if (S.objs[drag.obj].after !== undefined) return; if (!drag.snapped) { snap(); drag.snapped = true; } place2(S.objs[drag.obj], w[0] + drag.dx, w[1] + drag.dz); afterEdit(false); renderInsp(); return; }
@@ -1919,6 +1963,7 @@ canvas{display:block;width:100%;height:min(76vh,760px);min-height:360px;touch-ac
       if (d.add) found = d.base.concat(found.filter(function (q) { return d.base.indexOf(q) < 0; }));
       setSelList(found); renderInsp(); draw(); if (found.length > 1) flashHint(found.length + ' stamps selected'); return;
     }
+    if (d && d.draw) { var st = drawStroke; drawStroke = null; if (d.moved) { snap(); var mm = drawCommit(tool, st); if (!mm.length) hist.pop(); afterEdit(false); renderInsp(); draw(); flashHint(mm.length ? 'Drew ' + mm.length + ' joined ' + NAMES[tool].toLowerCase() + ' piece' + (mm.length > 1 ? 's' : '') : 'Stroke too short to draw'); return; } draw(); }
     if (!d || d.moved) return;
     var r = cv.getBoundingClientRect(), w = s2w(e.clientX - r.left, e.clientY - r.top);
     if (d.alt) {                                                 // alt/ctrl + click: add or remove one stamp
@@ -9546,7 +9591,8 @@ var CHANGELOG = [
   { v: 'v197', d: 'Nov 25, 2026', t: 'Editor tools', g: [
     ['Added', [
       'Rig Editor, Mobs page: a Save to Game button. It hands your mob changes to the game straight away and says so, without closing the editor (closing still works too). Reset This One now shows its message on the Mobs page as well.',
-      'Path Editor: Hills and Crags have a new Height With Others choice, Supersede. Everything under the stamp (ground, path, other hills, crags and ledges) is cut or filled flat to its bottom, with a short slope at the edge, and the stamp stands on that.'
+      'Path Editor: Hills and Crags have a new Height With Others choice, Supersede. Everything under the stamp (ground, path, other hills, crags and ledges) is cut or filled flat to its bottom, with a short slope at the edge, and the stamp stands on that.',
+      'Path Editor: a Draw toggle. Turn it on, choose Seg Chain, Ledge, Gap or Mud, and drag on the map: your stroke becomes a chain of joined pieces that follows it, with a turn at any sharp corner. A click still places one piece, and one Undo takes the whole chain back.'
     ]]
   ] },
   { v: 'v196', d: 'Nov 25, 2026', t: 'Characters and looks', g: [
