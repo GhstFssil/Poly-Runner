@@ -71,6 +71,7 @@
     cometInput(sdt);
     if (isComet()) setCharge(starCharging ? starT / Math.max(0.01, Math.round(cometC('star.cMax')) || 0.01) : 0, starCharging && playing);
     else setCharge(dashNow ? dashHold * DASH_RATE / DASH_MAX : 0, ballOn && playing);
+    dashLineTick(dashNow && !isComet());   // the Dash Line (ui/dash-line.js)
     if (ballOn && playing) { setPower(segCount - (dashNow ? BARRIER_DRAIN * 4 : BARRIER_DRAIN) * sdt); if (segCount <= 0) setBall(false); }   // the Barrier eats 1% of the Power Line each second and drops when it runs dry
     // Runner's Pose: hold S while standing still and she crouches, for as long as she likes. After 3 seconds she flashes a soft red
     // to say she is ready; the moment S is let go she takes off at 50 Zips. Letting go before the flash does nothing.

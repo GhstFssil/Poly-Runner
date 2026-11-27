@@ -13,7 +13,6 @@ Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to
 
 ## New mechanics (design first)
 - [ ] Wind: Placed kind of the same way as tunnels, but it has no collision, it's just an area that gives the runner a directional acceleration. The acceleration can be set in any direction including up/down. Should have some subtle and unobtrusive visual indicator
-- [ ] Paths that curve into walls need to be easier to follow somehow. If you don't aim pixel perfect you risk shooting off the edge at high speeds. **Decision**: guide visual, aim assist, or other (no physics changes for level problems).
 
 ## Infrastructure
 - [ ] (Ricky, 2026-11-22) Tavern and Update Buttons:

@@ -94,10 +94,13 @@ Height With Others (Ledge, Hill, Crags): Additive (stacks on what it crosses), I
 | Strafe | Q or E: an instant hop to the side (Molly only). Its distance is a stat | `strafe`, `stat.strafe` |
 | Sidestep | left or right mouse button held: she walks to her left or right of her heading, at a stat speed; its own animation (Rig Editor page Sidestep, clips `Step_L`, `Step_R`) shows only while she is not running forward | `sidestepTick`, `sideKeys`, `sideNow`, `stat.sidestep`, `step.*` |
 | Camera Zoom | the mouse wheel: how far the camera sits behind her (4 to 20, saved), stretched up to 30% by her speed | `camZoom`, `camPull`, `CAM_PULL`, `pr_camzoom` |
-| Free Look | Caps Lock on: the mouse turns only the camera, not her; turned off, the camera swings back behind her | `freeLook`, `lookBack` |
+| Free Look | each Caps Lock press flips it (the key's lock light is not read): on, the mouse turns only the camera, not her; off, the camera swings back behind her | `freeLook`, `lookBack` |
+| Lock Heading | the Caps Lock press that turns Free Look on also turns Molly once along the path under her feet (the nearer of its two ways); never on a wall path, at most once a second (`LH_COOL`); over 30° at over 20 Zips it trips her into the Faceplant instead | `lockHeadingTry`, `lockHeadingPath` (characters/lock-heading.js) |
+| Faceplant | she falls on her face and skids to a stop, helpless till she does: leaving the Barrier at 60 Zips or more, or a Lock Heading turn too sharp at speed | `fpOn`, `FP_MIN`, clip `Faceplant` |
 | Runner's Pose | hold S standing still, then let go to launch | `RP_DROP` |
 | Barrier | Molly's key 2: a red shell nothing can hurt (a ball you roll in). Costs Power | `ballOn`, `barrier*`, `BARRIER_COST` |
 | Dodecadash | hold S inside the Barrier, then let go to launch | |
+| Dash Line | the dotted red line on the ground, 200 units straight ahead, shown while a Dodecadash charges (look only) | `dashLineTick` (ui/dash-line.js) |
 | Style Boost | what a jump from the Style Boost zone of a ramp gives: it multiplies how fast Segs fill the Power Line for a while | `styleStacks`, `styleMult` |
 | Star Throw | Comet's Q or E: a thrown star, bigger the longer it is charged | `starPress`, `spawnStar`, `cometStars` |
 | Star | the thrown projectile | |

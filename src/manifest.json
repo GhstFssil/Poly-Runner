@@ -48,6 +48,7 @@
     "characters/molly.js",
     "characters/molly-update.js",
     "characters/molly-moves.js",
+    "characters/lock-heading.js",
     "characters/strafe-streaks.js",
     "characters/comet.js",
     {
@@ -70,6 +71,7 @@
     "level1/goal.js",
     "mobs/mobs.js",
     "ui/speedometer.js",
+    "ui/dash-line.js",
     "ui/rig-editor-host.js",
     "ui/path-editor-host.js",
     "ui/menu.js",

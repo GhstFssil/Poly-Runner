@@ -4,8 +4,8 @@ from righ import *
 g=Rig(w=480,h=320,draw=False); pg=g.pg
 S=lambda: pg.evaluate("__state()")
 def camd(): return pg.evaluate("(function(){var t=__T(),p=t.player.position;return t.camera.position.distanceTo(new t.THREE.Vector3(p.x,p.y+2.3,p.z))})()")
-def caps(on):   # headless Chrome sends its own mousemoves that report Caps Lock off, so the test stands in for the key's real state
-    pg.evaluate("(on)=>{window.__caps=on;if(!window.__capsHook){window.__capsHook=1;[KeyboardEvent,MouseEvent].forEach(function(C){var o=C.prototype.getModifierState;C.prototype.getModifierState=function(k){return k==='CapsLock'&&window.__caps!==undefined?window.__caps:o.call(this,k)}})}document.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyX'}))}", on)
+def caps(on):   # Caps Lock: each press flips Free Look (the game no longer reads the key's lock light), so press it only when the state has to change
+    pg.evaluate("(on)=>{if(__lh()[4]!==on)document.dispatchEvent(new KeyboardEvent('keydown',{code:'CapsLock'}));}", on)
 ok=True
 def chk(name, c, extra=''):
     global ok; ok = ok and bool(c); print('PASS' if c else 'FAIL', name, extra)

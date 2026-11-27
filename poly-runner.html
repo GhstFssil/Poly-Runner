@@ -342,7 +342,7 @@
         <span><span class="key">Hold S</span></span><span>Standing still: Runner's Pose. After 3 s, let go to launch at 50 Zips</span>
         <span><span class="key">Hold S</span></span><span>Standing still in the Barrier: Dodecadash. Let go to launch, +20 Zips per second held (max 120), 4 power a second</span>
         <span><span class="key">Wheel</span></span><span>Camera In / Out (it also pulls back a little as you speed up)</span>
-        <span><span class="key">Caps Lock</span></span><span>Free Look: on, the mouse turns only the camera; off, it swings back behind you</span>
+        <span><span class="key">Caps Lock</span></span><span>Free Look: press to turn it on (the mouse turns only the camera) and again to turn it off (it swings back behind you). Turning it on also does Lock Heading: on a path, Molly turns once to face along it (once a second; too sharp a turn above 20 Zips trips her)</span>
         <span><span class="key">Esc</span></span><span>Pause</span>
         <span><span class="key">F4</span></span><span>Mouse look mode: locked, or locked with raw input. Press Esc, then Play again, after changing it</span>
       </div>
@@ -9414,6 +9414,38 @@ requestAnimationFrame(tick);
     if (sideMove(Math.cos(heading) * dir, -Math.sin(heading) * dir, SIDESTEP_SPEED * sdt) > 1e-3) sideNow = dir;
   }
 
+  // ---- Lock Heading: the Caps Lock press that turns Free Look on also turns Molly, once, to face along the path she is standing on (whichever of its two ways is nearer
+  // her own). It never steers her after that. It only works on her feet or in the Barrier on a path (not a wall path, not a circular deck, not in the air, not off a path),
+  // and at most once a second. A turn of more than 30 degrees while she is faster than 20 Zips trips her instead: the Faceplant, and her heading stays as it was.
+  var LH_COOL = 1000, LH_TRIP_DEG = 30, LH_TRIP_ZIPS = 20, lhNext = 0;
+  function lockHeadingPath() {                                  // the heading of the stretch of path under her feet, or null
+    if (level !== 3 || !SB) return null;
+    var B = SB, sm = B.samples, ex = player.position.x - L3_X, z = player.position.z, py = player.position.y, best = null, bestDy = 3;   // the path line can sit a little under her feet (the ground eases over it), so this is loose: it only has to tell a path she is on from one passing over or under her
+    sbNear(B.pathH, ex, z, B.hwMax + 6, function (pa) {           // every stretch within reach, so where two paths cross she takes the one her feet are on
+      var pb = sm[pa.i + 1]; if (!pb || pb.brk || pa.wl || pb.wl || (pa.dsk && pb.dsk)) return;
+      var vx = pb.x - pa.x, vz = pb.z - pa.z, vl = vx * vx + vz * vz; if (vl < 1e-9) return;
+      var tt = Math.max(0, Math.min(1, ((ex - pa.x) * vx + (z - pa.z) * vz) / vl));
+      var hw = ((pa.w || B.width) + ((pb.w || B.width) - (pa.w || B.width)) * tt) / 2, rl = (pa.roll || 0) + ((pb.roll || 0) - (pa.roll || 0)) * tt;
+      if (Math.hypot(ex - pa.x - vx * tt, z - pa.z - vz * tt) > hw * Math.cos(rl * Math.PI / 180) + 0.5) return;
+      var lat = ((ex - pa.x) * -vz + (z - pa.z) * vx) / Math.sqrt(vl), yy = pa.y + (pb.y - pa.y) * tt - Math.max(-hw, Math.min(hw, lat)) * Math.tan(rl * Math.PI / 180);
+      var dy = Math.abs(py - yy); if (dy < bestDy) { bestDy = dy; best = Math.atan2(-vx, -vz); }   // forward is (-sin h, -cos h)
+    });
+    return best;
+  }
+  function lockHeadingTry() {                                   // called by input.js when a Caps Lock press turns Free Look on
+    if (!playing || isComet() || fpOn || wallOn || !grounded) return;
+    var now = performance.now(); if (now < lhNext) return;
+    var h = lockHeadingPath(); if (h === null) return;
+    lhNext = now + LH_COOL;
+    var d = wrapA(h - heading); if (Math.abs(d) > Math.PI / 2) { h = wrapA(h + Math.PI); d = wrapA(h - heading); }
+    if (Math.abs(d) > LH_TRIP_DEG * Math.PI / 180 && Math.abs(speed) > LH_TRIP_ZIPS * TILE) {   // too sharp a turn at speed: she trips
+      if (ballOn) setBall(false, true);
+      fpOn = true; fpSpeed = Math.abs(speed); fpHead = heading; shake(0.5);
+      return;
+    }
+    heading = h;
+  }
+  window.__lh = function () { return [lockHeadingPath(), heading, lhNext - performance.now(), fpOn, freeLook]; };   // (tests: path heading under her, her heading, cooldown left in ms, tripped?, Free Look on?)
   // ---- Strafe streaks: thin light lines left in the air along the path of a sidestep, fading in a third of a second ----
   var STREAK_LIFE = 0.3, streaks = [], streakNext = 0;
   var streakGeo = new THREE.BoxGeometry(1, 1, 1);
@@ -9631,13 +9663,18 @@ requestAnimationFrame(tick);
   }
 // ---- the change log on the main menu. Newest first. Add an entry (and bump the version label in the page) with every build.
 var CHANGELOG = [
-  { v: 'v197', d: 'Nov 27, 2026', t: 'Editor tools', g: [
+  { v: 'v197', d: 'Nov 27, 2026', t: 'Editor tools, Lock Heading', g: [
     ['Added', [
+      'Lock Heading: the Caps Lock press that turns Free Look on also turns Molly once to face along the path she is standing on (whichever way is nearer). It never steers her after that, works at most once a second, and not on a wall path. Turning more than 30 degrees while faster than 20 Zips trips her into a Faceplant instead.',
+      'Dash Line: while a Dodecadash charges, a dotted red line on the ground shows where she will go, 200 units straight ahead.',
       'Rig Editor, Mobs page: a Save to Game button. It hands your mob changes to the game straight away and says so, without closing the editor (closing still works too). Reset This One now shows its message on the Mobs page as well.',
       'Path Editor: Hills and Crags have a new Height With Others choice, Supersede. Everything under the stamp (ground, path, other hills, crags and ledges) is cut or filled flat to its bottom, with a short slope at the edge, and the stamp stands on that.',
       'Path Editor: a Draw toggle. Turn it on, choose Seg Chain, Ledge, Gap or Mud, and drag on the map: your stroke becomes a chain of joined pieces that follows it, with a turn at any sharp corner. A click still places one piece, and one Undo takes the whole chain back.',
       'Path Editor: a Draw Path tool. Start a stroke at the end of a path to extend it, or anywhere else to start a new path. The pieces follow your stroke, and a sharp corner becomes a turn.',
       'Path Editor: a Stretch tool. It shows handles at every joint and start of the paths, and at the ends of the selected ledge, gap, mud, platform or Seg Chain. Drag one to move that point: the piece before it bends and stretches to meet it, and everything after follows.'
+    ]],
+    ['Changed', [
+      'Free Look: Caps Lock now flips it on and off with each press, instead of following the key\'s lock light.'
     ]]
   ] },
   { v: 'v196', d: 'Nov 25, 2026', t: 'Characters and looks', g: [
@@ -10560,6 +10597,31 @@ var CHANGELOG = [
     chLast = f; chFillEl.setAttribute('d', f > 0.004 ? arcPathR(f, DASH_BAR_R) : '');
   }
 
+  // ---- Dash Line: while a Dodecadash charges, a dotted line on the ground shows where she will go, 200 units straight ahead along her heading.
+  // It follows the ground height (groundH), so it dips into a gap and climbs a slope the way the ground does. Look only: it never changes where she goes.
+  var DASH_LINE_LEN = 200, DASH_LINE_STEP = 4, DASH_LINE_N = Math.floor(DASH_LINE_LEN / DASH_LINE_STEP);
+  var dashLine = (function () {
+    var geo = new THREE.CircleGeometry(0.28, 10); geo.rotateX(-Math.PI / 2);   // a flat dot lying on the ground
+    var mat = new THREE.MeshBasicMaterial({ color: 0xff3a30, transparent: true, opacity: 0.85, depthWrite: false });
+    var m = new THREE.InstancedMesh(geo, mat, DASH_LINE_N);
+    m.frustumCulled = false; m.visible = false; m.renderOrder = 5; scene.add(m);
+    return m;
+  })();
+  var dashLineDummy = new THREE.Object3D();
+  function dashLineTick(on) {                                   // called every frame from loop.js with dashNow
+    dashLine.visible = !!on;
+    if (!on) return;
+    var fx = -Math.sin(heading), fz = -Math.cos(heading), px = player.position.x, pz = player.position.z;
+    for (var i = 0; i < DASH_LINE_N; i++) {
+      var d = (i + 1) * DASH_LINE_STEP, x = px + fx * d, z = pz + fz * d, y = groundH(x, z);
+      dashLineDummy.position.set(x, y + 0.08, z);
+      var s = i > DASH_LINE_N - 8 ? (DASH_LINE_N - i) / 8 : 1;   // the last few dots shrink away, so the line ends softly
+      dashLineDummy.scale.set(s, 1, s); dashLineDummy.updateMatrix();
+      dashLine.setMatrixAt(i, dashLineDummy.matrix);
+    }
+    dashLine.instanceMatrix.needsUpdate = true;
+  }
+  window.__dashLine = function () { var a = new THREE.Matrix4(), b = new THREE.Matrix4(); dashLine.getMatrixAt(0, a); dashLine.getMatrixAt(DASH_LINE_N - 1, b); return [dashLine.visible, [a.elements[12], a.elements[13], a.elements[14]], [b.elements[12], b.elements[13], b.elements[14]]]; };   // (tests: shown?, first dot, last dot)
   // ---- The Rig Editor: a full-screen panel (its own shadow tree, so its styles stay out of the game) opened from the title screen. Save to game rebuilds Molly. ----
   var rigHost = null;
   function openRig() {
@@ -10923,15 +10985,11 @@ function showScreen(name) {                                // the menu shows one
     camZoom = Math.max(CAM_MIN, Math.min(CAM_MAX, camZoom * (e.deltaY > 0 ? 1.1 : 1 / 1.1)));   // each notch is 10% in or out
     try { localStorage.setItem('pr_camzoom', camZoom.toFixed(2)); } catch (er) {}
   }, { passive: false });
-  function readCaps(e) {                                        // Caps Lock is read from every key and mouse event, so it stays right however it was toggled
-    if (!e.getModifierState) return;
-    var on = e.getModifierState('CapsLock');
-    if (freeLook && !on) lookBack = true;                       // let go: the camera swings back behind her (loop.js)
-    if (on) lookBack = false;
-    freeLook = on;
-  }
-  document.addEventListener('keydown', readCaps, true); document.addEventListener('keyup', readCaps, true);
-  document.addEventListener('mousemove', readCaps, true); document.addEventListener('mousedown', readCaps, true);
+  document.addEventListener('keydown', function (e) {           // Caps Lock: each press flips Free Look (the key's own lock light is not read). The press that turns it on also tries Lock Heading
+    if (e.code !== 'CapsLock' || e.repeat || !playing) return;
+    if (freeLook) { freeLook = false; lookBack = true; }        // turned off: the camera swings back behind her (loop.js)
+    else { freeLook = true; lookBack = false; lockHeadingTry(); }   // characters/lock-heading.js
+  }, true);
 
   var mouseMode = 'normal', mdTimer = 0, mdDrag = false, mdLX = 0, mdLY = 0, mdEl = document.createElement('div');
   try { var sm = localStorage.getItem('pr_mouse2'); if (sm === 'raw' || sm === 'normal') mouseMode = sm; } catch (e) {}   // a saved 'drag' (the old F4 option) falls back to locked
@@ -11036,6 +11094,7 @@ function showScreen(name) {                                // the menu shows one
     cometInput(sdt);
     if (isComet()) setCharge(starCharging ? starT / Math.max(0.01, Math.round(cometC('star.cMax')) || 0.01) : 0, starCharging && playing);
     else setCharge(dashNow ? dashHold * DASH_RATE / DASH_MAX : 0, ballOn && playing);
+    dashLineTick(dashNow && !isComet());   // the Dash Line (ui/dash-line.js)
     if (ballOn && playing) { setPower(segCount - (dashNow ? BARRIER_DRAIN * 4 : BARRIER_DRAIN) * sdt); if (segCount <= 0) setBall(false); }   // the Barrier eats 1% of the Power Line each second and drops when it runs dry
     // Runner's Pose: hold S while standing still and she crouches, for as long as she likes. After 3 seconds she flashes a soft red
     // to say she is ready; the moment S is let go she takes off at 50 Zips. Letting go before the flash does nothing.

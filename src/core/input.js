@@ -39,15 +39,11 @@
     camZoom = Math.max(CAM_MIN, Math.min(CAM_MAX, camZoom * (e.deltaY > 0 ? 1.1 : 1 / 1.1)));   // each notch is 10% in or out
     try { localStorage.setItem('pr_camzoom', camZoom.toFixed(2)); } catch (er) {}
   }, { passive: false });
-  function readCaps(e) {                                        // Caps Lock is read from every key and mouse event, so it stays right however it was toggled
-    if (!e.getModifierState) return;
-    var on = e.getModifierState('CapsLock');
-    if (freeLook && !on) lookBack = true;                       // let go: the camera swings back behind her (loop.js)
-    if (on) lookBack = false;
-    freeLook = on;
-  }
-  document.addEventListener('keydown', readCaps, true); document.addEventListener('keyup', readCaps, true);
-  document.addEventListener('mousemove', readCaps, true); document.addEventListener('mousedown', readCaps, true);
+  document.addEventListener('keydown', function (e) {           // Caps Lock: each press flips Free Look (the key's own lock light is not read). The press that turns it on also tries Lock Heading
+    if (e.code !== 'CapsLock' || e.repeat || !playing) return;
+    if (freeLook) { freeLook = false; lookBack = true; }        // turned off: the camera swings back behind her (loop.js)
+    else { freeLook = true; lookBack = false; lockHeadingTry(); }   // characters/lock-heading.js
+  }, true);
 
   var mouseMode = 'normal', mdTimer = 0, mdDrag = false, mdLX = 0, mdLY = 0, mdEl = document.createElement('div');
   try { var sm = localStorage.getItem('pr_mouse2'); if (sm === 'raw' || sm === 'normal') mouseMode = sm; } catch (e) {}   // a saved 'drag' (the old F4 option) falls back to locked
