@@ -93,3 +93,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-27 15:10 | main (docs) | HANDOFF: v197 published; faceting mirror diagnosis and plan
 - 2026-11-27 15:40 | next | Rig Editor: Mirror Bulge 1 toggle per part (`umir`); quads across the centre plane fanned into four round their middle (mirrored faceting); test fu/bmir1.py
 - 2026-11-27 16:05 | next | mirrored welds (weldMirror) when body and limbs are mirror images; models re-baked; v198 CHANGELOG entry; mirror1.py floors raised
+- 2026-11-27 16:10 | v198 | published: Mirror Bulge 1 toggle, centre-line facets fanned, mirrored welds
