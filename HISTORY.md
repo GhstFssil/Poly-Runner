@@ -85,3 +85,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-25 19:40 | next | Supersede Height With Others for Hill and Crags (sbSupApply; flattens terrain, path, stamps and ledges to the stamp bottom with a 6-unit slope); Path Editor option; test fu/sup1.py, hook __L3X
 - 2026-11-27 14:25 | next | Path Editor Draw toggle: a drag with Seg Chain, Ledge, Gap or Mud makes a chain of joined arc pieces fitted to the stroke (drawFit, drawCommit); test fu/draw1.py
 - 2026-11-27 15:05 | next | Path Editor Draw Path tool (extends a path or starts a new one) and Stretch tool (drag path joints and strip ends); test fu/draw2.py
+- 2026-11-27 14:20 | v197 | Publish: Editor tools (Mobs Save to Game, Supersede, Draw, Draw Path, Stretch); label v196 -> v197
