@@ -5,6 +5,13 @@
     "t": "Rig Editor Stretch and Draw",
     "g": [
       [
+        "Added",
+        [
+          "Rig Editor: a Stretch tool under the preview. Drag the dot at the selected part's end to set its length, or the dot at a selected hair lock's tip to set that lock's length.",
+          "Rig Editor: a Draw tool under the preview. Drag from where a hair lock leaves the cap and the lock (and its partner) takes the shape of your stroke. Right-drag turns the view while Draw is on."
+        ]
+      ],
+      [
         "Changed",
         [
           "Molly and Comet's neck facets are mirrored down the centre line too, and a few more of the hair's."

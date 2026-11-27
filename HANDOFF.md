@@ -1,29 +1,27 @@
 # Handoff (2026-11-27)
 
 ## Goal
-Mirrored faceting (BACKLOG, Characters and looks): published as v198. Waiting on Ricky for Mirror Bulge 1 on the torso.
+Session 2026-11-27 pm: spine facets mirrored, then Rig Editor Stretch and Draw (hair). All on `next`, not published (CHANGELOG entry v199 ready; label still v198).
 
 ## Done
-- v197 published (Editor tools, Lock Heading, Dash Line, Mirror toggle not in it).
-- Mirror Bulge 1 (`<part>.umir`, default 0): toggle row in Bulge 2's panel replaces its rows; `bulgeMirSync` (in save and rebuild) copies u1 to u2 with a negated, wl/wr and kl/kr swapped. Test `tests/fu/bmir1.py`.
-- Centre-line quads: `quadSplit(L,k,extra)` fans a quad that crosses x=0 into four round its middle (middle snapped to x=0 within 2 mm, else the welds' centre cut left a sliver: 1 odd hip edge).
-- Mirrored welds: `weldMirror` (rig-editor.html, before chainLoops): when both the body soup and the two limb soups are mirrors (keys rounded to 0.1 mm), only the left weld is cut/tidied/bridged; the body = left half + its mirror + untouched straddlers; right limb, bridge and cut loop mirrored; mirrored points snap to existing right-side points. Shipped torso bulges are not mirror pairs, so it falls back today.
-- Numbers (Molly, jit 0.2): unmirrored 860 -> 584 shipped; 104 with Mirror Bulge 1 on both torso parts (Head 68 hair, Spine 24, Pony1 12). rw4 seams: hips 0/0, arms 4/0 (as before). mirror1.py floors raised (84%, and 96% with the toggles). Models re-baked.
+- Spine facets: `diagPick` breaks full ties by sum |x|*y, then z*y (an upright tube's side quads tied on |x|, height and depth, so both sides kept the builder's diagonal). Spine 24 -> 0. With Mirror Bulge 1 on both torso parts 104 -> 48 left (all hair); shipped 584 -> 528. mirror1.py floors 86% / 98%. Models re-baked. rw4 seams unchanged (hips 0/0, arms 4/0).
+- Rig Editor Stretch: Tools row under the preview; dots (`.hdl` in `#toolLayer`) at the selected part's far end (bone matrix + `segOffset` + axis by kind) or the selected lock's tip; drag along the part's screen line sets `<part>.len` or `hair.L<k>.len` (clamped to the stat's range, rounded to its step; a lock never gets too short to build). Drags off a dot still orbit.
+- Rig Editor Draw (hair): `drawFit` picks the lock whose root is within 40 px of the stroke start (the selected lock wins a near tie), resamples the stroke to K+1 points, grid-searches len/curl/ang then refines twice; sets `hair.L<k>.*` and selects the lock. ~110 ms headless. Right-drag orbits in Draw (`controls.mouseButtons.RIGHT`). Left-drag captured on `#stage` (capture phase, ahead of OrbitControls).
+- `hairLocks` `lock(th,k,sg,o)`: with `o` it returns only the centre line; `HAIRLOCKS[].path(o)` maps it into the Head part's space (mirror included); world = `bones.Head.matrixWorld`.
+- Test `tests/fu/rigtool1.py` ALL PASS; hair1, mirror1, bmir1, mobsave1 pass; rx8, rigpages, fu3, fu6 logs clean.
 
 ## In progress
-- Ricky's visual check (screenshots sent) and his call on turning Mirror Bulge 1 on for the torso.
+- Nothing. Waiting on Ricky: try Stretch and Draw; Mirror Bulge 1 for the torso; publish v199 when happy.
 
 ## Decisions
-- Caps Lock press toggles Free Look; Lock Heading only on the press that turns it on (Ricky). Any angle; over 30° above 20 Zips trips (Ricky). Not on wall paths (Ricky). Dash Line only for the Dodecadash (Ricky).
-- My calls: in the Barrier a trip drops it and she faceplants; Comet has no Lock Heading or Dash Line (she has no Faceplant clip or Dodecadash); Free Look presses are ignored outside play; the cooldown starts only when it actually fires (or trips).
+- Draw reshapes an existing lock (its own Length, Extra Curl, Angle) rather than adding new free hair chains: no new saved data. Ricky to confirm that's what he wanted.
+- Turning a tool on poses her at Rest; turning it off gives the old pose back. The Mobs page turns the tools off.
 
 ## Next steps
-1. Ricky: Mirror Bulge 1 for Upper/Lower Torso (changes the shipped shape slightly), then re-bake. 2. Hair locks' straddling strips; the 24 spine facets. 3. Ricky playtests Lock Heading and the Dash Line.
+1. Ricky: playtest Stretch and Draw; say if Draw should make new chains instead. 2. Mirror Bulge 1 on Upper/Lower Torso, then re-bake. 3. Hair facets (48 left: lock strips at the cap, ponytail top). 4. Publish v199 (bump label).
 
 ## Gotchas
-- Free Look no longer follows the Caps Lock light: they can disagree (harmless). macOS Chrome may send CapsLock keydown only when the lock turns on (keyup when off); untested there.
-- Standing still with Free Look off, her heading follows the camera: tests set `yaw` with `heading`, or set heading inside Free Look.
-- weldMirror's symmetry test is exact to 0.1 mm: any asymmetric stat on a torso part (bulges) turns it off silently; `window.__wm`-style logging was used to find why.
-- Headless runs are slow: test the 1 s cooldown with key events dispatched inside one evaluate (lh1.py does).
+- With default lengths only locks 0, 1 and 13 exist (sides/back lengths are 0): tests must pick those.
+- Tests load the copy from `tests/mk_test.py`: always run the full build chain before a test, or it tests stale code.
+- Draw gives no hint where roots are; with few locks, start on the front locks. Could add root dots if Ricky finds it hard.
 - Shallow clone: `git -c push.negotiate=true push`. Tests leave `shots/` and `tests/fu/new_*` behind; don't commit them.
-- Any new test that starts a level from Level Select must click `#pcLast` after the level button.

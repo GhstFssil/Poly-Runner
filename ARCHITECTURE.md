@@ -30,6 +30,7 @@
   - Hover and Fly: `hovOn` / `flyOn` / `applyStats`.
   - Poses: stat sets `comet.pc|pt|pf|ho|fl.*`, applied by `cometPose` through the shared `window.__cometQ`.
 - The Rig Editor has pages Molly / Comet / Mobs (`setPage`, `loadChar`, `DEFM` / `DEFC`). Copy settings copies `{molly, comet, mobs}`.
+- The Rig Editor's preview has two tools (Tools row): Stretch (`stHandles`: dots at the selected part's end or lock tip set Length) and Draw (`drawFit`: a stroke from a lock's root is fitted, by a grid search over the lock's own Length / Extra Curl / Angle, to `HAIRLOCKS[].path`, the lock's centre line in the Head part's space). Either poses her at Rest while on. Test `tests/fu/rigtool1.py`.
 
 ## World
 - Units: TILE 2 (1 Zip = 2 u/s). Speeds are shown in Zips.

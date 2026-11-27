@@ -140,6 +140,8 @@ Height With Others (Ledge, Hill, Crags): Additive (stacks on what it crosses), I
 | lookup order | saved, then shipped, then built-in | `rigPick` |
 | bake | write the shipped models into the game file | `tools/bake_models.py` |
 | hair lock | one of the ring of locks round a character's hairline, all built alike from the shared hair stats (Lock Count, Thickness, Taper, Curl Amount, Curl Tightness, Spread, Part Position, Lock Length at the Front / Sides / Back). The old three bangs are the front locks; "bangs" is retired. Click one in the Rig Editor to give it (and its partner) its own Length, Extra Curl and Angle | `hair.*`, `hair.L<k>.*` (k: pairs counted from the front), `hairLocks`, `HAIRLOCKS`; old saved `bangL` becomes `hair.lenF` |
+| Stretch (Rig Editor) | a preview tool (Tools row under the preview): a dot at the selected part's far end, or at the selected hair lock's tip; dragging it sets that Length. Turning a tool on poses her at Rest until it is turned off | `toolSet`, `stHandles`, `stStart` |
+| Draw (Rig Editor) | a preview tool: a stroke started where a hair lock leaves the cap sets that lock's own Length, Extra Curl and Angle (its partner mirrors it) to match the stroke. Right-drag turns the view while it is on | `drawFit`, `HAIRLOCKS[].path` |
 | partner | a hair lock's mirror-image lock on the other side; the two share their own stats | `hairPair` |
 
 ## Build, repo and process

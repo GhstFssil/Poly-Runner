@@ -3,14 +3,13 @@ Open work only, in focused groups. Ricky decides priority and version numbers (s
 Format for new entries: `- [ ] (who, YYYY-MM-DD) short description; where/how to reproduce`. The sweeps tag theirs `(nightly/<name>)`. Older entries below have no who or date.
 
 ## Characters and looks
-- [ ] Runner model faceting should be mirrored down the center line. (Claude, 2026-11-27) Done on `next` except: the shipped torso bulges are not mirror pairs (Lower Torso 154/-155 and widths 50/51; Upper Torso start/end widths 0.16/0.31 vs 0.2/0.2), so the welds fall back to the old way until Mirror Bulge 1 is on for both torso parts (Ricky's call: it changes her shape a little). With it on, 104 of 3776 facets are left: the hair locks at the head and ponytail top, and 24 on the spine. Review with Ricky.
+- [ ] Runner model faceting should be mirrored down the center line. (Claude, 2026-11-27) Done on `next` except: the shipped torso bulges are not mirror pairs (Lower Torso 154/-155 and widths 50/51; Upper Torso start/end widths 0.16/0.31 vs 0.2/0.2), so the welds fall back to the old way until Mirror Bulge 1 is on for both torso parts (Ricky's call: it changes her shape a little). With it on, 48 of 3776 facets are left, all hair (the locks at the head and the ponytail top). Review with Ricky.
 - [ ] (Ricky, 2026-11-23) Give comet her own hair (ringlet curls)
 - [ ] (Ricky, 2026-11-27) Give Comet her own Faceplant animation.
 - [ ] (Ricky, 2026-11-23) Add special assets for the faces (eyes, mouth, nose).
 
 ## Editor tools
 - [ ] (Claude, 2026-11-25) Supersede for Ledges too? Hill and Crags have it; a ledge's bottom follows the ground along its length, so "flat to its bottom" needs a rule (its start's height, or follow the ground). **Decision** (Ricky).
-- [ ] (Claude, 2026-11-27) Editor tools, left from Ricky's draw/stretch item (plan approved 2026-11-25): Rig Editor Stretch, Rig Editor Draw for hair.
 
 ## New mechanics (design first)
 - [ ] Wind: Placed kind of the same way as tunnels, but it has no collision, it's just an area that gives the runner a directional acceleration. The acceleration can be set in any direction including up/down. Should have some subtle and unobtrusive visual indicator
