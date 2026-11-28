@@ -2,13 +2,17 @@
   {
     "v": "v199",
     "d": "Nov 27, 2026",
-    "t": "Rig Editor Stretch and Draw",
+    "t": "Stretch and Draw, Comet's ringlets",
     "g": [
       [
         "Added",
         [
           "Rig Editor: a Stretch tool under the preview. Drag the dot at the selected part's end to set its length, or the dot at a selected hair lock's tip to set that lock's length.",
-          "Rig Editor: a Draw tool under the preview. Drag from where a hair lock leaves the cap and the lock (and its partner) takes the shape of your stroke. Right-drag turns the view while Draw is on."
+          "Rig Editor: a Draw tool under the preview. Drag from where a hair lock leaves the cap and the lock (and its partner) takes the shape of your stroke. Right-drag turns the view while Draw is on.",
+          "Comet has her own hair: ringlet curls all round, and no ponytail.",
+          "Comet has her own Faceplant: a belly-flop dive, arms straight out ahead and feet kicked up as she skids.",
+          "Rig Editor: two new hair stats on the Head, Ringlet Turns and Ringlet Width, wind each lock into a corkscrew curl. Ringlets hang straight down past the widest part of the head.",
+          "Rig Editor: a Ponytail on / off switch under Ponytail Pose."
         ]
       ],
       [

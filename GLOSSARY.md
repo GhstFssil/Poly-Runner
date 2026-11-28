@@ -143,6 +143,8 @@ Height With Others (Ledge, Hill, Crags): Additive (stacks on what it crosses), I
 | Stretch (Rig Editor) | a preview tool (Tools row under the preview): a dot at the selected part's far end, or at the selected hair lock's tip; dragging it sets that Length. Turning a tool on poses her at Rest until it is turned off | `toolSet`, `stHandles`, `stStart` |
 | Draw (Rig Editor) | a preview tool: a stroke started where a hair lock leaves the cap sets that lock's own Length, Extra Curl and Angle (its partner mirrors it) to match the stroke. Right-drag turns the view while it is on | `drawFit`, `HAIRLOCKS[].path` |
 | partner | a hair lock's mirror-image lock on the other side; the two share their own stats | `hairPair` |
+| ringlet | a hair lock wound into a corkscrew round its own centre line (Head stats Ringlet Turns, Ringlet Width; 0 turns = none). Ringlets hang straight down past the head's widest line; a lock on the centre line (front or back) waves to and fro instead, so it stays its own mirror image. Comet's hair | `hair.ring`, `hair.ringW` |
+| Ponytail (switch) | on / off under Ponytail Pose: off builds no ponytail parts (its bones stay, so every clip still fits). Comet's is off | `ponyOn` |
 
 ## Build, repo and process
 The rows for src, part, build and the game file describe the source split, which is on `next` until the next version ships. On `main` the game file is still edited directly.

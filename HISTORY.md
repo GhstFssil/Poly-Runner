@@ -97,3 +97,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-27 16:12 | main (docs) | HANDOFF: v198 published
 - 2026-11-27 15:46 | next | Mirrored faceting: diagPick breaks ties by |x|*y then z*y, so the neck's side quads mirror (Spine 24 -> 0; with Mirror Bulge 1 on both torso parts 104 -> 48 left, all hair; shipped 584 -> 528); mirror1.py floors 86%/98%; models re-baked
 - 2026-11-27 16:04 | next | Rig Editor Stretch (drag a part's end or a hair lock's tip to set its Length) and Draw (a stroke from a lock's root sets its own Length, Extra Curl and Angle); HAIRLOCKS[].path; test fu/rigtool1.py; docs
+- 2026-11-27 19:05 | next | Comet: ringlets (new Head stats Ringlet Turns/Width, hair.ring/hair.ringW; hang below the widest line; centre-line locks wave) and no ponytail (new Ponytail switch ponyOn); her own Faceplant (belly-flop, m.fall.* keys); comet.glb re-baked; test fu/ringlet1.py; docs
