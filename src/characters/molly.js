@@ -190,7 +190,7 @@
         if (mollyRoot) { body.remove(mollyRoot); mollyRoot.traverse(function (o) { if (o.geometry) o.geometry.dispose(); }); }
         mollyAct = {}; mollyW = {}; mollyT = {}; mollyMesh = null; mollyOn = false;
         model.scale.setScalar(sc); model.rotation.y = MOLLY_YAW; model.position.y = -bb.min.y * sc; root.add(model);
-        model.traverse(function (o) { if (o.isMesh) { o.frustumCulled = false; o.castShadow = true; mollyMesh = o; o.material.roughness = 1; o.material.metalness = 0; } });
+        model.traverse(function (o) { if (o.isMesh) { o.frustumCulled = false; if (o.name === 'Runner_face') return; o.castShadow = true; mollyMesh = o; o.material.roughness = 1; o.material.metalness = 0; } });   // the face sheet (drawn eyes, brows and mouth) casts no shadow and stays unlit
         mollyMix = new THREE.AnimationMixer(model);
         MOLLY_CLIPS.forEach(function (n) {
           var c = THREE.AnimationClip.findByName(g.animations, n); if (!c) return;

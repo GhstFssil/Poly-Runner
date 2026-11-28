@@ -43,7 +43,9 @@ var SD={
 var GLOBAL={scale:1,pelvisDrop:10,shoulderX:20,shoulderY:31,hipX:6.5,shoulderOver:4,armSpread:9,hairVol:1,'hair.count':14,'hair.thick':1.1,'hair.taper':1,'hair.curl':0,'hair.tight':1,'hair.spread':4,'hair.part':0,'hair.lenF':1,'hair.lenS':0,'hair.lenB':0,'hair.ring':0,'hair.ringW':1,ponyOn:1,ponyAng:118,ponyCurl:50,
   jShoulder:5,jHip:4,jAnkle:3,jPony:2.5,jElbow:8,jWrist:3,jKnee:8,jWaist:6,jNeckBase:4,jNeckTop:4,
   sides:8,rings:2,ringGap:.8,jit:.18,irr:0,irrC:0,fmt:2,
-  cSuit:'#d9232b',cHair:'#e0202a',cSkin:'#f2a978',cBlk:'#2a1f22',cWht:'#f4f1ee',cEye:'#2f8fd0'};
+  cSuit:'#d9232b',cHair:'#e0202a',cSkin:'#f2a978',cBlk:'#2a1f22',cWht:'#f4f1ee',cEye:'#2f8fd0',cBrow:'#3b1d1e',
+  'face.on':1,'face.eyeX':4.1,'face.eyeY':10.9,'face.eyeW':4.7,'face.eyeH':3.4,'face.eyeTilt':6,'face.iris':1,'face.lash':.65,'face.wing':1.4,
+  'face.browY':14.3,'face.browW':4.8,'face.browT':.9,'face.browTilt':18,'face.browArch':.45,'face.mouthY':5,'face.mouthW':3.6,'face.smile':.3,'face.nose':1};
 /* ---- keyframed moves. Angles in degrees. Missing values carry over from the previous key.
    hyf hips height (1 = standing), hz hips forward (m), hp body pitch (+ leans forward), sp spine, hd head,
    aLp/aRp arm raise (+ forward and up), aLr/aRr arm out to the side, aLe/aRe elbow bend,
@@ -134,8 +136,13 @@ var GROUPS=[
    ['jElbow','Elbow Blend Length','cm',0,16,.5],['jWrist','Wrist Blend Length','cm',0,8,.5],['jKnee','Knee Blend Length','cm',0,16,.5],
    ['jWaist','Waist Blend Length','cm',0,14,.5],['jNeckBase','Neck Base Blend Length','cm',0,10,.5],['jNeckTop','Neck Top Blend Length','cm',0,10,.5]]],
  ['Skeleton and Joints',[['scale','Overall Scale (her size in the game too, after Save to game)','x',.8,1.25,.01],['pelvisDrop','Pelvis Below Hip Joint','cm',0,30,.5],['shoulderX','Shoulder Joint X','cm',8,40,.5],['shoulderY','Shoulder Joint Height on Torso','cm',15,42,.5],['hipX','Hip Joint X','cm',4,16,.5],['shoulderOver','Shoulder Overlap Into Torso','cm',-3,5,.5],['armSpread','Arm Spread','deg',0,40,1]]],
+ ['Face (eyes, brows and mouth are drawn on, the nose is built)',[['face.on','Drawn Face (off: the old flat eyes and mouth)','tog'],['face.eyeX','Eye Spacing (centre from the middle)','cm',1,7,.05],['face.eyeY','How High the Eyes Sit','cm',6,17,.05],
+   ['face.eyeW','Eye Width','cm',1,6,.05],['face.eyeH','Eye Height (how open)','cm',.6,5,.05],['face.eyeTilt','Eye Tilt (+ = outer corners up)','deg',-30,30,1],['face.iris','Iris Size (x the eye\'s height)','x',.3,1.5,.01],
+   ['face.lash','Lash Line Thickness','cm',0,1.5,.01],['face.wing','Lash Wing Length','cm',0,3,.05],
+   ['face.browY','How High the Brows Sit','cm',9,18,.05],['face.browW','Brow Length','cm',1,7,.05],['face.browT','Brow Thickness','cm',.1,1.5,.01],['face.browTilt','Brow Slant (+ = inner ends lower, a determined look)','deg',-40,40,1],['face.browArch','Brow Arch','cm',-1,2,.01],
+   ['face.mouthY','How High the Mouth Sits','cm',1,9,.05],['face.mouthW','Mouth Width','cm',1,8,.05],['face.smile','Smile (+ = corners up)','cm',-1.5,1.5,.01],['face.nose','Nose Size','x',0,2.5,.01]]],
  ['Ponytail Pose',[['ponyOn','Ponytail (off: no ponytail is built)','tog'],['ponyAng','Rise Angle','deg',70,150,1],['ponyCurl','Droop per Bend','deg',0,90,1]]],
  ['Faceting',[['sides','Sides per Ring','n',5,20,1],['rings','Rings per Side of the Max','n',1,4,1],['ringGap','Thinnest Strip of Facets (rings closer than this are merged)','cm',0,3,.05],['jit','Shading Variation','x',0,.5,.01],['irr','Irregularity of the Ring Sides','x',0,1,.01],['irrC','Contour Shift (up/down along the form)','x',0,1.5,.01]]],
 
 ];
-var COLORS=[['cSuit','Jumpsuit'],['cHair','Hair'],['cSkin','Skin'],['cBlk','Belt, Gloves, Pads'],['cWht','Arm Bands, Soles'],['cEye','Eyes']];
+var COLORS=[['cSuit','Jumpsuit'],['cHair','Hair'],['cSkin','Skin'],['cBlk','Belt, Gloves, Pads'],['cWht','Arm Bands, Soles'],['cEye','Eyes'],['cBrow','Brows']];

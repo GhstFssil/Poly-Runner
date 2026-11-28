@@ -1,26 +1,28 @@
-# Handoff (2026-11-27)
+# Handoff (2026-11-28)
 
 ## Goal
-Comet's own hair (ringlets) and her own Faceplant (BACKLOG, Characters and looks): done on `next`, waiting on Ricky's look. Next item after that: the face assets (Ricky's reference image: angled brows, almond eyes with heavy upper lashes and a two-tone iris with a highlight, a small triangle nose, a thin smile).
+Molly's face from Ricky's reference image (BACKLOG: special assets for the faces): a drawn face she can tune. First try done on `next`, waiting on Ricky's look.
 
 ## Done
-- Ringlets: Head stats Ringlet Turns `hair.ring` (0 = none) and Ringlet Width `hair.ringW` (times the lock's width). In `hairLocks`, with turns > 0 a lock gets 8 stretches a turn, hangs straight down once past the head's widest line, and its strand winds round the centre line as a three-sided tube (0.6x the width). A centre-line lock (front or back) waves to and fro in the centre plane instead, so it stays its own mirror image (mirror1.py needs that). Turns 0: byte-identical to before (Molly's glb is unchanged).
-- Ponytail switch `ponyOn` (default 1) under Ponytail Pose: off skips the Pony parts in `rebuild` (bones stay, clips unchanged).
-- Comet shipped: ponyOn 0, 16 locks, lengths F 0.4 / S 1.8 / B 2.3, turns 2, width 0.4, thickness 1.2, taper 0.4, spread 6.
-- Comet's Faceplant (her `m.fall.*` keys): belly-flop dive, arms straight ahead, lands prone with her back arched, knees bend so her feet kick up while she skids (key 6 held).
-- comet.glb re-baked. Test `tests/fu/ringlet1.py`. CHANGELOG lines added to the unpublished v199 entry (retitled).
+- Drawn face (GLOSSARY: drawn face, face sheet). `faceSheet()` in rig-editor.html paints eyes (eye white with lid shadow, layered iris in `cEye`, pupil, catch light, lash line thickening outward with a wing, short lower outer lash), brows (`cBrow`, thick inner end, tapering, arched, slanted) and mouth (line + soft lower lip) on a 512 px canvas, in cm on a built-in-size head (`FACE_S` -8..8 round the face, `FACE_Y` 2..18 up the head).
+- `buildFace()` (called from `rebuild`): 33x33 grid of rays from in front, dropped onto the Head's 'skin' facets, lifted 2 mm, u from distance round the face; only inked cells kept (~390 tris). SkinnedMesh `Runner_face`, MeshBasicMaterial (unlit, blended), weights from `vertW`.
+- Stats under Stats > Face (`face.*`, 19 of them) and a Brows colour. `face.on` off brings back the old flat eye/brow/mouth quads. Nose is still geometry, colour key 'nose' (so the sheet skips it), sized by `face.nose`.
+- Comet: `DEFC['face.on']=0`, so comet.glb is byte-identical. molly.glb re-baked (+108 KB: 40 KB PNG + face mesh).
+- molly.js loader: the face mesh casts no shadow and isn't taken as `mollyMesh`.
+- CHANGELOG line added to the unpublished v199 entry (retitled).
 
 ## In progress
-- Ricky's visual check (screenshots sent). Every number is a stat he can tune in the Rig Editor (Comet page, Head; Faceplant keys).
+- Ricky's visual check (screenshots sent from the Rig Editor and in game).
 
 ## Decisions
-- Ricky: Comet's ringlets replace her ponytail; her Faceplant is a belly-flop with her arms forward.
-- Mine: ringlets always hang below the widest line (only when turns > 0, so Molly is untouched); centre-line locks wave instead of winding.
+- Ricky: adjustable (sliders) rather than fixed to the reference.
+- Mine: unlit face sheet (crisp anime look; in shade the eye whites stay bright against dark skin; switching to lit is a one-word material change); colours other than iris/brows are fixed in `faceSheet`.
 
 ## Next steps
-1. Ricky reviews the ringlets and the Faceplant. 2. Face assets from his reference. 3. Lock Heading for Comet (unblocked). 4. Publish v199 when he says so.
+1. Ricky reviews/tunes. Possible: lit vs unlit, deeper default iris colour, blink/expression swaps. 2. Lock Heading for Comet. 3. Publish v199 when he says so.
 
 ## Gotchas
-- Comet can't trip in the game yet (no Barrier, no Lock Heading), so her Faceplant is only visible in the Rig Editor until Lock Heading lands.
-- More helix turns means more faces (8 stretches a turn, 6 faces a stretch, per lock).
+- A rebuild now takes ~165 ms instead of ~70 (the face raycast); fine for sliders, but a place to speed up if it drags.
+- `bake_models.py` rebuilds the game but the test copy comes from before: run `tests/mk_test.py` again before game tests.
+- In-game close-ups right after spawn catch the spawn flash; take a throwaway view first.
 - Shallow clone: `git -c push.negotiate=true push`. Tests leave `shots/` behind; don't commit it.

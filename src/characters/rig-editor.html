@@ -16,12 +16,13 @@ var bandOld=false,bandReady=false;                                  /* bandOld: 
 try{var gs=upgrade(JSON.parse(HOST.__init||'{}'));for(k in DEF){if(gs[k]!==undefined&&typeof gs[k]===typeof DEF[k])DEF[k]=gs[k];}defOld=!(gs.fmt>=2);}catch(e){}   /* the settings the shipped Molly was built from are the defaults, so every Reset button goes back to her and not to an older build */
 DEF.fmt=2;
 var DEFM=DEF,DEFC=JSON.parse(JSON.stringify(DEF));   /* Molly's defaults, and Comet's (hers over Molly's); every Reset on a page goes back to that runner's */
+DEFC['face.on']=0;   /* the drawn face is Molly's; Comet keeps her old one unless it is turned on */
 try{var gc=upgrade(JSON.parse(HOST.__initC||'{}'));for(k in DEFC){if(gc[k]!==undefined&&typeof gc[k]===typeof DEFC[k])DEFC[k]=gc[k];}}catch(e){}
 var P=JSON.parse(JSON.stringify(DEF));
 /* A typed or pasted value can go past its slider, but not to where the build breaks (a part with no length, a loop with no time, a million sides): each stat is held to the nearest value that still works. [pattern, least, most, whole numbers only] */
 var HOLDS=[[/\.len$/,.5,400],[/\.dia$/,.2,400],[/\.depth$/,.02,20],[/\.peak$/,.005,.995],[/\.t[SE]$/,.005,20],[/\.c[SE]$/,.05,50],
  [/\.u[12]w[lr]$/,.5,360],[/\.u[12]w[se]$/,.002,5],[/\.u[12]d$/,-100,100],[/\.u[12]p$/,-1,2],[/\.u[12]k[lrse]$/,-4,4],[/^Foot\.flat$/,0,.98],[/\.band[AL]$|^Shin\.pad$|^Foot\.(heel|sole|ankleH)$/,0,400],
- [/^scale$/,.05,20],[/^sides$/,5,48,1],[/^rings$/,1,8,1],[/^ringGap$/,0,20],[/^fmt$/,2,2],[/^hairVol$/,.05,10],[/^hair\.count$/,1,24,1],[/^hair\.thick$/,.05,5],[/^hair\.taper$/,0,1],[/^hair\.(curl|L\d+\.curl)$/,-720,720],[/^hair\.tight$/,.2,5],[/^hair\.(spread|part|L\d+\.ang)$/,-90,90],[/^hair\.(len[FSB]|L\d+\.len)$/,0,10],[/^j[A-Z]/,0,100],[/^(jit|irr|irrC)$/,0,5],
+ [/^face\.on$/,0,1,1],[/^face\.(eyeW|eyeH|iris|lash|wing|browW|browT|mouthW|nose)$/,0,20],[/^face\./,-50,50], [/^scale$/,.05,20],[/^sides$/,5,48,1],[/^rings$/,1,8,1],[/^ringGap$/,0,20],[/^fmt$/,2,2],[/^hairVol$/,.05,10],[/^hair\.count$/,1,24,1],[/^hair\.thick$/,.05,5],[/^hair\.taper$/,0,1],[/^hair\.(curl|L\d+\.curl)$/,-720,720],[/^hair\.tight$/,.2,5],[/^hair\.(spread|part|L\d+\.ang)$/,-90,90],[/^hair\.(len[FSB]|L\d+\.len)$/,0,10],[/^j[A-Z]/,0,100],[/^(jit|irr|irrC)$/,0,5],
  [/\.dur$/,.05,600],[/^comet\.(pc|pt|pf|fl|ho)\.(hyf|hz)$/,-2,2],[/^comet\.(pc|pt|pf|fl|ho)\./,-180,180],[/^comet\.hov\.(ankleY|backY)$/,-5,5],[/^comet\.(hov\.(ankleTilt|backTilt)|fly\.starTilt)$/,-180,180],[/^comet\./,0,1e4],[/^dA\.(hyf|hz)$/,-1,1],[/^dA\./,-180,180],[/^m\.drift\.time$/,.02,10],[/^m\.drift\.rate$/,.1,200],[/^m\.drift\.(cool|minZips)$/,0,1000],
  [/^barrier\.radius$/,.2,20],[/^barrier\.squeezeLen$/,.5,1e4],[/^barrier\.squeeze$/,-2,.95],[/^barrier\.stretch$/,-.95,10],[/^barrier\.glow$/,0,1],[/^barrier\.glowSize$/,.1,10],[/^barrier\.dash(Len|Gap)$/,.005,20],
  [/^stat\.top$/,1,1e4],[/^stat\.accelT$/,.5,1e4],[/^stat\.(brake|jumpH|wallGrip|fric)$/,0,1e4],[/^stat\.gripZ$/,.5,5e5],[/^stat\.grav$/,1,1e4],[/^stat\.fade(Wall|Slope)$/,0,1,1],[/^stat\.driftGrip$/,0,10],[/^stat\.fall$/,1,1e4],[/^stat\.slam(Acc|Max)$/,1,1e4],[/^mn\.\w+\.(scale|head[WHD]|torso[WHD]|arm[WL]|leg[WDL])$/,.05,100],[/^mn\.\w+\.hearts$/,1,99,1],[/^mn\.\w+\.dmg$/,0,99,1],[/^mn\.\w+\.(radius|top|acc|see|cool|k[123]|stomp|stride|bob)$/,0,1e4],[/^mn\.\w+\.(wing|flap|orbit|range|fire|bolt|bdmg)$/,0,1e4],[/^mn\.\w+\.(legSwing|armSwing|armRaise)$/,-180,180],[/^stat\.hearts$/,1,12,1],[/^stat\.colH$/,1.2,100],[/^stat\.colW$/,.2,100]];
@@ -188,20 +189,65 @@ function zAt(id,x,y,off){
   var L=P[id+'.len']/100,t=Math.min(1,Math.max(0,y/L)),s=ringAt(id,t,1),u=(x-s.cb)/(s.rb||1e-6);
   return s.cc+s.rc*Math.sqrt(Math.max(0,1-u*u))*.95+(off===undefined?.004:off);
 }
+/* The drawn face (Face stats): eyes, brows and mouth painted on a canvas, laid over the front of the head on a thin sheet (the face sheet, built in rebuild).
+   The canvas spans FACE_S (cm across the face, measured round its curve, 0 = the middle) by FACE_Y (cm up from the head's base) on a head of the built-in size;
+   a bigger or smaller head scales it with the head. Everything is drawn in cm, y up; one eye and brow are drawn and mirrored for the other side. */
+var FACE_S=[-8,8],FACE_Y=[2,18],FACE_PX=512;
+function faceSheet(){
+  var cv=document.createElement('canvas');cv.width=cv.height=FACE_PX;var c=cv.getContext('2d'),k=FACE_PX/(FACE_S[1]-FACE_S[0]),q=function(n){return Math.max(0,P[n]);};
+  function tone(hex,f){var n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;   /* f<0 darker toward black, f>0 lighter toward white */
+    function m(v){return Math.round(f<0?v*(1+f):v+(255-v)*f);}return 'rgb('+m(r)+','+m(g)+','+m(b)+')';}
+  function bez(a,b,cc,d,t){var u=1-t;return [u*u*u*a[0]+3*u*u*t*b[0]+3*u*t*t*cc[0]+t*t*t*d[0],u*u*u*a[1]+3*u*u*t*b[1]+3*u*t*t*cc[1]+t*t*t*d[1]];}
+  function poly(pts,fill){c.beginPath();pts.forEach(function(p,i){if(i)c.lineTo(p[0],p[1]);else c.moveTo(p[0],p[1]);});c.closePath();c.fillStyle=fill;c.fill();}
+  c.setTransform(k,0,0,-k,-FACE_S[0]*k,FACE_Y[1]*k);c.lineJoin=c.lineCap='round';
+  [1,-1].forEach(function(sd){
+    /* an eye, in its own frame: +x outward, y up, centred on the eye */
+    var a=q('face.eyeW')/2,b=q('face.eyeH')/2,I=[-a,-.1*b],O=[a,.15*b],U1=[-.6*a,.95*b],U2=[.35*a,1.15*b],L1=[.7*a,-1.05*b],L2=[-.5*a,-.95*b];
+    c.save();c.scale(sd,1);c.translate(P['face.eyeX'],P['face.eyeY']);c.rotate(P['face.eyeTilt']*Math.PI/180);
+    c.beginPath();c.moveTo(I[0],I[1]);c.bezierCurveTo(U1[0],U1[1],U2[0],U2[1],O[0],O[1]);c.bezierCurveTo(L1[0],L1[1],L2[0],L2[1],I[0],I[1]);c.closePath();
+    c.fillStyle='#f3e0d3';c.fill();c.save();c.clip();
+    var ry=q('face.iris')*b*1.05,rx=ry*.72,iy=.05*b;   /* the iris: a dark rim, the colour, a lighter lower half, the pupil and a catch light */
+    function ell(x,y,ex,ey,f){if(ex<=0||ey<=0)return;c.beginPath();c.ellipse(x,y,ex,ey,0,0,2*Math.PI);c.fillStyle=f;c.fill();}
+    ell(0,iy,rx,ry,tone(P.cEye,-.55));ell(0,iy,rx*.84,ry*.88,tone(P.cEye,-.15));ell(0,iy-.3*ry,rx*.62,ry*.5,tone(P.cEye,.18));
+    ell(0,iy+.08*ry,rx*.34,ry*.62,'#0c0e1c');
+    c.fillStyle='rgba(120,70,70,.42)';c.fillRect(-2*a,.42*b,4*a,2*b);   /* the shadow of the upper lid across the top of the eye */
+    ell(.3*rx,iy+.38*ry,rx*.16,ry*.22,'#ffffff');
+    c.restore();
+    c.beginPath();c.moveTo(O[0],O[1]);c.bezierCurveTo(L1[0],L1[1],L2[0],L2[1],I[0],I[1]);c.lineWidth=.1;c.strokeStyle='#c08a80';c.stroke();   /* the lower lid */
+    var lw=q('face.lash'),wg=q('face.wing'),N=16,top=[],bot=[],i;   /* the lash line: along the upper lid, thickening outward, then a wing up and out past the outer corner */
+    for(i=0;i<=N;i++){var t=i/N,p=bez(I,U1,U2,O,t),p2=bez(I,U1,U2,O,Math.min(1,t+.01)),p1=bez(I,U1,U2,O,Math.max(0,t-.01)),tx=p2[0]-p1[0],ty=p2[1]-p1[1],tl=Math.hypot(tx,ty)||1,th=lw*(.3+.7*t);
+      bot.push([p[0]-ty/tl*.05,p[1]+tx/tl*.05]);top.push([p[0]-ty/tl*th,p[1]+tx/tl*th]);}
+    if(lw>0){var wing=[O[0]+wg*.85,O[1]+lw*.5+wg*.6];poly([[I[0]-.15*a,I[1]-.12*b]].concat(bot,[wing],top.reverse()),'#14121c');
+      var lo=[];for(i=0;i<=6;i++)lo.push(bez(O,L1,L2,I,i/6*.3));   /* a short dark lash under the outer corner */
+      c.beginPath();lo.forEach(function(p,j){if(j)c.lineTo(p[0],p[1]);else c.moveTo(p[0],p[1]);});c.lineWidth=lw*.45;c.strokeStyle='#14121c';c.stroke();}
+    c.restore();
+    /* a brow: thick at the inner end, tapering outward, arched; slanted about its middle */
+    var bw=q('face.browW'),bt=q('face.browT'),ar=P['face.browArch'],up=[],dn=[];
+    c.save();c.scale(sd,1);c.translate(P['face.eyeX']+.1*bw,P['face.browY']);c.rotate(P['face.browTilt']*Math.PI/180);
+    for(i=0;i<=N;i++){var u=i/N,x=-bw/2+bw*u,y=ar*(4*u*(1-u)-.5*u*u),h2=bt*(1-.75*u)/2;up.push([x,y+h2]);dn.push([x,y-h2]);}
+    if(bw>0&&bt>0)poly(up.concat(dn.reverse()),P.cBrow);
+    c.restore();
+  });
+  /* the mouth: a dark line, its corners raised by Smile, over a soft lower lip */
+  var mw=q('face.mouthW')/2,my=P['face.mouthY'],sm=P['face.smile'];
+  if(mw>0){c.beginPath();c.moveTo(-mw,my+sm);c.quadraticCurveTo(0,my-sm,mw,my+sm);c.quadraticCurveTo(0,my-sm-.9,-mw,my+sm);c.fillStyle='rgba(214,110,96,.45)';c.fill();
+    c.beginPath();c.moveTo(-mw,my+sm);c.quadraticCurveTo(0,my-sm,mw,my+sm);c.lineWidth=.22;c.strokeStyle='#4e1a1c';c.stroke();}
+  return cv;
+}
 function headFeatures(Pt){
   var L=P['Head.len']/100,D=P['Head.dia']/100,dep=P['Head.depth'],sx=D/.172,sy=L/.235,sz=sx*dep/1.04;
   function fq(pts,col){var v=pts.map(function(p){return [p[0],p[1],zAt('Head',p[0],p[1])];});
     Pt.add(v[0],v[1],v[2],col,null,[0,0,1]);Pt.add(v[0],v[2],v[3],col,null,[0,0,1]);}
   [1,-1].forEach(function(s){
     var x=s*.036*sx,y=.115*sy,inn=x-s*.016*sx,out=x+s*.016*sx,h=sy;
-    fq([[inn,y-.012*h],[out,y-.012*h],[out,y+.013*h],[inn,y+.005*h]],'eye');
-    fq([[inn,y+.018*h],[out,y+.028*h],[out,y+.035*h],[inn,y+.025*h]],'blk');
+    if(!P['face.on']){fq([[inn,y-.012*h],[out,y-.012*h],[out,y+.013*h],[inn,y+.005*h]],'eye');
+      fq([[inn,y+.018*h],[out,y+.028*h],[out,y+.035*h],[inn,y+.025*h]],'blk');}   /* the drawn face (faceSheet) takes their place */
     var er=ringAt('Head',.105*sy/L,1);
     sphere(Pt,[er.cb+s*(er.rb+.003),.105*sy,-.005*sz+er.cc],[.012*sx,.022*sy,.016*sx],'skin',2,4);
   });
-  fq([[-.016*sx,.050*sy],[.016*sx,.048*sy],[.022*sx,.058*sy],[.016*sx,.054*sy]],'mouth');
-  var nz=zAt('Head',0,.084*sy,-.004);
-  spike(Pt,[[-.009*sx,.084*sy,nz],[.009*sx,.084*sy,nz],[0,.094*sy,nz+.002]],[0,.092*sy,nz+.02*sz],'skin');
+  if(!P['face.on'])fq([[-.016*sx,.050*sy],[.016*sx,.048*sy],[.022*sx,.058*sy],[.016*sx,.054*sy]],'mouth');
+  var nz=zAt('Head',0,.084*sy,-.004),ns=P['face.on']?P['face.nose']:1;   /* the nose: a little pyramid, its point down and out (colour 'nose', so the drawn face is laid over the skin under it, not over it) */
+  if(ns>0)spike(Pt,[[-.009*sx*ns,.084*sy,nz],[.009*sx*ns,.084*sy,nz],[0,.084*sy+.01*sy*ns,nz+.002]],[0,.084*sy+.008*sy*ns,nz+.02*sz*ns],'nose');
   var hv=P.hairVol,cen=[0,.10,-.008],rd=[.108*hv,.15*hv,.115*hv],lat=7,lon=12,hs=ringAt('Head',.43,1);
   function mp(p){return [p[0]*sx+hs.cb,p[1]*sy,p[2]*sz+hs.cc];}
   function hp(a,b){return [cen[0]+rd[0]*Math.sin(a)*Math.cos(b),cen[1]+rd[1]*Math.cos(a),cen[2]+rd[2]*Math.sin(a)*Math.sin(b)];}
@@ -423,7 +469,7 @@ function weightsFor(pr,x,y,z,outI,outW,o){
   for(i=0;i<4;i++){outI[o+i]=list[i]?BIDX[list[i][0]]:0;outW[o+i]=list[i]?list[i][1]/sum:0;}
 }
 
-var scene,camera,renderer,controls,grid,rigRoot,bones={},rest={},hipsBase=[0,1,0],dirty=true,skMesh=null,hlMesh=null,wireMesh=null,skeleton=null,ranges={},raycaster=new THREE.Raycaster();
+var scene,camera,renderer,controls,grid,rigRoot,bones={},rest={},hipsBase=[0,1,0],dirty=true,skMesh=null,hlMesh=null,wireMesh=null,faceMesh=null,skeleton=null,ranges={},raycaster=new THREE.Raycaster();
 var mat=new THREE.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:.85,metalness:0,skinning:true,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
 var hlMat=new THREE.MeshBasicMaterial({color:0xffd23f,wireframe:true,transparent:true,opacity:.95,skinning:true});
 var wireMat=new THREE.MeshBasicMaterial({color:0x111111,wireframe:true,transparent:true,opacity:.5,skinning:true});
@@ -456,9 +502,10 @@ function shadeAt(x,y,z,seed){var c=.025,X=Math.abs(x)/c,Y=y/c,Z=z/c,x0=Math.floo
 function rngFor(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 function disposeRig(){
   if(!rigRoot)return;
-  [skMesh,wireMesh,hlMesh].forEach(function(m){if(m&&m.geometry)m.geometry.dispose();});
+  [skMesh,wireMesh,hlMesh,faceMesh].forEach(function(m){if(m&&m.geometry)m.geometry.dispose();});
+  if(faceMesh){faceMesh.material.map.dispose();faceMesh.material.dispose();}
   if(skeleton)skeleton.dispose();
-  scene.remove(rigRoot);bones={};rest={};skMesh=hlMesh=wireMesh=skeleton=null;
+  scene.remove(rigRoot);bones={};rest={};skMesh=hlMesh=wireMesh=faceMesh=skeleton=null;
 }
 function sidesOf(seg){return seg.pair?[{s:'L',g:1},{s:'R',g:-1}]:[{s:'',g:1}];}
 /* ================= welded joints =================
@@ -620,7 +667,7 @@ var WELDJ={'LowerTorso>Thigh':{gate:0,soft:3},'UpperTorso>UpperArm':{gate:1,soft
 function rebuild(){bulgeMirSync();
   var t0=performance.now();
   disposeRig();
-  var pal={suit:hex2lin(P.cSuit),hair:hex2lin(P.cHair),skin:hex2lin(P.cSkin),blk:hex2lin(P.cBlk),wht:hex2lin(P.cWht),eye:hex2lin(P.cEye),mouth:hex2lin('#7a3a2c')};
+  var pal={suit:hex2lin(P.cSuit),hair:hex2lin(P.cHair),skin:hex2lin(P.cSkin),blk:hex2lin(P.cBlk),wht:hex2lin(P.cWht),eye:hex2lin(P.cEye),mouth:hex2lin('#7a3a2c'),nose:hex2lin(P.cSkin)};
   rigRoot=new THREE.Group();rigRoot.name='Runner';
   var rg=rigDef();
   rg.bones.forEach(function(r){
@@ -740,6 +787,8 @@ function rebuild(){bulgeMirSync();
     var m=new THREE.SkinnedMesh(g2,material);m.name=name;m.frustumCulled=false;rigRoot.add(m);m.bind(skeleton,new THREE.Matrix4());return m;}
   wireMesh=overlay(wireMat,'wire');wireMesh.visible=ui.wire;
   hlMesh=overlay(hlMat,'hl');
+  if(P['face.on']&&byKey.Head)faceMesh=buildFace(byKey.Head,soups.Head,vertW);
+  if(faceMesh){rigRoot.add(faceMesh);faceMesh.bind(skeleton,new THREE.Matrix4());}
   if(ui.lock!=null&&!lockOf(ui.lock)){ui.lock=null;if(ui.sel==='Head')setTimeout(renderPart,0);}   /* the clicked lock is gone (fewer locks, or too short) */
   hilite();
   hipsBase=[0,rg.bones[0][2][1],0];
@@ -748,6 +797,41 @@ function rebuild(){bulgeMirSync();
   $('#tri').textContent=(pos.length/9).toLocaleString()+' triangles';
   dirty=false;
   rebuild.ms=performance.now()-t0;
+}
+/* The face sheet: a grid over the front of the head, each point dropped onto her skin (a ray from straight in front of the face, against the head's
+   skin facets; not the hair, nor the nose, which stands out through it) and lifted 2 mm off it, mapped so the drawing keeps its size round the
+   head's curve. Only cells with some of the drawing in them are kept. It follows the head's bones like the skin under it. */
+function buildFace(pr,soup,vertW){
+  var cv=faceSheet(),img=cv.getContext('2d').getImageData(0,0,FACE_PX,FACE_PX).data;
+  var D=P['Head.dia']/100,L=P['Head.len']/100,sx=D/.172,sy=L/.235,NX=33,NY=33,i,j;
+  var M=pr.M,dir=new THREE.Vector3(0,0,-1).transformDirection(M),tri=soup.filter(function(t){return t[3]==='skin';}),o=new THREE.Vector3(),
+    e1=new THREE.Vector3(),e2=new THREE.Vector3(),pv=new THREE.Vector3(),tv=new THREE.Vector3(),qv=new THREE.Vector3(),a=new THREE.Vector3();
+  function hit(x,y){   /* the nearest skin facet along the ray (Moller-Trumbore), or null */
+    o.set(x,y,.5).applyMatrix4(M);var best=1e9;
+    for(var n=0;n<tri.length;n++){var t=tri[n];a.fromArray(t[0]);e1.fromArray(t[1]).sub(a);e2.fromArray(t[2]).sub(a);pv.crossVectors(dir,e2);var det=e1.dot(pv);if(Math.abs(det)<1e-12)continue;
+      var inv=1/det;tv.subVectors(o,a);var u=tv.dot(pv)*inv;if(u<0||u>1)continue;qv.crossVectors(tv,e1);var v=dir.dot(qv)*inv;if(v<0||u+v>1)continue;var d=e2.dot(qv)*inv;if(d>0&&d<best)best=d;}
+    return best<1e9?o.clone().addScaledVector(dir,best-.002*sx):null;}
+  var xs=.078*sx,y0=FACE_Y[0]/100*sy,y1=FACE_Y[1]/100*sy,G=[];
+  for(j=0;j<NY;j++){var row=[],y=y0+(y1-y0)*j/(NY-1);for(i=0;i<NX;i++)row.push(hit(-xs+2*xs*i/(NX-1),y));
+    var m=(NX-1)/2,arc=new Array(NX);arc[m]=0;   /* distance round the face from the middle, along the row */
+    for(i=m+1;i<NX;i++)arc[i]=row[i]&&row[i-1]?arc[i-1]+row[i].distanceTo(row[i-1]):NaN;
+    for(i=m-1;i>=0;i--)arc[i]=row[i]&&row[i+1]?arc[i+1]-row[i].distanceTo(row[i+1]):NaN;
+    G.push(row.map(function(p,i){return p&&arc[i]===arc[i]?{p:p,u:(arc[i]*100/sx-FACE_S[0])/(FACE_S[1]-FACE_S[0]),v:(j/(NY-1))}:null;}));}
+  function inked(u0,u1,v0,v1){   /* any of the drawing in this patch of the canvas */
+    var x0=Math.max(0,Math.floor(Math.min(u0,u1)*FACE_PX)-2),x1=Math.min(FACE_PX-1,Math.ceil(Math.max(u0,u1)*FACE_PX)+2),r0=Math.max(0,Math.floor((1-Math.max(v0,v1))*FACE_PX)-2),r1=Math.min(FACE_PX-1,Math.ceil((1-Math.min(v0,v1))*FACE_PX)+2);
+    for(var r=r0;r<=r1;r++)for(var x=x0;x<=x1;x++)if(img[(r*FACE_PX+x)*4+3]>0)return true;return false;}
+  var pos=[],uv=[],si=[],sw=[],e=[0,0,0,0,0,0,0,0];
+  function put(c){vertW(pr,[c.p.x,c.p.y,c.p.z],e);pos.push(c.p.x,c.p.y,c.p.z);uv.push(c.u,c.v);si.push(e[0],e[1],e[2],e[3]);sw.push(e[4],e[5],e[6],e[7]);}
+  for(j=0;j+1<NY;j++)for(i=0;i+1<NX;i++){var A=G[j][i],B=G[j][i+1],C=G[j+1][i+1],Dd=G[j+1][i];
+    if(!A||!B||!C||!Dd||!inked(Math.min(A.u,Dd.u),Math.max(B.u,C.u),A.v,C.v))continue;
+    [A,B,C,A,C,Dd].forEach(put);}
+  if(!pos.length)return null;
+  var gm=new THREE.BufferGeometry();
+  gm.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));gm.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
+  gm.setAttribute('skinIndex',new THREE.Uint16BufferAttribute(si,4));gm.setAttribute('skinWeight',new THREE.Float32BufferAttribute(sw,4));gm.computeVertexNormals();
+  var tex=new THREE.CanvasTexture(cv);tex.encoding=THREE.sRGBEncoding;tex.anisotropy=4;
+  var fm=new THREE.SkinnedMesh(gm,new THREE.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.05,skinning:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-4}));
+  fm.name='Runner_face';fm.frustumCulled=false;fm.renderOrder=1;return fm;
 }
 /* click picking runs on the skinned vertices, so it matches the pose on screen */
 function pickSeg(ray){
