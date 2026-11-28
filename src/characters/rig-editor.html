@@ -16,7 +16,6 @@ var bandOld=false,bandReady=false;                                  /* bandOld: 
 try{var gs=upgrade(JSON.parse(HOST.__init||'{}'));for(k in DEF){if(gs[k]!==undefined&&typeof gs[k]===typeof DEF[k])DEF[k]=gs[k];}defOld=!(gs.fmt>=2);}catch(e){}   /* the settings the shipped Molly was built from are the defaults, so every Reset button goes back to her and not to an older build */
 DEF.fmt=2;
 var DEFM=DEF,DEFC=JSON.parse(JSON.stringify(DEF));   /* Molly's defaults, and Comet's (hers over Molly's); every Reset on a page goes back to that runner's */
-DEFC['face.on']=0;   /* the drawn face is Molly's; Comet keeps her old one unless it is turned on */
 try{var gc=upgrade(JSON.parse(HOST.__initC||'{}'));for(k in DEFC){if(gc[k]!==undefined&&typeof gc[k]===typeof DEFC[k])DEFC[k]=gc[k];}}catch(e){}
 var P=JSON.parse(JSON.stringify(DEF));
 /* A typed or pasted value can go past its slider, but not to where the build breaks (a part with no length, a loop with no time, a million sides): each stat is held to the nearest value that still works. [pattern, least, most, whole numbers only] */

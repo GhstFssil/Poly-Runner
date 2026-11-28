@@ -99,3 +99,4 @@ Add a line with `echo '- ...' >> HISTORY.md`. Nightly sweeps tag theirs `nightly
 - 2026-11-27 16:04 | next | Rig Editor Stretch (drag a part's end or a hair lock's tip to set its Length) and Draw (a stroke from a lock's root sets its own Length, Extra Curl and Angle); HAIRLOCKS[].path; test fu/rigtool1.py; docs
 - 2026-11-27 19:05 | next | Comet: ringlets (new Head stats Ringlet Turns/Width, hair.ring/hair.ringW; hang below the widest line; centre-line locks wave) and no ponytail (new Ponytail switch ponyOn); her own Faceplant (belly-flop, m.fall.* keys); comet.glb re-baked; test fu/ringlet1.py; docs
 - 2026-11-28 11:19 | next | Molly's drawn face: eyes, brows and mouth painted on a face sheet over her head, tuned by new Face stats and a Brows colour in the Rig Editor; molly.glb re-baked
+- 2026-11-28 12:37 | v199 | Drawn face on for Comet too (comet.glb re-baked); v199 published: drawn faces, Stretch and Draw, Comet's ringlets

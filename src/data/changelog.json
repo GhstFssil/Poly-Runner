@@ -1,13 +1,13 @@
 [
   {
     "v": "v199",
-    "d": "Nov 27, 2026",
-    "t": "Molly's drawn face, Stretch and Draw, Comet's ringlets",
+    "d": "Nov 28, 2026",
+    "t": "Drawn faces, Stretch and Draw, Comet's ringlets",
     "g": [
       [
         "Added",
         [
-          "Molly has a drawn face: anime eyes with a heavy lash line and wing, a layered iris with a catch light, slanted brows and a small smile, over a little pyramid nose. In the Rig Editor, Stats > Face sets their size and place, and Colours has a new Brows colour.",
+          "Molly and Comet have drawn faces: anime eyes with a heavy lash line and wing, a layered iris with a catch light, slanted brows and a small smile, over a little pyramid nose. In the Rig Editor, Stats > Face sets their size and place, and Colours has a new Brows colour.",
           "Rig Editor: a Stretch tool under the preview. Drag the dot at the selected part's end to set its length, or the dot at a selected hair lock's tip to set that lock's length.",
           "Rig Editor: a Draw tool under the preview. Drag from where a hair lock leaves the cap and the lock (and its partner) takes the shape of your stroke. Right-drag turns the view while Draw is on.",
           "Comet has her own hair: ringlet curls all round, and no ponytail.",
